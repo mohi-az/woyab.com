@@ -1,0 +1,27 @@
+// User and authentication.
+
+enum UserRole {
+  USER
+  OWNER
+  ADMIN
+  SUPER_ADMIN
+
+  @@map("user_role")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  phone       String?   @unique
+  email       String?   @unique
+  name        String?
+  avatarUrl   String?
+  role        UserRole  @default(USER)
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  businesses  Business[]
+  reviews     Review[]
+
+  @@map("users")
+}

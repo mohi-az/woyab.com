@@ -1,0 +1,45 @@
+enum AttributeDataType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+  DATE
+
+  @@map("attribute_data_type")
+}
+
+/// Defines a possible attribute for a category or sub-category.
+model AttributeDefinition {
+  id            Int               @id @default(autoincrement())
+  key           String
+  labelFa       String
+  labelEn       String?
+  dataType      AttributeDataType
+  unit          String?
+  options       String?
+  categoryId    Int?
+  category      Category?         @relation(fields: [categoryId], references: [id])
+  subCategoryId Int?
+  subCategory   SubCategory?      @relation(fields: [subCategoryId], references: [id])
+  sortOrder     Int               @default(0)
+  active        Boolean           @default(true)
+
+  values BusinessAttribute[]
+
+  @@unique([key, subCategoryId])
+  @@map("attribute_definitions")
+}
+
+/// Stores the value of an attribute for a specific business.
+model BusinessAttribute {
+  id          Int                 @id @default(autoincrement())
+  businessId  String
+  business    Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  attributeId Int
+  attribute   AttributeDefinition @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  value       String
+
+  @@unique([businessId, attributeId])
+  @@map("business_attributes")
+}

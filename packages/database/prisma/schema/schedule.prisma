@@ -1,0 +1,61 @@
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+
+  @@map("day_of_week")
+}
+
+model BusinessHours {
+  id         Int       @id @default(autoincrement())
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  dayOfWeek  DayOfWeek
+  openTime   String?
+  closeTime  String?
+  isClosed   Boolean   @default(false)
+  note       String?
+
+  @@unique([businessId, dayOfWeek])
+  @@map("business_hours")
+}
+
+model Branch {
+  id         String    @id @default(cuid())
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name       String
+  phone      String?
+  mobile     String?
+  address    String?
+  latitude   Float?
+  longitude  Float?
+  cityId     Int?
+  city       City?     @relation(fields: [cityId], references: [id])
+  districtId Int?
+  district   District? @relation(fields: [districtId], references: [id])
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  branchHours BranchHours[]
+
+  @@map("branches")
+}
+
+model BranchHours {
+  id        Int       @id @default(autoincrement())
+  branchId  String
+  branch    Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  dayOfWeek DayOfWeek
+  openTime  String?
+  closeTime String?
+  isClosed  Boolean   @default(false)
+
+  @@unique([branchId, dayOfWeek])
+  @@map("branch_hours")
+}

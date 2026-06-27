@@ -1,0 +1,95 @@
+enum BusinessStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  CLOSED
+  REJECTED
+
+  @@map("business_status")
+}
+
+enum PriceRange {
+  BUDGET
+  MODERATE
+  EXPENSIVE
+  LUXURY
+
+  @@map("price_range")
+}
+
+model Business {
+  id               String         @id @default(cuid())
+  slug             String         @unique
+
+  businessName     String
+  legalName        String?
+  shortDescription String?
+  description      String?
+
+  logoUrl          String?
+  coverImageUrl    String?
+
+  categoryId    Int
+  category      Category     @relation(fields: [categoryId], references: [id])
+  subCategoryId Int?
+  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
+  specialtyId   Int?
+  specialty     Specialty?   @relation(fields: [specialtyId], references: [id])
+
+  ownerId       String?
+  owner         User?        @relation(fields: [ownerId], references: [id])
+
+  establishedYear Int?
+  priceRange      PriceRange?
+
+  phone     String?
+  mobile    String?
+  whatsapp  String?
+  email     String?
+  website   String?
+
+  instagram  String?
+  telegram   String?
+  facebook   String?
+  youtube    String?
+  linkedin   String?
+
+  latitude   Float?
+  longitude  Float?
+  cityId     Int
+  city       City      @relation(fields: [cityId], references: [id])
+  districtId Int?
+  district   District? @relation(fields: [districtId], references: [id])
+  address    String?
+  postalCode String?
+
+  status    BusinessStatus @default(PENDING)
+  verified  Boolean        @default(false)
+  featured  Boolean        @default(false)
+
+  averageRating Float @default(0)
+  reviewCount   Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  services      Service[]
+  reviews       Review[]
+  images        BusinessImage[]
+  videos        BusinessVideo[]
+  documents     Document[]
+  businessHours BusinessHours[]
+  branches      Branch[]
+  posts         Post[]
+  tags          BusinessTag[]
+  attributes    BusinessAttribute[]
+
+  @@index([slug])
+  @@index([cityId])
+  @@index([categoryId])
+  @@index([subCategoryId])
+  @@index([featured])
+  @@index([averageRating])
+  @@index([status])
+  @@map("businesses")
+}

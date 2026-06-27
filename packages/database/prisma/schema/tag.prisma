@@ -1,0 +1,20 @@
+model Tag {
+  id      Int    @id @default(autoincrement())
+  nameFa  String @unique
+  nameEn  String?
+  slug    String @unique
+
+  businesses BusinessTag[]
+
+  @@map("tags")
+}
+
+model BusinessTag {
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  tagId      Int
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([businessId, tagId])
+  @@map("business_tags")
+}

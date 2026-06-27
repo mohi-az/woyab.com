@@ -1,0 +1,20 @@
+model Service {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  price       Decimal? @db.Decimal(14, 2)
+  currency    String   @default("EUR")
+  duration    Int?
+  unit        String?
+
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessId])
+  @@map("services")
+}
