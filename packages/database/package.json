@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:push:dev": "dotenv -e .env.development -- prisma db push",
+    "db:migrate:dev": "dotenv -e .env.development -- prisma migrate dev",
+    "db:push": "dotenv -e .env.production -- prisma db push",
+    "db:migrate": "dotenv -e .env.production -- prisma migrate dev"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +24,8 @@
   "dependencies": {
     "@prisma/client": "^7.8.0",
     "prisma": "^7.8.0"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^11.0.0"
   }
 }
