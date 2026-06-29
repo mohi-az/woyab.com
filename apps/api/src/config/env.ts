@@ -6,6 +6,7 @@ const envSchema = z.object({
   API_VERSION: z.string().min(1).default("v1"),
   APP_NAME: z.string().min(1).default("Fargo API"),
   CORS_ORIGIN: z.string().min(1).default("*"),
+  DATABASE_URL: z.string().min(1),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),

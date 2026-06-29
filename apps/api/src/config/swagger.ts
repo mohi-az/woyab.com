@@ -3,7 +3,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import { env } from "./env.js";
 
 export const openApiSpec = swaggerJSDoc({
-  apis: ["src/routes/**/*.ts", "dist/routes/**/*.js"],
+  apis: ["src/routes/**/*.ts", "src/modules/**/*.ts", "dist/routes/**/*.js", "dist/modules/**/*.js"],
   definition: {
     openapi: "3.0.0",
     info: {

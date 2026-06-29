@@ -1,0 +1,124 @@
+import { Router } from "express";
+
+import { validateRequest } from "../../validation/validate-request.js";
+import { businessController } from "./business.controller.js";
+import { createBusinessBodySchema, updateBusinessBodySchema } from "./business.schema.js";
+
+export const businessRouter = Router();
+
+/**
+ * @openapi
+ * /businesses:
+ *   get:
+ *     summary: List all businesses
+ *     tags: [Businesses]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 20 }
+ *       - in: query
+ *         name: categoryId
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: cityId
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [PENDING, ACTIVE, SUSPENDED, CLOSED, REJECTED] }
+ *       - in: query
+ *         name: featured
+ *         schema: { type: string, enum: [true, false] }
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Paginated list of businesses
+ */
+businessRouter.get("/", businessController.list);
+
+/**
+ * @openapi
+ * /businesses/{id}:
+ *   get:
+ *     summary: Get a business by ID
+ *     tags: [Businesses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Business with full details
+ *       404:
+ *         description: Business not found
+ */
+businessRouter.get("/:id", businessController.getById);
+
+/**
+ * @openapi
+ * /businesses:
+ *   post:
+ *     summary: Create a new business
+ *     tags: [Businesses]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [slug, businessName, categoryId, cityId]
+ *             properties:
+ *               slug: { type: string }
+ *               businessName: { type: string }
+ *               categoryId: { type: integer }
+ *               cityId: { type: integer }
+ *     responses:
+ *       201:
+ *         description: Business created
+ *       409:
+ *         description: Slug already exists
+ */
+businessRouter.post("/", validateRequest({ body: createBusinessBodySchema }), businessController.create);
+
+/**
+ * @openapi
+ * /businesses/{id}:
+ *   patch:
+ *     summary: Update a business
+ *     tags: [Businesses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Updated business
+ *       404:
+ *         description: Business not found
+ */
+businessRouter.patch("/:id", validateRequest({ body: updateBusinessBodySchema }), businessController.update);
+
+/**
+ * @openapi
+ * /businesses/{id}:
+ *   delete:
+ *     summary: Delete a business
+ *     tags: [Businesses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       204:
+ *         description: Business deleted
+ *       404:
+ *         description: Business not found
+ */
+businessRouter.delete("/:id", businessController.delete);

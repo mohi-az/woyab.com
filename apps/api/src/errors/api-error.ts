@@ -45,4 +45,25 @@ export class ApiError extends Error {
       statusCode: 422,
     });
   }
+
+  static conflict(message = "Resource already exists") {
+    return new ApiError(message, {
+      code: "CONFLICT",
+      statusCode: 409,
+    });
+  }
+
+  static unauthorized(message = "Unauthorized") {
+    return new ApiError(message, {
+      code: "UNAUTHORIZED",
+      statusCode: 401,
+    });
+  }
+
+  static forbidden(message = "Forbidden") {
+    return new ApiError(message, {
+      code: "FORBIDDEN",
+      statusCode: 403,
+    });
+  }
 }

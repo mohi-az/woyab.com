@@ -1,8 +1,14 @@
 {
-  "name": "database",
+  "name": "@fargo/database",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Database package for Fargo - Prisma schema, migrations, and generated client.",
+  "main": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:push:dev": "dotenv -e .env.development -- prisma db push",
