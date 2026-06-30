@@ -14,13 +14,17 @@ type BusinessFilter = {
   }>;
 };
 
+type BusinessSort = "latest";
+
 export const businessRepository = {
-  findMany: (skip: number, take: number, where: BusinessFilter = {}) =>
+  findMany: (skip: number, take: number, where: BusinessFilter = {}, sortBy?: BusinessSort) =>
     prisma.business.findMany({
       where,
       skip,
       take,
-      orderBy: [{ featured: "desc" }, { averageRating: "desc" }, { createdAt: "desc" }],
+      orderBy: sortBy === "latest"
+        ? [{ createdAt: "desc" }]
+        : [{ featured: "desc" }, { averageRating: "desc" }, { createdAt: "desc" }],
       select: {
         id: true,
         slug: true,

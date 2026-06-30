@@ -94,6 +94,21 @@ serviceRouter.post("/", validateRequest({ body: createServiceBodySchema }), serv
  *         name: id
  *         required: true
  *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string }
+ *               description: { type: string }
+ *               price: { type: number }
+ *               currency: { type: string, minLength: 3, maxLength: 3 }
+ *               duration: { type: integer }
+ *               unit: { type: string }
+ *               active: { type: boolean }
+ *               sortOrder: { type: integer }
  *     responses:
  *       200:
  *         description: Updated service

@@ -88,6 +88,19 @@ reviewStandaloneRouter.get("/:id", reviewController.getById);
  *         name: id
  *         required: true
  *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating: { type: integer, minimum: 1, maximum: 5 }
+ *               title: { type: string, maxLength: 200 }
+ *               comment: { type: string, maxLength: 2000 }
+ *               visitDate: { type: string, format: date-time }
+ *               status: { type: string, enum: [PENDING, APPROVED, REJECTED] }
+ *               verified: { type: boolean }
  *     responses:
  *       200:
  *         description: Updated review

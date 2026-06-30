@@ -34,6 +34,9 @@ export const businessRouter = Router();
  *       - in: query
  *         name: search
  *         schema: { type: string }
+ *       - in: query
+ *         name: sortBy
+ *         schema: { type: string, enum: [latest] }
  *     responses:
  *       200:
  *         description: Paginated list of businesses
@@ -96,6 +99,45 @@ businessRouter.post("/", validateRequest({ body: createBusinessBodySchema }), bu
  *         name: id
  *         required: true
  *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               slug: { type: string }
+ *               businessName: { type: string }
+ *               legalName: { type: string }
+ *               shortDescription: { type: string, maxLength: 300 }
+ *               description: { type: string }
+ *               logoUrl: { type: string }
+ *               coverImageUrl: { type: string }
+ *               categoryId: { type: integer }
+ *               subCategoryId: { type: integer }
+ *               specialtyId: { type: integer }
+ *               ownerId: { type: string }
+ *               establishedYear: { type: integer, minimum: 1800 }
+ *               priceRange: { type: string, enum: [BUDGET, MODERATE, EXPENSIVE, LUXURY] }
+ *               phone: { type: string }
+ *               mobile: { type: string }
+ *               whatsapp: { type: string }
+ *               email: { type: string }
+ *               website: { type: string }
+ *               instagram: { type: string }
+ *               telegram: { type: string }
+ *               facebook: { type: string }
+ *               youtube: { type: string }
+ *               linkedin: { type: string }
+ *               latitude: { type: number }
+ *               longitude: { type: number }
+ *               cityId: { type: integer }
+ *               districtId: { type: integer }
+ *               address: { type: string }
+ *               postalCode: { type: string }
+ *               status: { type: string, enum: [PENDING, ACTIVE, SUSPENDED, CLOSED, REJECTED] }
+ *               verified: { type: boolean }
+ *               featured: { type: boolean }
  *     responses:
  *       200:
  *         description: Updated business

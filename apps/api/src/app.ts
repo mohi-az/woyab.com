@@ -33,7 +33,21 @@ export const createApp = () => {
   app.use(express.urlencoded({ extended: true }));
 
   app.get("/docs.json", (_req, res) => res.json(openApiSpec));
-  app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
+  app.use(
+    "/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(openApiSpec, {
+      customSiteTitle: `${env.APP_NAME} Docs`,
+      explorer: true,
+      swaggerOptions: {
+        defaultModelsExpandDepth: 1,
+        displayRequestDuration: true,
+        docExpansion: "list",
+        persistAuthorization: true,
+        tryItOutEnabled: true,
+      },
+    }),
+  );
 
   const v = `/${env.API_VERSION}`;
 

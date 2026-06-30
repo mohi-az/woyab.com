@@ -4,7 +4,7 @@ import { businessRepository } from "./business.repository.js";
 
 export const businessService = {
   list: async (query: ListBusinessesQuery) => {
-    const { page, limit, categoryId, subCategoryId, cityId, status, featured, verified, search } = query;
+    const { page, limit, categoryId, subCategoryId, cityId, status, featured, verified, search, sortBy } = query;
     const skip = (page - 1) * limit;
 
     const where = {
@@ -23,7 +23,7 @@ export const businessService = {
     };
 
     const [items, total] = await Promise.all([
-      businessRepository.findMany(skip, limit, where),
+      businessRepository.findMany(skip, limit, where, sortBy),
       businessRepository.count(where),
     ]);
 

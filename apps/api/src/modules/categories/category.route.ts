@@ -145,9 +145,105 @@ categoryRouter.delete("/:id", categoryController.delete);
  *         description: Paginated list of sub-categories
  */
 subCategoryRouter.get("/", subCategoryController.list);
+
+/**
+ * @openapi
+ * /sub-categories/{id}:
+ *   get:
+ *     summary: Get a sub-category by ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Sub-category details
+ *       404:
+ *         description: Sub-category not found
+ */
 subCategoryRouter.get("/:id", subCategoryController.getById);
+
+/**
+ * @openapi
+ * /sub-categories:
+ *   post:
+ *     summary: Create a sub-category
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nameFa, nameEn, slug, categoryId]
+ *             properties:
+ *               nameFa: { type: string }
+ *               nameEn: { type: string }
+ *               slug: { type: string }
+ *               icon: { type: string }
+ *               image: { type: string }
+ *               categoryId: { type: integer }
+ *               sortOrder: { type: integer }
+ *               active: { type: boolean }
+ *     responses:
+ *       201:
+ *         description: Sub-category created
+ */
 subCategoryRouter.post("/", validateRequest({ body: createSubCategoryBodySchema }), subCategoryController.create);
+
+/**
+ * @openapi
+ * /sub-categories/{id}:
+ *   patch:
+ *     summary: Update a sub-category
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nameFa: { type: string }
+ *               nameEn: { type: string }
+ *               slug: { type: string }
+ *               icon: { type: string }
+ *               image: { type: string }
+ *               categoryId: { type: integer }
+ *               sortOrder: { type: integer }
+ *               active: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Updated sub-category
+ *       404:
+ *         description: Sub-category not found
+ */
 subCategoryRouter.patch("/:id", validateRequest({ body: updateSubCategoryBodySchema }), subCategoryController.update);
+
+/**
+ * @openapi
+ * /sub-categories/{id}:
+ *   delete:
+ *     summary: Delete a sub-category
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       204:
+ *         description: Sub-category deleted
+ *       404:
+ *         description: Sub-category not found
+ */
 subCategoryRouter.delete("/:id", subCategoryController.delete);
 
 // ─── Specialty Routes ─────────────────────────────────────────────────────────
@@ -170,7 +266,97 @@ subCategoryRouter.delete("/:id", subCategoryController.delete);
  *         description: Paginated list of specialties
  */
 specialtyRouter.get("/", specialtyController.list);
+
+/**
+ * @openapi
+ * /specialties/{id}:
+ *   get:
+ *     summary: Get a specialty by ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Specialty details
+ *       404:
+ *         description: Specialty not found
+ */
 specialtyRouter.get("/:id", specialtyController.getById);
+
+/**
+ * @openapi
+ * /specialties:
+ *   post:
+ *     summary: Create a specialty
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nameFa, subCategoryId]
+ *             properties:
+ *               nameFa: { type: string }
+ *               nameEn: { type: string }
+ *               subCategoryId: { type: integer }
+ *               sortOrder: { type: integer }
+ *               active: { type: boolean }
+ *     responses:
+ *       201:
+ *         description: Specialty created
+ */
 specialtyRouter.post("/", validateRequest({ body: createSpecialtyBodySchema }), specialtyController.create);
+
+/**
+ * @openapi
+ * /specialties/{id}:
+ *   patch:
+ *     summary: Update a specialty
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nameFa: { type: string }
+ *               nameEn: { type: string }
+ *               subCategoryId: { type: integer }
+ *               sortOrder: { type: integer }
+ *               active: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Updated specialty
+ *       404:
+ *         description: Specialty not found
+ */
 specialtyRouter.patch("/:id", validateRequest({ body: updateSpecialtyBodySchema }), specialtyController.update);
+
+/**
+ * @openapi
+ * /specialties/{id}:
+ *   delete:
+ *     summary: Delete a specialty
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       204:
+ *         description: Specialty deleted
+ *       404:
+ *         description: Specialty not found
+ */
 specialtyRouter.delete("/:id", specialtyController.delete);

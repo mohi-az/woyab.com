@@ -51,6 +51,7 @@ export const listBusinessesQuerySchema = paginationQuerySchema.extend({
   featured: z.enum(["true", "false"]).optional(),
   verified: z.enum(["true", "false"]).optional(),
   search: z.string().optional(),
+  sortBy: z.enum(["latest"]).optional(),
 });
 
 export type CreateBusinessBody = z.infer<typeof createBusinessBodySchema>;

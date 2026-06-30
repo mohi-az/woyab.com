@@ -89,6 +89,19 @@ userRouter.post("/", validateRequest({ body: createUserBodySchema }), userContro
  *         name: id
  *         required: true
  *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone: { type: string }
+ *               email: { type: string }
+ *               name: { type: string }
+ *               avatarUrl: { type: string }
+ *               role: { type: string, enum: [USER, OWNER, ADMIN, SUPER_ADMIN] }
+ *               active: { type: boolean }
  *     responses:
  *       200:
  *         description: Updated user

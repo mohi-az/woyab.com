@@ -77,6 +77,16 @@ tagRouter.post("/", validateRequest({ body: createTagBodySchema }), tagControlle
  *         name: id
  *         required: true
  *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nameFa: { type: string }
+ *               nameEn: { type: string }
+ *               slug: { type: string }
  *     responses:
  *       200:
  *         description: Updated tag
