@@ -1,7 +1,10 @@
 "use client";
 
-// صفحه نمایش داده‌شده هنگام قطع اینترنت (توسط Service Worker)
+import { useTranslations } from "next-intl";
+
 export default function OfflinePage() {
+  const t = useTranslations("Offline");
+
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center gap-6 px-4 text-center">
       <div className="rounded-full bg-orange-50 p-6">
@@ -21,17 +24,15 @@ export default function OfflinePage() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">You&apos;re Offline</h1>
-        <p className="max-w-sm text-gray-500">
-          No internet connection. Please check your network and try again.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="max-w-sm text-gray-500">{t("description")}</p>
       </div>
 
       <button
         onClick={() => window.location.reload()}
         className="btn btn-primary rounded-full px-8"
       >
-        Try Again
+        {t("action")}
       </button>
     </div>
   );

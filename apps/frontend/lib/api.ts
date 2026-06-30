@@ -26,7 +26,7 @@ export async function fetchCategoryCounts(): Promise<Record<number, number>> {
     return Object.fromEntries(
       items.map((cat) => [cat.id, cat._count?.businesses ?? 0]),
     );
-  } catch (error) {
+  } catch {
     return {};
   }
 }

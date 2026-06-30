@@ -1,0 +1,91 @@
+{
+  "Navbar": {
+    "toggleNavigation": "Toggle navigation",
+    "nav": {
+      "home": "Home",
+      "businesses": "Businesses",
+      "allBusinesses": "All businesses",
+      "featured": "Featured",
+      "newListings": "New listings",
+      "pricing": "Pricing",
+      "vendors": "Vendors",
+      "pages": "Pages",
+      "aboutUs": "About us",
+      "howItWorks": "How it works",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "actions": {
+      "user": "User",
+      "vendor": "Vendor"
+    },
+    "userMenu": {
+      "login": "Login",
+      "register": "Register",
+      "profile": "My profile"
+    },
+    "vendorMenu": {
+      "becomeVendor": "Become a vendor",
+      "vendorLogin": "Vendor login",
+      "dashboard": "Dashboard"
+    }
+  },
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "options": {
+      "de": "Deutsch",
+      "en": "English",
+      "fa": "فارسی"
+    }
+  },
+  "Home": {
+    "hero": {
+      "title": "Are You Looking<br></br>For A Business?",
+      "description": "Fargo is the directory for discovering Iranian-owned businesses across Germany, from restaurants and pharmacies to lawyers and beauty salons.",
+      "queryPlaceholder": "I'm looking for",
+      "categoriesLabel": "Categories",
+      "allCategories": "All categories",
+      "locationPlaceholder": "Location",
+      "useCurrentLocation": "Use my current location",
+      "search": "Search",
+      "categories": {
+        "restaurants": "Restaurants",
+        "doctors": "Doctors",
+        "pharmacies": "Pharmacies",
+        "cafes": "Cafes",
+        "supermarkets": "Supermarkets",
+        "lawyers": "Lawyers",
+        "beauty": "Beauty salons",
+        "gyms": "Gyms and sports",
+        "bookstores": "Bookstores",
+        "repair": "Repair shops"
+      },
+      "imageAlts": {
+        "office": "Business office",
+        "coworking": "Coworking space",
+        "grid1": "Modern business interior",
+        "grid2": "City storefront",
+        "grid3": "Local shop"
+      }
+    },
+    "categoriesSection": {
+      "title": "Most Popular Categories",
+      "description": "Browse Iranian-owned businesses in Germany by category",
+      "items": {
+        "restaurantCafe": "Restaurant and cafe",
+        "healthBeauty": "Health and beauty",
+        "homeServices": "Home services",
+        "automotive": "Automotive",
+        "retail": "Retail",
+        "education": "Education",
+        "medical": "Medical",
+        "travelTransport": "Travel and transport"
+      }
+    }
+  },
+  "Offline": {
+    "title": "You're offline",
+    "description": "No internet connection. Please check your network and try again.",
+    "action": "Try again"
+  }
+}

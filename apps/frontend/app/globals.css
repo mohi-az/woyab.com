@@ -20,6 +20,22 @@ body {
   color: #171717;
 }
 
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] button,
+html[dir="rtl"] [role="button"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] .dropdown-content,
+html[dir="rtl"] .menu {
+  text-align: right;
+}
+
 .text-primary {
   color: oklch(64% 0.19 25);
 }

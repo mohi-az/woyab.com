@@ -1,0 +1,91 @@
+{
+  "Navbar": {
+    "toggleNavigation": "Navigation umschalten",
+    "nav": {
+      "home": "Startseite",
+      "businesses": "Unternehmen",
+      "allBusinesses": "Alle Unternehmen",
+      "featured": "Empfohlen",
+      "newListings": "Neue Eintrage",
+      "pricing": "Preise",
+      "vendors": "Anbieter",
+      "pages": "Seiten",
+      "aboutUs": "Uber uns",
+      "howItWorks": "So funktioniert es",
+      "faq": "FAQ",
+      "contact": "Kontakt"
+    },
+    "actions": {
+      "user": "Nutzer",
+      "vendor": "Anbieter"
+    },
+    "userMenu": {
+      "login": "Anmelden",
+      "register": "Registrieren",
+      "profile": "Mein Profil"
+    },
+    "vendorMenu": {
+      "becomeVendor": "Anbieter werden",
+      "vendorLogin": "Anbieter-Login",
+      "dashboard": "Dashboard"
+    }
+  },
+  "LocaleSwitcher": {
+    "label": "Sprache wechseln",
+    "options": {
+      "de": "Deutsch",
+      "en": "English",
+      "fa": "فارسی"
+    }
+  },
+  "Home": {
+    "hero": {
+      "title": "Suchen Sie<br></br>ein Unternehmen?",
+      "description": "Fargo ist das Verzeichnis fur iranische Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
+      "queryPlaceholder": "Ich suche nach",
+      "categoriesLabel": "Kategorien",
+      "allCategories": "Alle Kategorien",
+      "locationPlaceholder": "Standort",
+      "useCurrentLocation": "Meinen aktuellen Standort verwenden",
+      "search": "Suchen",
+      "categories": {
+        "restaurants": "Restaurants",
+        "doctors": "Arzte",
+        "pharmacies": "Apotheken",
+        "cafes": "Cafes",
+        "supermarkets": "Supermarkte",
+        "lawyers": "Anwalte",
+        "beauty": "Kosmetikstudios",
+        "gyms": "Fitness und Sport",
+        "bookstores": "Buchhandlungen",
+        "repair": "Reparaturdienste"
+      },
+      "imageAlts": {
+        "office": "Buro fur Unternehmen",
+        "coworking": "Coworking-Bereich",
+        "grid1": "Modernes Geschaft",
+        "grid2": "Geschaft in der Stadt",
+        "grid3": "Lokales Ladenlokal"
+      }
+    },
+    "categoriesSection": {
+      "title": "Beliebteste Kategorien",
+      "description": "Entdecken Sie iranische Unternehmen in Deutschland nach Kategorien",
+      "items": {
+        "restaurantCafe": "Restaurant und Cafe",
+        "healthBeauty": "Gesundheit und Schonheit",
+        "homeServices": "Dienstleistungen fur zu Hause",
+        "automotive": "Auto",
+        "retail": "Einzelhandel",
+        "education": "Bildung",
+        "medical": "Medizin",
+        "travelTransport": "Reise und Transport"
+      }
+    }
+  },
+  "Offline": {
+    "title": "Sie sind offline",
+    "description": "Keine Internetverbindung. Bitte prufen Sie Ihr Netzwerk und versuchen Sie es erneut.",
+    "action": "Erneut versuchen"
+  }
+}

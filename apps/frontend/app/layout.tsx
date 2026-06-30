@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import Navbar from "@/components/layout/Navbar";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { LocaleObserver } from "@/components/i18n/LocaleObserver";
+import { getDirection, isAppLocale } from "@/i18n/config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,7 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// تنظیمات viewport باید جدا از metadata export شود (Next.js 13+)
 export const viewport: Viewport = {
   themeColor: "#f5735c",
   width: "device-width",
@@ -24,22 +27,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Fargo — Iranian Businesses in Germany",
-  description:
-    "دایرکتوری کسب‌وکارهای ایرانی در آلمان — پزشک، رستوران، داروخانه، وکیل و بیشتر",
-  keywords: ["Iranian businesses", "Germany", "فارسی", "کسب‌وکار ایرانی", "آلمان"],
-  // تنظیمات PWA برای iOS Safari
+  title: "Fargo - Iranian Businesses in Germany",
+  description: "Directory for Iranian businesses in Germany",
+  keywords: ["Iranian businesses", "Germany", "Fargo", "Persian", "Deutsch"],
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Fargo",
   },
-  // غیرفعال کردن تشخیص خودکار شماره تلفن در iOS
   formatDetection: { telephone: false },
-  // آیکون‌های مختلف برای مرورگرها و دستگاه‌ها
   icons: {
     icon: [
-      { url: "/pwa-icons/32",  sizes: "32x32",   type: "image/png" },
+      { url: "/pwa-icons/32", sizes: "32x32", type: "image/png" },
       { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
     ],
     apple: [
@@ -49,20 +48,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const appLocale = isAppLocale(locale) ? locale : "de";
+
   return (
     <html
-      lang="en"
+      lang={appLocale}
+      dir={getDirection(appLocale)}
       data-theme="light"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-gray-900">
-        {/* ثبت Service Worker — فقط در production اجرا می‌شود */}
-        <ServiceWorkerRegistration />
-        <Navbar />
-        <main className="flex-1">{children}</main>
+        <NextIntlClientProvider locale={appLocale} messages={messages}>
+          <LocaleObserver />
+          <ServiceWorkerRegistration />
+          <Navbar />
+          <main className="flex-1">{children}</main>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

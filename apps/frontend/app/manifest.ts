@@ -1,24 +1,21 @@
 import type { MetadataRoute } from "next";
 
-// Web App Manifest برای PWA
-// آدرس سرو: /manifest.webmanifest
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Fargo — Iranian Businesses in Germany",
+    name: "Fargo - Iranian Businesses in Germany",
     short_name: "Fargo",
     description:
-      "دایرکتوری کسب‌وکارهای ایرانی در آلمان — پزشک، رستوران، داروخانه، وکیل و بیشتر",
+      "Verzeichnis iranischer Unternehmen in Deutschland - Restaurants, Apotheken, Anwalte und mehr",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#f5735c",
     orientation: "any",
-    lang: "en",
+    lang: "de",
     categories: ["business", "directory"],
-    // آیکون‌ها از route داینامیک /pwa-icons/[size] سرو می‌شوند
     icons: [
-      { src: "/pwa-icons/72",  sizes: "72x72",   type: "image/png" },
-      { src: "/pwa-icons/96",  sizes: "96x96",   type: "image/png" },
+      { src: "/pwa-icons/72", sizes: "72x72", type: "image/png" },
+      { src: "/pwa-icons/96", sizes: "96x96", type: "image/png" },
       { src: "/pwa-icons/128", sizes: "128x128", type: "image/png" },
       { src: "/pwa-icons/144", sizes: "144x144", type: "image/png" },
       { src: "/pwa-icons/152", sizes: "152x152", type: "image/png" },
@@ -28,9 +25,9 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       {
-        name: "Search Businesses",
-        short_name: "Search",
-        description: "Search for Iranian businesses in Germany",
+        name: "Unternehmen suchen",
+        short_name: "Suche",
+        description: "Suche nach iranischen Unternehmen in Deutschland",
         url: "/businesses?ref=pwa-shortcut",
         icons: [{ src: "/pwa-icons/96", sizes: "96x96", type: "image/png" }],
       },

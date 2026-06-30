@@ -1,0 +1,91 @@
+{
+  "Navbar": {
+    "toggleNavigation": "تغییر نمایش منو",
+    "nav": {
+      "home": "خانه",
+      "businesses": "کسب و کارها",
+      "allBusinesses": "همه کسب و کارها",
+      "featured": "ویژه",
+      "newListings": "جدیدترین‌ها",
+      "pricing": "قیمت‌ها",
+      "vendors": "فروشندگان",
+      "pages": "صفحات",
+      "aboutUs": "درباره ما",
+      "howItWorks": "نحوه کار",
+      "faq": "سوالات متداول",
+      "contact": "تماس با ما"
+    },
+    "actions": {
+      "user": "کاربر",
+      "vendor": "فروشنده"
+    },
+    "userMenu": {
+      "login": "ورود",
+      "register": "ثبت نام",
+      "profile": "پروفایل من"
+    },
+    "vendorMenu": {
+      "becomeVendor": "فروشنده شوید",
+      "vendorLogin": "ورود فروشنده",
+      "dashboard": "داشبورد"
+    }
+  },
+  "LocaleSwitcher": {
+    "label": "تغییر زبان",
+    "options": {
+      "de": "Deutsch",
+      "en": "English",
+      "fa": "فارسی"
+    }
+  },
+  "Home": {
+    "hero": {
+      "title": "دنبال یک<br></br>کسب و کار هستید؟",
+      "description": "فارگو دایرکتوری پیدا کردن کسب و کارهای ایرانی در سراسر آلمان است؛ از رستوران و داروخانه تا وکیل و سالن زیبایی.",
+      "queryPlaceholder": "دنبال چه چیزی هستید؟",
+      "categoriesLabel": "دسته‌بندی‌ها",
+      "allCategories": "همه دسته‌بندی‌ها",
+      "locationPlaceholder": "موقعیت",
+      "useCurrentLocation": "استفاده از موقعیت فعلی من",
+      "search": "جستجو",
+      "categories": {
+        "restaurants": "رستوران‌ها",
+        "doctors": "پزشکان",
+        "pharmacies": "داروخانه‌ها",
+        "cafes": "کافه‌ها",
+        "supermarkets": "سوپرمارکت‌ها",
+        "lawyers": "وکیل‌ها",
+        "beauty": "سالن‌های زیبایی",
+        "gyms": "ورزش و باشگاه",
+        "bookstores": "کتاب‌فروشی‌ها",
+        "repair": "تعمیرگاه‌ها"
+      },
+      "imageAlts": {
+        "office": "دفتر کسب و کار",
+        "coworking": "فضای کار اشتراکی",
+        "grid1": "فضای مدرن کسب و کار",
+        "grid2": "فروشگاه شهری",
+        "grid3": "فروشگاه محلی"
+      }
+    },
+    "categoriesSection": {
+      "title": "محبوب‌ترین دسته‌بندی‌ها",
+      "description": "کسب و کارهای ایرانی در آلمان را بر اساس دسته‌بندی مرور کنید",
+      "items": {
+        "restaurantCafe": "رستوران و کافه",
+        "healthBeauty": "سلامت و زیبایی",
+        "homeServices": "خدمات منزل",
+        "automotive": "خودرو",
+        "retail": "فروشگاهی",
+        "education": "آموزش",
+        "medical": "پزشکی",
+        "travelTransport": "سفر و حمل و نقل"
+      }
+    }
+  },
+  "Offline": {
+    "title": "شما آفلاین هستید",
+    "description": "اتصال اینترنت در دسترس نیست. لطفا شبکه خود را بررسی کنید و دوباره تلاش کنید.",
+    "action": "تلاش دوباره"
+  }
+}
