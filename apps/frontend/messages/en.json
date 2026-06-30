@@ -81,6 +81,17 @@
         "medical": "Medical",
         "travelTransport": "Travel and transport"
       }
+    },
+    "latestBusinessesSection": {
+      "eyebrow": "Fresh on Fargo",
+      "title": "Latest businesses",
+      "description": "Take a quick look at the newest active businesses added to the directory.",
+      "cta": "All businesses",
+      "favoriteAction": "Add to favorites",
+      "metaLabel": "New listing",
+      "priceRangeLabel": "Price range",
+      "reviews": "{count, plural, =0 {No reviews} one {# review} other {# reviews}}",
+      "unknownLocation": "Location not available"
     }
   },
   "Offline": {

@@ -109,3 +109,12 @@ html[dir="rtl"] .menu {
   background-color: oklch(64% 0.19 25);
   color: white;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,35 +1,7 @@
 import Link from "next/link";
-import type { ElementType } from "react";
 import { getTranslations } from "next-intl/server";
-import {
-  MdDirectionsCar,
-  MdFlight,
-  MdHomeRepairService,
-  MdLocalHospital,
-  MdRestaurant,
-  MdSchool,
-  MdSpa,
-  MdStorefront,
-} from "react-icons/md";
 import { fetchCategoryCounts } from "@/lib/api";
-
-type CategoryDef = {
-  dbId: number;
-  labelKey: string;
-  icon: ElementType;
-  slug: string;
-};
-
-const FEATURED_CATEGORIES: CategoryDef[] = [
-  { dbId: 1, labelKey: "restaurantCafe", icon: MdRestaurant, slug: "restaurant-cafe" },
-  { dbId: 2, labelKey: "healthBeauty", icon: MdSpa, slug: "health-beauty" },
-  { dbId: 4, labelKey: "homeServices", icon: MdHomeRepairService, slug: "home-services" },
-  { dbId: 5, labelKey: "automotive", icon: MdDirectionsCar, slug: "automotive" },
-  { dbId: 6, labelKey: "retail", icon: MdStorefront, slug: "retail" },
-  { dbId: 7, labelKey: "education", icon: MdSchool, slug: "education" },
-  { dbId: 8, labelKey: "medical", icon: MdLocalHospital, slug: "medical" },
-  { dbId: 10, labelKey: "travelTransport", icon: MdFlight, slug: "travel-transport" },
-];
+import { FEATURED_CATEGORIES } from "@/lib/business-categories";
 
 export default async function CategoriesSection() {
   const counts = await fetchCategoryCounts();

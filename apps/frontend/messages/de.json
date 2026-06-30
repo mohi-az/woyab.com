@@ -81,6 +81,17 @@
         "medical": "Medizin",
         "travelTransport": "Reise und Transport"
       }
+    },
+    "latestBusinessesSection": {
+      "eyebrow": "Neu bei Fargo",
+      "title": "Neueste Unternehmen",
+      "description": "Ein schneller Blick auf die neuesten aktiven Eintrage im Verzeichnis.",
+      "cta": "Alle Unternehmen",
+      "favoriteAction": "Zu Favoriten hinzufugen",
+      "metaLabel": "Neuer Eintrag",
+      "priceRangeLabel": "Preisklasse",
+      "reviews": "{count, plural, =0 {Keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
+      "unknownLocation": "Standort nicht verfugbar"
     }
   },
   "Offline": {
