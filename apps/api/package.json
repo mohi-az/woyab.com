@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "node --loader ts-node/esm --watch src/server.ts",
+    "dev": "node --env-file=../../packages/database/.env.development --loader ts-node/esm --watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node --env-file=../../packages/database/.env.production dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

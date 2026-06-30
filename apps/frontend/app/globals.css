@@ -1,26 +1,95 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root,
+[data-theme="light"] {
+  --color-primary: oklch(64% 0.19 25);
+  --color-primary-content: oklch(100% 0 0);
+  --color-base-100: #ffffff;
+  --color-base-200: #f8f8f8;
+  --color-base-300: #f0f0f0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: #ffffff;
+  color: #171717;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.text-primary {
+  color: oklch(64% 0.19 25);
+}
+.bg-primary {
+  background-color: oklch(64% 0.19 25);
+}
+.border-primary {
+  border-color: oklch(64% 0.19 25);
+}
+
+/* انیمیشن‌های شناور شکل‌های تزئینی — مقدار px ثابت تا روی هر اندازه‌ای دیده شود */
+@keyframes float-y-slow {
+  0%,
+  100% { transform: translateY(0px); }
+  50%  { transform: translateY(-22px); }
+}
+
+@keyframes float-y-slower {
+  0%,
+  100% { transform: translateY(0px); }
+  50%  { transform: translateY(22px); }
+}
+
+@keyframes float-x-slow {
+  0%,
+  100% { transform: translateX(0px); }
+  50%  { transform: translateX(22px); }
+}
+
+@keyframes float-x-slower {
+  0%,
+  100% { transform: translateX(0px); }
+  50%  { transform: translateX(-22px); }
+}
+
+.float-y-slow    { animation: float-y-slow   6s   ease-in-out infinite; }
+.float-y-slower  { animation: float-y-slower 7.5s ease-in-out 0.8s infinite; }
+.float-x-slow    { animation: float-x-slow   7s   ease-in-out infinite; }
+.float-x-slower  { animation: float-x-slower 8.5s ease-in-out 1.1s infinite; }
+
+/* ---- Category card hover effects ---- */
+
+/* punch + spring: ضربه سریع و ارتعاش میرا */
+@keyframes icon-punch {
+  0%   { transform: scale(1);    }
+  18%  { transform: scale(1.48); }
+  34%  { transform: scale(0.82); }
+  48%  { transform: scale(1.28); }
+  60%  { transform: scale(0.90); }
+  70%  { transform: scale(1.12); }
+  79%  { transform: scale(0.95); }
+  87%  { transform: scale(1.05); }
+  93%  { transform: scale(0.98); }
+  97%  { transform: scale(1.02); }
+  100% { transform: scale(1);    }
+}
+
+.cat-icon {
+  will-change: transform;
+}
+
+.cat-card:hover .cat-icon {
+  animation: icon-punch 0.75s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.count-badge {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cat-card:hover .count-badge {
+  background-color: oklch(64% 0.19 25);
+  color: white;
 }

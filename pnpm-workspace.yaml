@@ -2,6 +2,10 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
+  '@parcel/watcher': true
   '@prisma/engines': true
   '@scarf/scarf': false
+  '@swc/core': true
   prisma: true
+  sharp: false
+  unrs-resolver: false

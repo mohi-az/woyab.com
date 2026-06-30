@@ -28,6 +28,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# PWA — فایل‌های Service Worker که توسط next-pwa در build تولید می‌شوند
+# sw.js دستی است و نباید نادیده گرفته شود
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/worker-*.js
+/public/fallback-*.js
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)

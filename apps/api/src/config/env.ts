@@ -6,7 +6,7 @@ const envSchema = z.object({
   API_VERSION: z.string().min(1).default("v1"),
   APP_NAME: z.string().min(1).default("Fargo API"),
   CORS_ORIGIN: z.string().min(1).default("*"),
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL: z.string().min(1).optional(),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
@@ -19,7 +19,21 @@ if (!parsedEnv.success) {
   process.exit(1);
 }
 
-export const env = parsedEnv.data;
+export const env = {
+  ...parsedEnv.data,
+  DATABASE_URL:
+    parsedEnv.data.DATABASE_URL ??
+    (parsedEnv.data.NODE_ENV === "development"
+      ? "postgresql://localhost:5432/postgres"
+      : undefined),
+};
+
+if (!env.DATABASE_URL) {
+  console.error("Invalid environment configuration", {
+    DATABASE_URL: "DATABASE_URL is required outside development",
+  });
+  process.exit(1);
+}
 
 export const corsOrigins =
   env.CORS_ORIGIN === "*" ? "*" : env.CORS_ORIGIN.split(",").map((origin) => origin.trim());
