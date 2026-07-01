@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 
 import {
-  locationRetrieveQuerySchema,
   locationSuggestionQuerySchema,
   reverseGeocodeBodySchema,
 } from "./geo.schema.js";
@@ -15,11 +14,6 @@ export const geoController = {
   suggest: async (req: Request, res: Response) => {
     const query = locationSuggestionQuerySchema.parse(req.body);
     res.json({ success: true, data: await geoService.suggest(query) });
-  },
-
-  retrieve: async (req: Request, res: Response) => {
-    const query = locationRetrieveQuerySchema.parse(req.body);
-    res.json({ success: true, data: await geoService.retrieve(query) });
   },
 
   reverse: async (req: Request, res: Response) => {

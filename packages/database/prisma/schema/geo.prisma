@@ -21,6 +21,40 @@ enum SavedLocationIcon {
   @@map("saved_location_icon")
 }
 
+enum LocationCatalogKind {
+  CITY
+  DISTRICT
+  LOCALITY
+
+  @@map("location_catalog_kind")
+}
+
+model LocationCatalogEntry {
+  id             Int                 @id @default(autoincrement())
+  source         String
+  sourceId       String
+  name           String
+  asciiName      String?
+  alternateNames String[]            @default([])
+  searchText     String
+  featureCode    String
+  kind           LocationCatalogKind
+  countryCode    String              @default("DE")
+  admin1Code     String?
+  admin1Name     String?
+  parentName     String?
+  latitude       Float
+  longitude      Float
+  geoPoint       Unsupported("geography(Point,4326)")? @map("geo_point")
+  population     BigInt              @default(0)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@unique([source, sourceId])
+  @@index([countryCode, kind])
+  @@map("location_catalog_entries")
+}
+
 model BusinessLocation {
   id              String               @id @default(cuid())
   businessId      String

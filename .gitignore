@@ -62,4 +62,5 @@ Desktop.ini
 
 
 AI-Development-Guide.md5
-/apps/api/src/scripts/
+/apps/api/src/scripts/*
+!/apps/api/src/scripts/import-geonames-locations.ts

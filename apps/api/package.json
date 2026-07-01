@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "locations:import:geonames": "node --env-file=../../packages/database/.env.development --loader ts-node/esm src/scripts/import-geonames-locations.ts",
+    "locations:import:geonames:prod": "node --env-file=../../packages/database/.env.production --loader ts-node/esm src/scripts/import-geonames-locations.ts",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

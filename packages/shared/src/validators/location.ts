@@ -36,7 +36,6 @@ export const businessSearchBodySchema = paginationQuerySchema.extend({
 
 export const locationSuggestionQuerySchema = z.object({
   q: z.string().trim().min(3).max(120),
-  sessionToken: z.string().uuid(),
   language: z.enum(["de", "en", "fa"]).default("de"),
   proximityLatitude: z.coerce.number().min(-90).max(90).optional(),
   proximityLongitude: z.coerce.number().min(-180).max(180).optional(),
@@ -48,12 +47,6 @@ export const locationSuggestionQuerySchema = z.object({
       message: "Both proximity coordinates are required",
     });
   }
-});
-
-export const locationRetrieveQuerySchema = z.object({
-  mapboxId: z.string().min(1).max(300),
-  sessionToken: z.string().uuid(),
-  language: z.enum(["de", "en", "fa"]).default("de"),
 });
 
 export const reverseGeocodeBodySchema = z.object({

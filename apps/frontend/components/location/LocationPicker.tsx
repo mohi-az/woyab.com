@@ -28,6 +28,11 @@ type Suggestion = {
   primaryText: string;
   secondaryText: string;
   type: string;
+  latitude: number;
+  longitude: number;
+  city?: string | null;
+  district?: string | null;
+  providerId?: string | null;
 };
 
 export type LocationPickerLabels = {
@@ -84,17 +89,11 @@ export function LocationPicker({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [status, setStatus] = useState<"idle" | "searching" | "locating" | "retrieving">("idle");
+  const [status, setStatus] = useState<"idle" | "searching" | "locating">("idle");
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const operationRef = useRef(0);
   const skipFirstPersistRef = useRef(false);
-  const sessionTokenRef = useRef<string | null>(null);
-
-  function sessionToken() {
-    if (!sessionTokenRef.current) sessionTokenRef.current = crypto.randomUUID();
-    return sessionTokenRef.current;
-  }
 
   useEffect(() => {
     try {
@@ -151,7 +150,6 @@ export function LocationPicker({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             q: query.trim(),
-            sessionToken: sessionToken(),
             language,
             proximityLatitude: proximity?.latitude,
             proximityLongitude: proximity?.longitude,
@@ -176,33 +174,23 @@ export function LocationPicker({
     return () => window.clearTimeout(timer);
   }, [labels.unavailable, language, proximity?.latitude, proximity?.longitude, query, value?.label]);
 
-  async function selectSuggestion(suggestion: Suggestion) {
-    const operation = ++operationRef.current;
-    setStatus("retrieving");
+  function selectSuggestion(suggestion: Suggestion) {
+    operationRef.current += 1;
     setError(null);
-    try {
-      const response = await fetch("/api/geo/retrieve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mapboxId: suggestion.id,
-          sessionToken: sessionToken(),
-          language,
-        }),
-      });
-      if (!response.ok) throw new Error("provider");
-      const json = (await response.json()) as { data: Omit<LocationValue, "source"> & { providerId?: string } };
-      if (operation !== operationRef.current) return;
-      const selected: LocationValue = { ...json.data, source: "MANUAL" };
-      setQuery(selected.label);
-      setOpen(false);
-      setSuggestions([]);
-      onChange(selected);
-    } catch {
-      setError(labels.unavailable);
-    } finally {
-      setStatus("idle");
-    }
+    const selected: LocationValue = {
+      source: "MANUAL",
+      label: suggestion.label,
+      latitude: suggestion.latitude,
+      longitude: suggestion.longitude,
+      city: suggestion.city,
+      district: suggestion.district,
+      providerId: suggestion.providerId,
+    };
+    setQuery(selected.label);
+    setOpen(false);
+    setSuggestions([]);
+    setStatus("idle");
+    onChange(selected);
   }
 
   function useCurrentLocation() {
@@ -300,7 +288,7 @@ export function LocationPicker({
       setActiveIndex((index) => Math.max(index - 1, 0));
     } else if (event.key === "Enter" && activeIndex >= 0) {
       event.preventDefault();
-      void selectSuggestion(suggestions[activeIndex]);
+      selectSuggestion(suggestions[activeIndex]);
     } else if (event.key === "Escape") {
       setOpen(false);
     }
@@ -385,7 +373,7 @@ export function LocationPicker({
                 key={suggestion.id}
                 type="button"
                 onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => void selectSuggestion(suggestion)}
+                onClick={() => selectSuggestion(suggestion)}
                 className={`flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-start transition ${activeIndex === index ? "bg-primary/10" : "hover:bg-gray-50"}`}
               >
                 <FiMapPin className="mt-0.5 shrink-0 text-primary" />
@@ -397,6 +385,9 @@ export function LocationPicker({
             )) : <p className="p-4 text-center text-sm text-gray-500">{labels.noResults}</p>}
           </div>
         ) : null}
+        <p className="mt-1.5 text-[10px] text-gray-400">
+          Location data: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="underline hover:text-gray-600">GeoNames</a>
+        </p>
       </div>
 
       {error ? <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">{error}</p> : null}

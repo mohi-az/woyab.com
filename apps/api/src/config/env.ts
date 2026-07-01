@@ -8,9 +8,7 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().min(1).default("*"),
   DATABASE_URL: z.string().min(1).optional(),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
-  MAPBOX_ACCESS_TOKEN: z.string().min(1).optional(),
   MAPBOX_PUBLIC_TOKEN: z.string().min(1).optional(),
-  MAPBOX_COUNTRY: z.string().length(2).toUpperCase().default("DE"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
 });

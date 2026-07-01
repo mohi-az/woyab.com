@@ -1,125 +1,104 @@
+import { Prisma } from "@fargo/database";
+
 import { env } from "../../config/env.js";
 import { ApiError } from "../../errors/api-error.js";
+import { prisma } from "../../lib/prisma.js";
 
-type MapboxContext = Record<string, { name?: string; mapbox_id?: string } | undefined>;
-
-type MapboxSuggestion = {
-  name?: string;
-  mapbox_id?: string;
-  feature_type?: string;
-  address?: string;
-  full_address?: string;
-  place_formatted?: string;
+type CatalogRow = {
+  source: string;
+  sourceId: string;
+  name: string;
+  kind: "CITY" | "DISTRICT" | "LOCALITY";
+  admin1Name: string | null;
+  parentName: string | null;
+  latitude: number;
+  longitude: number;
 };
 
-type MapboxFeature = {
-  geometry?: { coordinates?: [number, number] };
-  properties?: MapboxSuggestion & { context?: MapboxContext };
-};
-
-function accessToken() {
-  if (!env.MAPBOX_ACCESS_TOKEN) {
-    throw ApiError.serviceUnavailable("Location search is not configured");
-  }
-  return env.MAPBOX_ACCESS_TOKEN;
+function normalizeQuery(value: string) {
+  return value.toLocaleLowerCase("de-DE").normalize("NFKD").replace(/\p{M}/gu, "");
 }
 
-async function mapboxJson<T>(url: URL): Promise<T> {
-  const response = await fetch(url, { headers: { Accept: "application/json" } });
-  if (!response.ok) {
-    throw ApiError.serviceUnavailable("Location provider is temporarily unavailable");
-  }
-  return response.json() as Promise<T>;
+function locationLabel(row: CatalogRow) {
+  return [...new Set([row.name, row.parentName, row.admin1Name, "Deutschland"].filter(Boolean))].join(", ");
 }
 
-function contextName(context: MapboxContext | undefined, keys: string[]) {
-  for (const key of keys) {
-    const name = context?.[key]?.name;
-    if (name) return name;
-  }
-  return null;
-}
-
-function normalizeFeature(feature: MapboxFeature) {
-  const properties = feature.properties ?? {};
-  const coordinates = feature.geometry?.coordinates;
-  if (!coordinates || coordinates.length < 2) {
-    throw ApiError.serviceUnavailable("Location provider returned an invalid result");
-  }
-
+function normalizedLocation(row: CatalogRow, coordinates?: { latitude: number; longitude: number }) {
+  const isDistrict = row.kind === "DISTRICT";
   return {
-    providerId: properties.mapbox_id ?? null,
-    label: properties.full_address ?? [properties.name, properties.place_formatted].filter(Boolean).join(", "),
-    latitude: coordinates[1],
-    longitude: coordinates[0],
-    city: contextName(properties.context, ["place", "locality"]),
-    district: contextName(properties.context, ["neighborhood", "district"]),
+    providerId: `${row.source.toLocaleLowerCase()}:${row.sourceId}`,
+    label: locationLabel(row),
+    latitude: coordinates?.latitude ?? row.latitude,
+    longitude: coordinates?.longitude ?? row.longitude,
+    city: isDistrict ? row.parentName : row.name,
+    district: isDistrict ? row.name : null,
   };
 }
 
 export const geoService = {
   mapConfig: () => {
-    const publicToken = env.MAPBOX_PUBLIC_TOKEN ??
-      (env.MAPBOX_ACCESS_TOKEN?.startsWith("pk.") ? env.MAPBOX_ACCESS_TOKEN : undefined);
-    if (!publicToken) throw ApiError.serviceUnavailable("Map display is not configured");
-    return { accessToken: publicToken, style: "mapbox://styles/mapbox/streets-v12" };
+    if (!env.MAPBOX_PUBLIC_TOKEN) throw ApiError.serviceUnavailable("Map display is not configured");
+    return { accessToken: env.MAPBOX_PUBLIC_TOKEN, style: "mapbox://styles/mapbox/streets-v12" };
   },
 
   suggest: async (query: {
     q: string;
-    sessionToken: string;
     language: "de" | "en" | "fa";
     proximityLatitude?: number;
     proximityLongitude?: number;
   }) => {
-    const url = new URL("https://api.mapbox.com/search/searchbox/v1/suggest");
-    url.searchParams.set("q", query.q);
-    url.searchParams.set("access_token", accessToken());
-    url.searchParams.set("session_token", query.sessionToken);
-    url.searchParams.set("country", env.MAPBOX_COUNTRY);
-    url.searchParams.set("language", query.language);
-    url.searchParams.set("types", "city,locality,neighborhood,address,street,postcode");
-    url.searchParams.set("limit", "6");
-    if (query.proximityLatitude !== undefined && query.proximityLongitude !== undefined) {
-      url.searchParams.set("proximity", `${query.proximityLongitude},${query.proximityLatitude}`);
-    }
+    const normalized = normalizeQuery(query.q);
+    const contains = `%${normalized}%`;
+    const prefix = `${normalized}%`;
+    const proximity = query.proximityLatitude !== undefined && query.proximityLongitude !== undefined
+      ? Prisma.sql`ST_SetSRID(ST_MakePoint(${query.proximityLongitude}, ${query.proximityLatitude}), 4326)::geography`
+      : null;
+    const distanceOrder = proximity
+      ? Prisma.sql`ST_Distance("geo_point", ${proximity}) ASC,`
+      : Prisma.empty;
 
-    const data = await mapboxJson<{ suggestions?: MapboxSuggestion[] }>(url);
-    return (data.suggestions ?? []).flatMap((suggestion) => {
-      if (!suggestion.mapbox_id || !suggestion.name) return [];
-      return [{
-        id: suggestion.mapbox_id,
-        label: suggestion.full_address ?? [suggestion.name, suggestion.place_formatted].filter(Boolean).join(", "),
-        primaryText: suggestion.name,
-        secondaryText: suggestion.place_formatted ?? "",
-        type: suggestion.feature_type ?? "place",
-      }];
-    });
-  },
+    const rows = await prisma.$queryRaw<CatalogRow[]>(Prisma.sql`
+      SELECT
+        "source", "sourceId", "name", "kind"::text AS "kind",
+        "admin1Name", "parentName", "latitude", "longitude"
+      FROM "location_catalog_entries"
+      WHERE "countryCode" = 'DE' AND "searchText" ILIKE ${contains}
+      ORDER BY
+        LOWER("name") = LOWER(${query.q}) DESC,
+        "searchText" ILIKE ${prefix} DESC,
+        ${distanceOrder}
+        CASE "kind"
+          WHEN 'CITY'::"location_catalog_kind" THEN 0
+          WHEN 'DISTRICT'::"location_catalog_kind" THEN 1
+          ELSE 2
+        END,
+        "population" DESC,
+        "name" ASC
+      LIMIT 8
+    `);
 
-  retrieve: async (query: { mapboxId: string; sessionToken: string; language: "de" | "en" | "fa" }) => {
-    const url = new URL(`https://api.mapbox.com/search/searchbox/v1/retrieve/${encodeURIComponent(query.mapboxId)}`);
-    url.searchParams.set("access_token", accessToken());
-    url.searchParams.set("session_token", query.sessionToken);
-    url.searchParams.set("language", query.language);
-    const data = await mapboxJson<{ features?: MapboxFeature[] }>(url);
-    const feature = data.features?.[0];
-    if (!feature) throw ApiError.notFound("Location not found");
-    return normalizeFeature(feature);
+    return rows.map((row) => ({
+      id: `${row.source.toLocaleLowerCase()}:${row.sourceId}`,
+      ...normalizedLocation(row),
+      primaryText: row.name,
+      secondaryText: [...new Set([row.parentName, row.admin1Name, "Deutschland"].filter(Boolean))].join(", "),
+      type: row.kind.toLocaleLowerCase(),
+    }));
   },
 
   reverse: async (input: { latitude: number; longitude: number; language: "de" | "en" | "fa" }) => {
-    const url = new URL("https://api.mapbox.com/search/geocode/v6/reverse");
-    url.searchParams.set("access_token", accessToken());
-    url.searchParams.set("longitude", String(input.longitude));
-    url.searchParams.set("latitude", String(input.latitude));
-    url.searchParams.set("country", env.MAPBOX_COUNTRY);
-    url.searchParams.set("language", input.language);
-    url.searchParams.set("types", "address,neighborhood,locality,place");
-    url.searchParams.set("limit", "1");
-    const data = await mapboxJson<{ features?: MapboxFeature[] }>(url);
-    const feature = data.features?.[0];
-    if (!feature) {
+    const point = Prisma.sql`ST_SetSRID(ST_MakePoint(${input.longitude}, ${input.latitude}), 4326)::geography`;
+    const rows = await prisma.$queryRaw<CatalogRow[]>(Prisma.sql`
+      SELECT
+        "source", "sourceId", "name", "kind"::text AS "kind",
+        "admin1Name", "parentName", "latitude", "longitude"
+      FROM "location_catalog_entries"
+      WHERE "countryCode" = 'DE' AND ST_DWithin("geo_point", ${point}, 75000)
+      ORDER BY "geo_point" <-> ${point}
+      LIMIT 1
+    `);
+    const nearest = rows[0];
+    if (!nearest) {
       return {
         providerId: null,
         label: `${input.latitude.toFixed(5)}, ${input.longitude.toFixed(5)}`,
@@ -129,6 +108,6 @@ export const geoService = {
         district: null,
       };
     }
-    return normalizeFeature(feature);
+    return normalizedLocation(nearest, input);
   },
 };
