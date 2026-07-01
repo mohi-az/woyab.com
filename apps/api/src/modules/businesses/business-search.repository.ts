@@ -2,6 +2,7 @@ import { Prisma } from "@fargo/database";
 import type { BusinessSearchBody } from "@fargo/shared";
 
 import { prisma } from "../../lib/prisma.js";
+import { appLocaleToContentLocale } from "./business-localization.js";
 
 export type SpatialBusinessMatch = {
   businessId: string;
@@ -11,6 +12,8 @@ export type SpatialBusinessMatch = {
   locationName: string | null;
   cityNameEn: string | null;
   cityNameFa: string | null;
+  businessName: string;
+  shortDescription: string | null;
 };
 
 function spatialConditions(input: BusinessSearchBody) {
@@ -18,6 +21,7 @@ function spatialConditions(input: BusinessSearchBody) {
   if (!origin) throw new Error("Spatial search requires an origin");
 
   const point = Prisma.sql`ST_SetSRID(ST_MakePoint(${origin.longitude}, ${origin.latitude}), 4326)::geography`;
+  const requestedLocale = appLocaleToContentLocale(input.locale);
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
     Prisma.sql`bl."active" = TRUE`,
@@ -32,14 +36,27 @@ function spatialConditions(input: BusinessSearchBody) {
   if (input.cityId) conditions.push(Prisma.sql`bl."cityId" = ${input.cityId}`);
   if (input.search) {
     const term = `%${input.search}%`;
-    conditions.push(Prisma.sql`(b."businessName" ILIKE ${term} OR b."shortDescription" ILIKE ${term})`);
+    conditions.push(Prisma.sql`(
+      b."businessName" ILIKE ${term}
+      OR b."shortDescription" ILIKE ${term}
+      OR EXISTS (
+        SELECT 1
+        FROM "business_translations" bt_search
+        WHERE bt_search."businessId" = b."id"
+          AND (
+            bt_search."businessName" ILIKE ${term}
+            OR bt_search."shortDescription" ILIKE ${term}
+            OR bt_search."description" ILIKE ${term}
+          )
+      )
+    )`);
   }
 
-  return { point, where: Prisma.join(conditions, " AND ") };
+  return { point, where: Prisma.join(conditions, " AND "), requestedLocale };
 }
 
 export async function findNearbyBusinesses(input: BusinessSearchBody) {
-  const { point, where } = spatialConditions(input);
+  const { point, where, requestedLocale } = spatialConditions(input);
   const skip = (input.page - 1) * input.limit;
   const orderBy = input.sortBy === "latest"
     ? Prisma.sql`"createdAt" DESC, "businessId" ASC`
@@ -55,6 +72,8 @@ export async function findNearbyBusinesses(input: BusinessSearchBody) {
       bl."name" AS "locationName",
       city."nameEn" AS "cityNameEn",
       city."nameFa" AS "cityNameFa",
+      COALESCE(bt_requested."businessName", bt_source."businessName", b."businessName") AS "businessName",
+      COALESCE(bt_requested."shortDescription", bt_source."shortDescription", b."shortDescription") AS "shortDescription",
       b."featured" AS "featured",
       b."averageRating" AS "averageRating",
       b."createdAt" AS "createdAt",
@@ -66,6 +85,10 @@ export async function findNearbyBusinesses(input: BusinessSearchBody) {
     FROM "businesses" b
     JOIN "business_locations" bl ON bl."businessId" = b."id"
     LEFT JOIN "cities" city ON city."id" = bl."cityId"
+    LEFT JOIN "business_translations" bt_requested
+      ON bt_requested."businessId" = b."id" AND bt_requested."locale" = ${requestedLocale}::"content_locale"
+    LEFT JOIN "business_translations" bt_source
+      ON bt_source."businessId" = b."id" AND bt_source."locale" = b."sourceLocale"
     WHERE ${where}
   `;
 
@@ -74,7 +97,7 @@ export async function findNearbyBusinesses(input: BusinessSearchBody) {
       WITH candidates AS (${candidates})
       SELECT
         "businessId", "locationId", "locationType", "locationName",
-        "cityNameEn", "cityNameFa", "distanceMeters"
+        "cityNameEn", "cityNameFa", "businessName", "shortDescription", "distanceMeters"
       FROM candidates
       WHERE "locationRank" = 1
       ORDER BY ${orderBy}

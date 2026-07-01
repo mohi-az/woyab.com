@@ -1,14 +1,23 @@
 import { z } from "zod";
 
-import { paginationQuerySchema } from "@fargo/shared";
+import { appLocaleSchema, paginationQuerySchema } from "@fargo/shared";
 export { businessMapBodySchema, businessSearchBodySchema } from "@fargo/shared";
+
+const businessTranslationInputSchema = z.object({
+  locale: appLocaleSchema,
+  businessName: z.string().min(1),
+  shortDescription: z.string().max(300).optional(),
+  description: z.string().optional(),
+});
 
 export const createBusinessBodySchema = z.object({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   businessName: z.string().min(1),
+  sourceLocale: appLocaleSchema.optional(),
   legalName: z.string().optional(),
   shortDescription: z.string().max(300).optional(),
   description: z.string().optional(),
+  translations: z.array(businessTranslationInputSchema).max(3).optional(),
   logoUrl: z.string().optional(),
   coverImageUrl: z.string().optional(),
   categoryId: z.number().int().positive(),
@@ -48,7 +57,12 @@ export const businessSlugParamsSchema = z.object({
   slug: z.string().min(1),
 });
 
+export const businessLocaleQuerySchema = z.object({
+  locale: appLocaleSchema.default("de"),
+});
+
 export const listBusinessesQuerySchema = paginationQuerySchema.extend({
+  locale: appLocaleSchema.default("de"),
   categoryId: z.coerce.number().int().positive().optional(),
   subCategoryId: z.coerce.number().int().positive().optional(),
   cityId: z.coerce.number().int().positive().optional(),

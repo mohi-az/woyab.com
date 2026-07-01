@@ -1,4 +1,4 @@
-import type { BusinessSearchBody, LocationOrigin } from "@fargo/shared";
+import type { AppLocale, BusinessSearchBody, LocationOrigin } from "@fargo/shared";
 
 type CategoryApiItem = {
   id: number;
@@ -27,6 +27,9 @@ type BusinessApiItem = {
   businessName: string;
   coverImageUrl?: string | null;
   shortDescription?: string | null;
+  description?: string | null;
+  contentLocale?: "de" | "en" | "fa";
+  isFallback?: boolean;
   averageRating?: number | null;
   reviewCount?: number | null;
   category?: {
@@ -58,6 +61,8 @@ type BusinessDetailApiResponse = {
     legalName?: string | null;
     shortDescription?: string | null;
     description?: string | null;
+    contentLocale?: "de" | "en" | "fa";
+    isFallback?: boolean;
     logoUrl?: string | null;
     coverImageUrl?: string | null;
     phone?: string | null;
@@ -331,7 +336,7 @@ export async function fetchCategoryCounts(): Promise<Record<number, number>> {
 
 export async function fetchLatestBusinesses(locale: string): Promise<LatestBusinessCardItem[]> {
   try {
-    const res = await fetch(`${API_BASE}/v1/businesses?limit=8&status=ACTIVE&sortBy=latest`, {
+    const res = await fetch(`${API_BASE}/v1/businesses?limit=8&status=ACTIVE&sortBy=latest&locale=${encodeURIComponent(locale)}`, {
       next: { revalidate: 300 },
     });
     if (!res.ok) return [];
@@ -388,7 +393,9 @@ export async function fetchBusinessDirectory(
   };
 
   try {
-    const res = await fetch(`${API_BASE}/v1/businesses?${directoryParams(filters)}`, {
+    const params = directoryParams(filters);
+    params.set("locale", locale);
+    const res = await fetch(`${API_BASE}/v1/businesses?${params}`, {
       cache: "no-store",
     });
     if (!res.ok) return fallback;
@@ -443,6 +450,7 @@ export async function searchBusinessDirectory(
     search: filters.search,
     sortBy: filters.sortBy ?? "recommended",
     origin,
+    locale: locale as AppLocale,
   };
   let response: Response | undefined;
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -530,12 +538,13 @@ export async function fetchBusinessBySlug(
   slug: string,
 ): Promise<BusinessDetailData | null> {
   try {
-    const res = await fetch(`${API_BASE}/v1/businesses/slug/${encodeURIComponent(slug)}`, {
+    const localizedRes = await fetch(`${API_BASE}/v1/businesses/slug/${encodeURIComponent(slug)}?locale=${encodeURIComponent(locale)}`, {
       cache: "no-store",
     });
-    if (!res.ok) return null;
 
-    const json = (await res.json()) as BusinessDetailApiResponse;
+    if (!localizedRes.ok) return null;
+
+    const json = (await localizedRes.json()) as BusinessDetailApiResponse;
     const business = json.data;
     const gallery = (business.images ?? []).map((image) => ({
       id: image.id,

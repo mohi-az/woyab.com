@@ -17,10 +17,19 @@ enum PriceRange {
   @@map("price_range")
 }
 
+enum ContentLocale {
+  DE
+  EN
+  FA
+
+  @@map("content_locale")
+}
+
 model Business {
   id               String         @id @default(cuid())
   slug             String         @unique
 
+  sourceLocale     ContentLocale  @default(DE)
   businessName     String
   legalName        String?
   shortDescription String?
@@ -85,6 +94,7 @@ model Business {
   posts         Post[]
   tags          BusinessTag[]
   attributes    BusinessAttribute[]
+  translations  BusinessTranslation[]
 
   @@index([slug])
   @@index([cityId])
@@ -94,4 +104,20 @@ model Business {
   @@index([averageRating])
   @@index([status])
   @@map("businesses")
+}
+
+model BusinessTranslation {
+  id               String        @id @default(cuid())
+  businessId       String
+  business         Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  locale           ContentLocale
+  businessName     String
+  shortDescription String?
+  description      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@unique([businessId, locale])
+  @@index([locale])
+  @@map("business_translations")
 }

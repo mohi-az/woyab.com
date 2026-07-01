@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { paginationQuerySchema } from "./common.js";
+import { appLocaleSchema, paginationQuerySchema } from "./common.js";
 
 export const locationSourceSchema = z.enum(["CURRENT", "MANUAL", "SAVED"]);
 
@@ -24,6 +24,7 @@ export const businessSearchBodySchema = paginationQuerySchema.extend({
   search: z.string().trim().min(1).max(120).optional(),
   sortBy: z.enum(["recommended", "latest", "distance"]).default("recommended"),
   origin: locationOriginSchema.optional(),
+  locale: appLocaleSchema,
 }).superRefine((value, context) => {
   if (value.sortBy === "distance" && !value.origin) {
     context.addIssue({
@@ -36,7 +37,7 @@ export const businessSearchBodySchema = paginationQuerySchema.extend({
 
 export const locationSuggestionQuerySchema = z.object({
   q: z.string().trim().min(3).max(120),
-  language: z.enum(["de", "en", "fa"]).default("de"),
+  language: appLocaleSchema,
   proximityLatitude: z.coerce.number().min(-90).max(90).optional(),
   proximityLongitude: z.coerce.number().min(-180).max(180).optional(),
 }).superRefine((value, context) => {
@@ -52,7 +53,7 @@ export const locationSuggestionQuerySchema = z.object({
 export const reverseGeocodeBodySchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  language: z.enum(["de", "en", "fa"]).default("de"),
+  language: appLocaleSchema,
 });
 
 export const mapBoundsSchema = z.object({
@@ -71,6 +72,7 @@ export const businessMapBodySchema = z.object({
   search: z.string().trim().min(1).max(120).optional(),
   origin: locationOriginSchema.optional(),
   bounds: mapBoundsSchema.optional(),
+  locale: appLocaleSchema,
 });
 
 export type BusinessSearchBody = z.infer<typeof businessSearchBodySchema>;

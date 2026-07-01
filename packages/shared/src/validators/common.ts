@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const uuidSchema = z.uuid();
+export const appLocaleSchema = z.enum(["de", "en", "fa"]).default("de");
 
 export const paginationQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -8,3 +9,4 @@ export const paginationQuerySchema = z.object({
 });
 
 export type PaginationQuery = z.infer<typeof paginationQuerySchema>;
+export type AppLocale = z.infer<typeof appLocaleSchema>;

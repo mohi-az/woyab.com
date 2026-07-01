@@ -261,6 +261,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
         cityId: filters.cityId,
         search: filters.search,
         origin,
+        locale,
       }),
       signal: controller.signal,
     }).then(async (response) => {
@@ -295,6 +296,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
     filters.subCategoryId,
     labels.error,
     location,
+    locale,
     radiusKm,
     ready,
   ]);
