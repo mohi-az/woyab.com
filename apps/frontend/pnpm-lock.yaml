@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fargo/shared':
+        specifier: link:../../packages/shared
+        version: link:../../packages/shared
       axios:
         specifier: ^1.18.1
         version: 1.18.1
@@ -17,6 +20,9 @@ importers:
       daisyui:
         specifier: ^5.6.3
         version: 5.6.5
+      mapbox-gl:
+        specifier: ^3.25.0
+        version: 3.25.0
       next:
         specifier: 16.2.9
         version: 16.2.9(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -45,6 +51,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.3.1
         version: 4.3.1
+      '@types/geojson':
+        specifier: ^7946.0.16
+        version: 7946.0.16
       '@types/node':
         specifier: ^20
         version: 20.19.43
@@ -1235,6 +1244,9 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
 
   '@types/glob@7.2.0':
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
@@ -2626,6 +2638,9 @@ packages:
   make-dir@3.1.0:
     resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}
     engines: {node: '>=8'}
+
+  mapbox-gl@3.25.0:
+    resolution: {integrity: sha512-I+9oSkJVFu51xIAAQcjKophFe6zVAGWROHsszeRhX9E1OXEizgPH+8BkF7GaxmmLd9FbADdEfvULF8NxEFcB5w==}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -4701,6 +4716,8 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/geojson@7946.0.16': {}
+
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
@@ -6260,6 +6277,8 @@ snapshots:
   make-dir@3.1.0:
     dependencies:
       semver: 6.3.1
+
+  mapbox-gl@3.25.0: {}
 
   math-intrinsics@1.1.0: {}
 

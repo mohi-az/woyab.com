@@ -1,0 +1,96 @@
+enum BusinessLocationType {
+  PRIMARY
+  BRANCH
+
+  @@map("business_location_type")
+}
+
+enum LocationProvider {
+  MANUAL
+  MAPBOX
+
+  @@map("location_provider")
+}
+
+enum SavedLocationIcon {
+  HOME
+  WORK
+  FAVORITE
+  OTHER
+
+  @@map("saved_location_icon")
+}
+
+model BusinessLocation {
+  id              String               @id @default(cuid())
+  businessId      String
+  business        Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  type            BusinessLocationType
+  legacyBranchId  String?              @unique
+  name            String?
+  phone           String?
+  mobile          String?
+  address         String?
+  postalCode      String?
+  countryCode     String               @default("DE")
+  latitude        Float
+  longitude       Float
+  geoPoint        Unsupported("geography(Point,4326)")? @map("geo_point")
+  cityId          Int?
+  city            City?                @relation(fields: [cityId], references: [id])
+  districtId      Int?
+  district        District?            @relation(fields: [districtId], references: [id])
+  provider        LocationProvider      @default(MANUAL)
+  providerPlaceId String?
+  active          Boolean              @default(true)
+  isPrimary       Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  hours BusinessLocationHours[]
+
+  @@index([businessId])
+  @@index([cityId])
+  @@index([districtId])
+  @@map("business_locations")
+}
+
+model BusinessLocationHours {
+  id         Int              @id @default(autoincrement())
+  locationId String
+  location   BusinessLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  dayOfWeek  DayOfWeek
+  openTime   String?
+  closeTime  String?
+  isClosed   Boolean          @default(false)
+
+  @@unique([locationId, dayOfWeek])
+  @@map("business_location_hours")
+}
+
+model UserSavedLocation {
+  id              String            @id @default(cuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label           String
+  icon            SavedLocationIcon @default(OTHER)
+  address         String
+  cityName        String?
+  districtName    String?
+  cityId          Int?
+  city            City?             @relation(fields: [cityId], references: [id])
+  districtId      Int?
+  district        District?         @relation(fields: [districtId], references: [id])
+  latitude        Float
+  longitude       Float
+  provider        LocationProvider  @default(MANUAL)
+  providerPlaceId String?
+  isDefault       Boolean           @default(false)
+  sortOrder       Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([userId, label])
+  @@index([userId])
+  @@map("user_saved_locations")
+}

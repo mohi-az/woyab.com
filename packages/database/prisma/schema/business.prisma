@@ -80,6 +80,7 @@ model Business {
   documents     Document[]
   businessHours BusinessHours[]
   branches      Branch[]
+  locations     BusinessLocation[]
   posts         Post[]
   tags          BusinessTag[]
   attributes    BusinessAttribute[]

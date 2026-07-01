@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 
 import {
   businessIdParamsSchema,
+  businessMapBodySchema,
+  businessSearchBodySchema,
   createBusinessBodySchema,
   listBusinessesQuerySchema,
   updateBusinessBodySchema,
@@ -9,6 +11,17 @@ import {
 import { businessService } from "./business.service.js";
 
 export const businessController = {
+  map: async (req: Request, res: Response) => {
+    const body = businessMapBodySchema.parse(req.body);
+    res.json({ success: true, data: await businessService.map(body) });
+  },
+
+  search: async (req: Request, res: Response) => {
+    const body = businessSearchBodySchema.parse(req.body);
+    const result = await businessService.search(body);
+    res.json({ success: true, data: result });
+  },
+
   list: async (req: Request, res: Response) => {
     const query = listBusinessesQuerySchema.parse(req.query);
     const result = await businessService.list(query);

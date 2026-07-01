@@ -94,6 +94,79 @@
       "unknownLocation": "Standort nicht verfugbar"
     }
   },
+  "Businesses": {
+    "eyebrow": "Lokale Unternehmen entdecken",
+    "title": "Finden Sie das passende Unternehmen",
+    "description": "Durchsuchen Sie das Fargo-Verzeichnis und filtern Sie nach Kategorie, Fachgebiet und Stadt.",
+    "resultsTitle": "Unternehmen",
+    "resultCount": "{count, plural, =0 {Keine Unternehmen gefunden} one {# Unternehmen gefunden} other {# Unternehmen gefunden}}",
+    "resultCountTemplate": "{count} Unternehmen gefunden",
+    "showing": "{from}-{to} angezeigt",
+    "loading": "Ergebnisse werden aktualisiert",
+    "error": "Die Ergebnisse konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+    "filters": {
+      "title": "Filter",
+      "search": "Unternehmensname",
+      "searchPlaceholder": "Wonach suchen Sie?",
+      "categories": "Kategorien",
+      "allCategories": "Alle Kategorien",
+      "subCategories": "Unterkategorien",
+      "allSubCategories": "Alle Unterkategorien",
+      "city": "Stadt",
+      "allCities": "Alle Städte",
+      "location": "Standort",
+      "reset": "Zurücksetzen"
+    },
+    "sort": {
+      "label": "Sortieren nach:",
+      "recommended": "Empfohlen",
+      "latest": "Datum: Neueste zuerst",
+      "nearest": "Nächste zuerst"
+    },
+    "card": {
+      "favorite": "Zu Favoriten hinzufügen",
+      "reviews": "{count, plural, =0 {Keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
+      "reviewsTemplate": "{count} Bewertungen",
+      "unknownLocation": "Standort nicht verfügbar",
+      "distance": "{distance} km entfernt"
+    },
+    "location": {
+      "inputLabel": "Ort suchen",
+      "placeholder": "Stadt, Viertel oder Adresse",
+      "useCurrentLocation": "Meinen aktuellen Standort verwenden",
+      "locating": "Standort wird ermittelt...",
+      "currentLocation": "Aktueller Standort",
+      "savedLocations": "Gespeicherte Orte",
+      "radius": "Entfernung",
+      "anyDistance": "Beliebige Entfernung",
+      "radiusHint": "Wählen Sie einen Standort, um den Entfernungsfilter zu aktivieren.",
+      "clear": "Standort löschen",
+      "unavailable": "Der Standortdienst ist derzeit nicht verfügbar. Die anderen Filter funktionieren weiterhin.",
+      "permissionDenied": "Der Standortzugriff wurde verweigert. Suchen Sie stattdessen nach einer Stadt oder einem Viertel.",
+      "timeout": "Die Standortbestimmung hat zu lange gedauert. Versuchen Sie es erneut oder geben Sie den Ort ein.",
+      "noResults": "Keine passenden Orte gefunden"
+    },
+    "empty": {
+      "title": "Keine passenden Unternehmen",
+      "description": "Entfernen Sie einen oder mehrere Filter oder suchen Sie nach einem anderen Unternehmensnamen."
+    },
+    "pagination": {
+      "label": "Ergebnisseiten der Unternehmen",
+      "previous": "Vorherige Seite",
+      "next": "Nächste Seite"
+    },
+    "map": {
+      "show": "Karte anzeigen",
+      "hide": "Karte ausblenden",
+      "title": "Unternehmen auf der Karte",
+      "loading": "Karte wird geladen",
+      "error": "Die Karte konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+      "truncated": "Verfeinern Sie die Filter, um alle passenden Ergebnisse zu sehen.",
+      "clusterResults": "{count} Unternehmen an diesem Ort",
+      "viewBusiness": "Unternehmen ansehen",
+      "reviews": "Bewertungen"
+    }
+  },
   "Offline": {
     "title": "Sie sind offline",
     "description": "Keine Internetverbindung. Bitte prufen Sie Ihr Netzwerk und versuchen Sie es erneut.",

@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { validateRequest } from "../../validation/validate-request.js";
 import { businessController } from "./business.controller.js";
-import { createBusinessBodySchema, updateBusinessBodySchema } from "./business.schema.js";
+import { businessMapBodySchema, businessSearchBodySchema, createBusinessBodySchema, updateBusinessBodySchema } from "./business.schema.js";
 
 export const businessRouter = Router();
 
@@ -42,6 +42,20 @@ export const businessRouter = Router();
  *         description: Paginated list of businesses
  */
 businessRouter.get("/", businessController.list);
+
+/**
+ * @openapi
+ * /businesses/search:
+ *   post:
+ *     summary: Search businesses, optionally around a private origin
+ *     tags: [Businesses]
+ *     responses:
+ *       200:
+ *         description: Paginated businesses with nearest matching locations
+ */
+businessRouter.post("/search", validateRequest({ body: businessSearchBodySchema }), businessController.search);
+
+businessRouter.post("/map", validateRequest({ body: businessMapBodySchema }), businessController.map);
 
 /**
  * @openapi

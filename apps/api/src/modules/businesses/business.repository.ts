@@ -33,9 +33,9 @@ export const businessRepository = {
         logoUrl: true,
         coverImageUrl: true,
         categoryId: true,
-        category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+        category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
         subCategoryId: true,
-        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
         cityId: true,
         city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
         status: true,
@@ -51,12 +51,39 @@ export const businessRepository = {
 
   count: (where: BusinessFilter = {}) => prisma.business.count({ where }),
 
+  findManyByIds: (ids: string[]) =>
+    prisma.business.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        slug: true,
+        businessName: true,
+        shortDescription: true,
+        logoUrl: true,
+        coverImageUrl: true,
+        categoryId: true,
+        category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+        subCategoryId: true,
+        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+        cityId: true,
+        city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+        status: true,
+        verified: true,
+        featured: true,
+        averageRating: true,
+        reviewCount: true,
+        priceRange: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+
   findById: (id: string) =>
     prisma.business.findUnique({
       where: { id },
       include: {
-        category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+        category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
         specialty: { select: { id: true, nameFa: true, nameEn: true } },
         owner: { select: { id: true, name: true, email: true, avatarUrl: true } },
         city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },

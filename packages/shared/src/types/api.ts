@@ -4,6 +4,7 @@ export type ApiErrorCode =
   | "FORBIDDEN"
   | "INTERNAL_SERVER_ERROR"
   | "NOT_FOUND"
+  | "SERVICE_UNAVAILABLE"
   | "UNAUTHORIZED"
   | "VALIDATION_ERROR";
 

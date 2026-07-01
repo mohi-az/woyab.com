@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { paginationQuerySchema } from "@fargo/shared";
+export { businessMapBodySchema, businessSearchBodySchema } from "@fargo/shared";
 
 export const createBusinessBodySchema = z.object({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),

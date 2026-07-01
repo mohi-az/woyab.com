@@ -94,6 +94,79 @@
       "unknownLocation": "Location not available"
     }
   },
+  "Businesses": {
+    "eyebrow": "Discover local businesses",
+    "title": "Find the right business for you",
+    "description": "Search Fargo's directory and narrow the results by category, specialty and city.",
+    "resultsTitle": "Businesses",
+    "resultCount": "{count, plural, =0 {No businesses found} one {# business found} other {# businesses found}}",
+    "resultCountTemplate": "{count} businesses found",
+    "showing": "Showing {from}-{to}",
+    "loading": "Updating results",
+    "error": "Results could not be updated. Please try again.",
+    "filters": {
+      "title": "Filters",
+      "search": "Business name",
+      "searchPlaceholder": "What are you looking for?",
+      "categories": "Categories",
+      "allCategories": "All categories",
+      "subCategories": "Subcategories",
+      "allSubCategories": "All subcategories",
+      "city": "City",
+      "allCities": "All cities",
+      "location": "Location",
+      "reset": "Reset"
+    },
+    "sort": {
+      "label": "Sort by:",
+      "recommended": "Recommended",
+      "latest": "Date: Newest on top",
+      "nearest": "Nearest first"
+    },
+    "card": {
+      "favorite": "Add to favorites",
+      "reviews": "{count, plural, =0 {No reviews} one {# review} other {# reviews}}",
+      "reviewsTemplate": "{count} reviews",
+      "unknownLocation": "Location not available",
+      "distance": "{distance} km away"
+    },
+    "location": {
+      "inputLabel": "Search an area",
+      "placeholder": "City, neighborhood or address",
+      "useCurrentLocation": "Use my current location",
+      "locating": "Finding location...",
+      "currentLocation": "Current location",
+      "savedLocations": "Saved places",
+      "radius": "Distance",
+      "anyDistance": "Any distance",
+      "radiusHint": "Choose a location to enable distance filtering.",
+      "clear": "Clear location",
+      "unavailable": "Location service is currently unavailable. You can still use the other filters.",
+      "permissionDenied": "Location access was denied. Search for a city or neighborhood instead.",
+      "timeout": "Getting your location took too long. Please try again or enter it manually.",
+      "noResults": "No matching locations found"
+    },
+    "empty": {
+      "title": "No matching businesses",
+      "description": "Try removing one or more filters or search with a different business name."
+    },
+    "pagination": {
+      "label": "Business result pages",
+      "previous": "Previous page",
+      "next": "Next page"
+    },
+    "map": {
+      "show": "Show map",
+      "hide": "Hide map",
+      "title": "Businesses on the map",
+      "loading": "Loading map",
+      "error": "The map could not be loaded. Please try again.",
+      "truncated": "Refine the filters to see all matching results.",
+      "clusterResults": "{count} businesses here",
+      "viewBusiness": "View business",
+      "reviews": "reviews"
+    }
+  },
   "Offline": {
     "title": "You're offline",
     "description": "No internet connection. Please check your network and try again.",

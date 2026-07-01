@@ -66,4 +66,11 @@ export class ApiError extends Error {
       statusCode: 403,
     });
   }
+
+  static serviceUnavailable(message = "Service unavailable") {
+    return new ApiError(message, {
+      code: "SERVICE_UNAVAILABLE",
+      statusCode: 503,
+    });
+  }
 }

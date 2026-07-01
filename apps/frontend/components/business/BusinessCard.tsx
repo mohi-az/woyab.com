@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
-import { FiHeart, FiMapPin } from "react-icons/fi";
+import { FiHeart, FiMapPin, FiNavigation } from "react-icons/fi";
 import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
 
@@ -12,6 +12,7 @@ export type BusinessCardProps = {
   imageUrl?: string | null;
   categoryName?: string | null;
   categorySlug?: string | null;
+  categoryIconKey?: string | null;
   rating?: number | null;
   reviewCount?: number | null;
   location?: string | null;
@@ -19,6 +20,8 @@ export type BusinessCardProps = {
   favoriteLabel: string;
   reviewsLabel: string;
   locationFallback: string;
+  distanceLabel?: string | null;
+  matchedLocationName?: string | null;
 };
 
 function RatingStars({ rating = 0 }: { rating?: number | null }) {
@@ -40,6 +43,7 @@ export function BusinessCard({
   imageUrl,
   categoryName,
   categorySlug,
+  categoryIconKey,
   rating,
   reviewCount,
   location,
@@ -47,6 +51,8 @@ export function BusinessCard({
   favoriteLabel,
   reviewsLabel,
   locationFallback,
+  distanceLabel,
+  matchedLocationName,
 }: BusinessCardProps) {
   const content = (
     <>
@@ -68,7 +74,7 @@ export function BusinessCard({
       <div className="space-y-3 p-5">
         <div className="flex items-center justify-between gap-3 text-sm text-gray-500">
           <span className="inline-flex min-w-0 items-center gap-1.5 text-gray-600">
-            <CategoryIcon categorySlug={categorySlug} className="shrink-0 text-base text-primary" />
+            <CategoryIcon iconKey={categoryIconKey} categorySlug={categorySlug} className="shrink-0 text-base text-primary" />
             <span className="truncate">{categoryName ?? "-"}</span>
           </span>
         </div>
@@ -96,6 +102,15 @@ export function BusinessCard({
             <FiMapPin className="shrink-0 text-base text-primary" />
             <span className="truncate">{location || locationFallback}</span>
           </div>
+
+          {distanceLabel ? (
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <FiNavigation className="shrink-0" />
+              <span className="truncate">
+                {distanceLabel}{matchedLocationName ? ` · ${matchedLocationName}` : ""}
+              </span>
+            </div>
+          ) : null}
         </div>
       </div>
     </>

@@ -1,13 +1,39 @@
-import type { ElementType, SVGProps } from "react";
+import { createElement, type ElementType, type SVGProps } from "react";
 import {
+  MdAccountBalance,
+  MdBakeryDining,
+  MdCalculate,
+  MdCameraAlt,
+  MdCarRental,
+  MdCarRepair,
+  MdCelebration,
+  MdCheckroom,
+  MdCleaningServices,
+  MdContentCut,
   MdDirectionsCar,
+  MdElectricalServices,
   MdFlight,
+  MdGavel,
   MdHomeRepairService,
+  MdKitchen,
+  MdLanguage,
+  MdLocalCafe,
+  MdLocalCarWash,
+  MdLocalGroceryStore,
   MdLocalHospital,
+  MdLocalShipping,
+  MdMedicalServices,
+  MdMusicNote,
+  MdPlumbing,
+  MdPsychology,
   MdRestaurant,
   MdSchool,
+  MdShield,
   MdSpa,
   MdStorefront,
+  MdTraffic,
+  MdTravelExplore,
+  MdVideocam,
   MdWorkOutline,
 } from "react-icons/md";
 
@@ -18,9 +44,49 @@ export type CategoryDef = {
   slug: string;
 };
 
+const ICON_COMPONENTS: Record<string, ElementType> = {
+  accounting: MdCalculate,
+  "aesthetic-clinic": MdMedicalServices,
+  bakery: MdBakeryDining,
+  balance: MdAccountBalance,
+  cafe: MdLocalCafe,
+  camera: MdCameraAlt,
+  car: MdDirectionsCar,
+  "car-dealer": MdDirectionsCar,
+  "car-rental": MdCarRental,
+  "car-repair": MdCarRepair,
+  "car-wash": MdLocalCarWash,
+  celebration: MdCelebration,
+  cleaning: MdCleaningServices,
+  clothing: MdCheckroom,
+  dentist: MdMedicalServices,
+  doctor: MdLocalHospital,
+  "driving-school": MdTraffic,
+  electrical: MdElectricalServices,
+  flight: MdFlight,
+  gavel: MdGavel,
+  grocery: MdLocalGroceryStore,
+  "hair-salon": MdContentCut,
+  "home-appliances": MdKitchen,
+  "home-repair": MdHomeRepairService,
+  insurance: MdShield,
+  language: MdLanguage,
+  medical: MdLocalHospital,
+  music: MdMusicNote,
+  plumbing: MdPlumbing,
+  psychology: MdPsychology,
+  restaurant: MdRestaurant,
+  school: MdSchool,
+  spa: MdSpa,
+  storefront: MdStorefront,
+  transport: MdLocalShipping,
+  travel: MdTravelExplore,
+  video: MdVideocam,
+};
+
 export const FEATURED_CATEGORIES: CategoryDef[] = [
-  { dbId: 1, labelKey: "restaurantCafe", icon: MdRestaurant, slug: "restaurant-cafe" },
-  { dbId: 2, labelKey: "healthBeauty", icon: MdSpa, slug: "health-beauty" },
+  { dbId: 1, labelKey: "restaurantCafe", icon: MdRestaurant, slug: "restaurants-cafes" },
+  { dbId: 2, labelKey: "healthBeauty", icon: MdSpa, slug: "beauty-wellness" },
   { dbId: 4, labelKey: "homeServices", icon: MdHomeRepairService, slug: "home-services" },
   { dbId: 5, labelKey: "automotive", icon: MdDirectionsCar, slug: "automotive" },
   { dbId: 6, labelKey: "retail", icon: MdStorefront, slug: "retail" },
@@ -29,38 +95,29 @@ export const FEATURED_CATEGORIES: CategoryDef[] = [
   { dbId: 10, labelKey: "travelTransport", icon: MdFlight, slug: "travel-transport" },
 ];
 
-const categoryIconBySlug: Record<string, ElementType> = Object.fromEntries(
-  FEATURED_CATEGORIES.map((category) => [category.slug, category.icon]),
-);
+const iconKeyByCategorySlug: Record<string, string> = {
+  "restaurants-cafes": "restaurant",
+  "beauty-wellness": "spa",
+  "legal-financial": "balance",
+  "home-services": "home-repair",
+  automotive: "car",
+  retail: "storefront",
+  education: "school",
+  medical: "medical",
+  "media-events": "celebration",
+  "travel-transport": "flight",
+};
 
-export function getCategoryIcon(categorySlug?: string | null): ElementType {
-  if (!categorySlug) return MdWorkOutline;
-  return categoryIconBySlug[categorySlug] ?? MdWorkOutline;
+export function getCategoryIcon(iconKey?: string | null, categorySlug?: string | null): ElementType {
+  const resolvedKey = iconKey ?? (categorySlug ? iconKeyByCategorySlug[categorySlug] : undefined);
+  return resolvedKey ? ICON_COMPONENTS[resolvedKey] ?? MdWorkOutline : MdWorkOutline;
 }
 
 type CategoryIconProps = SVGProps<SVGSVGElement> & {
+  iconKey?: string | null;
   categorySlug?: string | null;
 };
 
-export function CategoryIcon({ categorySlug, ...props }: CategoryIconProps) {
-  switch (categorySlug) {
-    case "restaurant-cafe":
-      return <MdRestaurant {...props} />;
-    case "health-beauty":
-      return <MdSpa {...props} />;
-    case "home-services":
-      return <MdHomeRepairService {...props} />;
-    case "automotive":
-      return <MdDirectionsCar {...props} />;
-    case "retail":
-      return <MdStorefront {...props} />;
-    case "education":
-      return <MdSchool {...props} />;
-    case "medical":
-      return <MdLocalHospital {...props} />;
-    case "travel-transport":
-      return <MdFlight {...props} />;
-    default:
-      return <MdWorkOutline {...props} />;
-  }
+export function CategoryIcon({ iconKey, categorySlug, ...props }: CategoryIconProps) {
+  return createElement(getCategoryIcon(iconKey, categorySlug), props);
 }

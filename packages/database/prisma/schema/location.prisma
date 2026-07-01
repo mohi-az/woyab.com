@@ -36,6 +36,8 @@ model City {
   districts  District[]
   businesses Business[]
   branches   Branch[]
+  businessLocations BusinessLocation[]
+  savedLocations    UserSavedLocation[]
 
   @@map("cities")
 }
@@ -49,6 +51,8 @@ model District {
 
   businesses Business[]
   branches   Branch[]
+  businessLocations BusinessLocation[]
+  savedLocations    UserSavedLocation[]
 
   @@map("districts")
 }

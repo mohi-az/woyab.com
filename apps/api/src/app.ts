@@ -11,6 +11,7 @@ import { httpLoggerMiddleware } from "./middlewares/http-logger.middleware.js";
 import { notFoundMiddleware } from "./middlewares/not-found.middleware.js";
 import { requestIdMiddleware } from "./middlewares/request-id.middleware.js";
 import { businessRouter } from "./modules/businesses/business.route.js";
+import { geoRouter } from "./modules/geo/geo.route.js";
 import { categoryRouter, specialtyRouter, subCategoryRouter } from "./modules/categories/category.route.js";
 import { cityRouter, countryRouter, districtRouter, provinceRouter } from "./modules/locations/location.route.js";
 import { reviewRouter, reviewStandaloneRouter } from "./modules/reviews/review.route.js";
@@ -57,6 +58,7 @@ export const createApp = () => {
   app.use(`${v}/sub-categories`, subCategoryRouter);
   app.use(`${v}/specialties`, specialtyRouter);
   app.use(`${v}/businesses`, businessRouter);
+  app.use(`${v}/geo`, geoRouter);
   app.use(`${v}/businesses/:businessId/services`, serviceRouter);
   app.use(`${v}/businesses/:businessId/reviews`, reviewRouter);
   app.use(`${v}/reviews`, reviewStandaloneRouter);
