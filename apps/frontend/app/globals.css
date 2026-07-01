@@ -16,9 +16,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html[lang="fa"] {
+  --font-sans: var(--font-dirooz);
+}
+
 body {
   background-color: #ffffff;
   color: #171717;
+  font-family: var(--font-sans);
+}
+
+.font-geist {
+  font-family: var(--font-geist-sans);
+}
+
+.font-dirooz {
+  font-family: var(--font-dirooz);
 }
 
 html[dir="rtl"] body {
