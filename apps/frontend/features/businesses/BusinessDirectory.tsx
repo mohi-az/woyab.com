@@ -145,7 +145,7 @@ export function BusinessDirectory({
   const numberFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
 
   return (
-    <section className="mx-auto max-w-[1480px] px-4 py-8 sm:px-6 sm:py-12">
+    <section className="mx-auto max-w-[1480px] px-4 py-10 sm:px-6 sm:py-14">
       {mapOpen ? (
         <div className="mb-8">
           <BusinessMap
@@ -157,7 +157,7 @@ export function BusinessDirectory({
           />
         </div>
       ) : null}
-      <div className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)]">
+      <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)]">
         <BusinessFilters
           filters={filters}
           categories={categories}
@@ -176,12 +176,12 @@ export function BusinessDirectory({
         />
 
         <div className="min-w-0">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white bg-white p-4 shadow-[0_8px_28px_rgba(15,23,42,.05)]">
             <button
               type="button"
               onClick={() => setMapOpen((open) => !open)}
               aria-expanded={mapOpen}
-              className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-5 text-sm font-bold transition ${mapOpen ? "border-primary bg-primary text-white" : "border-primary bg-white text-primary hover:bg-primary/5"}`}
+              className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-5 text-sm font-bold transition ${mapOpen ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}
             >
               <FiMap />
               {mapOpen ? labels.map.hide : labels.map.show}
@@ -194,7 +194,7 @@ export function BusinessDirectory({
                       .replace("{count}", numberFormat.format(directory.total))}
                   </span>
                   <span aria-hidden="true" className="text-gray-300">&bull;</span>
-                  <span className="rounded-full bg-[#f8f7f6] px-4 py-2">
+                  <span className="rounded-full bg-[#f8f5f1] px-4 py-2">
                     {labels.showing
                       .replace("{from}", String((currentPage - 1) * directory.limit + 1))
                       .replace("{to}", String(Math.min(currentPage * directory.limit, directory.total)))}
@@ -219,7 +219,7 @@ export function BusinessDirectory({
 
           <div className="relative min-h-80" aria-busy={loading}>
             {directory.items.length > 0 ? (
-              <div className={`grid grid-cols-1 gap-5 transition-opacity sm:grid-cols-2 xl:grid-cols-3 ${loading ? "opacity-50" : "opacity-100"}`}>
+              <div className={`grid grid-cols-1 gap-6 transition-opacity sm:grid-cols-2 xl:grid-cols-3 ${loading ? "opacity-50" : "opacity-100"}`}>
                 {directory.items.map((business, index) => {
                   const distanceLabel = business.distanceMeters == null
                     ? null
@@ -238,7 +238,7 @@ export function BusinessDirectory({
                 })}
               </div>
             ) : (
-              <div className="flex min-h-80 flex-col items-center justify-center rounded-[22px] border border-dashed border-gray-300 bg-[#fcfbfa] p-8 text-center">
+              <div className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
                 <FiInbox className="mb-4 text-5xl text-primary/70" />
                 <h2 className="text-xl font-extrabold text-gray-900">{labels.empty.title}</h2>
                 <p className="mt-2 max-w-md text-sm leading-6 text-gray-500">{labels.empty.description}</p>
@@ -263,7 +263,7 @@ export function BusinessDirectory({
                     type="button"
                     onClick={() => setFilters((current) => ({ ...current, page }))}
                     aria-current={page === currentPage ? "page" : undefined}
-                    className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-gray-200 bg-white text-gray-700 hover:border-primary hover:text-primary"}`}
+                    className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}
                   >{page}</button>
                 </span>
               ))}

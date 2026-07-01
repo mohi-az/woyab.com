@@ -4,16 +4,21 @@
 
 :root,
 [data-theme="light"] {
-  --color-primary: oklch(64% 0.19 25);
+  --color-primary: #f15b3f;
   --color-primary-content: oklch(100% 0 0);
   --color-base-100: #ffffff;
-  --color-base-200: #f8f8f8;
-  --color-base-300: #f0f0f0;
+  --color-base-200: #f7f5f2;
+  --color-base-300: #ebe7e2;
 }
 
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-primary: #f15b3f;
+  --color-primary-dark: #d9482c;
+  --color-primary-light: #ff9b86;
+  --color-ink: #111827;
+  --color-cream: #f8f5f1;
 }
 
 html[lang="fa"] {
@@ -22,8 +27,23 @@ html[lang="fa"] {
 
 body {
   background-color: #ffffff;
-  color: #171717;
+  color: #111827;
   font-family: var(--font-sans);
+}
+
+::selection {
+  background: rgb(241 91 63 / 22%);
+  color: #111827;
+}
+
+:focus-visible {
+  outline-color: #f15b3f;
+}
+
+.hero-theme {
+  background-image: url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2200&q=86");
+  background-position: center;
+  background-size: cover;
 }
 
 .font-geist {
@@ -51,16 +71,16 @@ html[dir="rtl"] .menu {
 }
 
 .text-primary {
-  color: oklch(64% 0.19 25);
+  color: #f15b3f;
 }
 .bg-primary {
-  background-color: oklch(64% 0.19 25);
+  background-color: #f15b3f;
 }
 .border-primary {
-  border-color: oklch(64% 0.19 25);
+  border-color: #f15b3f;
 }
 
-/* انیمیشن‌های شناور شکل‌های تزئینی — مقدار px ثابت تا روی هر اندازه‌ای دیده شود */
+/* Decorative motion */
 @keyframes float-y-slow {
   0%,
   100% { transform: translateY(0px); }
@@ -90,9 +110,66 @@ html[dir="rtl"] .menu {
 .float-x-slow    { animation: float-x-slow   7s   ease-in-out infinite; }
 .float-x-slower  { animation: float-x-slower 8.5s ease-in-out 1.1s infinite; }
 
-/* ---- Category card hover effects ---- */
+@keyframes latest-shape-orbit {
+  0%,
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  35% { transform: translate3d(14px, -18px, 0) rotate(7deg); }
+  70% { transform: translate3d(-8px, 10px, 0) rotate(-5deg); }
+}
 
-/* punch + spring: ضربه سریع و ارتعاش میرا */
+@keyframes latest-shape-float {
+  0%,
+  100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -20px, 0); }
+}
+
+@keyframes latest-shape-float-reverse {
+  0%,
+  100% { transform: translate3d(0, -8px, 0); }
+  50% { transform: translate3d(16px, 10px, 0); }
+}
+
+@keyframes latest-shape-pulse {
+  0%,
+  100% { opacity: 0.35; transform: scale(0.82); }
+  50% { opacity: 0.75; transform: scale(1.18); }
+}
+
+.latest-shape-orbit {
+  animation: latest-shape-orbit 11s ease-in-out infinite;
+  will-change: transform;
+}
+
+.latest-shape-float {
+  animation: latest-shape-float 7s ease-in-out infinite;
+  will-change: transform;
+}
+
+.latest-shape-float-reverse {
+  animation: latest-shape-float-reverse 9s ease-in-out 0.6s infinite;
+  will-change: transform;
+}
+
+.latest-shape-pulse {
+  animation: latest-shape-pulse 4.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.latest-shape-dots {
+  background-image: radial-gradient(circle, rgb(241 91 63 / 32%) 2px, transparent 2.5px);
+  background-size: 16px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .latest-shape-orbit,
+  .latest-shape-float,
+  .latest-shape-float-reverse,
+  .latest-shape-pulse {
+    animation: none;
+  }
+}
+
+/* Category card hover effects */
 @keyframes icon-punch {
   0%   { transform: scale(1);    }
   18%  { transform: scale(1.48); }
@@ -120,7 +197,7 @@ html[dir="rtl"] .menu {
 }
 
 .cat-card:hover .count-badge {
-  background-color: oklch(64% 0.19 25);
+  background-color: #f15b3f;
   color: white;
 }
 
@@ -187,7 +264,7 @@ html[dir="rtl"] .menu {
 
 .business-map-card__body a {
   margin-top: 4px;
-  color: oklch(64% 0.19 25);
+  color: #f15b3f;
   font-size: 12px;
   font-weight: 800;
 }

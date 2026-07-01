@@ -92,6 +92,7 @@ export type BusinessDirectoryFilters = {
 
 export type DirectoryFilterOption = {
   id: number;
+  slug: string;
   name: string;
   count?: number;
   iconKey?: string | null;
@@ -308,6 +309,7 @@ async function fetchDirectoryOptions(
     const json = (await res.json()) as PaginatedResponse<DirectoryOptionApiItem>;
     return (json.data?.items ?? []).map((item) => ({
       id: item.id,
+      slug: item.slug,
       name: getLocalizedName(locale, item) ?? item.nameEn,
       count: item._count?.businesses,
       iconKey: item.icon,

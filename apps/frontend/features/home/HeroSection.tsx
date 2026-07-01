@@ -1,209 +1,83 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { BsGrid3X3Gap } from "react-icons/bs";
-import { FiChevronDown, FiSearch } from "react-icons/fi";
-import { HiOutlineShoppingBag } from "react-icons/hi";
-import { MdLocationOn, MdMyLocation } from "react-icons/md";
-import { CATEGORIES } from "@/constants";
-import { cn } from "@/lib/utils";
-import type { SearchParams } from "@/types";
+import { FiChevronDown, FiMapPin, FiSearch } from "react-icons/fi";
+import { HiOutlineBuildingStorefront } from "react-icons/hi2";
+import type { DirectoryFilterOption } from "@/lib/api";
 
-const HERO_IMAGES = [
-  { src: "https://picsum.photos/seed/fargo-office/600/400", altKey: "office" },
-  { src: "https://picsum.photos/seed/fargo-cowork/600/520", altKey: "coworking" },
-  { src: "https://picsum.photos/seed/fargo-modern/420/340", altKey: "grid1" },
-  { src: "https://picsum.photos/seed/fargo-city/420/340", altKey: "grid2" },
-  { src: "https://picsum.photos/seed/fargo-store/420/340", altKey: "grid3" },
-] as const;
+type Props = {
+  categories: DirectoryFilterOption[];
+  cities: DirectoryFilterOption[];
+};
 
-export default function HeroSection() {
-  const [search, setSearch] = useState<SearchParams>({});
+export default function HeroSection({ categories, cities }: Props) {
+  const [query, setQuery] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [cityId, setCityId] = useState("");
   const t = useTranslations("Home.hero");
   const locale = useLocale();
-  const isRTL = locale === "fa";
+  const collator = new Intl.Collator(locale);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  function handleSearch(event: React.FormEvent) {
+    event.preventDefault();
     const params = new URLSearchParams();
-    if (search.query) params.set("q", search.query);
-    if (search.category) params.set("category", search.category);
-    if (search.location) params.set("location", search.location);
-    window.location.href = `/businesses?${params.toString()}`;
-  };
-
-  const handleGeoLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setSearch((s) => ({
-        ...s,
-        location: `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
-      }));
-    });
-  };
+    if (query.trim()) params.set("search", query.trim());
+    if (categoryId) params.set("categoryId", categoryId);
+    if (cityId) params.set("cityId", cityId);
+    const search = params.toString();
+    window.location.href = search ? `/businesses?${search}` : "/businesses";
+  }
 
   return (
-    <section className="relative min-h-[calc(100vh-5rem)] overflow-hidden bg-white">
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 py-16 lg:py-0">
-        <div className="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <div
-            className={cn(
-              "relative isolate flex w-full flex-col gap-7",
-              isRTL ? "lg:pl-8 lg:text-right" : "lg:pr-8",
-            )}
-          >
-            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 -z-10" aria-hidden>
-              <div className="float-y-slow absolute -bottom-10 -left-10 h-52 w-52 rounded-full bg-orange-100 opacity-55" />
-              <div className="float-x-slow absolute right-4 top-6 h-14 w-14 rotate-12 rounded-2xl bg-teal-100 opacity-80" />
-              <div className="float-x-slow absolute left-1 top-0 h-14 w-14 rotate-12 bg-sky-100 opacity-80" />
-              <div className="float-y-slower absolute right-16 top-1/2 h-10 w-10 -rotate-6 rounded-2xl bg-pink-100 opacity-80" />
-              <div className="float-x-slower absolute -left-8 top-8 h-44 w-44 rounded-full bg-blue-50 opacity-45 blur-2xl" />
+    <section className="hero-theme relative isolate min-h-[650px] overflow-hidden bg-slate-950 text-white lg:min-h-[720px]">
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.94)_0%,rgba(10,18,31,.82)_48%,rgba(10,18,31,.4)_100%)] rtl:bg-[linear-gradient(270deg,rgba(10,18,31,.94)_0%,rgba(10,18,31,.82)_48%,rgba(10,18,31,.4)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_28%,rgba(241,91,63,.22),transparent_30%)]" />
+      <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full border-[46px] border-white/5" aria-hidden="true" />
+
+      <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-5 pb-32 pt-20 sm:px-6 lg:min-h-[720px] lg:pb-40">
+        <div className="max-w-4xl">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white/85 backdrop-blur">
+            <HiOutlineBuildingStorefront className="text-lg text-primary" /> {t("eyebrow")}
+          </span>
+          <h1 className="mt-7 max-w-3xl text-4xl font-black leading-[1.15] tracking-tight sm:text-5xl lg:text-7xl">
+            {t.rich("title", { br: () => <br /> })}
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">{t("description")}</p>
+
+          <form onSubmit={handleSearch} className="mt-9 rounded-2xl bg-white p-2.5 shadow-[0_25px_70px_rgba(0,0,0,.28)] sm:p-3">
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1.45fr)_minmax(180px,.8fr)_minmax(170px,.75fr)_56px]">
+              <label className="flex min-h-14 items-center gap-3 rounded-xl bg-slate-50 px-4 text-slate-700 focus-within:ring-2 focus-within:ring-primary/25">
+                <FiSearch className="shrink-0 text-xl text-primary" />
+                <span className="sr-only">{t("queryPlaceholder")}</span>
+                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("queryPlaceholder")} className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" />
+              </label>
+
+              <label className="relative flex min-h-14 items-center gap-3 rounded-xl bg-slate-50 px-4 text-slate-700 focus-within:ring-2 focus-within:ring-primary/25">
+                <HiOutlineBuildingStorefront className="shrink-0 text-xl text-primary" />
+                <span className="sr-only">{t("categoriesLabel")}</span>
+                <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)} className="min-w-0 flex-1 appearance-none bg-transparent pe-5 text-sm outline-none">
+                  <option value="">{t("allCategories")}</option>
+                  {[...categories].sort((a, b) => collator.compare(a.name, b.name)).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                </select>
+                <FiChevronDown className="pointer-events-none absolute end-3 text-slate-400" />
+              </label>
+
+              <label className="relative flex min-h-14 items-center gap-3 rounded-xl bg-slate-50 px-4 text-slate-700 focus-within:ring-2 focus-within:ring-primary/25">
+                <FiMapPin className="shrink-0 text-xl text-primary" />
+                <span className="sr-only">{t("locationPlaceholder")}</span>
+                <select value={cityId} onChange={(event) => setCityId(event.target.value)} className="min-w-0 flex-1 appearance-none bg-transparent pe-5 text-sm outline-none">
+                  <option value="">{t("allCities")}</option>
+                  {[...cities].sort((a, b) => collator.compare(a.name, b.name)).map((city) => <option key={city.id} value={city.id}>{city.name}</option>)}
+                </select>
+                <FiChevronDown className="pointer-events-none absolute end-3 text-slate-400" />
+              </label>
+
+              <button type="submit" aria-label={t("search")} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-primary text-xl text-white shadow-[0_10px_25px_rgba(241,91,63,.32)] transition hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30">
+                <FiSearch />
+              </button>
             </div>
-
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-5xl xl:text-6xl">
-              {t.rich("title", { br: () => <br /> })}
-            </h1>
-
-            <p className="max-w-lg text-base leading-relaxed text-gray-500">
-              {t("description")}
-            </p>
-
-            <form onSubmit={handleSearch} className="w-full max-w-2xl">
-              <div className="flex items-center gap-1.5 rounded-2xl border border-gray-200 bg-white p-2 shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
-                <div className={cn("flex min-w-0 flex-1 items-center gap-2.5 px-3 py-1", isRTL && "flex-row-reverse")}>
-                  <HiOutlineShoppingBag className="shrink-0 text-xl text-primary" />
-                  <input
-                    type="text"
-                    placeholder={t("queryPlaceholder")}
-                    value={search.query ?? ""}
-                    onChange={(e) => setSearch((s) => ({ ...s, query: e.target.value }))}
-                    className={cn(
-                      "min-w-0 flex-1 bg-transparent text-sm text-gray-700 placeholder:text-gray-400 outline-none",
-                      isRTL && "text-right",
-                    )}
-                  />
-                </div>
-
-                <div className="h-8 w-px shrink-0 bg-gray-200" />
-
-                <div className="dropdown dropdown-bottom">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-3 py-2"
-                  >
-                    <BsGrid3X3Gap className="text-lg text-primary" />
-                    <span className="text-sm text-gray-600">
-                      {search.category ? t(`categories.${search.category}`) : t("categoriesLabel")}
-                    </span>
-                    <FiChevronDown className="text-xs text-gray-400" />
-                  </div>
-                  <ul
-                    tabIndex={0}
-                    className={cn(
-                      "dropdown-content z-50 menu mt-1 w-52 rounded-xl border border-gray-100 bg-white p-2 shadow-xl",
-                      isRTL && "text-right",
-                    )}
-                  >
-                    <li>
-                      <button
-                        type="button"
-                        className="text-sm text-gray-500 hover:text-primary"
-                        onClick={() => setSearch((s) => ({ ...s, category: undefined }))}
-                      >
-                        {t("allCategories")}
-                      </button>
-                    </li>
-                    <div className="divider my-1 h-px bg-gray-100" />
-                    {CATEGORIES.map((cat) => (
-                      <li key={cat.id}>
-                        <button
-                          type="button"
-                          className="flex items-center gap-2 text-sm text-gray-700 hover:text-primary"
-                          onClick={() => setSearch((s) => ({ ...s, category: cat.id }))}
-                        >
-                          <span>{cat.icon}</span>
-                          {t(`categories.${cat.id}`)}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="h-8 w-px shrink-0 bg-gray-200" />
-
-                <div className={cn("flex min-w-0 flex-1 items-center gap-2.5 px-3 py-1", isRTL && "flex-row-reverse")}>
-                  <MdLocationOn className="shrink-0 text-xl text-primary" />
-                  <input
-                    type="text"
-                    placeholder={t("locationPlaceholder")}
-                    value={search.location ?? ""}
-                    onChange={(e) => setSearch((s) => ({ ...s, location: e.target.value }))}
-                    className={cn(
-                      "min-w-0 flex-1 bg-transparent text-sm text-gray-700 placeholder:text-gray-400 outline-none",
-                      isRTL && "text-right",
-                    )}
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleGeoLocation}
-                  title={t("useCurrentLocation")}
-                  className="btn btn-primary btn-square btn-sm shrink-0 rounded-xl"
-                >
-                  <MdMyLocation className="text-lg" />
-                </button>
-
-                <button
-                  type="submit"
-                  title={t("search")}
-                  className="btn btn-primary btn-square shrink-0 rounded-xl"
-                >
-                  <FiSearch className="text-xl" />
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div className="hidden h-130 grid-cols-2 gap-3 lg:grid">
-            <div className="flex flex-col gap-3">
-              <div className="relative h-48 overflow-hidden rounded-2xl">
-                <Image
-                  src={HERO_IMAGES[0].src}
-                  alt={t(`imageAlts.${HERO_IMAGES[0].altKey}`)}
-                  fill
-                  className="object-cover transition-transform duration-500 hover:scale-105"
-                  sizes="(max-width: 1280px) 25vw, 300px"
-                />
-              </div>
-              <div className="relative flex-1 overflow-hidden rounded-2xl">
-                <Image
-                  src={HERO_IMAGES[1].src}
-                  alt={t(`imageAlts.${HERO_IMAGES[1].altKey}`)}
-                  fill
-                  className="object-cover transition-transform duration-500 hover:scale-105"
-                  sizes="(max-width: 1280px) 25vw, 300px"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {HERO_IMAGES.slice(2).map((img) => (
-                <div key={img.src} className="relative flex-1 overflow-hidden rounded-2xl">
-                  <Image
-                    src={img.src}
-                    alt={t(`imageAlts.${img.altKey}`)}
-                    fill
-                    className="object-cover transition-transform duration-500 hover:scale-105"
-                    sizes="(max-width: 1280px) 20vw, 240px"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </section>

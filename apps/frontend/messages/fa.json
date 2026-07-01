@@ -1,6 +1,8 @@
 {
   "Navbar": {
     "toggleNavigation": "تغییر نمایش منو",
+    "navigationLabel": "منوی اصلی",
+    "explore": "مشاهده کسب‌وکارها",
     "nav": {
       "home": "خانه",
       "businesses": "کسب و کارها",
@@ -40,12 +42,14 @@
   },
   "Home": {
     "hero": {
+      "eyebrow": "کسب‌وکارهای ایرانی در سراسر آلمان",
       "title": "دنبال یک<br></br>کسب و کار هستید؟",
       "description": "فارگو دایرکتوری پیدا کردن کسب و کارهای ایرانی در سراسر آلمان است؛ از رستوران و داروخانه تا وکیل و سالن زیبایی.",
       "queryPlaceholder": "دنبال چه چیزی هستید؟",
       "categoriesLabel": "دسته‌بندی‌ها",
       "allCategories": "همه دسته‌بندی‌ها",
       "locationPlaceholder": "موقعیت",
+      "allCities": "همه شهرها",
       "useCurrentLocation": "استفاده از موقعیت فعلی من",
       "search": "جستجو",
       "categories": {
@@ -67,6 +71,15 @@
         "grid2": "فروشگاه شهری",
         "grid3": "فروشگاه محلی"
       }
+    },
+    "citiesSection": {
+      "eyebrow": "جستجو بر اساس شهر",
+      "title": "کسب‌وکارهای شهر خود را پیدا کنید",
+      "description": "کسب‌وکارهای ایرانی را در فعال‌ترین شهرهای آلمان پیدا کنید.",
+      "listingCount": "{count} کسب‌وکار",
+      "previous": "شهرهای قبلی",
+      "next": "شهرهای بعدی",
+      "slideLabel": "رفتن به اسلاید شهر {number}"
     },
     "categoriesSection": {
       "title": "محبوب‌ترین دسته‌بندی‌ها",
@@ -164,6 +177,22 @@
       "viewBusiness": "مشاهده کسب‌وکار",
       "reviews": "نظر"
     }
+  },
+  "Footer": {
+    "description": "دایرکتوری کاربردی برای پیدا کردن کسب‌وکارها و خدمات معتبر ایرانی در سراسر آلمان.",
+    "linksTitle": "لینک‌های مفید",
+    "home": "خانه",
+    "businesses": "همه کسب‌وکارها",
+    "contactTitle": "ارتباط با ما",
+    "contactPending": "اطلاعات رسمی تماس به‌زودی در دسترس خواهد بود.",
+    "emailPending": "ایمیل به‌زودی اضافه می‌شود",
+    "soon": "راه‌های ارتباطی بیشتر به‌زودی",
+    "newsletterTitle": "باخبر بمانید",
+    "newsletterDescription": "عضویت در خبرنامه در نسخه آینده فعال خواهد شد.",
+    "emailPlaceholder": "آدرس ایمیل شما",
+    "comingSoon": "به‌زودی",
+    "copyright": "© {year} Fargo. همه حقوق محفوظ است.",
+    "madeFor": "کسب‌وکارهای ایرانی در آلمان"
   },
   "Offline": {
     "title": "شما آفلاین هستید",

@@ -12,29 +12,7 @@ export const NAV_LINKS: Array<{
   children?: Array<{ labelKey: string; href: string }>;
 }> = [
   { labelKey: "home", href: "/" },
-  {
-    labelKey: "businesses",
-    href: "/businesses",
-    hasDropdown: true,
-    children: [
-      { labelKey: "allBusinesses", href: "/businesses" },
-      { labelKey: "featured", href: "/businesses/featured" },
-      { labelKey: "newListings", href: "/businesses/new" },
-    ],
-  },
-  { labelKey: "pricing", href: "/pricing" },
-  { labelKey: "vendors", href: "/vendors" },
-  {
-    labelKey: "pages",
-    href: "/pages",
-    hasDropdown: true,
-    children: [
-      { labelKey: "aboutUs", href: "/about" },
-      { labelKey: "howItWorks", href: "/how-it-works" },
-      { labelKey: "faq", href: "/faq" },
-    ],
-  },
-  { labelKey: "contact", href: "/contact" },
+  { labelKey: "businesses", href: "/businesses" },
 ];
 
 export const CATEGORIES: Array<{

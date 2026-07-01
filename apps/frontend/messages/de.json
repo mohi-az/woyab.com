@@ -1,6 +1,8 @@
 {
   "Navbar": {
     "toggleNavigation": "Navigation umschalten",
+    "navigationLabel": "Hauptnavigation",
+    "explore": "Unternehmen entdecken",
     "nav": {
       "home": "Startseite",
       "businesses": "Unternehmen",
@@ -40,12 +42,14 @@
   },
   "Home": {
     "hero": {
+      "eyebrow": "Iranische Unternehmen in ganz Deutschland",
       "title": "Suchen Sie<br></br>ein Unternehmen?",
       "description": "Fargo ist das Verzeichnis fur iranische Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
       "queryPlaceholder": "Ich suche nach",
       "categoriesLabel": "Kategorien",
       "allCategories": "Alle Kategorien",
       "locationPlaceholder": "Standort",
+      "allCities": "Alle Städte",
       "useCurrentLocation": "Meinen aktuellen Standort verwenden",
       "search": "Suchen",
       "categories": {
@@ -67,6 +71,15 @@
         "grid2": "Geschaft in der Stadt",
         "grid3": "Lokales Ladenlokal"
       }
+    },
+    "citiesSection": {
+      "eyebrow": "Nach Standort entdecken",
+      "title": "Unternehmen in Ihrer Stadt finden",
+      "description": "Entdecken Sie iranische Unternehmen in den aktivsten Städten Deutschlands.",
+      "listingCount": "{count} Einträge",
+      "previous": "Vorherige Städte",
+      "next": "Nächste Städte",
+      "slideLabel": "Zur Stadtfolie {number}"
     },
     "categoriesSection": {
       "title": "Beliebteste Kategorien",
@@ -166,6 +179,22 @@
       "viewBusiness": "Unternehmen ansehen",
       "reviews": "Bewertungen"
     }
+  },
+  "Footer": {
+    "description": "Entdecken Sie vertrauenswürdige iranische Unternehmen und Dienstleistungen in ganz Deutschland.",
+    "linksTitle": "Nützliche Links",
+    "home": "Startseite",
+    "businesses": "Alle Unternehmen",
+    "contactTitle": "Kontakt",
+    "contactPending": "Offizielle Kontaktdaten folgen in Kürze.",
+    "emailPending": "E-Mail-Adresse folgt in Kürze",
+    "soon": "Weitere Kontaktmöglichkeiten folgen",
+    "newsletterTitle": "Bleiben Sie informiert",
+    "newsletterDescription": "Der Newsletter wird mit einem zukünftigen Update verfügbar sein.",
+    "emailPlaceholder": "Ihre E-Mail-Adresse",
+    "comingSoon": "Demnächst",
+    "copyright": "© {year} Fargo. Alle Rechte vorbehalten.",
+    "madeFor": "Iranische Unternehmen in Deutschland"
   },
   "Offline": {
     "title": "Sie sind offline",

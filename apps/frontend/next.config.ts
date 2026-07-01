@@ -1,8 +1,6 @@
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
-// جلوگیری از هشدار مربوط به ریشه turbopack در monorepo
-// تنظیمات مجاز برای بارگذاری تصاویر از منابع خارجی
 const nextConfig: NextConfig = {
   turbopack: {
     root: "../../",

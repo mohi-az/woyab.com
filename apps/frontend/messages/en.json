@@ -1,6 +1,8 @@
 {
   "Navbar": {
     "toggleNavigation": "Toggle navigation",
+    "navigationLabel": "Main navigation",
+    "explore": "Explore businesses",
     "nav": {
       "home": "Home",
       "businesses": "Businesses",
@@ -40,12 +42,14 @@
   },
   "Home": {
     "hero": {
+      "eyebrow": "Iranian businesses across Germany",
       "title": "Are You Looking<br></br>For A Business?",
       "description": "Fargo is the directory for discovering Iranian-owned businesses across Germany, from restaurants and pharmacies to lawyers and beauty salons.",
       "queryPlaceholder": "I'm looking for",
       "categoriesLabel": "Categories",
       "allCategories": "All categories",
       "locationPlaceholder": "Location",
+      "allCities": "All cities",
       "useCurrentLocation": "Use my current location",
       "search": "Search",
       "categories": {
@@ -67,6 +71,15 @@
         "grid2": "City storefront",
         "grid3": "Local shop"
       }
+    },
+    "citiesSection": {
+      "eyebrow": "Explore by location",
+      "title": "Find businesses in your city",
+      "description": "Discover Iranian-owned businesses in Germany's most active cities.",
+      "listingCount": "{count} listings",
+      "previous": "Previous cities",
+      "next": "Next cities",
+      "slideLabel": "Go to city slide {number}"
     },
     "categoriesSection": {
       "title": "Most Popular Categories",
@@ -166,6 +179,22 @@
       "viewBusiness": "View business",
       "reviews": "reviews"
     }
+  },
+  "Footer": {
+    "description": "Discover trusted Iranian-owned businesses and services across Germany in one practical directory.",
+    "linksTitle": "Useful links",
+    "home": "Home",
+    "businesses": "All businesses",
+    "contactTitle": "Contact",
+    "contactPending": "Official contact details will be available soon.",
+    "emailPending": "Email address coming soon",
+    "soon": "More ways to reach us are coming soon",
+    "newsletterTitle": "Stay in the loop",
+    "newsletterDescription": "Newsletter subscriptions will be available in a future update.",
+    "emailPlaceholder": "Your email address",
+    "comingSoon": "Coming soon",
+    "copyright": "© {year} Fargo. All rights reserved.",
+    "madeFor": "Iranian businesses in Germany"
   },
   "Offline": {
     "title": "You're offline",

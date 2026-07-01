@@ -77,8 +77,8 @@ export function BusinessFilters({
   }
 
   return (
-    <aside className="lg:sticky lg:top-24 lg:self-start">
-      <div className="space-y-5">
+    <aside className="lg:sticky lg:top-26 lg:self-start">
+      <div className="space-y-4 rounded-2xl border border-white bg-white p-4 shadow-[0_12px_36px_rgba(15,23,42,.06)]">
         <FilterSection title={labels.categories} defaultOpen>
           <fieldset>
             <legend className="sr-only">{labels.categories}</legend>
@@ -183,7 +183,7 @@ export function BusinessFilters({
           </div>
         </FilterSection>
 
-        <button type="button" onClick={reset} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-700 transition hover:border-primary hover:text-primary">
+        <button type="button" onClick={reset} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 transition hover:border-primary hover:bg-primary/5 hover:text-primary">
           <FiX /> {labels.reset}
         </button>
       </div>
@@ -194,19 +194,19 @@ export function BusinessFilters({
 function FilterSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <details open={isOpen} onToggle={(event) => setIsOpen(event.currentTarget.open)} className="group rounded-[18px] bg-[#f7f7f7]">
-      <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-6 text-lg font-extrabold text-gray-950 marker:content-none sm:text-xl">
+    <details open={isOpen} onToggle={(event) => setIsOpen(event.currentTarget.open)} className="group rounded-xl bg-[#f8f5f1]">
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-4 text-base font-extrabold text-slate-950 marker:content-none sm:text-lg">
         {title}
         <FiChevronDown className="shrink-0 text-base transition-transform duration-200 group-open:rotate-180" />
       </summary>
-      <div className="px-5 pb-6">{children}</div>
+      <div className="px-4 pb-5">{children}</div>
     </details>
   );
 }
 
 function FilterRadio({ name, value, label, count, iconKey, checked, onChange }: { name: string; value?: number; label: string; count?: number; iconKey?: string | null; checked: boolean; onChange: () => void }) {
   return (
-    <label className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 text-sm text-gray-600 transition hover:bg-white hover:text-gray-900">
+    <label className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 text-sm text-slate-600 transition hover:bg-white hover:text-slate-950">
       <input type="radio" name={name} value={value ?? ""} checked={checked} onChange={onChange} className="radio radio-xs border-gray-300 text-primary [--chkbg:var(--color-primary)]" />
       {iconKey ? <CategoryIcon iconKey={iconKey} className="shrink-0 text-base text-primary" /> : null}
       <span className="min-w-0 flex-1 truncate">{label}</span>

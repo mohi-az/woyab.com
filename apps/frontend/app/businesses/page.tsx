@@ -49,12 +49,14 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <section className="border-b border-[#f0e9e5] bg-[#fdf8f5] px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-[1480px]">
-          <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-primary">{t("eyebrow")}</p>
-          <h1 className="max-w-3xl text-3xl font-black tracking-tight text-gray-950 sm:text-5xl">{t("title")}</h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg">{t("description")}</p>
+    <div className="min-h-screen bg-[#f8f5f1]">
+      <section className="hero-theme relative isolate overflow-hidden px-4 py-14 text-white sm:px-6 sm:py-18">
+        <div className="absolute inset-0 bg-slate-950/88" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(241,91,63,.2),transparent_30%)]" />
+        <div className="relative mx-auto max-w-[1480px]">
+          <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.22em] text-primary-light">{t("eyebrow")}</p>
+          <h1 className="max-w-3xl text-3xl font-black tracking-tight sm:text-5xl">{t("title")}</h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">{t("description")}</p>
         </div>
       </section>
 

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { LocaleObserver } from "@/components/i18n/LocaleObserver";
 import { getDirection, isAppLocale } from "@/i18n/config";
@@ -9,7 +10,7 @@ import { dirooz, geistMono, geistSans } from "@/styles/fonts";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#f5735c",
+  themeColor: "#f15b3f",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -58,6 +59,7 @@ export default async function RootLayout({
           <ServiceWorkerRegistration />
           <Navbar />
           <main className="flex-1">{children}</main>
+          <Footer />
         </NextIntlClientProvider>
       </body>
     </html>
