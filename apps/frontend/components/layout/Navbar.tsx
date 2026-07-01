@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -14,6 +15,7 @@ export default function Navbar() {
   const t = useTranslations("Navbar");
   const locale = useLocale();
   const pathname = usePathname();
+  const { data: session, status } = useSession();
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 shadow-[0_6px_30px_rgba(15,23,42,0.05)] backdrop-blur-xl">
@@ -45,6 +47,14 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-3 lg:flex">
             <LanguageSelector />
+            {status !== "loading" && (session?.user ? (
+              <>
+                <Link href="/dashboard" className="text-sm font-bold text-slate-700 hover:text-primary">داشبورد</Link>
+                <button onClick={() => signOut({ redirectTo: "/" })} className="text-sm font-bold text-slate-500 hover:text-primary">خروج</button>
+              </>
+            ) : (
+              <Link href="/login" className="text-sm font-bold text-slate-700 hover:text-primary">ورود</Link>
+            ))}
             <Link href="/businesses" className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white shadow-[0_10px_25px_rgba(241,91,63,0.25)] transition hover:-translate-y-0.5 hover:bg-primary-dark">
               {t("explore")} <FiArrowRight className="rtl:rotate-180" />
             </Link>
@@ -74,6 +84,11 @@ export default function Navbar() {
               ))}
             </div>
             <div className="mt-4 border-t border-slate-100 pt-4">
+              <div className="mb-3 flex gap-3 px-4">
+                {session?.user ? (
+                  <><Link href="/dashboard" onClick={() => setMobileOpen(false)} className="font-bold text-primary">داشبورد</Link><button onClick={() => signOut({ redirectTo: "/" })} className="font-bold text-slate-500">خروج</button></>
+                ) : <Link href="/login" onClick={() => setMobileOpen(false)} className="font-bold text-primary">ورود / ثبت‌نام</Link>}
+              </div>
               <div className={`flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>
                 <LanguageSelector align="start" />
               </div>

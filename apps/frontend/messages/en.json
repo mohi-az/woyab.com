@@ -180,6 +180,70 @@
       "reviews": "reviews"
     }
   },
+  "BusinessDetail": {
+    "pageLabel": "Business detail page",
+    "back": "Back to all businesses",
+    "verified": "Verified business",
+    "reviewsCount": "{count, plural, =0 {No reviews yet} one {# review} other {# reviews}}",
+    "established": "Since {year}",
+    "overviewTitle": "Overview",
+    "descriptionFallback": "This business has not added a full description yet.",
+    "stats": {
+      "rating": "Rating",
+      "reviews": "Reviews",
+      "category": "Category",
+      "specialty": "Specialty"
+    },
+    "reviewsSection": {
+      "eyebrow": "Community feedback",
+      "title": "Customer reviews",
+      "verified": "Verified",
+      "empty": "No reviews have been posted yet."
+    },
+    "reviewsForm": {
+      "title": "Write a review",
+      "ratingLabel": "Your rating",
+      "chooseStars": "Give {count} stars",
+      "titlePlaceholder": "Review title (optional)",
+      "commentPlaceholder": "Share your experience with this business",
+      "loginRequired": "Logged-in users can leave a review here. Once your auth flow is connected, store the current user in local session and this form will become active.",
+      "ratingRequired": "Please choose a star rating.",
+      "commentRequired": "Please write a short review.",
+      "submit": "Submit review",
+      "submitting": "Submitting...",
+      "submitSuccess": "Your review was added.",
+      "submitError": "Your review could not be submitted."
+    },
+    "contactCard": {
+      "title": "Contact information",
+      "website": "Visit website"
+    },
+    "contactForm": {
+      "title": "Send a message",
+      "description": "Use this form to contact the business directly.",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "Your email address",
+      "phonePlaceholder": "Phone number",
+      "messagePlaceholder": "Write your message",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "submitSuccess": "Your message was sent.",
+      "submitSuccessMock": "The message was accepted in mock mode. Add the email env values to deliver it for real.",
+      "submitError": "Your message could not be sent."
+    },
+    "hoursTitle": "Business hours",
+    "hoursUnavailable": "Business hours are not available yet.",
+    "closed": "Closed",
+    "days": {
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday",
+      "SUNDAY": "Sunday"
+    }
+  },
   "Footer": {
     "description": "Discover trusted Iranian-owned businesses and services across Germany in one practical directory.",
     "linksTitle": "Useful links",

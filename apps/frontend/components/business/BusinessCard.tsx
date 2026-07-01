@@ -2,11 +2,13 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
-import { FiHeart, FiMapPin, FiNavigation } from "react-icons/fi";
+import { FiMapPin, FiNavigation } from "react-icons/fi";
 import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
+import { FavoriteButton } from "@/components/business/FavoriteButton";
 
 export type BusinessCardProps = {
+  businessId: string;
   title: string;
   href?: string;
   imageUrl?: string | null;
@@ -38,6 +40,7 @@ function RatingStars({ rating = 0 }: { rating?: number | null }) {
 }
 
 export function BusinessCard({
+  businessId,
   title,
   href,
   imageUrl,
@@ -116,13 +119,7 @@ export function BusinessCard({
 
   return (
     <article className="group relative w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_10px_32px_rgba(15,23,42,.07)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_48px_rgba(15,23,42,.13)]">
-      <button
-        type="button"
-        aria-label={favoriteLabel}
-        className="absolute end-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-primary shadow-[0_6px_18px_rgba(17,24,39,.16)] backdrop-blur transition hover:scale-105 hover:bg-primary hover:text-white"
-      >
-        <FiHeart className="text-base" />
-      </button>
+      <FavoriteButton businessId={businessId} label={favoriteLabel} />
 
       {href ? (
         <Link href={href} className="block">

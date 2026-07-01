@@ -178,6 +178,70 @@
       "reviews": "نظر"
     }
   },
+  "BusinessDetail": {
+    "pageLabel": "صفحه جزئیات کسب‌وکار",
+    "back": "بازگشت به همه کسب‌وکارها",
+    "verified": "کسب‌وکار تاییدشده",
+    "reviewsCount": "{count, plural, =0 {هنوز نظری ثبت نشده} one {# نظر} other {# نظر}}",
+    "established": "از {year}",
+    "overviewTitle": "معرفی",
+    "descriptionFallback": "هنوز توضیح کاملی برای این کسب‌وکار ثبت نشده است.",
+    "stats": {
+      "rating": "امتیاز",
+      "reviews": "نظرها",
+      "category": "دسته‌بندی",
+      "specialty": "تخصص"
+    },
+    "reviewsSection": {
+      "eyebrow": "نظر کاربران",
+      "title": "دیدگاه مشتریان",
+      "verified": "تاییدشده",
+      "empty": "هنوز نظری برای این کسب‌وکار ثبت نشده است."
+    },
+    "reviewsForm": {
+      "title": "ثبت نظر",
+      "ratingLabel": "امتیاز شما",
+      "chooseStars": "ثبت {count} ستاره",
+      "titlePlaceholder": "عنوان نظر (اختیاری)",
+      "commentPlaceholder": "تجربه خودتان از این کسب‌وکار را بنویسید",
+      "loginRequired": "کاربرانی که لاگین باشند می‌توانند از اینجا نظر ثبت کنند. وقتی جریان auth پروژه وصل شود و کاربر فعلی در سشن محلی ذخیره شود، این فرم فعال می‌شود.",
+      "ratingRequired": "لطفا تعداد ستاره را انتخاب کنید.",
+      "commentRequired": "لطفا یک نظر کوتاه بنویسید.",
+      "submit": "ثبت نظر",
+      "submitting": "در حال ثبت...",
+      "submitSuccess": "نظر شما اضافه شد.",
+      "submitError": "ثبت نظر انجام نشد."
+    },
+    "contactCard": {
+      "title": "اطلاعات تماس",
+      "website": "مشاهده وب‌سایت"
+    },
+    "contactForm": {
+      "title": "ارسال پیام",
+      "description": "از این فرم برای ارتباط مستقیم با کسب‌وکار استفاده کنید.",
+      "namePlaceholder": "نام شما",
+      "emailPlaceholder": "آدرس ایمیل",
+      "phonePlaceholder": "شماره تماس",
+      "messagePlaceholder": "پیام خود را بنویسید",
+      "submit": "ارسال پیام",
+      "sending": "در حال ارسال...",
+      "submitSuccess": "پیام شما ارسال شد.",
+      "submitSuccessMock": "پیام در حالت آزمایشی ثبت شد. برای ارسال واقعی فقط کافی است envهای ایمیل را اضافه کنید.",
+      "submitError": "ارسال پیام انجام نشد."
+    },
+    "hoursTitle": "ساعات کاری",
+    "hoursUnavailable": "ساعات کاری هنوز ثبت نشده است.",
+    "closed": "بسته",
+    "days": {
+      "MONDAY": "دوشنبه",
+      "TUESDAY": "سه‌شنبه",
+      "WEDNESDAY": "چهارشنبه",
+      "THURSDAY": "پنجشنبه",
+      "FRIDAY": "جمعه",
+      "SATURDAY": "شنبه",
+      "SUNDAY": "یکشنبه"
+    }
+  },
   "Footer": {
     "description": "دایرکتوری کاربردی برای پیدا کردن کسب‌وکارها و خدمات معتبر ایرانی در سراسر آلمان.",
     "linksTitle": "لینک‌های مفید",

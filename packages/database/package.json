@@ -7,9 +7,14 @@
     ".": {
       "types": "./index.ts",
       "default": "./index.ts"
+    },
+    "./client": {
+      "types": "./generated/prisma/client.ts",
+      "default": "./generated/prisma/client.ts"
     }
   },
   "scripts": {
+    "generate": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:push:dev": "dotenv -e .env.development -- prisma db push",
     "db:migrate:dev": "dotenv -e .env.development -- prisma migrate dev",

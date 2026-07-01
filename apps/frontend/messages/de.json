@@ -180,6 +180,70 @@
       "reviews": "Bewertungen"
     }
   },
+  "BusinessDetail": {
+    "pageLabel": "Unternehmensdetailseite",
+    "back": "Zuruck zu allen Unternehmen",
+    "verified": "Verifiziertes Unternehmen",
+    "reviewsCount": "{count, plural, =0 {Noch keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
+    "established": "Seit {year}",
+    "overviewTitle": "Uberblick",
+    "descriptionFallback": "Dieses Unternehmen hat noch keine ausfuhrliche Beschreibung hinzugefugt.",
+    "stats": {
+      "rating": "Bewertung",
+      "reviews": "Bewertungen",
+      "category": "Kategorie",
+      "specialty": "Schwerpunkt"
+    },
+    "reviewsSection": {
+      "eyebrow": "Feedback der Community",
+      "title": "Kundenbewertungen",
+      "verified": "Verifiziert",
+      "empty": "Bisher wurden noch keine Bewertungen veroffentlicht."
+    },
+    "reviewsForm": {
+      "title": "Bewertung schreiben",
+      "ratingLabel": "Ihre Bewertung",
+      "chooseStars": "{count} Sterne vergeben",
+      "titlePlaceholder": "Titel der Bewertung (optional)",
+      "commentPlaceholder": "Teilen Sie Ihre Erfahrung mit diesem Unternehmen",
+      "loginRequired": "Angemeldete Nutzer konnen hier eine Bewertung schreiben. Sobald Ihr Auth-Flow verbunden ist, aktiviert eine lokale Session diesen Bereich.",
+      "ratingRequired": "Bitte wahlen Sie eine Sternebewertung aus.",
+      "commentRequired": "Bitte schreiben Sie eine kurze Bewertung.",
+      "submit": "Bewertung senden",
+      "submitting": "Wird gesendet...",
+      "submitSuccess": "Ihre Bewertung wurde hinzugefugt.",
+      "submitError": "Ihre Bewertung konnte nicht gesendet werden."
+    },
+    "contactCard": {
+      "title": "Kontaktinformationen",
+      "website": "Website besuchen"
+    },
+    "contactForm": {
+      "title": "Nachricht senden",
+      "description": "Verwenden Sie dieses Formular, um das Unternehmen direkt zu kontaktieren.",
+      "namePlaceholder": "Ihr Name",
+      "emailPlaceholder": "Ihre E-Mail-Adresse",
+      "phonePlaceholder": "Telefonnummer",
+      "messagePlaceholder": "Schreiben Sie Ihre Nachricht",
+      "submit": "Nachricht senden",
+      "sending": "Wird gesendet...",
+      "submitSuccess": "Ihre Nachricht wurde gesendet.",
+      "submitSuccessMock": "Die Nachricht wurde im Mock-Modus akzeptiert. Fugen Sie die E-Mail-Env-Werte hinzu, um echte Zustellung zu aktivieren.",
+      "submitError": "Ihre Nachricht konnte nicht gesendet werden."
+    },
+    "hoursTitle": "Offnungszeiten",
+    "hoursUnavailable": "Offnungszeiten sind noch nicht verfugbar.",
+    "closed": "Geschlossen",
+    "days": {
+      "MONDAY": "Montag",
+      "TUESDAY": "Dienstag",
+      "WEDNESDAY": "Mittwoch",
+      "THURSDAY": "Donnerstag",
+      "FRIDAY": "Freitag",
+      "SATURDAY": "Samstag",
+      "SUNDAY": "Sonntag"
+    }
+  },
   "Footer": {
     "description": "Entdecken Sie vertrauenswürdige iranische Unternehmen und Dienstleistungen in ganz Deutschland.",
     "linksTitle": "Nützliche Links",

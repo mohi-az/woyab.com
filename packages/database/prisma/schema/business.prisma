@@ -75,6 +75,7 @@ model Business {
 
   services      Service[]
   reviews       Review[]
+  favoritedBy   Favorite[]
   images        BusinessImage[]
   videos        BusinessVideo[]
   documents     Document[]

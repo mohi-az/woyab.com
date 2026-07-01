@@ -17,7 +17,6 @@ import { cityRouter, countryRouter, districtRouter, provinceRouter } from "./mod
 import { reviewRouter, reviewStandaloneRouter } from "./modules/reviews/review.route.js";
 import { serviceRouter } from "./modules/services/service.route.js";
 import { tagRouter } from "./modules/tags/tag.route.js";
-import { userRouter } from "./modules/users/user.route.js";
 import { healthRouter } from "./routes/health.route.js";
 
 export const createApp = () => {
@@ -53,7 +52,6 @@ export const createApp = () => {
   const v = `/${env.API_VERSION}`;
 
   app.use(v, healthRouter);
-  app.use(`${v}/users`, userRouter);
   app.use(`${v}/categories`, categoryRouter);
   app.use(`${v}/sub-categories`, subCategoryRouter);
   app.use(`${v}/specialties`, specialtyRouter);

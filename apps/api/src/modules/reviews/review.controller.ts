@@ -5,7 +5,6 @@ import {
   listReviewsQuerySchema,
   reviewBusinessParamsSchema,
   reviewIdParamsSchema,
-  reviewParamsSchema,
   updateReviewBodySchema,
 } from "./review.schema.js";
 import { reviewService } from "./review.service.js";

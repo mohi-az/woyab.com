@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { LocaleObserver } from "@/components/i18n/LocaleObserver";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { getDirection, isAppLocale } from "@/i18n/config";
 import { dirooz, geistMono, geistSans } from "@/styles/fonts";
 import "./globals.css";
@@ -55,11 +56,13 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-white text-gray-900">
         <NextIntlClientProvider locale={appLocale} messages={messages}>
-          <LocaleObserver />
-          <ServiceWorkerRegistration />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <AuthProvider>
+            <LocaleObserver />
+            <ServiceWorkerRegistration />
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Authentication setup
+
+The frontend uses Auth.js (NextAuth v5) as the only session authority. Email/password accounts and Google accounts are stored in the shared Fargo database.
+
+1. Copy `.env.example` to `.env.local` and set a strong `AUTH_SECRET` (`npx auth secret` can generate one).
+2. In Firebase Authentication, enable Google sign-in. Open the linked Google Cloud OAuth web client and copy its client ID and secret to `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`.
+3. Add `http://localhost:3000/api/auth/callback/google` as an authorized redirect URI. Add the production callback URI before deployment.
+4. Apply the Prisma migration in `packages/database/prisma/migrations/20260701160000_add_user_auth_and_favorites`.
+
+Firebase supplies the Google OAuth client configuration; Auth.js owns cookies, sessions, credential login, and authorization. Do not add a second Firebase client session alongside it.

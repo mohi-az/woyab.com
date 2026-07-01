@@ -1,6 +1,4 @@
 import type { Request, Response } from "express";
-import { z } from "zod";
-
 import { createUserBodySchema, listUsersQuerySchema, updateUserBodySchema, userIdParamsSchema } from "./user.schema.js";
 import { userService } from "./user.service.js";
 
