@@ -49,6 +49,112 @@ type BusinessApiItem = {
   } | null;
 };
 
+type BusinessDetailApiResponse = {
+  success: boolean;
+  data: {
+    id: string;
+    slug: string;
+    businessName: string;
+    legalName?: string | null;
+    shortDescription?: string | null;
+    description?: string | null;
+    logoUrl?: string | null;
+    coverImageUrl?: string | null;
+    phone?: string | null;
+    mobile?: string | null;
+    whatsapp?: string | null;
+    email?: string | null;
+    website?: string | null;
+    instagram?: string | null;
+    telegram?: string | null;
+    facebook?: string | null;
+    youtube?: string | null;
+    linkedin?: string | null;
+    address?: string | null;
+    postalCode?: string | null;
+    establishedYear?: number | null;
+    priceRange?: "BUDGET" | "MODERATE" | "EXPENSIVE" | "LUXURY" | null;
+    averageRating?: number | null;
+    reviewCount?: number | null;
+    verified?: boolean;
+    featured?: boolean;
+    category?: {
+      id: number;
+      nameFa: string;
+      nameEn: string;
+      slug: string;
+      icon?: string | null;
+    } | null;
+    subCategory?: {
+      id: number;
+      nameFa: string;
+      nameEn: string;
+      slug: string;
+      icon?: string | null;
+    } | null;
+    specialty?: {
+      id: number;
+      nameFa: string;
+      nameEn: string;
+    } | null;
+    city?: {
+      id: number;
+      nameFa: string;
+      nameEn: string;
+      slug: string;
+    } | null;
+    district?: {
+      id: number;
+      nameFa: string;
+      nameEn: string;
+    } | null;
+    businessHours?: Array<{
+      id: number;
+      dayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+      openTime?: string | null;
+      closeTime?: string | null;
+      isClosed: boolean;
+      note?: string | null;
+    }>;
+    tags?: Array<{
+      tag: {
+        id: number;
+        nameFa: string;
+        nameEn: string;
+        slug: string;
+      };
+    }>;
+    images?: Array<{
+      id: string;
+      imageUrl: string;
+      caption?: string | null;
+      sortOrder: number;
+    }>;
+    _count?: {
+      reviews: number;
+      services: number;
+      branches: number;
+    };
+  };
+};
+
+type ReviewApiItem = {
+  id: string;
+  rating: number;
+  title?: string | null;
+  comment?: string | null;
+  visitDate?: string | null;
+  helpfulCount?: number;
+  verified?: boolean;
+  status?: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  user?: {
+    id: string;
+    name?: string | null;
+    avatarUrl?: string | null;
+  } | null;
+};
+
 type PaginatedResponse<T> = {
   success: boolean;
   data: {
@@ -111,6 +217,8 @@ export type BusinessDirectoryData = {
 
 export type LatestBusinessCardItem = {
   id: string;
+  businessId: string;
+  slug: string;
   href: string;
   title: string;
   imageUrl?: string | null;
@@ -123,6 +231,76 @@ export type LatestBusinessCardItem = {
   location?: string | null;
   distanceMeters?: number | null;
   matchedLocationName?: string | null;
+};
+
+export type BusinessDetailData = {
+  id: string;
+  slug: string;
+  title: string;
+  legalName?: string | null;
+  shortDescription?: string | null;
+  description?: string | null;
+  logoUrl?: string | null;
+  coverImageUrl?: string | null;
+  gallery: Array<{
+    id: string;
+    imageUrl: string;
+    caption?: string | null;
+  }>;
+  categoryName?: string | null;
+  categorySlug?: string | null;
+  categoryIconKey?: string | null;
+  subCategoryName?: string | null;
+  specialtyName?: string | null;
+  location?: string | null;
+  address?: string | null;
+  postalCode?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  whatsapp?: string | null;
+  email?: string | null;
+  website?: string | null;
+  socialLinks: Array<{
+    key: "instagram" | "telegram" | "facebook" | "youtube" | "linkedin";
+    url: string;
+  }>;
+  establishedYear?: number | null;
+  priceRange?: "BUDGET" | "MODERATE" | "EXPENSIVE" | "LUXURY" | null;
+  rating: number;
+  reviewCount: number;
+  verified: boolean;
+  featured: boolean;
+  hours: Array<{
+    dayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+    openTime?: string | null;
+    closeTime?: string | null;
+    isClosed: boolean;
+    note?: string | null;
+  }>;
+  tags: string[];
+};
+
+export type BusinessReviewItem = {
+  id: string;
+  rating: number;
+  title?: string | null;
+  comment?: string | null;
+  createdAt: string;
+  visitDate?: string | null;
+  verified: boolean;
+  status?: "PENDING" | "APPROVED" | "REJECTED";
+  user: {
+    id: string;
+    name: string;
+    avatarUrl?: string | null;
+  };
+};
+
+export type CurrentUser = {
+  id: string;
+  name: string;
+  email?: string | null;
+  avatarUrl?: string | null;
 };
 
 const API_BASE = process.env.API_URL ?? "http://localhost:4000";
@@ -163,7 +341,9 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
 
     return items.map((business) => ({
       id: business.id,
-      href: `/businesses?search=${encodeURIComponent(business.businessName)}`,
+      businessId: business.id,
+      slug: business.slug,
+      href: `/businesses/${business.slug}`,
       title: business.businessName,
       imageUrl: business.coverImageUrl,
       shortDescription: business.shortDescription,
@@ -218,7 +398,9 @@ export async function fetchBusinessDirectory(
       ...json.data,
       items: (json.data?.items ?? []).map((business) => ({
         id: business.id,
-        href: `/businesses?search=${encodeURIComponent(business.businessName)}`,
+        businessId: business.id,
+        slug: business.slug,
+        href: `/businesses/${business.slug}`,
         title: business.businessName,
         imageUrl: business.coverImageUrl,
         shortDescription: business.shortDescription,
@@ -283,7 +465,9 @@ export async function searchBusinessDirectory(
     ...json.data,
     items: (json.data.items ?? []).map((business) => ({
       id: business.id,
-      href: `/businesses?search=${encodeURIComponent(business.businessName)}`,
+      businessId: business.id,
+      slug: business.slug,
+      href: `/businesses/${business.slug}`,
       title: business.businessName,
       imageUrl: business.coverImageUrl,
       shortDescription: business.shortDescription,
@@ -335,4 +519,112 @@ export function fetchDirectorySubCategories(locale: string, categoryId?: number)
 
 export function fetchDirectoryCities(locale: string) {
   return fetchDirectoryOptions(locale, "/v1/cities?limit=100");
+}
+
+function localizedText(locale: string, item?: { nameFa: string; nameEn: string } | null) {
+  return getLocalizedName(locale, item);
+}
+
+export async function fetchBusinessBySlug(
+  locale: string,
+  slug: string,
+): Promise<BusinessDetailData | null> {
+  try {
+    const res = await fetch(`${API_BASE}/v1/businesses/slug/${encodeURIComponent(slug)}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+
+    const json = (await res.json()) as BusinessDetailApiResponse;
+    const business = json.data;
+    const gallery = (business.images ?? []).map((image) => ({
+      id: image.id,
+      imageUrl: image.imageUrl,
+      caption: image.caption,
+    }));
+
+    if (gallery.length === 0 && business.coverImageUrl) {
+      gallery.push({
+        id: `${business.id}-cover`,
+        imageUrl: business.coverImageUrl,
+        caption: business.businessName,
+      });
+    }
+
+    return {
+      id: business.id,
+      slug: business.slug,
+      title: business.businessName,
+      legalName: business.legalName,
+      shortDescription: business.shortDescription,
+      description: business.description,
+      logoUrl: business.logoUrl,
+      coverImageUrl: business.coverImageUrl,
+      gallery,
+      categoryName: localizedText(locale, business.category),
+      categorySlug: business.category?.slug,
+      categoryIconKey: business.category?.icon,
+      subCategoryName: localizedText(locale, business.subCategory),
+      specialtyName: localizedText(locale, business.specialty),
+      location: localizedText(locale, business.city),
+      address: business.address,
+      postalCode: business.postalCode,
+      phone: business.phone,
+      mobile: business.mobile,
+      whatsapp: business.whatsapp,
+      email: business.email,
+      website: business.website,
+      socialLinks: ([
+        ["instagram", business.instagram],
+        ["telegram", business.telegram],
+        ["facebook", business.facebook],
+        ["youtube", business.youtube],
+        ["linkedin", business.linkedin],
+      ] as const).flatMap(([key, url]) => (url ? [{ key, url }] : [])),
+      establishedYear: business.establishedYear,
+      priceRange: business.priceRange,
+      rating: business.averageRating ?? 0,
+      reviewCount: business.reviewCount ?? 0,
+      verified: Boolean(business.verified),
+      featured: Boolean(business.featured),
+      hours: (business.businessHours ?? []).map((hour) => ({
+        dayOfWeek: hour.dayOfWeek,
+        openTime: hour.openTime,
+        closeTime: hour.closeTime,
+        isClosed: hour.isClosed,
+        note: hour.note,
+      })),
+      tags: (business.tags ?? []).map((entry) => localizedText(locale, entry.tag) ?? entry.tag.nameEn),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchBusinessReviews(businessId: string): Promise<BusinessReviewItem[]> {
+  try {
+    const res = await fetch(`${API_BASE}/v1/businesses/${businessId}/reviews?limit=50`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+
+    const json = (await res.json()) as PaginatedResponse<ReviewApiItem>;
+    return (json.data?.items ?? []).map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      title: review.title,
+      comment: review.comment,
+      createdAt: review.createdAt,
+      visitDate: review.visitDate,
+      verified: Boolean(review.verified),
+      status: review.status,
+      user: {
+        id: review.user?.id ?? "anonymous",
+        name: review.user?.name?.trim() || "Anonymous",
+        avatarUrl: review.user?.avatarUrl,
+      },
+    }));
+  } catch {
+    return [];
+  }
 }

@@ -59,6 +59,25 @@ businessRouter.post("/map", validateRequest({ body: businessMapBodySchema }), bu
 
 /**
  * @openapi
+ * /businesses/slug/{slug}:
+ *   get:
+ *     summary: Get a business by slug
+ *     tags: [Businesses]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Business with full details
+ *       404:
+ *         description: Business not found
+ */
+businessRouter.get("/slug/:slug", businessController.getBySlug);
+
+/**
+ * @openapi
  * /businesses/{id}:
  *   get:
  *     summary: Get a business by ID

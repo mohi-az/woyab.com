@@ -85,7 +85,7 @@ export const businessService = {
   },
 
   getBySlug: async (slug: string) => {
-    const business = await businessRepository.findBySlug(slug);
+    const business = await businessRepository.findDetailBySlug(slug);
     if (!business) throw ApiError.notFound("Business not found");
     return business;
   },

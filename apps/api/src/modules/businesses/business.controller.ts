@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import {
   businessIdParamsSchema,
+  businessSlugParamsSchema,
   businessMapBodySchema,
   businessSearchBodySchema,
   createBusinessBodySchema,
@@ -31,6 +32,12 @@ export const businessController = {
   getById: async (req: Request, res: Response) => {
     const { id } = businessIdParamsSchema.parse(req.params);
     const business = await businessService.getById(id);
+    res.json({ success: true, data: business });
+  },
+
+  getBySlug: async (req: Request, res: Response) => {
+    const { slug } = businessSlugParamsSchema.parse(req.params);
+    const business = await businessService.getBySlug(slug);
     res.json({ success: true, data: business });
   },
 

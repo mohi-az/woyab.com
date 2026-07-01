@@ -78,7 +78,7 @@ function businessCardElement(properties: MapProperties, locale: Props["locale"],
   rating.className = "business-map-card__rating";
   rating.textContent = `★ ${Number(properties.averageRating ?? 0).toFixed(1)} · ${properties.reviewCount ?? 0} ${labels.reviews}`;
   const link = document.createElement("a");
-  link.href = `/businesses?search=${encodeURIComponent(properties.businessName)}`;
+  link.href = `/businesses/${encodeURIComponent(properties.slug)}`;
   link.textContent = labels.viewBusiness;
   body.append(title, meta, rating, link);
   card.append(body);

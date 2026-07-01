@@ -16,6 +16,19 @@ type BusinessFilter = {
 
 type BusinessSort = "latest";
 
+const businessDetailInclude = {
+  category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+  subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+  specialty: { select: { id: true, nameFa: true, nameEn: true } },
+  owner: { select: { id: true, name: true, email: true, avatarUrl: true } },
+  city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+  district: { select: { id: true, nameFa: true, nameEn: true } },
+  businessHours: { orderBy: { dayOfWeek: "asc" as const } },
+  tags: { include: { tag: { select: { id: true, nameFa: true, nameEn: true, slug: true } } } },
+  images: { orderBy: { sortOrder: "asc" as const } },
+  _count: { select: { reviews: true, services: true, branches: true } },
+} satisfies Parameters<typeof prisma.business.findUnique>[0]["include"];
+
 export const businessRepository = {
   findMany: (skip: number, take: number, where: BusinessFilter = {}, sortBy?: BusinessSort) =>
     prisma.business.findMany({
@@ -81,21 +94,16 @@ export const businessRepository = {
   findById: (id: string) =>
     prisma.business.findUnique({
       where: { id },
-      include: {
-        category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
-        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
-        specialty: { select: { id: true, nameFa: true, nameEn: true } },
-        owner: { select: { id: true, name: true, email: true, avatarUrl: true } },
-        city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        district: { select: { id: true, nameFa: true, nameEn: true } },
-        businessHours: { orderBy: { dayOfWeek: "asc" } },
-        tags: { include: { tag: { select: { id: true, nameFa: true, nameEn: true, slug: true } } } },
-        images: { orderBy: { sortOrder: "asc" } },
-        _count: { select: { reviews: true, services: true, branches: true } },
-      },
+      include: businessDetailInclude,
     }),
 
   findBySlug: (slug: string) => prisma.business.findUnique({ where: { slug } }),
+
+  findDetailBySlug: (slug: string) =>
+    prisma.business.findUnique({
+      where: { slug },
+      include: businessDetailInclude,
+    }),
 
   create: (data: CreateBusinessBody) => prisma.business.create({ data }),
 

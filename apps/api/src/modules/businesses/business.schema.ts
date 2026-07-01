@@ -44,6 +44,10 @@ export const businessIdParamsSchema = z.object({
   id: z.string().min(1),
 });
 
+export const businessSlugParamsSchema = z.object({
+  slug: z.string().min(1),
+});
+
 export const listBusinessesQuerySchema = paginationQuerySchema.extend({
   categoryId: z.coerce.number().int().positive().optional(),
   subCategoryId: z.coerce.number().int().positive().optional(),
