@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 type DashboardUser = {
@@ -9,11 +10,19 @@ type DashboardUser = {
   avatarUrl: string | null;
 };
 
-const links = [["/dashboard", "نمای کلی"], ["/dashboard/profile", "پروفایل"], ["/dashboard/favorites", "علاقه‌مندی‌ها"], ["/dashboard/addresses", "آدرس‌های من"], ["/dashboard/reviews", "نظرهای من"], ["/dashboard/security", "امنیت حساب"]];
+const links = [
+  ["/dashboard", "overview"],
+  ["/dashboard/profile", "profile"],
+  ["/dashboard/favorites", "favorites"],
+  ["/dashboard/addresses", "addresses"],
+  ["/dashboard/reviews", "reviews"],
+  ["/dashboard/security", "security"],
+] as const;
 
 export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }) {
+  const t = useTranslations("Dashboard.sidebar");
   const [user, setUser] = useState(initialUser);
-  const displayName = user.name || "کاربر فارگو";
+  const displayName = user.name || t("fallbackName");
   const initials = displayName.trim().slice(0, 1).toUpperCase();
 
   useEffect(() => {
@@ -42,9 +51,9 @@ export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }
         </div>
       </div>
       <nav className="mt-3 grid grid-cols-2 gap-1 lg:grid-cols-1">
-        {links.map(([href, label]) => (
+        {links.map(([href, labelKey]) => (
           <Link key={href} href={href} className="rounded-xl px-3 py-3 text-sm font-bold text-slate-600 hover:bg-primary/5 hover:text-primary">
-            {label}
+            {t(labelKey)}
           </Link>
         ))}
       </nav>

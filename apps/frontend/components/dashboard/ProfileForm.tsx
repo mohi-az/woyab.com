@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { FiCamera, FiSave, FiUploadCloud } from "react-icons/fi";
 
@@ -9,6 +10,7 @@ type Crop = { x: number; y: number; zoom: number };
 
 export function ProfileForm({ initial }: { initial: Profile }) {
   const router = useRouter();
+  const t = useTranslations("Dashboard.profile.form");
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,18 +20,18 @@ export function ProfileForm({ initial }: { initial: Profile }) {
   const [selectedImage, setSelectedImage] = useState("");
   const [crop, setCrop] = useState<Crop>({ x: 0, y: 0, zoom: 1 });
 
-  const displayName = name || initial.email || "کاربر فارگو";
+  const displayName = name || initial.email || t("fallbackName");
   const initials = displayName.trim().slice(0, 1).toUpperCase();
   const previewImage = selectedImage || avatarUrl;
 
   function chooseImage(file: File | undefined) {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setMessage("لطفاً یک فایل تصویر معتبر انتخاب کنید.");
+      setMessage(t("invalidImage"));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setMessage("حجم تصویر باید کمتر از ۵ مگابایت باشد.");
+      setMessage(t("imageTooLarge"));
       return;
     }
 
@@ -67,7 +69,7 @@ export function ProfileForm({ initial }: { initial: Profile }) {
       body: JSON.stringify({ image: cropped }),
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error ?? "آپلود تصویر انجام نشد.");
+    if (!response.ok) throw new Error(result.error ?? t("uploadFailed"));
     return result.data.avatarUrl as string;
   }
 
@@ -85,17 +87,17 @@ export function ProfileForm({ initial }: { initial: Profile }) {
       });
       const result = await response.json();
 
-      if (!response.ok) throw new Error(result.error ?? "ذخیره انجام نشد.");
+      if (!response.ok) throw new Error(result.error ?? t("saveFailed"));
 
       setAvatarUrl(result.data.avatarUrl ?? "");
       setSelectedImage("");
-      setMessage("پروفایل با موفقیت ذخیره شد.");
+      setMessage(t("saved"));
       window.dispatchEvent(new CustomEvent("fargo:profile-updated", {
         detail: { name, email: initial.email, avatarUrl: result.data.avatarUrl ?? "" },
       }));
       router.refresh();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "ذخیره انجام نشد.");
+      setMessage(error instanceof Error ? error.message : t("saveFailed"));
     } finally {
       setLoading(false);
     }
@@ -117,7 +119,7 @@ export function ProfileForm({ initial }: { initial: Profile }) {
             </div>
             <label className="mt-5 inline-flex h-11 cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white transition hover:bg-primary-dark">
               <FiUploadCloud className="text-lg" />
-              انتخاب تصویر
+              {t("chooseImage")}
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
@@ -126,7 +128,7 @@ export function ProfileForm({ initial }: { initial: Profile }) {
               />
             </label>
             <p className="mt-3 text-xs leading-6 text-slate-500">
-              تصویر را آپلود کنید، جای آن را تنظیم کنید و خروجی گرد را همان‌جا ببینید.
+              {t("imageHelp")}
             </p>
           </div>
         </section>
@@ -136,14 +138,14 @@ export function ProfileForm({ initial }: { initial: Profile }) {
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <div className="flex items-center gap-2 text-sm font-black text-slate-900">
                 <FiCamera className="text-primary" />
-                تنظیم کراپ تصویر
+                {t("cropTitle")}
               </div>
               <div className="mt-4 grid gap-5 md:grid-cols-[220px_1fr]">
                 <div className="mx-auto h-52 w-52 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
                   <img
                     ref={imageRef}
                     src={selectedImage}
-                    alt="پیش‌نمایش تصویر پروفایل"
+                    alt={t("previewAlt")}
                     className="h-full w-full object-cover"
                     style={{
                       transform: `translate(${crop.x}px, ${crop.y}px) scale(${crop.zoom})`,
@@ -151,22 +153,22 @@ export function ProfileForm({ initial }: { initial: Profile }) {
                   />
                 </div>
                 <div className="space-y-4">
-                  <Slider label="بزرگ‌نمایی" min={1} max={2.4} step={0.05} value={crop.zoom} onChange={(zoom) => setCrop((current) => ({ ...current, zoom }))} />
-                  <Slider label="جابجایی افقی" min={-80} max={80} step={1} value={crop.x} onChange={(x) => setCrop((current) => ({ ...current, x }))} />
-                  <Slider label="جابجایی عمودی" min={-80} max={80} step={1} value={crop.y} onChange={(y) => setCrop((current) => ({ ...current, y }))} />
+                  <Slider label={t("zoom")} min={1} max={2.4} step={0.05} value={crop.zoom} onChange={(zoom) => setCrop((current) => ({ ...current, zoom }))} />
+                  <Slider label={t("panX")} min={-80} max={80} step={1} value={crop.x} onChange={(x) => setCrop((current) => ({ ...current, x }))} />
+                  <Slider label={t("panY")} min={-80} max={80} step={1} value={crop.y} onChange={(y) => setCrop((current) => ({ ...current, y }))} />
                 </div>
               </div>
             </div>
           ) : null}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="نام و نام خانوادگی">
+            <Field label={t("name")}>
               <input value={name} onChange={(event) => setName(event.target.value)} required className="h-12 w-full rounded-xl border border-slate-300 px-4 outline-none focus:border-primary" />
             </Field>
-            <Field label="ایمیل">
+            <Field label={t("email")}>
               <input value={initial.email} disabled dir="ltr" className="h-12 w-full rounded-xl border border-slate-300 bg-slate-100 px-4 text-left outline-none" />
             </Field>
-            <Field label="شماره تماس">
+            <Field label={t("phone")}>
               <input value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" dir="ltr" className="h-12 w-full rounded-xl border border-slate-300 px-4 text-left outline-none focus:border-primary" />
             </Field>
           </div>
@@ -174,7 +176,7 @@ export function ProfileForm({ initial }: { initial: Profile }) {
           {message ? <p role="status" className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">{message}</p> : null}
           <button disabled={loading} className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-6 font-bold text-white disabled:opacity-60">
             <FiSave />
-            {loading ? "در حال ذخیره..." : "ذخیره تغییرات"}
+            {loading ? t("saving") : t("save")}
           </button>
         </section>
       </div>

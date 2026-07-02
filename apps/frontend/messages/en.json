@@ -326,5 +326,142 @@
       "failed": "Registration could not be completed.",
       "haveAccount": "Already have an account?"
     }
+  },
+  "Dashboard": {
+    "overview": {
+      "greeting": "Hi {name}",
+      "fallbackName": "friend",
+      "description": "Manage your account information and activity from here.",
+      "favorites": "Favorites",
+      "addresses": "Addresses",
+      "reviews": "Reviews",
+      "completionTitle": "Complete your account",
+      "completionDescription": "Add your name, phone number and profile photo for a more personal experience.",
+      "editProfile": "Edit profile"
+    },
+    "sidebar": {
+      "fallbackName": "Fargo user",
+      "overview": "Overview",
+      "profile": "Profile",
+      "favorites": "Favorites",
+      "addresses": "My addresses",
+      "reviews": "My reviews",
+      "security": "Account security"
+    },
+    "profile": {
+      "title": "My profile",
+      "description": "Manage your main information and profile photo.",
+      "form": {
+        "fallbackName": "Fargo user",
+        "invalidImage": "Please choose a valid image file.",
+        "imageTooLarge": "Image size must be under 5 MB.",
+        "uploadFailed": "Image upload failed.",
+        "saveFailed": "Save failed.",
+        "saved": "Profile saved successfully.",
+        "chooseImage": "Choose image",
+        "imageHelp": "Upload an image, adjust its position and preview the round result.",
+        "cropTitle": "Adjust image crop",
+        "previewAlt": "Profile image preview",
+        "zoom": "Zoom",
+        "panX": "Horizontal position",
+        "panY": "Vertical position",
+        "name": "Full name",
+        "email": "Email",
+        "phone": "Phone number",
+        "saving": "Saving...",
+        "save": "Save changes"
+      }
+    },
+    "favorites": {
+      "title": "My favorites",
+      "viewBusiness": "View business",
+      "empty": "Your favorites list is empty.",
+      "remove": "Remove"
+    },
+    "reviews": {
+      "title": "My reviews",
+      "empty": "You have not posted a review yet.",
+      "status": {
+        "PENDING": "Pending review",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected"
+      }
+    },
+    "security": {
+      "title": "Account security",
+      "form": {
+        "passwordTitle": "Password",
+        "hasPasswordText": "To change your password, a secure one-time link will be sent to your email.",
+        "googleText": "This account was created with Google. You can also create a local password after email verification.",
+        "resetSent": "A secure password setup link was sent to your account email.",
+        "sending": "Sending...",
+        "sendChangeLink": "Send password change link",
+        "sendCreateLink": "Send password setup link",
+        "deleteTitle": "Delete account",
+        "deleteText": "This is permanent and will delete account-related data.",
+        "confirmDelete": "Account deletion is permanent. Continue?",
+        "deleteFailed": "Account could not be deleted.",
+        "passwordConfirm": "Enter your current password to confirm",
+        "deleteConfirm": "Type DELETE to confirm",
+        "deleteButton": "Permanently delete account"
+      }
+    },
+    "addresses": {
+      "title": "Saved addresses",
+      "description": "Move the map until the center pin is on the exact address; city and district update automatically.",
+      "manager": {
+        "icons": {
+          "HOME": "Home",
+          "WORK": "Work",
+          "FAVORITE": "Favorite",
+          "OTHER": "Other"
+        },
+        "map": {
+          "loading": "Preparing map",
+          "searchPlaceholder": "Search street, district or city",
+          "currentLocation": "My location",
+          "label": "Choose address on map"
+        },
+        "form": {
+          "newEyebrow": "New address",
+          "editEyebrow": "Edit address",
+          "title": "Selected address details",
+          "label": "Address label",
+          "address": "Address",
+          "addressPlaceholder": "This updates automatically as you move the map.",
+          "city": "City",
+          "district": "District",
+          "default": "Make this my default address",
+          "save": "Save address",
+          "cancel": "Cancel"
+        },
+        "saved": {
+          "title": "Saved addresses",
+          "description": "Used for searches and recommendations near you.",
+          "count": "{count} addresses",
+          "defaultBadge": "Default",
+          "noArea": "No city/district",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "empty": {
+          "title": "No saved addresses yet",
+          "description": "Use the map above to select and save home, work or other important places."
+        },
+        "messages": {
+          "saved": "Address saved."
+        },
+        "errors": {
+          "mapUnavailable": "The map is unavailable. Check Mapbox or geo service configuration.",
+          "searchUnavailable": "Address search is currently unavailable.",
+          "geolocationUnsupported": "Your browser does not support current location.",
+          "permissionDenied": "Enable browser location access to use your current location.",
+          "locationUnavailable": "Current location was not found. Search an address or place a pin on the map.",
+          "pickFirst": "Move the map until the center pin is on the exact address.",
+          "saveFailed": "Address could not be saved.",
+          "deleteFailed": "Address could not be deleted."
+        }
+      }
+    }
   }
 }

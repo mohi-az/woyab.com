@@ -326,5 +326,142 @@
       "failed": "Die Registrierung konnte nicht abgeschlossen werden.",
       "haveAccount": "Sie haben bereits ein Konto?"
     }
+  },
+  "Dashboard": {
+    "overview": {
+      "greeting": "Hallo {name}",
+      "fallbackName": "Freund",
+      "description": "Verwalten Sie hier Ihre Kontoinformationen und Aktivit?ten.",
+      "favorites": "Favoriten",
+      "addresses": "Adressen",
+      "reviews": "Bewertungen",
+      "completionTitle": "Konto vervollst?ndigen",
+      "completionDescription": "Erg?nzen Sie Name, Telefonnummer und Profilbild f?r eine pers?nlichere Erfahrung.",
+      "editProfile": "Profil bearbeiten"
+    },
+    "sidebar": {
+      "fallbackName": "Fargo-Nutzer",
+      "overview": "?bersicht",
+      "profile": "Profil",
+      "favorites": "Favoriten",
+      "addresses": "Meine Adressen",
+      "reviews": "Meine Bewertungen",
+      "security": "Kontosicherheit"
+    },
+    "profile": {
+      "title": "Mein Profil",
+      "description": "Verwalten Sie Ihre wichtigsten Informationen und Ihr Profilbild.",
+      "form": {
+        "fallbackName": "Fargo-Nutzer",
+        "invalidImage": "Bitte w?hlen Sie eine g?ltige Bilddatei.",
+        "imageTooLarge": "Das Bild muss kleiner als 5 MB sein.",
+        "uploadFailed": "Bild konnte nicht hochgeladen werden.",
+        "saveFailed": "Speichern fehlgeschlagen.",
+        "saved": "Profil wurde gespeichert.",
+        "chooseImage": "Bild ausw?hlen",
+        "imageHelp": "Laden Sie ein Bild hoch, passen Sie es an und sehen Sie die runde Vorschau.",
+        "cropTitle": "Bildzuschnitt anpassen",
+        "previewAlt": "Profilbild-Vorschau",
+        "zoom": "Zoom",
+        "panX": "Horizontale Position",
+        "panY": "Vertikale Position",
+        "name": "Vollst?ndiger Name",
+        "email": "E-Mail",
+        "phone": "Telefonnummer",
+        "saving": "Speichern...",
+        "save": "?nderungen speichern"
+      }
+    },
+    "favorites": {
+      "title": "Meine Favoriten",
+      "viewBusiness": "Unternehmen ansehen",
+      "empty": "Ihre Favoritenliste ist leer.",
+      "remove": "Entfernen"
+    },
+    "reviews": {
+      "title": "Meine Bewertungen",
+      "empty": "Sie haben noch keine Bewertung abgegeben.",
+      "status": {
+        "PENDING": "Wird gepr?ft",
+        "APPROVED": "Genehmigt",
+        "REJECTED": "Abgelehnt"
+      }
+    },
+    "security": {
+      "title": "Kontosicherheit",
+      "form": {
+        "passwordTitle": "Passwort",
+        "hasPasswordText": "Zum ?ndern Ihres Passworts senden wir einen sicheren Einmallink an Ihre E-Mail.",
+        "googleText": "Dieses Konto wurde mit Google erstellt. Sie k?nnen nach E-Mail-Best?tigung auch ein lokales Passwort erstellen.",
+        "resetSent": "Ein sicherer Link zum Einrichten des Passworts wurde an Ihre E-Mail gesendet.",
+        "sending": "Wird gesendet...",
+        "sendChangeLink": "Link zum ?ndern senden",
+        "sendCreateLink": "Link zum Erstellen senden",
+        "deleteTitle": "Konto l?schen",
+        "deleteText": "Dies ist dauerhaft und l?scht die mit dem Konto verbundenen Daten.",
+        "confirmDelete": "Das L?schen des Kontos ist dauerhaft. Fortfahren?",
+        "deleteFailed": "Konto konnte nicht gel?scht werden.",
+        "passwordConfirm": "Geben Sie zur Best?tigung Ihr aktuelles Passwort ein",
+        "deleteConfirm": "Geben Sie DELETE zur Best?tigung ein",
+        "deleteButton": "Konto dauerhaft l?schen"
+      }
+    },
+    "addresses": {
+      "title": "Gespeicherte Adressen",
+      "description": "Verschieben Sie die Karte, bis der mittlere Pin auf der genauen Adresse liegt; Stadt und Viertel werden automatisch aktualisiert.",
+      "manager": {
+        "icons": {
+          "HOME": "Zuhause",
+          "WORK": "Arbeit",
+          "FAVORITE": "Favorit",
+          "OTHER": "Andere"
+        },
+        "map": {
+          "loading": "Karte wird vorbereitet",
+          "searchPlaceholder": "Stra?e, Viertel oder Stadt suchen",
+          "currentLocation": "Mein Standort",
+          "label": "Adresse auf der Karte ausw?hlen"
+        },
+        "form": {
+          "newEyebrow": "Neue Adresse",
+          "editEyebrow": "Adresse bearbeiten",
+          "title": "Details der ausgew?hlten Adresse",
+          "label": "Adressname",
+          "address": "Adresse",
+          "addressPlaceholder": "Dies wird automatisch aktualisiert, wenn Sie die Karte verschieben.",
+          "city": "Stadt",
+          "district": "Viertel",
+          "default": "Als Standardadresse verwenden",
+          "save": "Adresse speichern",
+          "cancel": "Abbrechen"
+        },
+        "saved": {
+          "title": "Gespeicherte Adressen",
+          "description": "Wird f?r Suchen und Empfehlungen in Ihrer N?he verwendet.",
+          "count": "{count} Adressen",
+          "defaultBadge": "Standard",
+          "noArea": "Keine Stadt/kein Viertel",
+          "edit": "Bearbeiten",
+          "delete": "L?schen"
+        },
+        "empty": {
+          "title": "Noch keine Adresse gespeichert",
+          "description": "W?hlen und speichern Sie oben auf der Karte Zuhause, Arbeit oder andere wichtige Orte."
+        },
+        "messages": {
+          "saved": "Adresse gespeichert."
+        },
+        "errors": {
+          "mapUnavailable": "Die Karte ist nicht verf?gbar. Pr?fen Sie Mapbox- oder Geo-Service-Konfiguration.",
+          "searchUnavailable": "Adresssuche ist derzeit nicht verf?gbar.",
+          "geolocationUnsupported": "Ihr Browser unterst?tzt den aktuellen Standort nicht.",
+          "permissionDenied": "Aktivieren Sie den Standortzugriff im Browser.",
+          "locationUnavailable": "Aktueller Standort wurde nicht gefunden. Suchen Sie eine Adresse oder setzen Sie einen Pin auf der Karte.",
+          "pickFirst": "Verschieben Sie die Karte, bis der mittlere Pin auf der genauen Adresse liegt.",
+          "saveFailed": "Adresse konnte nicht gespeichert werden.",
+          "deleteFailed": "Adresse konnte nicht gel?scht werden."
+        }
+      }
+    }
   }
 }
