@@ -90,6 +90,9 @@ export function ProfileForm({ initial }: { initial: Profile }) {
       setAvatarUrl(result.data.avatarUrl ?? "");
       setSelectedImage("");
       setMessage("پروفایل با موفقیت ذخیره شد.");
+      window.dispatchEvent(new CustomEvent("fargo:profile-updated", {
+        detail: { name, email: initial.email, avatarUrl: result.data.avatarUrl ?? "" },
+      }));
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "ذخیره انجام نشد.");

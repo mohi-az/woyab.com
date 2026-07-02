@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { auth } from "@/auth";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
@@ -45,6 +46,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const session = await auth();
   const appLocale = isAppLocale(locale) ? locale : "de";
 
   return (
@@ -56,7 +58,7 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-white text-gray-900">
         <NextIntlClientProvider locale={appLocale} messages={messages}>
-          <AuthProvider>
+          <AuthProvider session={session}>
             <LocaleObserver />
             <ServiceWorkerRegistration />
             <Navbar />

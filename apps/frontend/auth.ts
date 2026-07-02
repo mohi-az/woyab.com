@@ -72,9 +72,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } else {
         await prisma.user.create({
           data: {
-          email,
-          emailVerified: new Date(),
-          name: profile.name,
+            email,
+            emailVerified: new Date(),
+            name: profile.name,
             avatarUrl: googleAvatar,
           },
         });

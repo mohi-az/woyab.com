@@ -96,6 +96,10 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         </button>
       </form>
 
+      <Link href="/forgot-password" className="mt-4 block text-center text-sm font-bold text-primary">
+        فراموشی یا تنظیم رمز عبور
+      </Link>
+
       <p className="mt-6 text-center text-sm text-slate-600">
         {t("login.noAccount")}{" "}
         <Link href="/register" className="font-bold text-primary">

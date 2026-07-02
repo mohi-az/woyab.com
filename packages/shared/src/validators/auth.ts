@@ -48,6 +48,21 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const passwordResetRequestSchema = z.object({
+  email: email.optional().or(z.literal("")),
+});
+
+export const passwordResetConfirmSchema = z
+  .object({
+    token: z.string().trim().min(32).max(256),
+    password,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export const savedLocationSchema = z.object({
   label: z.string().trim().min(1).max(40),
   icon: z.enum(["HOME", "WORK", "FAVORITE", "OTHER"]).default("OTHER"),
@@ -62,4 +77,6 @@ export const savedLocationSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type PasswordResetRequestInput = z.infer<typeof passwordResetRequestSchema>;
+export type PasswordResetConfirmInput = z.infer<typeof passwordResetConfirmSchema>;
 export type SavedLocationInput = z.infer<typeof savedLocationSchema>;
