@@ -83,7 +83,7 @@ export function BusinessFilters({
         <FilterSection title={labels.categories} defaultOpen>
           <fieldset>
             <legend className="sr-only">{labels.categories}</legend>
-            <div className="max-h-80 space-y-1 overflow-y-auto pe-1">
+            <div className="max-h-80 space-y-1 overflow-y-auto overflow-x-hidden pe-4 [scrollbar-gutter:stable]">
               <FilterRadio
                 name="categoryId"
                 label={labels.allCategories}
@@ -110,7 +110,7 @@ export function BusinessFilters({
           <FilterSection title={labels.subCategories} defaultOpen>
             <fieldset>
               <legend className="sr-only">{labels.subCategories}</legend>
-              <div className="max-h-64 space-y-1 overflow-y-auto pe-1">
+              <div className="max-h-64 space-y-1 overflow-y-auto overflow-x-hidden pe-4 [scrollbar-gutter:stable]">
                 <FilterRadio
                   name="subCategoryId"
                   label={labels.allSubCategories}
@@ -122,8 +122,8 @@ export function BusinessFilters({
                     key={subCategory.id}
                     name="subCategoryId"
                     value={subCategory.id}
-                  label={subCategory.name}
-                  iconKey={subCategory.iconKey}
+                    label={subCategory.name}
+                    iconKey={subCategory.iconKey}
                     count={subCategory.count}
                     checked={filters.subCategoryId === subCategory.id}
                     onChange={() => onFiltersChange({ subCategoryId: subCategory.id })}
@@ -204,7 +204,7 @@ export function BusinessFilters({
 function FilterSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <details open={isOpen} onToggle={(event) => setIsOpen(event.currentTarget.open)} className="group rounded-xl bg-[#f8f5f1]">
+    <details open={isOpen} onToggle={(event) => setIsOpen(event.currentTarget.open)} className="group overflow-hidden rounded-xl bg-[#f8f5f1]">
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-4 text-base font-extrabold text-slate-950 marker:content-none sm:text-lg">
         {title}
         <FiChevronDown className="shrink-0 text-base transition-transform duration-200 group-open:rotate-180" />
@@ -216,11 +216,11 @@ function FilterSection({ title, defaultOpen = false, children }: { title: string
 
 function FilterRadio({ name, value, label, count, iconKey, checked, onChange }: { name: string; value?: number; label: string; count?: number; iconKey?: string | null; checked: boolean; onChange: () => void }) {
   return (
-    <label className="flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-2 text-sm text-slate-600 transition hover:bg-white hover:text-slate-950">
+    <label className="grid min-h-10 w-full min-w-0 cursor-pointer grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 text-sm text-slate-600 transition hover:bg-white hover:text-slate-950">
       <input type="radio" name={name} value={value ?? ""} checked={checked} onChange={onChange} className="radio radio-xs border-gray-300 text-primary [--chkbg:var(--color-primary)]" />
-      {iconKey ? <CategoryIcon iconKey={iconKey} className="shrink-0 text-base text-primary" /> : null}
-      <span className="min-w-0 flex-1 truncate">{label}</span>
-      {count !== undefined ? <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-gray-400">{count}</span> : null}
+      {iconKey ? <CategoryIcon iconKey={iconKey} className="shrink-0 text-base text-primary" /> : <span aria-hidden="true" />}
+      <span className="min-w-0 truncate">{label}</span>
+      {count !== undefined ? <span className="justify-self-end whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-gray-400">{count}</span> : null}
     </label>
   );
 }
