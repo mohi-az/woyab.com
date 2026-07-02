@@ -54,20 +54,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const email = profile.email?.trim().toLowerCase();
       if (!email || profile.email_verified !== true) return false;
 
-      await prisma.user.upsert({
-        where: { email },
-        create: {
+      const existingUser = await prisma.user.findUnique({ where: { email }, select: { avatarUrl: true } });
+      const googleAvatar = typeof profile.picture === "string" ? profile.picture : undefined;
+      const avatarUrl = existingUser?.avatarUrl?.startsWith("/uploads/avatars/")
+        ? undefined
+        : googleAvatar;
+
+      if (existingUser) {
+        await prisma.user.update({
+          where: { email },
+          data: {
+            emailVerified: new Date(),
+            name: profile.name ?? undefined,
+            avatarUrl,
+          },
+        });
+      } else {
+        await prisma.user.create({
+          data: {
           email,
           emailVerified: new Date(),
           name: profile.name,
-          avatarUrl: typeof profile.picture === "string" ? profile.picture : undefined,
-        },
-        update: {
-          emailVerified: new Date(),
-          name: profile.name ?? undefined,
-          avatarUrl: typeof profile.picture === "string" ? profile.picture : undefined,
-        },
-      });
+            avatarUrl: googleAvatar,
+          },
+        });
+      }
       return true;
     },
     jwt: async ({ token, user }) => {

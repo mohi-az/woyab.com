@@ -31,38 +31,62 @@ export default function Navbar() {
           <nav className="hidden items-center gap-8 lg:flex" aria-label={t("navigationLabel")}>
             {NAV_LINKS.map((link) => {
               const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+
               return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={active ? "page" : undefined}
-                className={`relative py-3 text-sm font-bold transition-colors ${active ? "text-primary" : "text-slate-700 hover:text-primary"}`}
-              >
-                {t(`nav.${link.labelKey}`)}
-                <span className={`absolute inset-x-0 -bottom-0.5 mx-auto h-0.5 rounded-full bg-primary transition-all ${active ? "w-full" : "w-0"}`} />
-              </Link>
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative py-3 text-sm font-bold transition-colors ${active ? "text-primary" : "text-slate-700 hover:text-primary"}`}
+                >
+                  {t(`nav.${link.labelKey}`)}
+                  <span
+                    className={`absolute inset-x-0 -bottom-0.5 mx-auto h-0.5 rounded-full bg-primary transition-all ${active ? "w-full" : "w-0"}`}
+                  />
+                </Link>
               );
             })}
           </nav>
 
           <div className="hidden items-center gap-3 lg:flex">
             <LanguageSelector />
-            {status !== "loading" && (session?.user ? (
-              <>
-                <Link href="/dashboard" className="text-sm font-bold text-slate-700 hover:text-primary">داشبورد</Link>
-                <button onClick={() => signOut({ redirectTo: "/" })} className="text-sm font-bold text-slate-500 hover:text-primary">خروج</button>
-              </>
-            ) : (
-              <Link href="/login" className="text-sm font-bold text-slate-700 hover:text-primary">ورود</Link>
-            ))}
-            <Link href="/businesses" className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white shadow-[0_10px_25px_rgba(241,91,63,0.25)] transition hover:-translate-y-0.5 hover:bg-primary-dark">
+            {status !== "loading" &&
+              (session?.user ? (
+                <>
+                  <Link href="/dashboard" className="text-sm font-bold text-slate-700 hover:text-primary">
+                    {t("auth.dashboard")}
+                  </Link>
+                  <button
+                    onClick={() => signOut({ redirectTo: "/" })}
+                    className="text-sm font-bold text-slate-500 hover:text-primary"
+                  >
+                    {t("auth.logout")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="text-sm font-bold text-slate-700 hover:text-primary">
+                    {t("auth.login")}
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="inline-flex h-11 items-center rounded-xl border border-slate-200 px-4 text-sm font-bold text-slate-700 transition hover:border-primary hover:text-primary"
+                  >
+                    {t("auth.register")}
+                  </Link>
+                </>
+              ))}
+            <Link
+              href="/businesses"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white shadow-[0_10px_25px_rgba(241,91,63,0.25)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
+            >
               {t("explore")} <FiArrowRight className="rtl:rotate-180" />
             </Link>
           </div>
 
           <button
             className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-800 lg:hidden"
-            onClick={() => setMobileOpen((v) => !v)}
+            onClick={() => setMobileOpen((value) => !value)}
             aria-label={t("toggleNavigation")}
           >
             {mobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
@@ -86,8 +110,24 @@ export default function Navbar() {
             <div className="mt-4 border-t border-slate-100 pt-4">
               <div className="mb-3 flex gap-3 px-4">
                 {session?.user ? (
-                  <><Link href="/dashboard" onClick={() => setMobileOpen(false)} className="font-bold text-primary">داشبورد</Link><button onClick={() => signOut({ redirectTo: "/" })} className="font-bold text-slate-500">خروج</button></>
-                ) : <Link href="/login" onClick={() => setMobileOpen(false)} className="font-bold text-primary">ورود / ثبت‌نام</Link>}
+                  <>
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="font-bold text-primary">
+                      {t("auth.dashboard")}
+                    </Link>
+                    <button onClick={() => signOut({ redirectTo: "/" })} className="font-bold text-slate-500">
+                      {t("auth.logout")}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setMobileOpen(false)} className="font-bold text-primary">
+                      {t("auth.login")}
+                    </Link>
+                    <Link href="/register" onClick={() => setMobileOpen(false)} className="font-bold text-slate-600">
+                      {t("auth.register")}
+                    </Link>
+                  </>
+                )}
               </div>
               <div className={`flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>
                 <LanguageSelector align="start" />

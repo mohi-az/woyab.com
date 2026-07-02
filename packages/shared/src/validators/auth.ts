@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 const email = z.string().trim().toLowerCase().email().max(254);
+const avatarUrl = z
+  .string()
+  .trim()
+  .max(2048)
+  .refine((value) => value === "" || value.startsWith("/") || z.string().url().safeParse(value).success, "Invalid avatar URL");
 const password = z
   .string()
   .min(10, "Password must be at least 10 characters")
@@ -29,7 +34,7 @@ export const registerSchema = z
 export const profileSchema = z.object({
   name: z.string().trim().min(2).max(80),
   phone: z.string().trim().max(30).optional().or(z.literal("")),
-  avatarUrl: z.string().trim().url().max(2048).optional().or(z.literal("")),
+  avatarUrl: avatarUrl.optional().or(z.literal("")),
 });
 
 export const changePasswordSchema = z

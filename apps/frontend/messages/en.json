@@ -30,6 +30,12 @@
       "becomeVendor": "Become a vendor",
       "vendorLogin": "Vendor login",
       "dashboard": "Dashboard"
+    },
+    "auth": {
+      "login": "Login",
+      "register": "Register",
+      "dashboard": "Dashboard",
+      "logout": "Logout"
     }
   },
   "LocaleSwitcher": {
@@ -264,5 +270,61 @@
     "title": "You're offline",
     "description": "No internet connection. Please check your network and try again.",
     "action": "Try again"
+  },
+  "Auth": {
+    "tabs": {
+      "login": "Login",
+      "register": "Register"
+    },
+    "fields": {
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password"
+    },
+    "divider": "or continue with email",
+    "google": {
+      "login": "Continue with Google",
+      "register": "Sign up with Google",
+      "unavailable": "Google sign-in is not configured yet. Add AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET in the frontend env file."
+    },
+    "password": {
+      "title": "Password security checklist",
+      "show": "Show password",
+      "hide": "Hide password",
+      "rules": {
+        "minLength": "At least 10 characters",
+        "lowercase": "At least one lowercase letter",
+        "uppercase": "At least one uppercase letter",
+        "number": "At least one number",
+        "match": "Passwords match"
+      }
+    },
+    "validation": {
+      "nameTooShort": "Enter at least 2 characters.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordTooShort": "Password must be at least 10 characters.",
+      "passwordLowercase": "Password must include a lowercase letter.",
+      "passwordUppercase": "Password must include an uppercase letter.",
+      "passwordNumber": "Password must include a number.",
+      "passwordMismatch": "Passwords do not match.",
+      "emailExists": "An account with this email already exists."
+    },
+    "login": {
+      "title": "Login to Fargo",
+      "description": "Use Google for the fastest sign-in, or continue with your email and password.",
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "invalidCredentials": "Your email or password is incorrect.",
+      "noAccount": "Don't have an account?"
+    },
+    "register": {
+      "title": "Create your account",
+      "description": "Best practice is to start with Google. Email registration is still available if you prefer it.",
+      "submit": "Create account",
+      "submitting": "Creating account...",
+      "failed": "Registration could not be completed.",
+      "haveAccount": "Already have an account?"
+    }
   }
 }

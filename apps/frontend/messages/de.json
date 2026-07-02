@@ -30,6 +30,12 @@
       "becomeVendor": "Anbieter werden",
       "vendorLogin": "Anbieter-Login",
       "dashboard": "Dashboard"
+    },
+    "auth": {
+      "login": "Anmelden",
+      "register": "Registrieren",
+      "dashboard": "Dashboard",
+      "logout": "Abmelden"
     }
   },
   "LocaleSwitcher": {
@@ -264,5 +270,61 @@
     "title": "Sie sind offline",
     "description": "Keine Internetverbindung. Bitte prufen Sie Ihr Netzwerk und versuchen Sie es erneut.",
     "action": "Erneut versuchen"
+  },
+  "Auth": {
+    "tabs": {
+      "login": "Anmelden",
+      "register": "Registrieren"
+    },
+    "fields": {
+      "name": "Vollstandiger Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestatigen"
+    },
+    "divider": "oder mit E-Mail fortfahren",
+    "google": {
+      "login": "Mit Google fortfahren",
+      "register": "Mit Google registrieren",
+      "unavailable": "Google-Anmeldung ist noch nicht konfiguriert. Tragen Sie AUTH_GOOGLE_ID und AUTH_GOOGLE_SECRET in die Frontend-Env-Datei ein."
+    },
+    "password": {
+      "title": "Passwort-Sicherheitscheck",
+      "show": "Passwort anzeigen",
+      "hide": "Passwort ausblenden",
+      "rules": {
+        "minLength": "Mindestens 10 Zeichen",
+        "lowercase": "Mindestens ein Kleinbuchstabe",
+        "uppercase": "Mindestens ein Großbuchstabe",
+        "number": "Mindestens eine Zahl",
+        "match": "Passwörter stimmen überein"
+      }
+    },
+    "validation": {
+      "nameTooShort": "Geben Sie mindestens 2 Zeichen ein.",
+      "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+      "passwordTooShort": "Das Passwort muss mindestens 10 Zeichen lang sein.",
+      "passwordLowercase": "Das Passwort muss einen Kleinbuchstaben enthalten.",
+      "passwordUppercase": "Das Passwort muss einen Großbuchstaben enthalten.",
+      "passwordNumber": "Das Passwort muss eine Zahl enthalten.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "emailExists": "Für diese E-Mail existiert bereits ein Konto."
+    },
+    "login": {
+      "title": "Bei Fargo anmelden",
+      "description": "Google ist der schnellste Weg. Alternativ konnen Sie sich mit E-Mail und Passwort anmelden.",
+      "submit": "Anmelden",
+      "submitting": "Anmeldung lauft...",
+      "invalidCredentials": "E-Mail oder Passwort ist nicht korrekt.",
+      "noAccount": "Noch kein Konto?"
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "description": "Am einfachsten starten Nutzer mit Google. Wenn Sie mochten, konnen Sie auch ein Passwortkonto anlegen.",
+      "submit": "Konto erstellen",
+      "submitting": "Konto wird erstellt...",
+      "failed": "Die Registrierung konnte nicht abgeschlossen werden.",
+      "haveAccount": "Sie haben bereits ein Konto?"
+    }
   }
 }
