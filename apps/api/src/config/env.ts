@@ -9,6 +9,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1).optional(),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   MAPBOX_PUBLIC_TOKEN: z.string().min(1).optional(),
+  NOMINATIM_REVERSE_URL: z.string().url().default("https://nominatim.openstreetmap.org/reverse"),
+  NOMINATIM_USER_AGENT: z.string().min(8).default("Fargo/1.0 (https://fargo.local)"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
 });

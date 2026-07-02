@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FiLoader, FiMapPin } from "react-icons/fi";
 import type { Feature, FeatureCollection, Point } from "geojson";
 import type mapboxgl from "mapbox-gl";
-import type { LocationValue, RadiusKm } from "@/components/location/LocationPicker";
+import type { LocationValue, RadiusKm, SavedLocationOption } from "@/components/location/LocationPicker";
 import type { BusinessDirectoryFilters } from "@/lib/api";
 
 type MapProperties = {
@@ -12,6 +12,7 @@ type MapProperties = {
   locationType: "PRIMARY" | "BRANCH";
   locationName?: string | null;
   businessId: string;
+  isFavorite?: boolean;
   slug: string;
   businessName: string;
   shortDescription?: string | null;
@@ -44,6 +45,8 @@ type Props = {
   radiusKm: RadiusKm | null;
   locale: "de" | "en" | "fa";
   labels: BusinessMapLabels;
+  favoriteBusinessIds: Set<string>;
+  savedLocations: Array<SavedLocationOption & { isDefault?: boolean }>;
 };
 
 type MapData = FeatureCollection<Point, MapProperties> & { truncated?: boolean };
@@ -85,11 +88,19 @@ function businessCardElement(properties: MapProperties, locale: Props["locale"],
   return card;
 }
 
-export function BusinessMap({ filters, location, radiusKm, locale, labels }: Props) {
+function savedLocationIcon(icon: SavedLocationOption["icon"]) {
+  if (icon === "HOME") return '<svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>';
+  if (icon === "WORK") return '<svg viewBox="0 0 24 24"><path d="M10 6V5a2 2 0 0 1 4 0v1"/><path d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 13h18"/></svg>';
+  if (icon === "FAVORITE") return '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>';
+  return '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+}
+
+export function BusinessMap({ filters, location, radiusKm, locale, labels, favoriteBusinessIds, savedLocations }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapboxRef = useRef<typeof mapboxgl | null>(null);
   const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const savedMarkersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -151,15 +162,27 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
           paint: { "text-color": "#ffffff" },
         });
         map.addLayer({
+          id: "business-favorite-glow",
+          type: "circle",
+          source: "businesses",
+          filter: ["==", ["get", "businessId"], ""],
+          paint: {
+            "circle-color": "#fde2ea",
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 19.5, 9, 22.5, 13, 24, 16, 26],
+            "circle-opacity": 0.68,
+            "circle-blur": 0.65,
+          },
+        });
+        map.addLayer({
           id: "business-points",
           type: "circle",
           source: "businesses",
           filter: ["!", ["has", "point_count"]],
           paint: {
             "circle-color": "#f97360",
-            "circle-radius": 17,
-            "circle-stroke-width": 4,
-            "circle-stroke-color": "#ffffff",
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 12.35, 9, 13.65, 13, 14.95, 16, 16.25],
+            "circle-stroke-width": 2.5,
+            "circle-stroke-color": "#1f2937",
           },
         });
         map.addLayer({
@@ -169,10 +192,45 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
           filter: ["!", ["has", "point_count"]],
           layout: {
             "icon-image": ["get", "mapIcon"],
-            "icon-size": 0.75,
+            "icon-size": ["interpolate", ["linear"], ["zoom"], 4, 1.15, 9, 1.32, 13, 1.42, 16, 1.5],
             "icon-allow-overlap": true,
           },
           paint: { "icon-color": "#ffffff" },
+        });
+        map.addLayer({
+          id: "business-point-glyphs",
+          type: "symbol",
+          source: "businesses",
+          filter: ["all", ["!", ["has", "point_count"]], ["has", "mapGlyph"]],
+          layout: {
+            "text-field": ["get", "mapGlyph"],
+            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+            "text-size": ["interpolate", ["linear"], ["zoom"], 4, 13, 9, 15, 13, 16, 16, 17],
+            "text-allow-overlap": true,
+          },
+          paint: {
+            "text-color": "#ffffff",
+            "text-halo-width": 0,
+          },
+        });
+        map.addLayer({
+          id: "business-favorite-badge",
+          type: "symbol",
+          source: "businesses",
+          filter: ["==", ["get", "businessId"], ""],
+          layout: {
+            "text-field": "\u2665",
+            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+            "text-size": 11,
+            "text-offset": [1.08, -1.08],
+            "text-allow-overlap": true,
+          },
+          paint: {
+            "text-color": "#ffffff",
+            "text-halo-color": "#be123c",
+            "text-halo-width": 8,
+            "text-halo-blur": 0.25,
+          },
         });
 
         map.on("click", "business-clusters", (event) => {
@@ -235,10 +293,54 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
     return () => {
       cancelled = true;
       popupRef.current?.remove();
+      savedMarkersRef.current.forEach((marker) => marker.remove());
+      savedMarkersRef.current.clear();
       mapRef.current?.remove();
       mapRef.current = null;
     };
   }, [labels, locale]);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    const map = mapRef.current;
+    const ids = [...favoriteBusinessIds];
+    const favoriteFilter = ["in", ["get", "businessId"], ["literal", ids]];
+    map.setPaintProperty("business-points", "circle-radius", [
+      "case",
+      favoriteFilter,
+      ["interpolate", ["linear"], ["zoom"], 4, 13.65, 9, 14.95, 13, 16.25, 16, 17.55],
+      ["interpolate", ["linear"], ["zoom"], 4, 12.35, 9, 13.65, 13, 14.95, 16, 16.25],
+    ]);
+    map.setPaintProperty("business-points", "circle-stroke-width", 2.5);
+    map.setPaintProperty("business-points", "circle-stroke-color", "#1f2937");
+    if (map.getLayer("business-favorite-glow")) {
+      map.setFilter("business-favorite-glow", favoriteFilter);
+    }
+    if (map.getLayer("business-favorite-badge")) {
+      map.setFilter("business-favorite-badge", favoriteFilter);
+    }
+  }, [favoriteBusinessIds, ready]);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current || !mapboxRef.current) return;
+    const map = mapRef.current;
+    const mapbox = mapboxRef.current;
+    savedMarkersRef.current.forEach((marker) => marker.remove());
+    savedMarkersRef.current.clear();
+
+    savedLocations.forEach((item) => {
+      const element = document.createElement("button");
+      element.type = "button";
+      element.className = `address-saved-marker${item.isDefault ? " address-saved-marker--default" : ""}`;
+      element.setAttribute("aria-label", item.label);
+      element.innerHTML = savedLocationIcon(item.icon);
+      const marker = new mapbox.Marker({ element, anchor: "center" })
+        .setLngLat([item.longitude, item.latitude])
+        .setPopup(new mapbox.Popup({ offset: 18 }).setText(item.label))
+        .addTo(map);
+      savedMarkersRef.current.set(item.id, marker);
+    });
+  }, [ready, savedLocations]);
 
   useEffect(() => {
     if (!ready || !mapRef.current || !mapboxRef.current) return;
@@ -262,6 +364,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
         search: filters.search,
         origin,
         locale,
+        favoritesOnly: filters.favoritesOnly,
       }),
       signal: controller.signal,
     }).then(async (response) => {
@@ -276,11 +379,12 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
         features: data.features,
       });
       setTruncated(Boolean(data.truncated));
-      if (data.features.length === 1) {
+      if (data.features.length === 1 && savedLocations.length === 0) {
         map.easeTo({ center: data.features[0].geometry.coordinates as [number, number], zoom: 13 });
-      } else if (data.features.length > 1) {
+      } else if (data.features.length > 0 || savedLocations.length > 0) {
         const bounds = new mapbox.LngLatBounds();
         data.features.forEach((feature) => bounds.extend(feature.geometry.coordinates as [number, number]));
+        savedLocations.forEach((item) => bounds.extend([item.longitude, item.latitude]));
         map.fitBounds(bounds, { padding: 55, maxZoom: 14, duration: 700 });
       }
     }).catch((requestError) => {
@@ -294,11 +398,13 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels }: Pro
     filters.cityId,
     filters.search,
     filters.subCategoryId,
+    filters.favoritesOnly,
     labels.error,
     location,
     locale,
     radiusKm,
     ready,
+    savedLocations,
   ]);
 
   return (

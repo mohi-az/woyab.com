@@ -95,7 +95,7 @@ export const FEATURED_CATEGORIES: CategoryDef[] = [
   { dbId: 10, labelKey: "travelTransport", icon: MdFlight, slug: "travel-transport" },
 ];
 
-const iconKeyByCategorySlug: Record<string, string> = {
+export const iconKeyByCategorySlug: Record<string, string> = {
   "restaurants-cafes": "restaurant",
   "beauty-wellness": "spa",
   "legal-financial": "balance",
@@ -108,8 +108,12 @@ const iconKeyByCategorySlug: Record<string, string> = {
   "travel-transport": "flight",
 };
 
+export function resolveCategoryIconKey(iconKey?: string | null, categorySlug?: string | null) {
+  return iconKey ?? (categorySlug ? iconKeyByCategorySlug[categorySlug] : undefined) ?? "work-outline";
+}
+
 export function getCategoryIcon(iconKey?: string | null, categorySlug?: string | null): ElementType {
-  const resolvedKey = iconKey ?? (categorySlug ? iconKeyByCategorySlug[categorySlug] : undefined);
+  const resolvedKey = resolveCategoryIconKey(iconKey, categorySlug);
   return resolvedKey ? ICON_COMPONENTS[resolvedKey] ?? MdWorkOutline : MdWorkOutline;
 }
 

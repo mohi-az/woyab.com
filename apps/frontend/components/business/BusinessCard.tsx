@@ -24,6 +24,8 @@ export type BusinessCardProps = {
   locationFallback: string;
   distanceLabel?: string | null;
   matchedLocationName?: string | null;
+  isFavorite?: boolean;
+  onFavoriteChange?: (saved: boolean) => void;
 };
 
 function RatingStars({ rating = 0 }: { rating?: number | null }) {
@@ -56,6 +58,8 @@ export function BusinessCard({
   locationFallback,
   distanceLabel,
   matchedLocationName,
+  isFavorite,
+  onFavoriteChange,
 }: BusinessCardProps) {
   const content = (
     <>
@@ -119,7 +123,7 @@ export function BusinessCard({
 
   return (
     <article className="group relative w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_10px_32px_rgba(15,23,42,.07)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_48px_rgba(15,23,42,.13)]">
-      <FavoriteButton businessId={businessId} label={favoriteLabel} />
+      <FavoriteButton businessId={businessId} label={favoriteLabel} initialSaved={isFavorite} onChange={onFavoriteChange} />
 
       {href ? (
         <Link href={href} className="block">

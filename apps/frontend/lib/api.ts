@@ -199,6 +199,7 @@ export type BusinessDirectoryFilters = {
   subCategoryId?: number;
   cityId?: number;
   sortBy?: "latest" | "distance";
+  favoritesOnly?: boolean;
 };
 
 export type DirectoryFilterOption = {
@@ -441,7 +442,7 @@ export async function searchBusinessDirectory(
   origin?: LocationOrigin,
   signal?: AbortSignal,
 ): Promise<BusinessDirectoryData> {
-  const body: BusinessSearchBody = {
+  const body: BusinessSearchBody & { favoritesOnly?: boolean } = {
     page: filters.page,
     limit: filters.limit,
     categoryId: filters.categoryId,
@@ -449,6 +450,7 @@ export async function searchBusinessDirectory(
     cityId: filters.cityId,
     search: filters.search,
     sortBy: filters.sortBy ?? "recommended",
+    favoritesOnly: filters.favoritesOnly,
     origin,
     locale: locale as AppLocale,
   };

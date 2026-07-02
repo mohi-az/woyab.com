@@ -134,7 +134,8 @@
       "city": "City",
       "allCities": "All cities",
       "location": "Location",
-      "reset": "Reset"
+        "reset": "Reset",
+        "favoritesOnly": "Show only my favorites"
     },
     "sort": {
       "label": "Sort by:",
@@ -433,7 +434,8 @@
           "district": "District",
           "default": "Make this my default address",
           "save": "Save address",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "syncing": "Updating address..."
         },
         "saved": {
           "title": "Saved addresses",

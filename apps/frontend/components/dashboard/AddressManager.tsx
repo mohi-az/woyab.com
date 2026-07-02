@@ -32,6 +32,7 @@ type Suggestion = {
 type DraftAddress = Omit<Address, "id">;
 
 const DEFAULT_CENTER = { latitude: 52.52, longitude: 13.405 };
+const MAP_REVERSE_IDLE_MS = 3_000;
 
 const empty: DraftAddress = {
   label: "",
@@ -83,6 +84,7 @@ export function AddressManager({ initial }: { initial: Address[] }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [status, setStatus] = useState<"idle" | "searching" | "locating" | "saving" | "resolving">("idle");
+  const [addressSyncPending, setAddressSyncPending] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -148,6 +150,14 @@ export function AddressManager({ initial }: { initial: Address[] }) {
         zoom: 12,
       });
 
+      map.on("movestart", () => {
+        if (reverseTimeoutRef.current) {
+          window.clearTimeout(reverseTimeoutRef.current);
+          reverseTimeoutRef.current = null;
+        }
+        setAddressSyncPending(false);
+      });
+
       map.on("moveend", () => {
         const center = map.getCenter();
         setDraft((current) => ({ ...current, latitude: center.lat, longitude: center.lng }));
@@ -156,9 +166,11 @@ export function AddressManager({ initial }: { initial: Address[] }) {
           return;
         }
         if (reverseTimeoutRef.current) window.clearTimeout(reverseTimeoutRef.current);
+        setAddressSyncPending(true);
         reverseTimeoutRef.current = window.setTimeout(() => {
+          setAddressSyncPending(false);
           void reverseGeocode(center.lat, center.lng);
-        }, 350);
+        }, MAP_REVERSE_IDLE_MS);
       });
       map.addControl(new mapbox.NavigationControl({ showCompass: false }), "bottom-left");
 
@@ -179,6 +191,7 @@ export function AddressManager({ initial }: { initial: Address[] }) {
       cancelled = true;
       abortRef.current?.abort();
       if (reverseTimeoutRef.current) window.clearTimeout(reverseTimeoutRef.current);
+      setAddressSyncPending(false);
       popupRef.current?.remove();
       savedMarkers.forEach((savedMarker) => savedMarker.remove());
       savedMarkers.clear();
@@ -303,6 +316,7 @@ export function AddressManager({ initial }: { initial: Address[] }) {
     }
 
     setStatus("locating");
+    setAddressSyncPending(false);
     setError("");
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -401,12 +415,13 @@ export function AddressManager({ initial }: { initial: Address[] }) {
   }
 
   const isBusy = status !== "idle";
+  const addressFieldsLoading = addressSyncPending || status === "resolving";
 
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_380px]">
-          <div className="relative min-h-[430px] overflow-hidden bg-slate-100 xl:min-h-[620px]">
+          <div className="relative min-h-[380px] overflow-hidden bg-slate-100 xl:min-h-[520px]">
             <div ref={containerRef} className="absolute inset-0 h-full w-full" aria-label={t("map.label")} />
             {!mapReady ? (
               <div className="absolute inset-0 flex items-center justify-center bg-white/45 backdrop-blur-[1px]">
@@ -501,22 +516,32 @@ export function AddressManager({ initial }: { initial: Address[] }) {
               />
             </label>
 
-            <label className="block text-sm font-bold text-slate-800">
-              {t("form.address")}
-              <textarea
-                required
-                value={draft.address}
-                onChange={(event) => setDraft((current) => ({ ...current, address: event.target.value }))}
-                rows={4}
-                className="mt-2 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm font-normal leading-6 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
-                placeholder={t("form.addressPlaceholder")}
-              />
-            </label>
+            <div className={`relative space-y-3 rounded-2xl transition ${addressFieldsLoading ? "pointer-events-none opacity-55 blur-[1px]" : ""}`}>
+              <label className="block text-sm font-bold text-slate-800">
+                {t("form.address")}
+                <textarea
+                  required
+                  value={draft.address}
+                  onChange={(event) => setDraft((current) => ({ ...current, address: event.target.value }))}
+                  rows={2}
+                  className="mt-2 w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm font-normal leading-6 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  placeholder={t("form.addressPlaceholder")}
+                />
+              </label>
 
-            <div className="grid grid-cols-2 gap-3">
-              <TextInput label={t("form.city")} value={draft.cityName} onChange={(value) => setDraft((current) => ({ ...current, cityName: value }))} />
-              <TextInput label={t("form.district")} value={draft.districtName} onChange={(value) => setDraft((current) => ({ ...current, districtName: value }))} />
+              <div className="grid grid-cols-2 gap-3">
+                <TextInput label={t("form.city")} value={draft.cityName} onChange={(value) => setDraft((current) => ({ ...current, cityName: value }))} />
+                <TextInput label={t("form.district")} value={draft.districtName} onChange={(value) => setDraft((current) => ({ ...current, districtName: value }))} />
+              </div>
             </div>
+            {addressFieldsLoading ? (
+              <div className="pointer-events-none -mt-2 flex justify-center">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-black text-slate-700 shadow-lg ring-1 ring-slate-200">
+                  <FiLoader className="animate-spin text-primary" />
+                  {t("form.syncing")}
+                </span>
+              </div>
+            ) : null}
 
             <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-bold text-slate-700">
               <input

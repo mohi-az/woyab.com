@@ -29,14 +29,27 @@ type BusinessMapRow = {
 const mapIconByCategory: Record<string, string> = {
   restaurant: "restaurant",
   spa: "hairdresser",
-  balance: "courthouse",
+  balance: "bank",
+  "legal-financial": "bank",
   "home-repair": "hardware",
+  "home-services": "hardware",
   car: "car",
+  automotive: "car",
   storefront: "shop",
+  retail: "shop",
   school: "school",
+  education: "school",
   medical: "hospital",
+  "beauty-wellness": "hairdresser",
+  "restaurants-cafes": "restaurant",
   celebration: "theatre",
+  "media-events": "theatre",
   flight: "airport",
+  "travel-transport": "airport",
+};
+
+const mapGlyphByCategorySlug: Record<string, string> = {
+  "legal-financial": "\u2696",
 };
 
 export async function findBusinessMapPoints(input: BusinessMapBody) {
@@ -50,6 +63,11 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
   if (input.categoryId) conditions.push(Prisma.sql`b."categoryId" = ${input.categoryId}`);
   if (input.subCategoryId) conditions.push(Prisma.sql`b."subCategoryId" = ${input.subCategoryId}`);
   if (input.cityId) conditions.push(Prisma.sql`bl."cityId" = ${input.cityId}`);
+  if (input.favoriteBusinessIds) {
+    conditions.push(input.favoriteBusinessIds.length
+      ? Prisma.sql`b."id" IN (${Prisma.join(input.favoriteBusinessIds)})`
+      : Prisma.sql`FALSE`);
+  }
   if (input.search) {
     const term = `%${input.search}%`;
     conditions.push(Prisma.sql`(
@@ -134,7 +152,8 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
         categoryNameEn: row.categoryNameEn,
         categorySlug: row.categorySlug,
         categoryIcon: row.categoryIcon,
-        mapIcon: row.categoryIcon ? mapIconByCategory[row.categoryIcon] ?? "marker" : "marker",
+        mapIcon: mapIconByCategory[row.categoryIcon ?? ""] ?? mapIconByCategory[row.categorySlug] ?? "marker",
+        mapGlyph: mapGlyphByCategorySlug[row.categorySlug] ?? null,
         cityNameFa: row.cityNameFa,
         cityNameEn: row.cityNameEn,
         distanceMeters: row.distanceMeters,

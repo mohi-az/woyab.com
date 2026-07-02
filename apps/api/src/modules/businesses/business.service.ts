@@ -12,13 +12,14 @@ import { findBusinessMapPoints } from "./business-map.repository.js";
 import { findNearbyBusinesses } from "./business-search.repository.js";
 import { businessRepository } from "./business.repository.js";
 
-function businessListWhere(query: ListBusinessesQuery) {
+function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: string[] }) {
   const { categoryId, subCategoryId, cityId, status, featured, verified, search } = query;
 
   return {
     ...(categoryId !== undefined && { categoryId }),
     ...(subCategoryId !== undefined && { subCategoryId }),
     ...(cityId !== undefined && { cityId }),
+    ...(query.favoriteBusinessIds && { id: { in: query.favoriteBusinessIds } }),
     ...(status && { status }),
     ...(featured !== undefined && { featured: featured === "true" }),
     ...(verified !== undefined && { verified: verified === "true" }),
@@ -255,6 +256,7 @@ export const businessService = {
         cityId: input.cityId,
         search: input.search,
         sortBy: input.sortBy === "latest" ? "latest" : undefined,
+        favoriteBusinessIds: input.favoriteBusinessIds,
       });
     }
 
@@ -290,7 +292,7 @@ export const businessService = {
     };
   },
 
-  list: async (query: ListBusinessesQuery) => {
+  list: async (query: ListBusinessesQuery & { favoriteBusinessIds?: string[] }) => {
     const { page, limit, locale, sortBy } = query;
     const skip = (page - 1) * limit;
     const where = businessListWhere(query);

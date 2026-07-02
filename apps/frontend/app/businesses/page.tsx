@@ -39,6 +39,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
     subCategoryId: positiveInt(first(params.subCategoryId)),
     cityId: positiveInt(first(params.cityId)),
     sortBy: first(params.sortBy) === "latest" ? "latest" : undefined,
+    favoritesOnly: first(params.favoritesOnly) === "true" || undefined,
   };
 
   const [directory, categories, subCategories, cities] = await Promise.all([
@@ -114,6 +115,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             city: t("filters.city"),
             allCities: t("filters.allCities"),
             location: t("filters.location"),
+            favoritesOnly: t("filters.favoritesOnly"),
             reset: t("filters.reset"),
             locationPicker: {
               inputLabel: t("location.inputLabel"),

@@ -34,6 +34,11 @@ function spatialConditions(input: BusinessSearchBody) {
   if (input.categoryId) conditions.push(Prisma.sql`b."categoryId" = ${input.categoryId}`);
   if (input.subCategoryId) conditions.push(Prisma.sql`b."subCategoryId" = ${input.subCategoryId}`);
   if (input.cityId) conditions.push(Prisma.sql`bl."cityId" = ${input.cityId}`);
+  if (input.favoriteBusinessIds) {
+    conditions.push(input.favoriteBusinessIds.length
+      ? Prisma.sql`b."id" IN (${Prisma.join(input.favoriteBusinessIds)})`
+      : Prisma.sql`FALSE`);
+  }
   if (input.search) {
     const term = `%${input.search}%`;
     conditions.push(Prisma.sql`(

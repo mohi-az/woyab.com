@@ -7,7 +7,7 @@ import { BusinessFilters, type BusinessFilterLabels } from "@/components/busines
 import { BusinessMap, type BusinessMapLabels } from "@/components/business/BusinessMap";
 import { BusinessReveal } from "@/components/business/BusinessReveal";
 import { BusinessSort } from "@/components/business/BusinessSort";
-import type { LocationValue, RadiusKm } from "@/components/location/LocationPicker";
+import type { LocationValue, RadiusKm, SavedLocationOption } from "@/components/location/LocationPicker";
 import {
   searchBusinessDirectory,
   type BusinessDirectoryData,
@@ -72,6 +72,28 @@ export function BusinessDirectory({
   const [error, setError] = useState<string | null>(null);
   const [resetVersion, setResetVersion] = useState(0);
   const [mapOpen, setMapOpen] = useState(false);
+  const [favoriteBusinessIds, setFavoriteBusinessIds] = useState<Set<string>>(new Set());
+  const [savedLocations, setSavedLocations] = useState<Array<SavedLocationOption & { isDefault?: boolean }>>([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/account/directory-context", { cache: "no-store", signal: controller.signal })
+      .then((response) => response.json())
+      .then(({ data }) => {
+        setFavoriteBusinessIds(new Set<string>(data.favoriteBusinessIds ?? []));
+        setSavedLocations((data.savedLocations ?? []).map((item: { id: string; label: string; icon: SavedLocationOption["icon"]; latitude: number; longitude: number; isDefault?: boolean }) => ({
+          id: item.id,
+          source: "SAVED" as const,
+          label: item.label,
+          icon: item.icon,
+          latitude: item.latitude,
+          longitude: item.longitude,
+          isDefault: item.isDefault,
+        })));
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
 
   const changeFilters = useCallback((patch: Partial<BusinessDirectoryFilters>) => {
     setFilters((current) => ({ ...current, ...patch, page: 1 }));
@@ -107,6 +129,7 @@ export function BusinessDirectory({
     if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
     if (filters.cityId) params.set("cityId", String(filters.cityId));
     if (filters.sortBy === "latest") params.set("sortBy", "latest");
+    if (filters.favoritesOnly) params.set("favoritesOnly", "true");
     if (filters.page > 1) params.set("page", String(filters.page));
     const query = params.toString();
     window.history.replaceState(null, "", query ? `/businesses?${query}` : "/businesses");
@@ -154,6 +177,8 @@ export function BusinessDirectory({
             radiusKm={radiusKm}
             locale={locale}
             labels={labels.map}
+            favoriteBusinessIds={favoriteBusinessIds}
+            savedLocations={savedLocations}
           />
         </div>
       ) : null}
@@ -172,7 +197,7 @@ export function BusinessDirectory({
           onRadiusChange={changeRadius}
           onReset={reset}
           resetVersion={resetVersion}
-          savedLocations={[]}
+          savedLocations={savedLocations}
         />
 
         <div className="min-w-0">
@@ -232,6 +257,13 @@ export function BusinessDirectory({
                         reviewsLabel={labels.card.reviews}
                         locationFallback={labels.card.unknownLocation}
                         distanceLabel={distanceLabel}
+                        isFavorite={favoriteBusinessIds.has(business.businessId)}
+                        onFavoriteChange={(saved) => setFavoriteBusinessIds((current) => {
+                          const next = new Set(current);
+                          if (saved) next.add(business.businessId);
+                          else next.delete(business.businessId);
+                          return next;
+                        })}
                       />
                     </BusinessReveal>
                   );

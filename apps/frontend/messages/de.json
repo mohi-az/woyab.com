@@ -134,7 +134,8 @@
       "city": "Stadt",
       "allCities": "Alle Städte",
       "location": "Standort",
-      "reset": "Zurücksetzen"
+        "reset": "Zurücksetzen",
+        "favoritesOnly": "Nur meine Favoriten anzeigen"
     },
     "sort": {
       "label": "Sortieren nach:",
@@ -433,7 +434,8 @@
           "district": "Viertel",
           "default": "Als Standardadresse verwenden",
           "save": "Adresse speichern",
-          "cancel": "Abbrechen"
+          "cancel": "Abbrechen",
+          "syncing": "Adresse wird aktualisiert..."
         },
         "saved": {
           "title": "Gespeicherte Adressen",
