@@ -25,6 +25,7 @@ model Review {
   updatedAt DateTime @updatedAt
 
   images ReviewImage[]
+  reports DirectoryReport[]
 
   @@unique([businessId, userId])
   @@index([businessId])

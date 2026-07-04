@@ -29,6 +29,14 @@ model User {
   favorites   Favorite[]
   savedLocations UserSavedLocation[]
   passwordResetTokens PasswordResetToken[]
+  adminAuditLogs AdminAuditLog[] @relation("AdminAuditActor")
+  directoryReports DirectoryReport[] @relation("DirectoryReportReporter")
+  resolvedDirectoryReports DirectoryReport[] @relation("DirectoryReportResolver")
+  businessClaims BusinessClaim[] @relation("BusinessClaimClaimant")
+  reviewedBusinessClaims BusinessClaim[] @relation("BusinessClaimReviewer")
+  supportTickets SupportTicket[] @relation("SupportTicketUser")
+  assignedSupportTickets SupportTicket[] @relation("SupportTicketAssignee")
+  updatedAdminSettings AdminSetting[] @relation("AdminSettingUpdater")
 
   @@map("users")
 }

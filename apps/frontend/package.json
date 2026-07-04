@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "admin:upsert": "dotenv -e ../../packages/database/.env.development -- node scripts/upsert-admin.mjs",
     "dev": "dotenv -e ../../packages/database/.env.development -- next dev",
-    "build": "next build",
+    "build": "dotenv -e ../../packages/database/.env.development -- next build",
     "start": "next start",
     "lint": "eslint"
   },

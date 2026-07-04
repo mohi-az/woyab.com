@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -71,13 +71,8 @@ export function LanguageSelector({
   const searchParams = useSearchParams();
   const activeLocale = isAppLocale(locale) ? locale : "de";
   const [switchingLocale, setSwitchingLocale] = useState<AppLocale | null>(null);
-  const [mounted, setMounted] = useState(false);
   const effectiveLocale = switchingLocale ?? activeLocale;
   const isPersian = effectiveLocale === "fa";
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleChange = (nextLocale: AppLocale) => {
     if (!isAppLocale(locale) || nextLocale === locale || switchingLocale) return;
@@ -96,7 +91,7 @@ export function LanguageSelector({
 
   return (
     <>
-      {mounted && switchingLocale
+      {switchingLocale
         ? createPortal(
           <div className={cn("fixed inset-0 z-[1000] bg-slate-950/45 backdrop-blur-sm", isPersian && "font-dirooz")}>
             <div className="absolute left-1/2 top-1/2 w-full max-w-xs -translate-x-1/2 -translate-y-1/2 px-4">

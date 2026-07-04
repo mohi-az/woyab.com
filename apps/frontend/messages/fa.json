@@ -469,5 +469,201 @@
         }
       }
     }
+  },
+  "Admin": {
+    "shell": {
+      "fallbackName": "مدیر فارگو",
+      "ownerPanel": "فضای مالک",
+      "title": "پنل مدیریت فارگو",
+      "openMenu": "باز کردن منوی مدیریت",
+      "closeMenu": "بستن منوی مدیریت",
+      "lightMode": "حالت روشن",
+      "darkMode": "حالت تاریک",
+      "exit": "خروج"
+    },
+    "nav": {
+      "overview": "داشبورد",
+      "businesses": "کسب‌وکارها",
+      "reviews": "نظرها",
+      "users": "کاربران",
+      "taxonomy": "دسته‌بندی‌ها",
+      "reports": "گزارش‌ها",
+      "claims": "درخواست مالکیت",
+      "messages": "پیام‌ها",
+      "tickets": "تیکت‌ها",
+      "settings": "تنظیمات",
+      "audit": "لاگ عملیات"
+    },
+    "overview": {
+      "title": "خوش برگشتی",
+      "description": "عملیات فارگو، صف‌های بررسی و کیفیت دایرکتوری را از یک جا مدیریت کن.",
+      "businessHealth": "وضعیت کسب‌وکارها",
+      "businessHealthDescription": "وضعیت انتشار فعلی listingها.",
+      "reviewHealth": "وضعیت نظرها",
+      "reviewHealthDescription": "وضعیت moderation نظرهای کاربران.",
+      "businessTrend": "کسب‌وکارهای جدید",
+      "reviewTrend": "نظرهای جدید",
+      "lastThirtyDays": "۳۰ روز گذشته",
+      "pendingBusinesses": "کسب‌وکارهای در انتظار",
+      "pendingReviews": "نظرهای در انتظار"
+    },
+    "metrics": {
+      "businesses": "کسب‌وکارها",
+      "users": "کاربران",
+      "reviews": "نظرها",
+      "queue": "صف باز",
+      "reports": "گزارش‌های باز",
+      "claims": "درخواست‌های مالکیت",
+      "messages": "پیام‌های جدید",
+      "tickets": "تیکت‌های باز"
+    },
+    "businesses": {
+      "title": "مدیریت کسب‌وکارها",
+      "description": "بررسی، انتشار، تعلیق و ویرایش کسب‌وکارها در هر سه زبان.",
+      "list": "لیست کسب‌وکارها",
+      "editDetails": "ویرایش جزئیات و ترجمه‌ها"
+    },
+    "reviews": {
+      "title": "بررسی نظرها",
+      "description": "نظرهای واقعی را منتشر کن، اسپم را رد کن و امتیازها را دقیق نگه دار.",
+      "list": "نظرهای کاربران"
+    },
+    "users": {
+      "title": "مدیریت کاربران",
+      "description": "دسترسی، فعال بودن و نقش‌های مالک/ادمین را مدیریت کن.",
+      "list": "کاربران",
+      "activity": "{businesses} کسب‌وکار / {reviews} نظر"
+    },
+    "taxonomy": {
+      "title": "دسته‌بندی‌ها",
+      "description": "category، subcategory و specialtyهای دایرکتوری را مدیریت کن.",
+      "categories": "دسته‌بندی‌ها",
+      "subCategories": "زیردسته‌ها",
+      "specialties": "تخصص‌ها",
+      "categoryCounts": "{businesses} listing / {children} زیرمجموعه"
+    },
+    "reports": {
+      "title": "گزارش‌ها",
+      "description": "گزارش‌های کاربران درباره کسب‌وکارها یا نظرها را بررسی کن.",
+      "list": "گزارش‌های دایرکتوری"
+    },
+    "claims": {
+      "title": "درخواست‌های مالکیت",
+      "description": "درخواست مالکیت listingهای موجود را تایید یا رد کن.",
+      "list": "درخواست‌ها"
+    },
+    "messages": {
+      "title": "پیام‌های تماس",
+      "description": "پیام‌های ثبت‌شده از فرم تماس کسب‌وکارها.",
+      "list": "پیام‌ها"
+    },
+    "tickets": {
+      "title": "تیکت‌های پشتیبانی",
+      "description": "درخواست‌های پشتیبانی را پیگیری و اولویت‌بندی کن.",
+      "list": "تیکت‌ها"
+    },
+    "settings": {
+      "title": "تنظیمات",
+      "description": "پیش‌فرض‌های moderation و اعلان‌های مالک را کنترل کن.",
+      "moderation": "تنظیمات بررسی",
+      "keys": {
+        "autoApproveBusinesses": "تایید خودکار کسب‌وکارهای جدید",
+        "autoApproveReviews": "تایید خودکار نظرهای جدید",
+        "adminEmail": "ایمیل اعلان مدیر",
+        "moderationNote": "یادداشت داخلی بررسی"
+      }
+    },
+    "audit": {
+      "title": "لاگ عملیات",
+      "description": "عملیات حساس ادمین همراه با کاربر، هدف و metadata.",
+      "list": "آخرین عملیات"
+    },
+    "filters": {
+      "title": "فیلترها",
+      "search": "جستجو",
+      "allCategories": "همه دسته‌بندی‌ها",
+      "allCities": "همه شهرها",
+      "allStatuses": "همه وضعیت‌ها",
+      "allRoles": "همه نقش‌ها"
+    },
+    "fields": {
+      "business": "کسب‌وکار",
+      "owner": "مالک",
+      "category": "دسته‌بندی",
+      "subCategory": "زیردسته",
+      "specialty": "تخصص",
+      "city": "شهر",
+      "status": "وضعیت",
+      "flags": "نشان‌ها",
+      "actions": "عملیات",
+      "slug": "اسلاگ",
+      "legalName": "نام حقوقی",
+      "sourceLocale": "زبان مبدا",
+      "verified": "تایید شده",
+      "featured": "ویژه",
+      "email": "ایمیل",
+      "phone": "تلفن",
+      "mobile": "موبایل",
+      "website": "وب‌سایت",
+      "address": "آدرس",
+      "postalCode": "کد پستی",
+      "businessName": "نام کسب‌وکار",
+      "shortDescription": "توضیح کوتاه",
+      "description": "توضیح",
+      "review": "نظر",
+      "author": "نویسنده",
+      "user": "کاربر",
+      "role": "نقش",
+      "activity": "فعالیت",
+      "name": "نام",
+      "sort": "ترتیب",
+      "icon": "آیکن",
+      "report": "گزارش",
+      "target": "هدف",
+      "reporter": "گزارش‌دهنده",
+      "claimant": "درخواست‌دهنده",
+      "message": "پیام",
+      "from": "از طرف",
+      "ticket": "تیکت",
+      "priority": "اولویت",
+      "time": "زمان",
+      "actor": "کاربر",
+      "action": "عملیات",
+      "entity": "موجودیت",
+      "metadata": "متادیتا"
+    },
+    "actions": {
+      "filter": "فیلتر",
+      "save": "ذخیره",
+      "apply": "اعمال",
+      "viewAll": "مشاهده همه",
+      "viewPublic": "صفحه عمومی",
+      "verify": "تایید",
+      "unverify": "لغو تایید",
+      "feature": "ویژه کن",
+      "unfeature": "لغو ویژه",
+      "delete": "حذف"
+    },
+    "pagination": {
+      "summary": "{total} مورد / صفحه {page} از {totalPages}",
+      "previous": "قبلی",
+      "next": "بعدی"
+    },
+    "empty": {
+      "noPendingBusinesses": "کسب‌وکار در انتظاری وجود ندارد.",
+      "noPendingReviews": "نظر در انتظاری وجود ندارد.",
+      "noReports": "هنوز گزارشی ثبت نشده است.",
+      "noClaims": "هنوز درخواست مالکیتی ثبت نشده است.",
+      "noMessages": "هنوز پیام تماسی ثبت نشده است.",
+      "noTickets": "هنوز تیکتی ثبت نشده است."
+    },
+    "common": {
+      "yes": "بله",
+      "no": "خیر",
+      "active": "فعال",
+      "inactive": "غیرفعال",
+      "enabled": "فعال",
+      "disabled": "غیرفعال"
+    }
   }
 }

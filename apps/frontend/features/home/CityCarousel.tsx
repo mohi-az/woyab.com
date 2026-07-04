@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { FiArrowLeft, FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 
@@ -30,7 +30,11 @@ type Props = {
 };
 
 export default function CityCarousel({ items, listingLabel, previousLabel, nextLabel }: Props) {
-  const [hydrated, setHydrated] = useState(false);
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [page, setPage] = useState(0);
   const [perPage, setPerPage] = useState(1);
   const [interactionPaused, setInteractionPaused] = useState(false);
@@ -48,7 +52,6 @@ export default function CityCarousel({ items, listingLabel, previousLabel, nextL
       else setPerPage(1);
     };
     update();
-    setHydrated(true);
     window.addEventListener("resize", update);
     const onMotionChange = (event: MediaQueryListEvent) => setReduceMotion(event.matches);
     media.addEventListener("change", onMotionChange);

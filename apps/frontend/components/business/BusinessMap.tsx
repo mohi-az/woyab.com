@@ -166,7 +166,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
 
       // Add user location control
       class UserLocationControl {
-        onAdd(_map: typeof mapboxgl) {
+        onAdd(_map: mapboxgl.Map) {
           const container = document.createElement("div");
           container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
           

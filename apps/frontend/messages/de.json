@@ -471,5 +471,201 @@
         }
       }
     }
+  },
+  "Admin": {
+    "shell": {
+      "fallbackName": "Fargo Admin",
+      "ownerPanel": "Owner-Bereich",
+      "title": "Fargo Kontrollpanel",
+      "openMenu": "Admin-Menue oeffnen",
+      "closeMenu": "Admin-Menue schliessen",
+      "lightMode": "Hellen Modus nutzen",
+      "darkMode": "Dunklen Modus nutzen",
+      "exit": "Beenden"
+    },
+    "nav": {
+      "overview": "Dashboard",
+      "businesses": "Eintraege",
+      "reviews": "Bewertungen",
+      "users": "Benutzer",
+      "taxonomy": "Taxonomie",
+      "reports": "Meldungen",
+      "claims": "Claims",
+      "messages": "Nachrichten",
+      "tickets": "Tickets",
+      "settings": "Einstellungen",
+      "audit": "Audit-Log"
+    },
+    "overview": {
+      "title": "Willkommen zurueck",
+      "description": "Ueberwachen Sie Fargo-Betrieb, Moderation und Verzeichnisqualitaet an einem Ort.",
+      "businessHealth": "Status der Eintraege",
+      "businessHealthDescription": "Aktueller Veroeffentlichungsstatus.",
+      "reviewHealth": "Status der Bewertungen",
+      "reviewHealthDescription": "Moderationsstatus aller Bewertungen.",
+      "businessTrend": "Neue Eintraege",
+      "reviewTrend": "Neue Bewertungen",
+      "lastThirtyDays": "Letzte 30 Tage",
+      "pendingBusinesses": "Ausstehende Eintraege",
+      "pendingReviews": "Ausstehende Bewertungen"
+    },
+    "metrics": {
+      "businesses": "Eintraege",
+      "users": "Benutzer",
+      "reviews": "Bewertungen",
+      "queue": "Offene Queue",
+      "reports": "Offene Meldungen",
+      "claims": "Ausstehende Claims",
+      "messages": "Neue Nachrichten",
+      "tickets": "Offene Tickets"
+    },
+    "businesses": {
+      "title": "Eintragsverwaltung",
+      "description": "Pruefen, veroeffentlichen, sperren und bearbeiten Sie Eintraege in allen Sprachen.",
+      "list": "Business-Eintraege",
+      "editDetails": "Details und Uebersetzungen bearbeiten"
+    },
+    "reviews": {
+      "title": "Bewertungsmoderation",
+      "description": "Echte Bewertungen freigeben, Spam ablehnen und Ratings korrekt halten.",
+      "list": "Kundenbewertungen"
+    },
+    "users": {
+      "title": "Benutzerverwaltung",
+      "description": "Zugriff, Aktivstatus und Owner/Admin-Rollen verwalten.",
+      "list": "Benutzer",
+      "activity": "{businesses} Eintraege / {reviews} Bewertungen"
+    },
+    "taxonomy": {
+      "title": "Taxonomie",
+      "description": "Kategorien, Unterkategorien und Spezialgebiete verwalten.",
+      "categories": "Kategorien",
+      "subCategories": "Unterkategorien",
+      "specialties": "Spezialgebiete",
+      "categoryCounts": "{businesses} Eintraege / {children} Kinder"
+    },
+    "reports": {
+      "title": "Meldungen",
+      "description": "Nutzer-Meldungen zu Eintraegen oder Bewertungen pruefen.",
+      "list": "Verzeichnis-Meldungen"
+    },
+    "claims": {
+      "title": "Business Claims",
+      "description": "Eigentuemeranfragen fuer bestehende Eintraege genehmigen oder ablehnen.",
+      "list": "Claim-Anfragen"
+    },
+    "messages": {
+      "title": "Kontakt-Nachrichten",
+      "description": "Nachrichten aus den Kontaktformularen der Eintraege.",
+      "list": "Nachrichten"
+    },
+    "tickets": {
+      "title": "Support-Tickets",
+      "description": "Supportanfragen verfolgen und priorisieren.",
+      "list": "Tickets"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Moderationsstandards und Owner-Benachrichtigungen steuern.",
+      "moderation": "Moderation",
+      "keys": {
+        "autoApproveBusinesses": "Neue Eintraege automatisch freigeben",
+        "autoApproveReviews": "Neue Bewertungen automatisch freigeben",
+        "adminEmail": "Admin-Benachrichtigungs-E-Mail",
+        "moderationNote": "Interne Moderationsnotiz"
+      }
+    },
+    "audit": {
+      "title": "Audit-Log",
+      "description": "Sensible Admin-Aktionen mit Akteur, Ziel und Metadaten.",
+      "list": "Letzte Aktionen"
+    },
+    "filters": {
+      "title": "Filter",
+      "search": "Suchen",
+      "allCategories": "Alle Kategorien",
+      "allCities": "Alle Staedte",
+      "allStatuses": "Alle Status",
+      "allRoles": "Alle Rollen"
+    },
+    "fields": {
+      "business": "Business",
+      "owner": "Owner",
+      "category": "Kategorie",
+      "subCategory": "Unterkategorie",
+      "specialty": "Spezialgebiet",
+      "city": "Stadt",
+      "status": "Status",
+      "flags": "Flags",
+      "actions": "Aktionen",
+      "slug": "Slug",
+      "legalName": "Rechtlicher Name",
+      "sourceLocale": "Quellsprache",
+      "verified": "Verifiziert",
+      "featured": "Featured",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "mobile": "Mobil",
+      "website": "Website",
+      "address": "Adresse",
+      "postalCode": "Postleitzahl",
+      "businessName": "Business-Name",
+      "shortDescription": "Kurzbeschreibung",
+      "description": "Beschreibung",
+      "review": "Bewertung",
+      "author": "Autor",
+      "user": "Benutzer",
+      "role": "Rolle",
+      "activity": "Aktivitaet",
+      "name": "Name",
+      "sort": "Sortierung",
+      "icon": "Icon",
+      "report": "Meldung",
+      "target": "Ziel",
+      "reporter": "Melder",
+      "claimant": "Claimant",
+      "message": "Nachricht",
+      "from": "Von",
+      "ticket": "Ticket",
+      "priority": "Prioritaet",
+      "time": "Zeit",
+      "actor": "Akteur",
+      "action": "Aktion",
+      "entity": "Entitaet",
+      "metadata": "Metadaten"
+    },
+    "actions": {
+      "filter": "Filtern",
+      "save": "Speichern",
+      "apply": "Anwenden",
+      "viewAll": "Alle anzeigen",
+      "viewPublic": "Oeffentliche Seite",
+      "verify": "Verifizieren",
+      "unverify": "Verifizierung entfernen",
+      "feature": "Hervorheben",
+      "unfeature": "Nicht hervorheben",
+      "delete": "Loeschen"
+    },
+    "pagination": {
+      "summary": "{total} gesamt / Seite {page} von {totalPages}",
+      "previous": "Zurueck",
+      "next": "Weiter"
+    },
+    "empty": {
+      "noPendingBusinesses": "Keine ausstehenden Eintraege.",
+      "noPendingReviews": "Keine ausstehenden Bewertungen.",
+      "noReports": "Noch keine Meldungen.",
+      "noClaims": "Noch keine Claims.",
+      "noMessages": "Noch keine Kontakt-Nachrichten.",
+      "noTickets": "Noch keine Support-Tickets."
+    },
+    "common": {
+      "yes": "Ja",
+      "no": "Nein",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert"
+    }
   }
 }

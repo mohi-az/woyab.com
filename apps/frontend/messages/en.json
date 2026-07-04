@@ -471,5 +471,201 @@
         }
       }
     }
+  },
+  "Admin": {
+    "shell": {
+      "fallbackName": "Fargo admin",
+      "ownerPanel": "Owner workspace",
+      "title": "Fargo Control Panel",
+      "openMenu": "Open admin menu",
+      "closeMenu": "Close admin menu",
+      "lightMode": "Use light mode",
+      "darkMode": "Use dark mode",
+      "exit": "Exit"
+    },
+    "nav": {
+      "overview": "Dashboard",
+      "businesses": "Listings",
+      "reviews": "Reviews",
+      "users": "Users",
+      "taxonomy": "Taxonomy",
+      "reports": "Reports",
+      "claims": "Claims",
+      "messages": "Messages",
+      "tickets": "Tickets",
+      "settings": "Settings",
+      "audit": "Audit log"
+    },
+    "overview": {
+      "title": "Welcome back",
+      "description": "Monitor Fargo operations, moderation queues and directory quality from one place.",
+      "businessHealth": "Business status",
+      "businessHealthDescription": "Current listing publication state.",
+      "reviewHealth": "Review status",
+      "reviewHealthDescription": "Moderation state across customer reviews.",
+      "businessTrend": "New listings",
+      "reviewTrend": "New reviews",
+      "lastThirtyDays": "Last 30 days",
+      "pendingBusinesses": "Pending listings",
+      "pendingReviews": "Pending reviews"
+    },
+    "metrics": {
+      "businesses": "Businesses",
+      "users": "Users",
+      "reviews": "Reviews",
+      "queue": "Open queue",
+      "reports": "Open reports",
+      "claims": "Pending claims",
+      "messages": "New messages",
+      "tickets": "Open tickets"
+    },
+    "businesses": {
+      "title": "Listings management",
+      "description": "Review, publish, suspend and edit directory listings in all supported languages.",
+      "list": "Business listings",
+      "editDetails": "Edit details and translations"
+    },
+    "reviews": {
+      "title": "Review moderation",
+      "description": "Approve genuine feedback, reject spam and keep public ratings accurate.",
+      "list": "Customer reviews"
+    },
+    "users": {
+      "title": "User management",
+      "description": "Manage access, active status and owner/admin roles.",
+      "list": "Users",
+      "activity": "{businesses} businesses / {reviews} reviews"
+    },
+    "taxonomy": {
+      "title": "Taxonomy",
+      "description": "Manage categories, subcategories and specialties used by the directory.",
+      "categories": "Categories",
+      "subCategories": "Subcategories",
+      "specialties": "Specialties",
+      "categoryCounts": "{businesses} listings / {children} children"
+    },
+    "reports": {
+      "title": "Reports",
+      "description": "Review user-submitted reports about listings or reviews.",
+      "list": "Directory reports"
+    },
+    "claims": {
+      "title": "Business claims",
+      "description": "Approve or reject ownership requests for existing listings.",
+      "list": "Claim requests"
+    },
+    "messages": {
+      "title": "Contact messages",
+      "description": "Messages submitted through business contact forms.",
+      "list": "Messages"
+    },
+    "tickets": {
+      "title": "Support tickets",
+      "description": "Track support requests and assign operational priority.",
+      "list": "Tickets"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Control moderation defaults and owner notifications.",
+      "moderation": "Moderation settings",
+      "keys": {
+        "autoApproveBusinesses": "Auto-approve new listings",
+        "autoApproveReviews": "Auto-approve new reviews",
+        "adminEmail": "Admin notification email",
+        "moderationNote": "Internal moderation note"
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "description": "Sensitive admin actions with actor, target and metadata.",
+      "list": "Recent actions"
+    },
+    "filters": {
+      "title": "Filters",
+      "search": "Search",
+      "allCategories": "All categories",
+      "allCities": "All cities",
+      "allStatuses": "All statuses",
+      "allRoles": "All roles"
+    },
+    "fields": {
+      "business": "Business",
+      "owner": "Owner",
+      "category": "Category",
+      "subCategory": "Subcategory",
+      "specialty": "Specialty",
+      "city": "City",
+      "status": "Status",
+      "flags": "Flags",
+      "actions": "Actions",
+      "slug": "Slug",
+      "legalName": "Legal name",
+      "sourceLocale": "Source language",
+      "verified": "Verified",
+      "featured": "Featured",
+      "email": "Email",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "website": "Website",
+      "address": "Address",
+      "postalCode": "Postal code",
+      "businessName": "Business name",
+      "shortDescription": "Short description",
+      "description": "Description",
+      "review": "Review",
+      "author": "Author",
+      "user": "User",
+      "role": "Role",
+      "activity": "Activity",
+      "name": "Name",
+      "sort": "Sort",
+      "icon": "Icon",
+      "report": "Report",
+      "target": "Target",
+      "reporter": "Reporter",
+      "claimant": "Claimant",
+      "message": "Message",
+      "from": "From",
+      "ticket": "Ticket",
+      "priority": "Priority",
+      "time": "Time",
+      "actor": "Actor",
+      "action": "Action",
+      "entity": "Entity",
+      "metadata": "Metadata"
+    },
+    "actions": {
+      "filter": "Filter",
+      "save": "Save",
+      "apply": "Apply",
+      "viewAll": "View all",
+      "viewPublic": "Public page",
+      "verify": "Verify",
+      "unverify": "Unverify",
+      "feature": "Feature",
+      "unfeature": "Unfeature",
+      "delete": "Delete"
+    },
+    "pagination": {
+      "summary": "{total} total / page {page} of {totalPages}",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "empty": {
+      "noPendingBusinesses": "No pending listings.",
+      "noPendingReviews": "No pending reviews.",
+      "noReports": "No reports yet.",
+      "noClaims": "No claims yet.",
+      "noMessages": "No contact messages yet.",
+      "noTickets": "No support tickets yet."
+    },
+    "common": {
+      "yes": "Yes",
+      "no": "No",
+      "active": "Active",
+      "inactive": "Inactive",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    }
   }
 }

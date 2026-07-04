@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { FiHeart } from "react-icons/fi";
@@ -12,7 +12,6 @@ export function FavoriteButton({ businessId, label, initialSaved = false, onChan
   const [saved, setSaved] = useState(initialSaved);
   const [loading, setLoading] = useState(false);
   const activeLocale = isAppLocale(locale) ? locale : "de";
-  useEffect(() => setSaved(initialSaved), [initialSaved]);
   return <button type="button" aria-label={label} aria-pressed={saved} disabled={loading} onClick={async () => {
     setLoading(true);
     const response = await fetch(`/api/account/favorites/${businessId}`, { method: saved ? "DELETE" : "PUT" });

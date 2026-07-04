@@ -95,6 +95,9 @@ model Business {
   tags          BusinessTag[]
   attributes    BusinessAttribute[]
   translations  BusinessTranslation[]
+  directoryReports DirectoryReport[]
+  claims        BusinessClaim[]
+  contactMessages ContactMessage[]
 
   @@index([slug])
   @@index([cityId])

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { NextResponse, type NextRequest } from "next/server";
-
-const API_BASE = process.env.API_URL ?? "http://localhost:4000";
+import { prisma } from "@/lib/prisma";
 
 const contactPayloadSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -14,27 +13,15 @@ type RouteContext = {
   params: Promise<{ businessId: string }>;
 };
 
-type BusinessLookupResponse = {
-  success: boolean;
-  data?: {
-    id: string;
-    businessName: string;
-    email?: string | null;
-  };
-};
-
 async function fetchBusinessContactTarget(businessId: string) {
-  const response = await fetch(`${API_BASE}/v1/businesses/${businessId}`, {
-    cache: "no-store",
-    headers: { Accept: "application/json" },
+  return prisma.business.findUnique({
+    where: { id: businessId },
+    select: {
+      id: true,
+      businessName: true,
+      email: true,
+    },
   });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  const json = (await response.json()) as BusinessLookupResponse;
-  return json.data ?? null;
 }
 
 async function deliverWithResend({
@@ -80,10 +67,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const payload = contactPayloadSchema.parse(await request.json());
     const business = await fetchBusinessContactTarget(businessId);
 
-    if (!business?.email) {
+    if (!business) {
       return NextResponse.json(
-        { success: false, error: "Business email is not available." },
-        { status: 400 },
+        { success: false, error: "Business not found." },
+        { status: 404 },
       );
     }
 
@@ -98,12 +85,14 @@ export async function POST(request: NextRequest, context: RouteContext) {
       <p>${payload.message.replace(/\n/g, "<br />")}</p>
     `;
 
-    const sent = await deliverWithResend({
-      to: business.email,
-      subject,
-      html,
-      replyTo: payload.email,
-    });
+    const sent = business.email
+      ? await deliverWithResend({
+        to: business.email,
+        subject,
+        html,
+        replyTo: payload.email,
+      })
+      : false;
 
     if (!sent) {
       console.info("[business-contact:mock]", {
@@ -112,6 +101,17 @@ export async function POST(request: NextRequest, context: RouteContext) {
         payload,
       });
     }
+
+    await prisma.contactMessage.create({
+      data: {
+        businessId,
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone || null,
+        message: payload.message,
+        deliveryMode: sent ? "resend" : "mock",
+      },
+    });
 
     return NextResponse.json({
       success: true,

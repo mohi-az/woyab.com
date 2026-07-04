@@ -54,6 +54,365 @@ body {
   font-family: var(--font-dirooz);
 }
 
+html[lang="fa"] .admin-shell,
+html[lang="fa"] .admin-shell * {
+  font-family: var(--font-dirooz);
+}
+
+.admin-shell {
+  --admin-page-bg: #171d31;
+  --admin-surface: #20283d;
+  --admin-surface-strong: #171d31;
+  --admin-sidebar-bg: #20283d;
+  --admin-topbar-bg: #171d31;
+  --admin-border: rgb(255 255 255 / 0.08);
+  --admin-muted: #94a3b8;
+  --admin-text: #ffffff;
+  --admin-table-head: rgb(255 255 255 / 0.05);
+  --admin-field-bg: #171d31;
+  --admin-field-border: rgb(255 255 255 / 0.10);
+  --admin-row-hover: rgb(255 255 255 / 0.04);
+  --admin-brand: #fb5c73;
+  --admin-active-bg: #ffffff;
+  --admin-active-text: #20283d;
+  background: var(--admin-page-bg);
+  color: var(--admin-text);
+}
+
+.admin-shell[data-admin-theme="light"] {
+  --admin-page-bg: #eef3f9;
+  --admin-surface: #ffffff;
+  --admin-surface-strong: #f3f6fb;
+  --admin-sidebar-bg: #ffffff;
+  --admin-topbar-bg: #ffffff;
+  --admin-border: #d9e2ef;
+  --admin-muted: #64748b;
+  --admin-text: #0f172a;
+  --admin-table-head: #f8fafc;
+  --admin-field-bg: #ffffff;
+  --admin-field-border: #cbd5e1;
+  --admin-row-hover: #f8fafc;
+  --admin-brand: #fb5c73;
+  --admin-active-bg: #0f172a;
+  --admin-active-text: #ffffff;
+}
+
+.admin-main {
+  background: var(--admin-page-bg);
+  color: var(--admin-text);
+}
+
+.admin-sidebar {
+  background: var(--admin-sidebar-bg);
+  border-color: var(--admin-border);
+  color: var(--admin-muted);
+}
+
+.admin-topbar {
+  background: var(--admin-topbar-bg);
+  border-color: var(--admin-border);
+  color: var(--admin-text);
+}
+
+.admin-sidebar-border {
+  border-color: var(--admin-border);
+}
+
+.admin-brand,
+.admin-brand-icon {
+  color: var(--admin-brand);
+}
+
+.admin-brand-icon {
+  border-color: color-mix(in srgb, var(--admin-brand) 45%, transparent);
+}
+
+.admin-avatar-fallback {
+  background: color-mix(in srgb, #38bdf8 18%, transparent);
+  color: #7dd3fc;
+}
+
+.admin-nav-link {
+  color: var(--admin-muted);
+}
+
+.admin-nav-link:hover {
+  background: color-mix(in srgb, var(--admin-text) 6%, transparent);
+  color: var(--admin-text);
+}
+
+.admin-nav-link-active {
+  background: var(--admin-active-bg);
+  color: var(--admin-active-text);
+}
+
+.admin-icon-button,
+.admin-secondary-link {
+  background: color-mix(in srgb, var(--admin-surface) 86%, transparent);
+  border-color: var(--admin-border);
+  color: var(--admin-text);
+}
+
+.admin-icon-button:hover,
+.admin-secondary-link:hover {
+  background: color-mix(in srgb, var(--admin-text) 8%, var(--admin-surface));
+}
+
+.admin-section,
+.admin-table-wrap {
+  background: var(--admin-surface);
+  border-color: var(--admin-border);
+  color: var(--admin-text);
+}
+
+.admin-section-header,
+.admin-table,
+.admin-table > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--admin-border);
+}
+
+.admin-title,
+.admin-td {
+  color: var(--admin-text);
+}
+
+.admin-muted,
+.admin-th {
+  color: var(--admin-muted);
+}
+
+.admin-th {
+  background: var(--admin-table-head);
+}
+
+.admin-table tbody,
+.admin-table tbody > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--admin-border);
+}
+
+.admin-table tbody tr:hover {
+  background: var(--admin-row-hover);
+}
+
+.admin-input {
+  min-width: 0;
+  border: 1px solid var(--admin-field-border);
+  background: var(--admin-field-bg);
+  color: var(--admin-text);
+}
+
+.admin-input::placeholder {
+  color: var(--admin-muted);
+}
+
+.admin-button {
+  background: color-mix(in srgb, #38bdf8 12%, transparent);
+  border-color: color-mix(in srgb, #38bdf8 42%, transparent);
+  color: #bae6fd;
+}
+
+.admin-button:hover {
+  background: color-mix(in srgb, #38bdf8 20%, transparent);
+}
+
+.admin-button[data-tone="success"] {
+  background: color-mix(in srgb, #10b981 13%, transparent);
+  border-color: color-mix(in srgb, #10b981 44%, transparent);
+  color: #a7f3d0;
+}
+
+.admin-button[data-tone="danger"] {
+  background: color-mix(in srgb, #f43f5e 13%, transparent);
+  border-color: color-mix(in srgb, #f43f5e 44%, transparent);
+  color: #fecdd3;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #075985;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button[data-tone="success"] {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button[data-tone="danger"] {
+  background: #fff1f2;
+  border-color: #fda4af;
+  color: #9f1239;
+}
+
+.admin-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-status-badge {
+  background: rgb(148 163 184 / 0.16);
+  color: #cbd5e1;
+  --tw-ring-color: rgb(148 163 184 / 0.25);
+}
+
+.admin-status-badge[data-status="ACTIVE"],
+.admin-status-badge[data-status="APPROVED"],
+.admin-status-badge[data-status="RESOLVED"],
+.admin-status-badge[data-status="READ"] {
+  background: rgb(16 185 129 / 0.16);
+  color: #a7f3d0;
+  --tw-ring-color: rgb(16 185 129 / 0.24);
+}
+
+.admin-status-badge[data-status="PENDING"] {
+  background: rgb(245 158 11 / 0.16);
+  color: #fde68a;
+  --tw-ring-color: rgb(245 158 11 / 0.24);
+}
+
+.admin-status-badge[data-status="OPEN"],
+.admin-status-badge[data-status="REVIEWING"],
+.admin-status-badge[data-status="NEW"] {
+  background: rgb(14 165 233 / 0.16);
+  color: #bae6fd;
+  --tw-ring-color: rgb(14 165 233 / 0.24);
+}
+
+.admin-status-badge[data-status="SUSPENDED"] {
+  background: rgb(249 115 22 / 0.16);
+  color: #fed7aa;
+  --tw-ring-color: rgb(249 115 22 / 0.24);
+}
+
+.admin-status-badge[data-status="REJECTED"] {
+  background: rgb(244 63 94 / 0.16);
+  color: #fecdd3;
+  --tw-ring-color: rgb(244 63 94 / 0.24);
+}
+
+.admin-shell[data-admin-theme="light"] .admin-status-badge {
+  background: #f1f5f9;
+  color: #475569;
+  --tw-ring-color: #cbd5e1;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="ACTIVE"],
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="APPROVED"],
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="RESOLVED"],
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="READ"] {
+  background: #dcfce7;
+  color: #166534;
+  --tw-ring-color: #86efac;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="PENDING"] {
+  background: #fef3c7;
+  color: #92400e;
+  --tw-ring-color: #fcd34d;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="OPEN"],
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="REVIEWING"],
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="NEW"] {
+  background: #e0f2fe;
+  color: #075985;
+  --tw-ring-color: #7dd3fc;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="SUSPENDED"] {
+  background: #ffedd5;
+  color: #9a3412;
+  --tw-ring-color: #fdba74;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-status-badge[data-status="REJECTED"] {
+  background: #ffe4e6;
+  color: #9f1239;
+  --tw-ring-color: #fda4af;
+}
+
+.admin-field-panel {
+  background: color-mix(in srgb, var(--admin-surface-strong) 72%, var(--admin-surface));
+  border-color: var(--admin-border);
+}
+
+.admin-shell[data-admin-theme="light"] .admin-field-panel {
+  background: #f8fafc;
+}
+
+.admin-shell[data-admin-theme="light"] [class*="bg-[#20283d]"],
+.admin-shell[data-admin-theme="light"] [class*="bg-[#171d31]"],
+.admin-shell[data-admin-theme="light"] [class*="bg-white/5"],
+.admin-shell[data-admin-theme="light"] [class*="bg-black/10"] {
+  background-color: var(--admin-surface) !important;
+}
+
+.admin-shell[data-admin-theme="light"] [class*="border-white/"],
+.admin-shell[data-admin-theme="light"] [class*="divide-white/"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--admin-border) !important;
+}
+
+.admin-shell[data-admin-theme="light"] input,
+.admin-shell[data-admin-theme="light"] select,
+.admin-shell[data-admin-theme="light"] textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: inset 0 1px 0 rgb(15 23 42 / 0.03);
+}
+
+.admin-shell[data-admin-theme="light"] input::placeholder,
+.admin-shell[data-admin-theme="light"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.admin-shell[data-admin-theme="light"] .text-white,
+.admin-shell[data-admin-theme="light"] .text-slate-200,
+.admin-shell[data-admin-theme="light"] .text-slate-300,
+.admin-shell[data-admin-theme="light"] .text-sky-200,
+.admin-shell[data-admin-theme="light"] .text-emerald-100,
+.admin-shell[data-admin-theme="light"] .text-rose-100 {
+  color: #0f172a !important;
+}
+
+.admin-shell[data-admin-theme="light"] .text-slate-400,
+.admin-shell[data-admin-theme="light"] .text-slate-500 {
+  color: #64748b !important;
+}
+
+.admin-shell[data-admin-theme="light"] table thead th {
+  background-color: #f8fafc !important;
+}
+
+.admin-shell[data-admin-theme="light"] details,
+.admin-shell[data-admin-theme="light"] fieldset {
+  background-color: #f8fafc !important;
+  border-color: #d9e2ef !important;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-nav-link-active {
+  background: var(--admin-active-bg) !important;
+  color: var(--admin-active-text) !important;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-nav-link-active svg,
+.admin-shell[data-admin-theme="light"] .admin-nav-link-active span {
+  color: var(--admin-active-text) !important;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button {
+  color: #075985 !important;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button[data-tone="success"] {
+  color: #166534 !important;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button[data-tone="danger"] {
+  color: #9f1239 !important;
+}
+
 html[dir="rtl"] body {
   text-align: right;
 }
