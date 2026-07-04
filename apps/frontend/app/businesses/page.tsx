@@ -51,7 +51,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-[#f8f5f1]">
-      <section className="hero-theme relative isolate overflow-hidden px-4 py-14 text-white sm:px-6 sm:py-18">
+      <section className="hero-theme relative isolate -mt-16 overflow-hidden px-4 pb-14 pt-28 text-white sm:px-6 sm:pb-18 sm:pt-32 lg:-mt-[4.75rem] lg:pt-36">
         <div className="absolute inset-0 bg-slate-950/88" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(241,91,63,.2),transparent_30%)]" />
         <div className="relative mx-auto max-w-[1480px]">
@@ -103,6 +103,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             clusterResults: t("map.clusterResults", { count: "{count}" }),
             viewBusiness: t("map.viewBusiness"),
             reviews: t("map.reviews"),
+            directions: t("map.directions"),
           },
           filters: {
             title: t("filters.title"),

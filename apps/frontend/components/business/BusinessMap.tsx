@@ -5,7 +5,9 @@ import { FiLoader, FiMapPin } from "react-icons/fi";
 import type { Feature, FeatureCollection, Point } from "geojson";
 import type mapboxgl from "mapbox-gl";
 import type { LocationValue, RadiusKm, SavedLocationOption } from "@/components/location/LocationPicker";
+import { localizePathname, type AppLocale } from "@/i18n/config";
 import type { BusinessDirectoryFilters } from "@/lib/api";
+import { buildDirectionsUrl } from "@/lib/directions";
 
 type MapProperties = {
   locationId: string;
@@ -37,6 +39,7 @@ export type BusinessMapLabels = {
   clusterResults: string;
   viewBusiness: string;
   reviews: string;
+  directions: string;
 };
 
 type Props = {
@@ -58,10 +61,12 @@ function localized(properties: MapProperties, locale: Props["locale"]) {
   };
 }
 
-function businessCardElement(properties: MapProperties, locale: Props["locale"], labels: BusinessMapLabels) {
+function businessCardElement(feature: Feature<Point, MapProperties>, locale: Props["locale"], labels: BusinessMapLabels) {
+  const properties = feature.properties;
   const names = localized(properties, locale);
   const card = document.createElement("article");
   card.className = "business-map-card";
+  if (locale === "fa") card.style.fontFamily = "var(--font-dirooz)";
 
   if (properties.coverImageUrl) {
     const image = document.createElement("img");
@@ -73,17 +78,42 @@ function businessCardElement(properties: MapProperties, locale: Props["locale"],
 
   const body = document.createElement("div");
   body.className = "business-map-card__body";
+
   const title = document.createElement("strong");
   title.textContent = properties.businessName;
+
   const meta = document.createElement("p");
-  meta.textContent = [names.category, names.city].filter(Boolean).join(" · ");
+  meta.textContent = [names.category, names.city].filter(Boolean).join(" / ");
+
   const rating = document.createElement("p");
   rating.className = "business-map-card__rating";
-  rating.textContent = `★ ${Number(properties.averageRating ?? 0).toFixed(1)} · ${properties.reviewCount ?? 0} ${labels.reviews}`;
-  const link = document.createElement("a");
-  link.href = `/businesses/${encodeURIComponent(properties.slug)}`;
-  link.textContent = labels.viewBusiness;
-  body.append(title, meta, rating, link);
+  rating.textContent = `${Number(properties.averageRating ?? 0).toFixed(1)} / ${properties.reviewCount ?? 0} ${labels.reviews}`;
+
+  const actions = document.createElement("div");
+  actions.className = "business-map-card__actions";
+
+  const detailLink = document.createElement("a");
+  detailLink.className = "business-map-card__action";
+  detailLink.href = localizePathname(`/businesses/${encodeURIComponent(properties.slug)}`, locale as AppLocale);
+  detailLink.textContent = labels.viewBusiness;
+  actions.append(detailLink);
+
+  const directionsUrl = buildDirectionsUrl({
+    latitude: feature.geometry.coordinates[1],
+    longitude: feature.geometry.coordinates[0],
+  });
+
+  if (directionsUrl) {
+    const directionsLink = document.createElement("a");
+    directionsLink.className = "business-map-card__action business-map-card__action--primary";
+    directionsLink.href = directionsUrl;
+    directionsLink.target = "_blank";
+    directionsLink.rel = "noreferrer";
+    directionsLink.innerHTML = `<svg viewBox="0 0 24 24" class="business-map-card__action-icon" aria-hidden="true"><path d="M12 2l6 14H6l6-14z" fill="currentColor"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg><span>${labels.directions}</span>`;
+    actions.append(directionsLink);
+  }
+
+  body.append(title, meta, rating, actions);
   card.append(body);
   return card;
 }
@@ -108,6 +138,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
 
   useEffect(() => {
     let cancelled = false;
+
     void Promise.all([
       import("mapbox-gl"),
       fetch("/api/geo/map-config", { cache: "no-store" }).then(async (response) => {
@@ -116,9 +147,11 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
       }),
     ]).then(([module, config]) => {
       if (cancelled || !containerRef.current) return;
+
       const mapbox = module.default;
       mapbox.accessToken = config.data.accessToken;
       mapboxRef.current = mapbox;
+
       const map = new mapbox.Map({
         container: containerRef.current,
         style: config.data.style,
@@ -126,9 +159,57 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
         zoom: 5,
         attributionControl: true,
       });
+
       mapRef.current = map;
       map.addControl(new mapbox.NavigationControl(), "top-left");
       map.addControl(new mapbox.FullscreenControl(), "top-left");
+
+      // Add user location control
+      class UserLocationControl {
+        onAdd(_map: typeof mapboxgl) {
+          const container = document.createElement("div");
+          container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+          
+          const button = document.createElement("button");
+          button.className = "mapboxgl-ctrl-icon mapboxgl-user-location-btn";
+          button.type = "button";
+          button.title = "Go to your location";
+          button.setAttribute("aria-label", "Go to your location");
+          button.innerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+          
+          button.addEventListener("click", () => {
+            if (navigator.geolocation) {
+              button.disabled = true;
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const { latitude, longitude } = position.coords;
+                  map.easeTo({
+                    center: [longitude, latitude],
+                    zoom: 14,
+                    duration: 1000,
+                  });
+                  button.disabled = false;
+                },
+                () => {
+                  button.disabled = false;
+                }
+              );
+            }
+          });
+
+          container.appendChild(button);
+          return container;
+        }
+
+        onRemove() {}
+
+        getDefaultPosition() {
+          return "top-left" as const;
+        }
+      }
+
+      map.addControl(new UserLocationControl(), "top-left");
+
       map.on("load", () => {
         map.addSource("businesses", {
           type: "geojson",
@@ -138,6 +219,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
           clusterRadius: 52,
           generateId: true,
         });
+
         map.addLayer({
           id: "business-clusters",
           type: "circle",
@@ -150,6 +232,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
             "circle-stroke-color": "rgba(249,115,96,0.25)",
           },
         });
+
         map.addLayer({
           id: "business-cluster-count",
           type: "symbol",
@@ -161,6 +244,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
           },
           paint: { "text-color": "#ffffff" },
         });
+
         map.addLayer({
           id: "business-favorite-glow",
           type: "circle",
@@ -173,6 +257,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
             "circle-blur": 0.65,
           },
         });
+
         map.addLayer({
           id: "business-points",
           type: "circle",
@@ -185,6 +270,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
             "circle-stroke-color": "#1f2937",
           },
         });
+
         map.addLayer({
           id: "business-point-icons",
           type: "symbol",
@@ -197,6 +283,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
           },
           paint: { "icon-color": "#ffffff" },
         });
+
         map.addLayer({
           id: "business-point-glyphs",
           type: "symbol",
@@ -213,6 +300,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
             "text-halo-width": 0,
           },
         });
+
         map.addLayer({
           id: "business-favorite-badge",
           type: "symbol",
@@ -238,31 +326,45 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
             | Feature<Point, { cluster_id: number; point_count: number }>
             | undefined;
           if (!feature || feature.geometry.type !== "Point") return;
+
           const clusterId = Number(feature.properties?.cluster_id);
           const source = map.getSource("businesses") as mapboxgl.GeoJSONSource;
+
           source.getClusterExpansionZoom(clusterId, (zoomError, zoom) => {
             if (zoomError || zoom == null) return;
+
             if (zoom <= map.getZoom() + 0.25 || map.getZoom() >= 17.5) {
               source.getClusterLeaves(clusterId, 8, 0, (leavesError, leaves) => {
                 if (leavesError || !leaves) return;
+
                 const list = document.createElement("div");
                 list.className = "business-map-cluster-list";
+                if (locale === "fa") list.style.fontFamily = "var(--font-dirooz)";
+
                 const heading = document.createElement("strong");
                 heading.textContent = labels.clusterResults.replace("{count}", String(feature.properties?.point_count ?? leaves.length));
                 list.append(heading);
+
                 leaves.forEach((leaf) => {
                   const business = leaf as Feature<Point, MapProperties>;
                   if (business.geometry.type !== "Point") return;
-                  list.append(businessCardElement(business.properties, locale, labels));
+                  list.append(businessCardElement(business, locale, labels));
                 });
+
                 popupRef.current?.remove();
                 popupRef.current = new mapbox.Popup({ maxWidth: "340px" })
                   .setLngLat(feature.geometry.coordinates as [number, number])
                   .setDOMContent(list)
                   .addTo(map);
+
+                if (locale === "fa") {
+                  const popupElement = popupRef.current?.getElement();
+                  if (popupElement) popupElement.style.fontFamily = "var(--font-dirooz)";
+                }
               });
               return;
             }
+
             map.easeTo({ center: feature.geometry.coordinates as [number, number], zoom });
           });
         });
@@ -270,18 +372,31 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
         map.on("click", "business-points", (event) => {
           const feature = event.features?.[0] as Feature<Point, MapProperties> | undefined;
           if (!feature) return;
+
           popupRef.current?.remove();
           popupRef.current = new mapbox.Popup({ offset: 18, maxWidth: "320px" })
             .setLngLat(feature.geometry.coordinates as [number, number])
-            .setDOMContent(businessCardElement(feature.properties, locale, labels))
+            .setDOMContent(businessCardElement(feature, locale, labels))
             .addTo(map);
+
+          if (locale === "fa") {
+            const popupElement = popupRef.current?.getElement();
+            if (popupElement) popupElement.style.fontFamily = "var(--font-dirooz)";
+          }
         });
+
         for (const layer of ["business-clusters", "business-points"]) {
-          map.on("mouseenter", layer, () => { map.getCanvas().style.cursor = "pointer"; });
-          map.on("mouseleave", layer, () => { map.getCanvas().style.cursor = ""; });
+          map.on("mouseenter", layer, () => {
+            map.getCanvas().style.cursor = "pointer";
+          });
+          map.on("mouseleave", layer, () => {
+            map.getCanvas().style.cursor = "";
+          });
         }
+
         setReady(true);
       });
+
       map.on("error", () => setError(labels.error));
     }).catch(() => {
       if (!cancelled) {
@@ -302,9 +417,11 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
 
   useEffect(() => {
     if (!ready || !mapRef.current) return;
+
     const map = mapRef.current;
     const ids = [...favoriteBusinessIds];
     const favoriteFilter = ["in", ["get", "businessId"], ["literal", ids]];
+
     map.setPaintProperty("business-points", "circle-radius", [
       "case",
       favoriteFilter,
@@ -313,9 +430,11 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
     ]);
     map.setPaintProperty("business-points", "circle-stroke-width", 2.5);
     map.setPaintProperty("business-points", "circle-stroke-color", "#1f2937");
+
     if (map.getLayer("business-favorite-glow")) {
       map.setFilter("business-favorite-glow", favoriteFilter);
     }
+
     if (map.getLayer("business-favorite-badge")) {
       map.setFilter("business-favorite-badge", favoriteFilter);
     }
@@ -323,6 +442,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
 
   useEffect(() => {
     if (!ready || !mapRef.current || !mapboxRef.current) return;
+
     const map = mapRef.current;
     const mapbox = mapboxRef.current;
     savedMarkersRef.current.forEach((marker) => marker.remove());
@@ -334,19 +454,23 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
       element.className = `address-saved-marker${item.isDefault ? " address-saved-marker--default" : ""}`;
       element.setAttribute("aria-label", item.label);
       element.innerHTML = savedLocationIcon(item.icon);
+
       const marker = new mapbox.Marker({ element, anchor: "center" })
         .setLngLat([item.longitude, item.latitude])
         .setPopup(new mapbox.Popup({ offset: 18 }).setText(item.label))
         .addTo(map);
+
       savedMarkersRef.current.set(item.id, marker);
     });
   }, [ready, savedLocations]);
 
   useEffect(() => {
     if (!ready || !mapRef.current || !mapboxRef.current) return;
+
     const controller = new AbortController();
     setLoading(true);
     setError(null);
+
     const origin = location
       ? {
           latitude: location.latitude,
@@ -354,6 +478,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
           ...(radiusKm !== null && { radiusKm }),
         }
       : undefined;
+
     void fetch("/api/businesses/map", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -374,11 +499,14 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
       const map = mapRef.current;
       const mapbox = mapboxRef.current;
       if (!map || !mapbox) return;
+
       (map.getSource("businesses") as mapboxgl.GeoJSONSource).setData({
         type: "FeatureCollection",
         features: data.features,
       });
+
       setTruncated(Boolean(data.truncated));
+
       if (data.features.length === 1 && savedLocations.length === 0) {
         map.easeTo({ center: data.features[0].geometry.coordinates as [number, number], zoom: 13 });
       } else if (data.features.length > 0 || savedLocations.length > 0) {
@@ -392,6 +520,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
     }).finally(() => {
       if (!controller.signal.aborted) setLoading(false);
     });
+
     return () => controller.abort();
   }, [
     filters.categoryId,
@@ -412,7 +541,10 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
       <div ref={containerRef} role="region" aria-label={labels.title} className="h-[360px] w-full sm:h-[440px] lg:h-[500px]" />
       {loading ? (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/35 backdrop-blur-[1px]">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-lg"><FiLoader className="animate-spin text-primary" />{labels.loading}</span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-lg">
+            <FiLoader className="animate-spin text-primary" />
+            {labels.loading}
+          </span>
         </div>
       ) : null}
       {error ? <p role="alert" className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 shadow-lg">{error}</p> : null}
