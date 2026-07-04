@@ -40,6 +40,8 @@
   },
   "LocaleSwitcher": {
     "label": "Sprache wechseln",
+    "switchingTitle": "Sprache wird gewechselt",
+    "switchingDescription": "Die Seite wird in der gewahlten Sprache geladen...",
     "options": {
       "de": "Deutsch",
       "en": "English",
@@ -82,6 +84,8 @@
       "eyebrow": "Nach Standort entdecken",
       "title": "Unternehmen in Ihrer Stadt finden",
       "description": "Entdecken Sie iranische Unternehmen in den aktivsten Städten Deutschlands.",
+      "allCitiesTitle": "Alle unterstützten Städte",
+      "allCitiesDescription": "Sehen Sie die vollständige Städte-Liste und entdecken Sie Unternehmen auch über diese Auswahl hinaus.",
       "listingCount": "{count} Einträge",
       "previous": "Vorherige Städte",
       "next": "Nächste Städte",
@@ -184,7 +188,8 @@
       "truncated": "Verfeinern Sie die Filter, um alle passenden Ergebnisse zu sehen.",
       "clusterResults": "{count} Unternehmen an diesem Ort",
       "viewBusiness": "Unternehmen ansehen",
-      "reviews": "Bewertungen"
+      "reviews": "Bewertungen",
+      "directions": "Route"
     }
   },
   "BusinessDetail": {
@@ -193,6 +198,7 @@
     "verified": "Verifiziertes Unternehmen",
     "reviewsCount": "{count, plural, =0 {Noch keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
     "established": "Seit {year}",
+    "directions": "Route planen",
     "overviewTitle": "Uberblick",
     "descriptionFallback": "Dieses Unternehmen hat noch keine ausfuhrliche Beschreibung hinzugefugt.",
     "stats": {

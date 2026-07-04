@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { FiChevronDown, FiMapPin, FiSearch } from "react-icons/fi";
 import { HiOutlineBuildingStorefront } from "react-icons/hi2";
+import { isAppLocale, localizePathname } from "@/i18n/config";
 import type { DirectoryFilterOption } from "@/lib/api";
 
 type Props = {
@@ -17,6 +18,7 @@ export default function HeroSection({ categories, cities }: Props) {
   const [cityId, setCityId] = useState("");
   const t = useTranslations("Home.hero");
   const locale = useLocale();
+  const activeLocale = isAppLocale(locale) ? locale : "de";
   const collator = new Intl.Collator(locale);
 
   function handleSearch(event: React.FormEvent) {
@@ -26,16 +28,16 @@ export default function HeroSection({ categories, cities }: Props) {
     if (categoryId) params.set("categoryId", categoryId);
     if (cityId) params.set("cityId", cityId);
     const search = params.toString();
-    window.location.href = search ? `/businesses?${search}` : "/businesses";
+    window.location.assign(localizePathname(search ? `/businesses?${search}` : "/businesses", activeLocale));
   }
 
   return (
-    <section className="hero-theme relative isolate min-h-[650px] overflow-hidden bg-slate-950 text-white lg:min-h-[720px]">
+    <section className="hero-theme relative isolate -mt-16 min-h-[650px] overflow-hidden bg-slate-950 text-white lg:-mt-[4.75rem] lg:min-h-[720px]">
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.94)_0%,rgba(10,18,31,.82)_48%,rgba(10,18,31,.4)_100%)] rtl:bg-[linear-gradient(270deg,rgba(10,18,31,.94)_0%,rgba(10,18,31,.82)_48%,rgba(10,18,31,.4)_100%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_28%,rgba(241,91,63,.22),transparent_30%)]" />
       <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full border-[46px] border-white/5" aria-hidden="true" />
 
-      <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-5 pb-32 pt-20 sm:px-6 lg:min-h-[720px] lg:pb-40">
+      <div className="relative mx-auto flex min-h-[650px] max-w-7xl items-center px-5 pb-32 pt-28 sm:px-6 lg:min-h-[720px] lg:pb-40 lg:pt-32">
         <div className="max-w-4xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white/85 backdrop-blur">
             <HiOutlineBuildingStorefront className="text-lg text-primary" /> {t("eyebrow")}

@@ -1,7 +1,7 @@
-import Link from "next/link";
 /* eslint-disable @next/next/no-img-element */
 import { getLocale, getTranslations } from "next-intl/server";
 import { RemoveFavoriteButton } from "@/components/dashboard/FavoriteActions";
+import { Link } from "@/i18n/navigation";
 import { isAppLocale } from "@/i18n/config";
 import { requireUserId } from "@/lib/auth-user";
 import { localizeBusinessContent } from "@/lib/business-localization";

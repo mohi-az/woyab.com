@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.stuttgart-tourist.de",
+      },
+      {
+        protocol: "https",
+        hostname: "www.klassenfahrten-kluehspies.de",
+      },
     ],
   },
 };

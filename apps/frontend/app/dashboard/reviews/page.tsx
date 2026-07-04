@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { isAppLocale } from "@/i18n/config";
 import { requireUserId } from "@/lib/auth-user";
 import { localizeBusinessContent } from "@/lib/business-localization";

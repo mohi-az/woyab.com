@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import GermanyFlag from "country-flag-icons/react/3x2/DE";
 import UnitedKingdomFlag from "country-flag-icons/react/3x2/GB";
@@ -14,6 +15,7 @@ import {
   localeCookieMaxAge,
   localeCookieName,
   localeLabels,
+  localizePathname,
   localeStorageKey,
   type AppLocale,
 } from "@/i18n/config";
@@ -21,6 +23,8 @@ import { cn } from "@/lib/utils";
 
 type LanguageSelectorProps = {
   align?: "start" | "end";
+  triggerClassName?: string;
+  menuClassName?: string;
 };
 
 const localeFlags = {
@@ -58,61 +62,99 @@ function persistLocale(nextLocale: AppLocale) {
 
 export function LanguageSelector({
   align = "end",
+  triggerClassName,
+  menuClassName,
 }: LanguageSelectorProps) {
   const t = useTranslations("LocaleSwitcher");
   const locale = useLocale();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const activeLocale = isAppLocale(locale) ? locale : "de";
+  const [switchingLocale, setSwitchingLocale] = useState<AppLocale | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const effectiveLocale = switchingLocale ?? activeLocale;
+  const isPersian = effectiveLocale === "fa";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleChange = (nextLocale: AppLocale) => {
-    if (!isAppLocale(locale) || nextLocale === locale) return;
+    if (!isAppLocale(locale) || nextLocale === locale || switchingLocale) return;
 
+    setSwitchingLocale(nextLocale);
     persistLocale(nextLocale);
 
-    startTransition(() => {
-      router.refresh();
+    const search = searchParams.toString();
+    const nextPathname = localizePathname(`${pathname}${search ? `?${search}` : ""}`, nextLocale);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.location.assign(nextPathname);
+      });
     });
   };
 
   return (
-    <div className={cn("dropdown", align === "end" && "dropdown-end")}>
-      <div tabIndex={0} role="button">
+    <>
+      {mounted && switchingLocale
+        ? createPortal(
+          <div className={cn("fixed inset-0 z-[1000] bg-slate-950/45 backdrop-blur-sm", isPersian && "font-dirooz")}>
+            <div className="absolute left-1/2 top-1/2 w-full max-w-xs -translate-x-1/2 -translate-y-1/2 px-4">
+              <div className="rounded-3xl bg-white p-6 text-center shadow-[0_25px_80px_rgba(15,23,42,.35)]">
+                <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-primary" />
+                <p className="mt-4 text-base font-black text-slate-950">{t("switchingTitle")}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-500">{t("switchingDescription")}</p>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+        : null}
+      <div className={cn("dropdown", align === "end" && "dropdown-end", isPersian && "font-dirooz")}>
+        <div tabIndex={0} role="button">
         <button
           type="button"
-          className="btn btn-ghost btn-sm gap-1.5 font-medium text-gray-600 hover:text-primary"
+          className={cn(
+            "btn btn-ghost btn-sm gap-1.5 font-medium text-gray-600 hover:text-primary",
+            triggerClassName,
+          )}
           aria-label={t("label")}
-          disabled={isPending}
+          disabled={Boolean(switchingLocale)}
         >
           <LanguageFlag locale={activeLocale} />
           {localeLabels[activeLocale]}
           <FiChevronDown className="text-xs opacity-70" />
         </button>
-      </div>
-      <ul
-        tabIndex={0}
-        className="dropdown-content z-50 mt-2 w-44 rounded-xl border border-gray-100 bg-white p-2 shadow-xl"
-      >
-        {appLocales.map((item) => {
-          const isActive = item === locale;
+        </div>
+        <ul
+          tabIndex={0}
+          className={cn(
+            "dropdown-content z-50 mt-2 w-44 rounded-xl border border-gray-100 bg-white p-2 shadow-xl",
+            menuClassName,
+          )}
+        >
+          {appLocales.map((item) => {
+            const isActive = item === locale;
 
-          return (
-            <li key={item}>
-              <button
-                type="button"
-                onClick={() => handleChange(item)}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary"
-              >
-                <span className="flex items-center gap-2">
-                  <LanguageFlag locale={item} />
-                  <span>{t(`options.${item}`)}</span>
-                </span>
-                {isActive ? <FiCheck className="text-primary" /> : null}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+            return (
+              <li key={item}>
+                <button
+                  type="button"
+                  onClick={() => handleChange(item)}
+                  disabled={Boolean(switchingLocale)}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="flex items-center gap-2">
+                    <LanguageFlag locale={item} />
+                    <span>{t(`options.${item}`)}</span>
+                  </span>
+                  {isActive ? <FiCheck className="text-primary" /> : null}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </>
   );
 }

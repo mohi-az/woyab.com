@@ -6,6 +6,7 @@ export const defaultLocale: AppLocale = "de";
 export const localeStorageKey = "fargo-locale";
 export const localeCookieName = "FARGO_LOCALE";
 export const localeCookieMaxAge = 60 * 60 * 24 * 365;
+export const localeHeaderName = "x-fargo-locale";
 
 export const localeLabels: Record<AppLocale, string> = {
   de: "Deutsch",
@@ -19,4 +20,32 @@ export function isAppLocale(value: string | null | undefined): value is AppLocal
 
 export function getDirection(locale: AppLocale) {
   return locale === "fa" ? "rtl" : "ltr";
+}
+
+export function getLocaleFromPathname(pathname: string) {
+  const normalized = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  const [candidate] = normalized.slice(1).split("/", 1);
+  return isAppLocale(candidate) ? candidate : null;
+}
+
+export function stripLocalePrefix(pathname: string) {
+  const normalized = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  const locale = getLocaleFromPathname(normalized);
+
+  if (!locale) return normalized;
+
+  const withoutLocale = normalized.slice(locale.length + 1);
+  return withoutLocale ? (withoutLocale.startsWith("/") ? withoutLocale : `/${withoutLocale}`) : "/";
+}
+
+export function localizePathname(pathname: string, locale: AppLocale) {
+  if (!pathname) return `/${locale}`;
+  if (/^(https?:)?\/\//.test(pathname) || pathname.startsWith("mailto:") || pathname.startsWith("tel:")) {
+    return pathname;
+  }
+
+  const url = new URL(pathname.startsWith("/") ? pathname : `/${pathname}`, "http://fargo.local");
+  const localizedPath = stripLocalePrefix(url.pathname);
+
+  return `/${locale}${localizedPath === "/" ? "" : localizedPath}${url.search}${url.hash}`;
 }

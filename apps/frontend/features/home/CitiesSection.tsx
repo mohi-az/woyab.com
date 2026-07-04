@@ -7,12 +7,12 @@ const CITY_IMAGES: Record<string, string> = {
   hamburg: "https://images.unsplash.com/photo-1553547274-0df401ae03c9?auto=format&fit=crop&w=1000&q=82",
   munich: "https://images.unsplash.com/photo-1595867818082-083862f3d630?auto=format&fit=crop&w=1000&q=82",
   muenchen: "https://images.unsplash.com/photo-1595867818082-083862f3d630?auto=format&fit=crop&w=1000&q=82",
-  cologne: "https://images.unsplash.com/photo-1565443689695-2bb10aa02c75?auto=format&fit=crop&w=1000&q=82",
-  koeln: "https://images.unsplash.com/photo-1565443689695-2bb10aa02c75?auto=format&fit=crop&w=1000&q=82",
+  cologne: "https://www.klassenfahrten-kluehspies.de/fileadmin/_processed_/8/b/csm_klassenfahrtkc3b6lnccrcphotostock-4036_125d03370a.jpg",
+  koeln: "https://www.klassenfahrten-kluehspies.de/fileadmin/_processed_/8/b/csm_klassenfahrtkc3b6lnccrcphotostock-4036_125d03370a.jpg",
   frankfurt: "https://images.unsplash.com/photo-1559564484-e48b3e040ff4?auto=format&fit=crop&w=1000&q=82",
   dusseldorf: "https://images.unsplash.com/photo-1577702312706-e23ff063064f?auto=format&fit=crop&w=1000&q=82",
   duesseldorf: "https://images.unsplash.com/photo-1577702312706-e23ff063064f?auto=format&fit=crop&w=1000&q=82",
-  stuttgart: "https://images.unsplash.com/photo-1594991690894-84f4924b942f?auto=format&fit=crop&w=1000&q=82",
+  stuttgart: "https://www.stuttgart-tourist.de/images/dz6rwisjidq-/bca286c934a535515333c6e6daedb7f4.jpg",
   leipzig: "https://images.unsplash.com/photo-1580746738099-2cb123f11b53?auto=format&fit=crop&w=1000&q=82",
   dresden: "https://images.unsplash.com/photo-1567438210822-8a9d983a1d32?auto=format&fit=crop&w=1000&q=82",
 };
@@ -27,10 +27,10 @@ type Props = { cities: DirectoryFilterOption[] };
 
 export default async function CitiesSection({ cities }: Props) {
   const t = await getTranslations("Home.citiesSection");
-  const items: CityCardItem[] = cities
+  const featuredItems: CityCardItem[] = cities
     .filter((city) => (city.count ?? 0) > 0)
     .sort((a, b) => (b.count ?? 0) - (a.count ?? 0) || a.name.localeCompare(b.name))
-    .slice(0, 18)
+    .slice(0, 7)
     .map((city, index) => ({
       id: city.id,
       name: city.name,
@@ -39,24 +39,30 @@ export default async function CitiesSection({ cities }: Props) {
       imageUrl: CITY_IMAGES[city.slug.toLowerCase()] ?? FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],
     }));
 
-  if (items.length === 0) return null;
+  if (featuredItems.length === 0) return null;
+
+  const items: CityCardItem[] = [
+    ...featuredItems,
+    {
+      id: "all-cities",
+      kind: "all-cities",
+      name: t("allCitiesTitle"),
+      description: t("allCitiesDescription"),
+      href: "/businesses",
+    },
+  ];
 
   return (
-    <section className="relative z-10 -mt-24 pb-16 lg:-mt-28 lg:pb-22" aria-labelledby="cities-title">
-      <div className="mx-auto max-w-7xl px-5 sm:px-6">
-        <div className="mb-7 flex flex-col gap-2 text-white sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-primary-light">{t("eyebrow")}</p>
-            <h2 id="cities-title" className="mt-2 text-2xl font-black sm:text-3xl">{t("title")}</h2>
-          </div>
-          <p className="max-w-md text-sm leading-6 text-slate-300">{t("description")}</p>
-        </div>
+    <section className="relative z-20 -mt-20 pb-8 sm:-mt-24 lg:-mt-28 lg:pb-12" aria-labelledby="cities-title">
+      <div className="absolute inset-x-0 bottom-0 top-20 bg-[#f8f5f1] sm:top-24 lg:top-28" aria-hidden="true" />
+      <h2 id="cities-title" className="sr-only">{t("title")}</h2>
+      <p className="sr-only">{t("description")}</p>
+      <div className="relative mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-8 xl:w-[72%]">
         <CityCarousel
           items={items}
           listingLabel={t("listingCount", { count: "{count}" })}
           previousLabel={t("previous")}
           nextLabel={t("next")}
-          slideLabel={t("slideLabel", { number: "{number}" })}
         />
       </div>
     </section>

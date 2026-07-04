@@ -40,6 +40,8 @@
   },
   "LocaleSwitcher": {
     "label": "تغییر زبان",
+    "switchingTitle": "در حال تغییر زبان",
+    "switchingDescription": "لطفا چند لحظه صبر کنید تا صفحه با زبان انتخاب‌شده بارگذاری شود.",
     "options": {
       "de": "Deutsch",
       "en": "English",
@@ -82,6 +84,8 @@
       "eyebrow": "جستجو بر اساس شهر",
       "title": "کسب‌وکارهای شهر خود را پیدا کنید",
       "description": "کسب‌وکارهای ایرانی را در فعال‌ترین شهرهای آلمان پیدا کنید.",
+      "allCitiesTitle": "همه شهرهای تحت پوشش",
+      "allCitiesDescription": "فهرست کامل شهرها را ببینید و کسب‌وکارهای بیشتری را در سراسر آلمان پیدا کنید.",
       "listingCount": "{count} کسب‌وکار",
       "previous": "شهرهای قبلی",
       "next": "شهرهای بعدی",
@@ -182,7 +186,8 @@
       "truncated": "برای دیدن همه نتایج، فیلترها را دقیق‌تر کنید.",
       "clusterResults": "{count} کسب‌وکار در این موقعیت",
       "viewBusiness": "مشاهده کسب‌وکار",
-      "reviews": "نظر"
+      "reviews": "نظر",
+      "directions": "مسیریابی"
     }
   },
   "BusinessDetail": {
@@ -191,6 +196,7 @@
     "verified": "کسب‌وکار تاییدشده",
     "reviewsCount": "{count, plural, =0 {هنوز نظری ثبت نشده} one {# نظر} other {# نظر}}",
     "established": "از {year}",
+    "directions": "مسیریابی",
     "overviewTitle": "معرفی",
     "descriptionFallback": "هنوز توضیح کاملی برای این کسب‌وکار ثبت نشده است.",
     "stats": {

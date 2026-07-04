@@ -62,7 +62,7 @@ export default async function RootLayout({
             <LocaleObserver />
             <ServiceWorkerRegistration />
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pt-16 lg:pt-[4.75rem]">{children}</main>
             <Footer />
           </AuthProvider>
         </NextIntlClientProvider>

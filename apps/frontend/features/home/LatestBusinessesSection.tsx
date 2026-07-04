@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import LatestBusinessesCarousel from "@/features/home/LatestBusinessesCarousel";
+import { Link } from "@/i18n/navigation";
 import { fetchLatestBusinesses } from "@/lib/api";
 
 export default async function LatestBusinessesSection() {

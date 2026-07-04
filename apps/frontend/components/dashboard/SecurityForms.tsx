@@ -1,15 +1,18 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { isAppLocale, localizePathname } from "@/i18n/config";
 
 export function SecurityForms({ hasPassword }: { hasPassword: boolean }) {
   const t = useTranslations("Dashboard.security.form");
+  const locale = useLocale();
   const [message, setMessage] = useState("");
   const [devLink, setDevLink] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
+  const activeLocale = isAppLocale(locale) ? locale : "de";
 
   async function requestPasswordLink() {
     setLoading(true);
@@ -33,7 +36,7 @@ export function SecurityForms({ hasPassword }: { hasPassword: boolean }) {
     const response = await fetch("/api/account", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const result = await response.json();
     if (!response.ok) return setDeleteMessage(result.error ?? t("deleteFailed"));
-    await signOut({ redirectTo: "/" });
+    await signOut({ redirectTo: localizePathname("/", activeLocale) });
   }
 
   return <div className="space-y-6">

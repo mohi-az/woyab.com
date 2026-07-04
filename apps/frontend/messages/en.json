@@ -40,6 +40,8 @@
   },
   "LocaleSwitcher": {
     "label": "Change language",
+    "switchingTitle": "Switching language",
+    "switchingDescription": "Loading the selected language for this page...",
     "options": {
       "de": "Deutsch",
       "en": "English",
@@ -82,6 +84,8 @@
       "eyebrow": "Explore by location",
       "title": "Find businesses in your city",
       "description": "Discover Iranian-owned businesses in Germany's most active cities.",
+      "allCitiesTitle": "All supported cities",
+      "allCitiesDescription": "See the full city list and browse businesses beyond the featured locations.",
       "listingCount": "{count} listings",
       "previous": "Previous cities",
       "next": "Next cities",
@@ -184,7 +188,8 @@
       "truncated": "Refine the filters to see all matching results.",
       "clusterResults": "{count} businesses here",
       "viewBusiness": "View business",
-      "reviews": "reviews"
+      "reviews": "reviews",
+      "directions": "Directions"
     }
   },
   "BusinessDetail": {
@@ -193,6 +198,7 @@
     "verified": "Verified business",
     "reviewsCount": "{count, plural, =0 {No reviews yet} one {# review} other {# reviews}}",
     "established": "Since {year}",
+    "directions": "Get directions",
     "overviewTitle": "Overview",
     "descriptionFallback": "This business has not added a full description yet.",
     "stats": {

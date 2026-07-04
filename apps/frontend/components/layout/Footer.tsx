@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { FaClipboardList } from "react-icons/fa";
 import { FiArrowRight, FiClock, FiMail, FiMapPin } from "react-icons/fi";
+import { Link } from "@/i18n/navigation";
 
 export default async function Footer() {
   const t = await getTranslations("Footer");

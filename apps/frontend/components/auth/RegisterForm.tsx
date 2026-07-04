@@ -2,12 +2,13 @@
 
 import type { RegisterInput } from "@fargo/shared";
 import { registerSchema } from "@fargo/shared";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { isAppLocale, localizePathname } from "@/i18n/config";
+import { Link } from "@/i18n/navigation";
 
 type RegisterValues = RegisterInput;
 type RegisterErrors = Partial<Record<keyof RegisterValues, string>>;
@@ -22,6 +23,7 @@ const passwordChecks = {
 export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
   const t = useTranslations("Auth");
   const locale = useLocale();
+  const activeLocale = isAppLocale(locale) ? locale : "de";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -108,11 +110,11 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
     });
 
     if (login?.error) {
-      window.location.assign("/login");
+      window.location.assign(localizePathname("/login", activeLocale));
       return;
     }
 
-    window.location.assign("/dashboard");
+    window.location.assign(localizePathname("/dashboard", activeLocale));
   }
 
   return (
@@ -140,7 +142,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
         <button
           type="button"
           disabled={!googleEnabled}
-          onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+          onClick={() => signIn("google", { redirectTo: localizePathname("/dashboard", activeLocale) })}
           className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
         >
           <FcGoogle className="text-xl" aria-hidden="true" />

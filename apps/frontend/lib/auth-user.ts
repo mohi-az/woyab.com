@@ -1,7 +1,7 @@
 import "server-only";
 
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { redirectWithLocale } from "@/i18n/server";
 
 export async function currentUserId() {
   const session = await auth();
@@ -10,6 +10,6 @@ export async function currentUserId() {
 
 export async function requireUserId() {
   const userId = await currentUserId();
-  if (!userId) redirect("/login");
+  if (!userId) await redirectWithLocale("/login");
   return userId;
 }

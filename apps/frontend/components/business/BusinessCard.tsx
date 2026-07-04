@@ -1,11 +1,11 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
-import Link from "next/link";
 import { FiMapPin, FiNavigation } from "react-icons/fi";
 import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
 import { FavoriteButton } from "@/components/business/FavoriteButton";
+import { Link } from "@/i18n/navigation";
 
 export type BusinessCardProps = {
   businessId: string;
@@ -85,7 +85,7 @@ export function BusinessCard({
 
       <div className="space-y-3 p-5 sm:p-6">
         <div className="space-y-3">
-          <h3 className="line-clamp-2 min-h-[3.4rem] text-[1.08rem] font-black leading-7 text-slate-950 transition-colors duration-200 group-hover:text-primary md:text-[1.2rem]">
+          <h3 className="line-clamp-2 min-h-[2.6rem] text-[0.75rem] font-black leading-5 text-slate-950 transition-colors duration-200 group-hover:text-primary md:text-[0.8rem]">
             {title}
           </h3>
 

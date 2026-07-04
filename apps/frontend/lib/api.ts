@@ -76,6 +76,8 @@ type BusinessDetailApiResponse = {
     youtube?: string | null;
     linkedin?: string | null;
     address?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     postalCode?: string | null;
     establishedYear?: number | null;
     priceRange?: "BUDGET" | "MODERATE" | "EXPENSIVE" | "LUXURY" | null;
@@ -260,6 +262,8 @@ export type BusinessDetailData = {
   specialtyName?: string | null;
   location?: string | null;
   address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   postalCode?: string | null;
   phone?: string | null;
   mobile?: string | null;
@@ -579,6 +583,8 @@ export async function fetchBusinessBySlug(
       specialtyName: localizedText(locale, business.specialty),
       location: localizedText(locale, business.city),
       address: business.address,
+      latitude: business.latitude,
+      longitude: business.longitude,
       postalCode: business.postalCode,
       phone: business.phone,
       mobile: business.mobile,

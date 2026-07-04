@@ -1,7 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -13,13 +12,16 @@ import {
   FiMail,
   FiMapPin,
   FiMessageSquare,
+  FiNavigation,
   FiPhone,
   FiSend,
 } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTelegramPlane, FaYoutube } from "react-icons/fa";
 import { MdStar, MdStarBorder } from "react-icons/md";
+import { Link } from "@/i18n/navigation";
 import { CategoryIcon } from "@/lib/business-categories";
 import type { BusinessDetailData, BusinessReviewItem, CurrentUser } from "@/lib/api";
+import { buildDirectionsUrl } from "@/lib/directions";
 
 type Props = {
   business: BusinessDetailData;
@@ -86,6 +88,12 @@ function ReviewAvatar({ user }: { user: BusinessReviewItem["user"] }) {
 export default function BusinessDetailClient({ business, initialReviews }: Props) {
   const t = useTranslations("BusinessDetail");
   const locale = useLocale();
+  const directionsHref = buildDirectionsUrl({
+    address: business.address,
+    city: business.location,
+    latitude: business.latitude,
+    longitude: business.longitude,
+  });
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [reviews, setReviews] = useState(initialReviews);
@@ -231,7 +239,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
   return (
     <div className="bg-[#f8f5f1] pb-16">
-      <section className="hero-theme relative isolate overflow-hidden bg-slate-950 px-4 py-12 text-white sm:px-6 sm:py-16">
+      <section className="hero-theme relative isolate -mt-16 overflow-hidden bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 lg:-mt-[4.75rem] lg:pt-36">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(241,91,63,.26),transparent_26%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.96)_0%,rgba(10,18,31,.83)_52%,rgba(10,18,31,.68)_100%)]" />
         <div className="relative mx-auto max-w-[1480px]">
@@ -281,6 +289,25 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   </span>
                 ) : null}
               </div>
+
+              {directionsHref ? (
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <a
+                    href={directionsHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black text-white shadow-[0_18px_40px_-18px_rgba(241,91,63,.8)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
+                  >
+                    <FiNavigation />
+                    {t("directions")}
+                  </a>
+                  {business.address ? (
+                    <span className="inline-flex min-h-12 items-center rounded-2xl border border-white/12 bg-white/8 px-4 text-sm text-slate-200">
+                      {business.address}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

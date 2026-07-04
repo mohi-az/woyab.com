@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 

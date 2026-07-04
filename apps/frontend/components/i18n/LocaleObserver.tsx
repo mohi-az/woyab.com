@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import {
   getDirection,
@@ -21,21 +20,12 @@ function persistLocale(locale: AppLocale) {
 
 export function LocaleObserver() {
   const locale = useLocale();
-  const router = useRouter();
 
   useEffect(() => {
     if (!isAppLocale(locale)) return;
 
-    const storedLocale = localStorage.getItem(localeStorageKey);
-
-    if (isAppLocale(storedLocale) && storedLocale !== locale) {
-      persistLocale(storedLocale);
-      router.refresh();
-      return;
-    }
-
     persistLocale(locale);
-  }, [locale, router]);
+  }, [locale]);
 
   return null;
 }

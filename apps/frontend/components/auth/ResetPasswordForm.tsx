@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import { Link } from "@/i18n/navigation";
 
 export function ResetPasswordForm({ token }: { token: string }) {
   const [message, setMessage] = useState("");

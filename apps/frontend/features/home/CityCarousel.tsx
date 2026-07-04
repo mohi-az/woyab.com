@@ -1,27 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FiArrowLeft, FiArrowRight, FiMapPin } from "react-icons/fi";
+import { FiArrowLeft, FiArrowRight, FiArrowUpRight } from "react-icons/fi";
+import { Link } from "@/i18n/navigation";
 
-export type CityCardItem = {
-  id: number;
-  name: string;
-  count: number;
-  href: string;
-  imageUrl: string;
-};
+export type CityCardItem =
+  | {
+    id: number;
+    name: string;
+    count: number;
+    href: string;
+    imageUrl: string;
+    kind?: "city";
+  }
+  | {
+    id: string;
+    name: string;
+    href: string;
+    description: string;
+    kind: "all-cities";
+  };
 
 type Props = {
   items: CityCardItem[];
   listingLabel: string;
   previousLabel: string;
   nextLabel: string;
-  slideLabel: string;
 };
 
-export default function CityCarousel({ items, listingLabel, previousLabel, nextLabel, slideLabel }: Props) {
+export default function CityCarousel({ items, listingLabel, previousLabel, nextLabel }: Props) {
+  const [hydrated, setHydrated] = useState(false);
   const [page, setPage] = useState(0);
   const [perPage, setPerPage] = useState(1);
   const [interactionPaused, setInteractionPaused] = useState(false);
@@ -39,6 +48,7 @@ export default function CityCarousel({ items, listingLabel, previousLabel, nextL
       else setPerPage(1);
     };
     update();
+    setHydrated(true);
     window.addEventListener("resize", update);
     const onMotionChange = (event: MediaQueryListEvent) => setReduceMotion(event.matches);
     media.addEventListener("change", onMotionChange);
@@ -67,9 +77,63 @@ export default function CityCarousel({ items, listingLabel, previousLabel, nextL
     return () => window.clearInterval(timer);
   }, [interactionPaused, move, pages.length, reduceMotion]);
 
+  const renderCard = (item: CityCardItem, eager = false) => {
+    if (item.kind === "all-cities") {
+      return (
+        <Link
+          key={item.id}
+          href={item.href}
+          className="group relative flex h-[14.2rem] flex-col justify-between overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(250,204,21,.2),_transparent_42%),linear-gradient(145deg,_#0f172a,_#1e293b_56%,_#0f766e)] p-6 text-white shadow-[0_24px_48px_rgba(15,23,42,.18)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/35 sm:h-[15rem] lg:h-[15.6rem]"
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,.16),transparent_45%,rgba(15,23,42,.22))]" />
+          <div className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl border
+           border-white/20 bg-white/10 text-lg backdrop-blur-sm transition duration-300 group-hover:scale-105 group-hover:bg-white/15">
+            <FiArrowUpRight />
+          </div>
+          <div className="relative text-center">
+            <h3 className="text-2xl font-black tracking-[-0.03em] sm:text-[2rem]">{item.name}</h3>
+            <p className="mx-auto mt-3 max-w-[18rem] text-sm leading-7 text-slate-100/88">{item.description}</p>
+          </div>
+        </Link>
+      );
+    }
+
+    return (
+      <Link
+        key={item.id}
+        href={item.href}
+        className="group relative h-[14.2rem] overflow-hidden bg-transparent shadow-[0_24px_48px_rgba(15,23,42,.16)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/35 sm:h-[15rem] lg:h-[15.6rem]"
+      >
+        <Image
+          src={item.imageUrl}
+          alt={item.name}
+          fill
+          priority={eager}
+          sizes="(max-width: 519px) 100vw, (max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+          className="object-cover transition duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,.04)_0%,rgba(15,23,42,.12)_42%,rgba(2,6,23,.86)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 p-6 text-center text-white">
+          <h3 className="text-[1.9rem] font-black leading-none tracking-[-0.03em] drop-shadow-[0_8px_20px_rgba(0,0,0,.32)] sm:text-[2.05rem]">{item.name}</h3>
+          <p className="mt-3 text-lg font-semibold text-white/92">{listingLabel.replace("{count}", String(item.count))}</p>
+        </div>
+      </Link>
+    );
+  };
+
+  if (!hydrated) {
+    return (
+      <div aria-hidden="true" className="pointer-events-none overflow-hidden" dir="ltr">
+        <div className="grid max-h-[15.6rem] gap-5 overflow-hidden sm:grid-cols-2 md:grid-cols-3 lg:gap-7 xl:grid-cols-4">
+          {items.slice(0, 4).map((item, index) => renderCard(item, index < 4))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
-      className="group/carousel"
+      className="group/carousel relative"
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}
       onFocusCapture={() => setInteractionPaused(true)}
@@ -82,36 +146,23 @@ export default function CityCarousel({ items, listingLabel, previousLabel, nextL
         startX.current = null;
       }}
     >
-      <div className="overflow-hidden rounded-2xl" dir="ltr">
+      <div className="overflow-hidden" dir="ltr">
         <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${safePage * 100}%)` }}>
           {pages.map((pageItems, pageIndex) => (
-            <div key={pageIndex} className="grid min-w-full gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-              {pageItems.map((city) => (
-                <Link key={city.id} href={city.href} className="group relative h-72 overflow-hidden rounded-2xl bg-slate-800 shadow-[0_18px_45px_rgba(15,23,42,.18)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/35">
-                  <Image src={city.imageUrl} alt={city.name} fill sizes="(max-width: 519px) 100vw, (max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw" className="object-cover transition duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                    <span className="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm"><FiMapPin /></span>
-                    <h3 className="text-xl font-black">{city.name}</h3>
-                    <p className="mt-1 text-sm text-slate-200">{listingLabel.replace("{count}", String(city.count))}</p>
-                  </div>
-                </Link>
-              ))}
+            <div key={pageIndex} className="grid min-w-full gap-5 sm:grid-cols-2 md:grid-cols-3 lg:gap-7 xl:grid-cols-4">
+              {pageItems.map((item, itemIndex) => renderCard(item, pageIndex === 0 && itemIndex < 4))}
             </div>
           ))}
         </div>
       </div>
 
       {pages.length > 1 ? (
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <div className="flex gap-2" dir="ltr">
-            <button type="button" onClick={() => move(-1)} aria-label={previousLabel} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"><FiArrowLeft /></button>
-            <button type="button" onClick={() => move(1)} aria-label={nextLabel} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-primary hover:bg-primary hover:text-white"><FiArrowRight /></button>
+        <>
+          <div className="pointer-events-none absolute inset-y-0 left-0 right-0 top-[45%] hidden -translate-y-1/2 items-center justify-between xl:flex" dir="ltr">
+            <button type="button" onClick={() => move(-1)} aria-label={previousLabel} className="pointer-events-auto inline-flex h-12 w-12 -translate-x-3 items-center justify-center rounded-full border-2 border-[#4054d4] bg-white text-2xl text-[#4054d4] shadow-[0_15px_35px_rgba(17,24,39,.16)] transition hover:-translate-x-4 hover:scale-[1.03] hover:bg-[#4054d4] hover:text-white"><FiArrowLeft /></button>
+            <button type="button" onClick={() => move(1)} aria-label={nextLabel} className="pointer-events-auto inline-flex h-12 w-12 translate-x-3 items-center justify-center rounded-full border-2 border-[#4054d4] bg-white text-2xl text-[#4054d4] shadow-[0_15px_35px_rgba(17,24,39,.16)] transition hover:translate-x-4 hover:scale-[1.03] hover:bg-[#4054d4] hover:text-white"><FiArrowRight /></button>
           </div>
-          <div className="flex items-center gap-2">
-            {pages.map((_, index) => <button key={index} type="button" onClick={() => setPage(index)} aria-label={slideLabel.replace("{number}", String(index + 1))} aria-current={index === safePage ? "true" : undefined} className={`h-2.5 rounded-full transition-all ${index === safePage ? "w-8 bg-primary" : "w-2.5 bg-slate-300 hover:bg-slate-400"}`} />)}
-          </div>
-        </div>
+        </>
       ) : null}
     </div>
   );
