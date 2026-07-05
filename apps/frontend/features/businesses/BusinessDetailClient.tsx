@@ -22,6 +22,7 @@ import { Link } from "@/i18n/navigation";
 import { CategoryIcon } from "@/lib/business-categories";
 import type { BusinessDetailData, BusinessReviewItem, CurrentUser } from "@/lib/api";
 import { buildDirectionsUrl } from "@/lib/directions";
+import { DirectoryReportButton } from "@/features/businesses/DirectoryReportButton";
 
 type Props = {
   business: BusinessDetailData;
@@ -285,8 +286,8 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 ) : null}
               </div>
 
-              {directionsHref ? (
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {directionsHref ? (
                   <a
                     href={directionsHref}
                     target="_blank"
@@ -296,13 +297,20 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                     <FiNavigation />
                     {t("directions")}
                   </a>
-                  {business.address ? (
-                    <span className="inline-flex min-h-12 items-center rounded-2xl border border-white/12 bg-white/8 px-4 text-sm text-slate-200">
-                      {business.address}
-                    </span>
-                  ) : null}
-                </div>
-              ) : null}
+                ) : null}
+                {business.address ? (
+                  <span className="inline-flex min-h-12 items-center rounded-2xl border border-white/12 bg-white/8 px-4 text-sm text-slate-200">
+                    {business.address}
+                  </span>
+                ) : null}
+                <DirectoryReportButton
+                  targetType="business"
+                  targetId={business.id}
+                  targetLabel={business.title}
+                  currentUser={currentUser}
+                  variant="hero"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -399,13 +407,19 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                           <h3 className="text-base font-black text-slate-950">{review.user.name}</h3>
                           <p className="text-sm text-slate-500">{formatReviewDate(review.createdAt, locale)}</p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <StaticStars rating={review.rating} />
                           {review.verified ? (
                             <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
                               {t("reviewsSection.verified")}
                             </span>
                           ) : null}
+                          <DirectoryReportButton
+                            targetType="review"
+                            targetId={review.id}
+                            targetLabel={review.title || review.comment || review.user.name}
+                            currentUser={currentUser}
+                          />
                         </div>
                       </div>
 

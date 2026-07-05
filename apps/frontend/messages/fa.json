@@ -227,6 +227,33 @@
       "submitSuccess": "ممنون از نظر شما. نظر شما بعد از بررسی و تایید منتشر می‌شود.",
       "submitError": "ثبت نظر انجام نشد."
     },
+    "report": {
+      "buttonBusiness": "گزارش کسب‌وکار",
+      "buttonReview": "گزارش",
+      "modalTitle": "گزارش محتوا",
+      "close": "بستن فرم گزارش",
+      "reasonLabel": "دلیل",
+      "reasons": {
+        "SPAM": "اسپم یا تبلیغات",
+        "FAKE_OR_MANIPULATED": "محتوای جعلی یا دستکاری‌شده",
+        "WRONG_BUSINESS": "کسب‌وکار اشتباه یا محتوای نامرتبط",
+        "ILLEGAL_CONTENT": "محتوای غیرقانونی",
+        "PERSONAL_DATA": "اطلاعات شخصی یا محرمانه",
+        "HATE_OR_HARASSMENT": "نفرت‌پراکنی، آزار یا تهدید",
+        "COPYRIGHT": "کپی‌رایت یا مالکیت فکری",
+        "OTHER": "سایر موارد"
+      },
+      "otherPlaceholder": "دلیل را توضیح دهید",
+      "messagePlaceholder": "جزئیاتی بنویسید که به بررسی گزارش کمک کند",
+      "namePlaceholder": "نام شما",
+      "emailPlaceholder": "ایمیل شما",
+      "emailRequired": "لطفا برای پیگیری گزارش، ایمیل خود را وارد کنید.",
+      "cancel": "انصراف",
+      "submit": "ثبت گزارش",
+      "submitting": "در حال ثبت...",
+      "submitSuccess": "ممنون. گزارش شما برای بررسی ثبت شد.",
+      "submitError": "ثبت گزارش انجام نشد."
+    },
     "contactCard": {
       "title": "اطلاعات تماس",
       "website": "مشاهده وب‌سایت"

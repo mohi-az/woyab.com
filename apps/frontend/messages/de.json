@@ -229,6 +229,33 @@
       "submitSuccess": "Vielen Dank fur Ihre Bewertung. Sie wird nach Prufung und Freigabe veroffentlicht.",
       "submitError": "Ihre Bewertung konnte nicht gesendet werden."
     },
+    "report": {
+      "buttonBusiness": "Eintrag melden",
+      "buttonReview": "Melden",
+      "modalTitle": "Inhalt melden",
+      "close": "Meldeformular schliessen",
+      "reasonLabel": "Grund",
+      "reasons": {
+        "SPAM": "Spam oder Werbung",
+        "FAKE_OR_MANIPULATED": "Fake oder manipulierte Inhalte",
+        "WRONG_BUSINESS": "Falscher Eintrag oder falscher Ort",
+        "ILLEGAL_CONTENT": "Illegaler Inhalt",
+        "PERSONAL_DATA": "Personenbezogene oder vertrauliche Daten",
+        "HATE_OR_HARASSMENT": "Hass, Belaestigung oder Drohungen",
+        "COPYRIGHT": "Urheberrecht oder geistiges Eigentum",
+        "OTHER": "Sonstiges"
+      },
+      "otherPlaceholder": "Beschreiben Sie den Grund",
+      "messagePlaceholder": "Ergaenzen Sie Details fuer die Moderation",
+      "namePlaceholder": "Ihr Name",
+      "emailPlaceholder": "Ihre E-Mail-Adresse",
+      "emailRequired": "Bitte geben Sie eine E-Mail-Adresse an, damit wir die Meldung bearbeiten koennen.",
+      "cancel": "Abbrechen",
+      "submit": "Meldung senden",
+      "submitting": "Wird gesendet...",
+      "submitSuccess": "Danke. Die Meldung wurde zur Pruefung eingereicht.",
+      "submitError": "Die Meldung konnte nicht gesendet werden."
+    },
     "contactCard": {
       "title": "Kontaktinformationen",
       "website": "Website besuchen"

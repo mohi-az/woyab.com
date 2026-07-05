@@ -229,6 +229,33 @@
       "submitSuccess": "Thank you for your review. It will be published after review and approval.",
       "submitError": "Your review could not be submitted."
     },
+    "report": {
+      "buttonBusiness": "Report business",
+      "buttonReview": "Report",
+      "modalTitle": "Report content",
+      "close": "Close report form",
+      "reasonLabel": "Reason",
+      "reasons": {
+        "SPAM": "Spam or advertising",
+        "FAKE_OR_MANIPULATED": "Fake or manipulated content",
+        "WRONG_BUSINESS": "Wrong business or misplaced content",
+        "ILLEGAL_CONTENT": "Illegal content",
+        "PERSONAL_DATA": "Personal or confidential data",
+        "HATE_OR_HARASSMENT": "Hate, harassment, or threats",
+        "COPYRIGHT": "Copyright or intellectual property",
+        "OTHER": "Other"
+      },
+      "otherPlaceholder": "Describe the reason",
+      "messagePlaceholder": "Add details that help moderators review this report",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "Your email address",
+      "emailRequired": "Please enter an email address so we can process the report.",
+      "cancel": "Cancel",
+      "submit": "Submit report",
+      "submitting": "Submitting...",
+      "submitSuccess": "Thanks. The report was submitted for review.",
+      "submitError": "The report could not be submitted."
+    },
     "contactCard": {
       "title": "Contact information",
       "website": "Visit website"

@@ -7,6 +7,19 @@ enum DirectoryReportStatus {
   @@map("directory_report_status")
 }
 
+enum DirectoryReportReason {
+  SPAM
+  FAKE_OR_MANIPULATED
+  WRONG_BUSINESS
+  ILLEGAL_CONTENT
+  PERSONAL_DATA
+  HATE_OR_HARASSMENT
+  COPYRIGHT
+  OTHER
+
+  @@map("directory_report_reason")
+}
+
 enum BusinessClaimStatus {
   PENDING
   APPROVED
@@ -66,19 +79,30 @@ model DirectoryReport {
   review         Review?               @relation(fields: [reviewId], references: [id], onDelete: SetNull)
   reporterUserId String?
   reporter       User?                 @relation("DirectoryReportReporter", fields: [reporterUserId], references: [id], onDelete: SetNull)
+  reporterName   String?
+  reporterEmail  String?
+  reasonCode     DirectoryReportReason @default(OTHER)
   reason         String
   message        String?
+  targetUrl      String?
+  targetSnapshot Json?
   status         DirectoryReportStatus @default(OPEN)
   resolvedById   String?
   resolvedBy     User?                 @relation("DirectoryReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
   resolvedAt     DateTime?
+  moderatorNote  String?
+  decisionReason String?
+  actionTaken    String?
+  notifiedAt     DateTime?
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
 
   @@index([businessId])
   @@index([reviewId])
   @@index([reporterUserId])
+  @@index([reasonCode])
   @@index([status])
+  @@index([createdAt])
   @@map("directory_reports")
 }
 

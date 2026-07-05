@@ -366,6 +366,9 @@ export async function updateReportStatus(formData: FormData) {
   const id = value(formData, "id");
   const status = value(formData, "status") as "OPEN" | "REVIEWING" | "RESOLVED" | "DISMISSED";
   if (!id || !["OPEN", "REVIEWING", "RESOLVED", "DISMISSED"].includes(status)) throw new Error("Invalid report status.");
+  const moderatorNote = nullableValue(formData, "moderatorNote");
+  const decisionReason = nullableValue(formData, "decisionReason");
+  const actionTaken = nullableValue(formData, "actionTaken");
 
   await prisma.directoryReport.update({
     where: { id },
@@ -373,9 +376,12 @@ export async function updateReportStatus(formData: FormData) {
       status,
       resolvedById: ["RESOLVED", "DISMISSED"].includes(status) ? actor.id : null,
       resolvedAt: ["RESOLVED", "DISMISSED"].includes(status) ? new Date() : null,
+      moderatorNote,
+      decisionReason,
+      actionTaken,
     },
   });
-  await audit(actor.id, "report.status", "DirectoryReport", id, { status });
+  await audit(actor.id, "report.status", "DirectoryReport", id, { status, decisionReason, actionTaken });
   refreshAdmin();
 }
 
