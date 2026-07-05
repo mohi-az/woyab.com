@@ -51,7 +51,7 @@ export function StatCard({ label, value, icon: Icon, tone = "blue" }: {
 
 export function StatusBadge({ status }: { status: string }) {
   return (
-    <span data-status={status} className="admin-status-badge inline-flex min-h-7 items-center rounded-full px-3 text-xs font-black uppercase ring-1">
+    <span data-status={status} className="admin-status-badge inline-flex min-h-6 items-center rounded-full px-2.5 text-[11px] font-black uppercase ring-1">
       {status}
     </span>
   );
@@ -62,8 +62,8 @@ export function AdminTable({ children }: { children: React.ReactNode }) {
 }
 
 export const tableClassName = "admin-table min-w-full divide-y text-sm";
-export const thClassName = "admin-th whitespace-nowrap px-4 py-3 text-start text-xs font-black uppercase tracking-wide";
-export const tdClassName = "admin-td align-top px-4 py-4";
+export const thClassName = "admin-th whitespace-nowrap px-4 py-2.5 text-start text-xs font-black uppercase tracking-wide";
+export const tdClassName = "admin-td align-middle px-4 py-2.5";
 
 export function AdminButton({ children, tone = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: "default" | "danger" | "success" }) {
   return <button {...props} data-tone={tone} className={cn("admin-button rounded-lg border px-3 py-2 text-xs font-black transition", props.className)}>{children}</button>;

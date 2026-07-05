@@ -28,6 +28,13 @@ function intValue(formData: FormData, key: string) {
   return Number.isInteger(parsed) ? parsed : null;
 }
 
+function numberValue(formData: FormData, key: string) {
+  const raw = value(formData, key);
+  if (!raw) return null;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 async function audit(actorId: string, action: string, entityType: string, entityId?: string | null, metadata?: Prisma.InputJsonValue) {
   await prisma.adminAuditLog.create({
     data: {
@@ -126,6 +133,8 @@ export async function updateBusinessDetails(formData: FormData) {
       specialtyId,
       cityId,
       districtId: intValue(formData, "districtId"),
+      latitude: numberValue(formData, "latitude"),
+      longitude: numberValue(formData, "longitude"),
       address: nullableValue(formData, "address"),
       postalCode: nullableValue(formData, "postalCode"),
       email: nullableValue(formData, "email"),
@@ -155,6 +164,76 @@ export async function updateBusinessDetails(formData: FormData) {
   });
 
   await audit(actor.id, "business.update", "Business", businessId, { status, sourceLocale });
+  refreshAdmin();
+}
+
+export async function createBusinessDetails(formData: FormData) {
+  const actor = await requireAdmin();
+  if (actor.role !== "SUPER_ADMIN") throw new Error("Only super admins can create businesses.");
+
+  const slug = value(formData, "slug");
+  const sourceLocale = value(formData, "sourceLocale") as "DE" | "EN" | "FA";
+  const categoryId = intValue(formData, "categoryId");
+  const cityId = intValue(formData, "cityId");
+  const subCategoryId = intValue(formData, "subCategoryId");
+  const specialtyId = intValue(formData, "specialtyId");
+  const status = value(formData, "status") as BusinessStatus;
+
+  if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
+  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId || !businessStatuses.includes(status)) {
+    throw new Error("Please check the required business fields.");
+  }
+
+  const duplicate = await prisma.business.findUnique({ where: { slug }, select: { id: true } });
+  if (duplicate) throw new Error("This business slug already exists.");
+
+  const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
+    locale,
+    businessName: value(formData, `businessName_${locale}`),
+    shortDescription: nullableValue(formData, `shortDescription_${locale}`),
+    description: nullableValue(formData, `description_${locale}`),
+  })).filter((translation) => translation.businessName);
+
+  const source = translations.find((translation) => translation.locale === sourceLocale) ?? translations[0];
+  if (!source) throw new Error("At least one translated business name is required.");
+
+  const business = await prisma.business.create({
+    data: {
+      slug,
+      sourceLocale,
+      businessName: source.businessName,
+      shortDescription: source.shortDescription,
+      description: source.description,
+      legalName: nullableValue(formData, "legalName"),
+      categoryId,
+      subCategoryId,
+      specialtyId,
+      cityId,
+      districtId: intValue(formData, "districtId"),
+      latitude: numberValue(formData, "latitude"),
+      longitude: numberValue(formData, "longitude"),
+      address: nullableValue(formData, "address"),
+      postalCode: nullableValue(formData, "postalCode"),
+      email: nullableValue(formData, "email"),
+      phone: nullableValue(formData, "phone"),
+      mobile: nullableValue(formData, "mobile"),
+      website: nullableValue(formData, "website"),
+      status,
+      verified: booleanValue(formData, "verified"),
+      featured: booleanValue(formData, "featured"),
+      translations: {
+        create: translations.map((translation) => ({
+          locale: translation.locale,
+          businessName: translation.businessName,
+          shortDescription: translation.shortDescription,
+          description: translation.description,
+        })),
+      },
+    },
+    select: { id: true },
+  });
+
+  await audit(actor.id, "business.create", "Business", business.id, { status, sourceLocale });
   refreshAdmin();
 }
 

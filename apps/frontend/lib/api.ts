@@ -620,7 +620,7 @@ export async function fetchBusinessBySlug(
 
 export async function fetchBusinessReviews(businessId: string): Promise<BusinessReviewItem[]> {
   try {
-    const res = await fetch(`${API_BASE}/v1/businesses/${businessId}/reviews?limit=50`, {
+    const res = await fetch(`${API_BASE}/v1/businesses/${businessId}/reviews?limit=50&status=APPROVED`, {
       cache: "no-store",
     });
     if (!res.ok) return [];

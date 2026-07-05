@@ -9,6 +9,7 @@ import { LocaleObserver } from "@/components/i18n/LocaleObserver";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { getDirection, isAppLocale } from "@/i18n/config";
 import { dirooz, geistMono, geistSans } from "@/styles/fonts";
+import "antd/dist/reset.css";
 import "./globals.css";
 
 export const viewport: Viewport = {

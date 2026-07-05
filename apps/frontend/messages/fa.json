@@ -217,12 +217,13 @@
       "chooseStars": "ثبت {count} ستاره",
       "titlePlaceholder": "عنوان نظر (اختیاری)",
       "commentPlaceholder": "تجربه خودتان از این کسب‌وکار را بنویسید",
-      "loginRequired": "کاربرانی که لاگین باشند می‌توانند از اینجا نظر ثبت کنند. وقتی جریان auth پروژه وصل شود و کاربر فعلی در سشن محلی ذخیره شود، این فرم فعال می‌شود.",
+      "loginRequired": "برای ثبت نظر ابتدا وارد شوید.",
+      "loginAction": "ورود به حساب",
       "ratingRequired": "لطفا تعداد ستاره را انتخاب کنید.",
       "commentRequired": "لطفا یک نظر کوتاه بنویسید.",
       "submit": "ثبت نظر",
       "submitting": "در حال ثبت...",
-      "submitSuccess": "نظر شما اضافه شد.",
+      "submitSuccess": "ممنون از نظر شما. نظر شما بعد از بررسی و تایید منتشر می‌شود.",
       "submitError": "ثبت نظر انجام نشد."
     },
     "contactCard": {
@@ -521,7 +522,10 @@
       "title": "مدیریت کسب‌وکارها",
       "description": "بررسی، انتشار، تعلیق و ویرایش کسب‌وکارها در هر سه زبان.",
       "list": "لیست کسب‌وکارها",
-      "editDetails": "ویرایش جزئیات و ترجمه‌ها"
+      "editDetails": "ویرایش جزئیات و ترجمه‌ها",
+      "editTitle": "ویرایش کسب‌وکار",
+      "createTitle": "افزودن کسب‌وکار جدید",
+      "createDescription": "کسب‌وکار را از طرف سوپر ادمین ثبت کنید."
     },
     "reviews": {
       "title": "بررسی نظرها",
@@ -586,6 +590,14 @@
       "allStatuses": "همه وضعیت‌ها",
       "allRoles": "همه نقش‌ها"
     },
+    "location": {
+      "title": "موقعیت روی نقشه",
+      "address": "آدرس",
+      "searchPlaceholder": "جستجوی شهر، محله یا آدرس",
+      "currentLocation": "موقعیت فعلی",
+      "loading": "در حال آماده‌سازی نقشه",
+      "mapUnavailable": "نقشه در دسترس نیست. تنظیمات Mapbox یا سرویس geo را بررسی کنید."
+    },
     "fields": {
       "business": "کسب‌وکار",
       "owner": "مالک",
@@ -636,6 +648,11 @@
       "filter": "فیلتر",
       "save": "ذخیره",
       "apply": "اعمال",
+      "create": "ایجاد",
+      "cancel": "انصراف",
+      "previous": "قبلی",
+      "next": "بعدی",
+      "addBusiness": "افزودن کسب‌وکار",
       "viewAll": "مشاهده همه",
       "viewPublic": "صفحه عمومی",
       "verify": "تایید",
@@ -643,6 +660,17 @@
       "feature": "ویژه کن",
       "unfeature": "لغو ویژه",
       "delete": "حذف"
+    },
+    "businessWizard": {
+      "identity": "مشخصات",
+      "classification": "دسته‌بندی",
+      "translations": "ترجمه‌ها",
+      "location": "موقعیت"
+    },
+    "validation": {
+      "required": "این فیلد اجباری است.",
+      "slug": "فقط حروف کوچک انگلیسی، عدد و خط تیره مجاز است.",
+      "sourceBusinessName": "نام کسب‌وکار را برای زبان مبنا وارد کنید."
     },
     "pagination": {
       "summary": "{total} مورد / صفحه {page} از {totalPages}",

@@ -219,12 +219,13 @@
       "chooseStars": "Give {count} stars",
       "titlePlaceholder": "Review title (optional)",
       "commentPlaceholder": "Share your experience with this business",
-      "loginRequired": "Logged-in users can leave a review here. Once your auth flow is connected, store the current user in local session and this form will become active.",
+      "loginRequired": "Please log in before submitting a review.",
+      "loginAction": "Log in",
       "ratingRequired": "Please choose a star rating.",
       "commentRequired": "Please write a short review.",
       "submit": "Submit review",
       "submitting": "Submitting...",
-      "submitSuccess": "Your review was added.",
+      "submitSuccess": "Thank you for your review. It will be published after review and approval.",
       "submitError": "Your review could not be submitted."
     },
     "contactCard": {
@@ -523,7 +524,10 @@
       "title": "Listings management",
       "description": "Review, publish, suspend and edit directory listings in all supported languages.",
       "list": "Business listings",
-      "editDetails": "Edit details and translations"
+      "editDetails": "Edit details and translations",
+      "editTitle": "Edit business",
+      "createTitle": "Add new business",
+      "createDescription": "Create a listing on behalf of the platform owner."
     },
     "reviews": {
       "title": "Review moderation",
@@ -588,6 +592,14 @@
       "allStatuses": "All statuses",
       "allRoles": "All roles"
     },
+    "location": {
+      "title": "Map location",
+      "address": "Address",
+      "searchPlaceholder": "Search city, district or address",
+      "currentLocation": "Current location",
+      "loading": "Preparing map",
+      "mapUnavailable": "The map is unavailable. Check Mapbox or geo service configuration."
+    },
     "fields": {
       "business": "Business",
       "owner": "Owner",
@@ -638,6 +650,11 @@
       "filter": "Filter",
       "save": "Save",
       "apply": "Apply",
+      "create": "Create",
+      "cancel": "Cancel",
+      "previous": "Previous",
+      "next": "Next",
+      "addBusiness": "Add business",
       "viewAll": "View all",
       "viewPublic": "Public page",
       "verify": "Verify",
@@ -645,6 +662,17 @@
       "feature": "Feature",
       "unfeature": "Unfeature",
       "delete": "Delete"
+    },
+    "businessWizard": {
+      "identity": "Identity",
+      "classification": "Classification",
+      "translations": "Translations",
+      "location": "Location"
+    },
+    "validation": {
+      "required": "This field is required.",
+      "slug": "Use lowercase letters, numbers and hyphens only.",
+      "sourceBusinessName": "Enter the business name for the selected source language."
     },
     "pagination": {
       "summary": "{total} total / page {page} of {totalPages}",

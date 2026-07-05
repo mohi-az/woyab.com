@@ -96,7 +96,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   });
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [reviews, setReviews] = useState(initialReviews);
+  const reviews = initialReviews;
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({ rating: 0, title: "", comment: "" });
   const [contactForm, setContactForm] = useState<ContactFormState>({
     name: "",
@@ -119,10 +119,11 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           const session = await response.json() as {
             user?: { id?: string; name?: string | null; email?: string | null; image?: string | null; invalid?: boolean };
           };
-          if (!cancelled && session.user?.id && session.user.name && !session.user.invalid) {
+          if (!cancelled && session.user?.id && !session.user.invalid) {
+            const displayName = session.user.name?.trim() || session.user.email || "User";
             const user = {
               id: session.user.id,
-              name: session.user.name,
+              name: displayName,
               email: session.user.email ?? null,
               avatarUrl: session.user.image ?? null,
             };
@@ -184,19 +185,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
         return;
       }
 
-      setReviews((current) => [
-        {
-          id: json?.data?.id ?? `local-${Date.now()}`,
-          rating: reviewForm.rating,
-          title: reviewForm.title.trim() || null,
-          comment: reviewForm.comment.trim(),
-          createdAt: json?.data?.createdAt ?? new Date().toISOString(),
-          verified: false,
-          status: json?.data?.status ?? "PENDING",
-          user: currentUser,
-        },
-        ...current,
-      ]);
       setReviewForm({ rating: 0, title: "", comment: "" });
       setReviewFeedback(t("reviewsForm.submitSuccess"));
     } catch {
@@ -487,8 +475,11 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   </button>
                 </form>
               ) : (
-                <div className="mt-5 rounded-3xl border border-dashed border-slate-200 bg-white px-5 py-6 text-sm leading-7 text-slate-600">
-                  {t("reviewsForm.loginRequired")}
+                <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-3 rounded-3xl border border-dashed border-slate-200 bg-white px-5 py-6 text-sm leading-7 text-slate-600">
+                  <span>{t("reviewsForm.loginRequired")}</span>
+                  <Link href="/login" className="font-black text-primary transition hover:text-primary-dark">
+                    {t("reviewsForm.loginAction")}
+                  </Link>
                 </div>
               )}
             </div>

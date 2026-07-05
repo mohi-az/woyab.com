@@ -219,12 +219,13 @@
       "chooseStars": "{count} Sterne vergeben",
       "titlePlaceholder": "Titel der Bewertung (optional)",
       "commentPlaceholder": "Teilen Sie Ihre Erfahrung mit diesem Unternehmen",
-      "loginRequired": "Angemeldete Nutzer konnen hier eine Bewertung schreiben. Sobald Ihr Auth-Flow verbunden ist, aktiviert eine lokale Session diesen Bereich.",
+      "loginRequired": "Bitte melden Sie sich an, um eine Bewertung zu schreiben.",
+      "loginAction": "Anmelden",
       "ratingRequired": "Bitte wahlen Sie eine Sternebewertung aus.",
       "commentRequired": "Bitte schreiben Sie eine kurze Bewertung.",
       "submit": "Bewertung senden",
       "submitting": "Wird gesendet...",
-      "submitSuccess": "Ihre Bewertung wurde hinzugefugt.",
+      "submitSuccess": "Vielen Dank fur Ihre Bewertung. Sie wird nach Prufung und Freigabe veroffentlicht.",
       "submitError": "Ihre Bewertung konnte nicht gesendet werden."
     },
     "contactCard": {
@@ -523,7 +524,10 @@
       "title": "Eintragsverwaltung",
       "description": "Pruefen, veroeffentlichen, sperren und bearbeiten Sie Eintraege in allen Sprachen.",
       "list": "Business-Eintraege",
-      "editDetails": "Details und Uebersetzungen bearbeiten"
+      "editDetails": "Details und Uebersetzungen bearbeiten",
+      "editTitle": "Business bearbeiten",
+      "createTitle": "Neues Business hinzufuegen",
+      "createDescription": "Erstellen Sie einen Eintrag im Namen des Plattform-Owners."
     },
     "reviews": {
       "title": "Bewertungsmoderation",
@@ -588,6 +592,14 @@
       "allStatuses": "Alle Status",
       "allRoles": "Alle Rollen"
     },
+    "location": {
+      "title": "Position auf der Karte",
+      "address": "Adresse",
+      "searchPlaceholder": "Stadt, Viertel oder Adresse suchen",
+      "currentLocation": "Aktueller Standort",
+      "loading": "Karte wird vorbereitet",
+      "mapUnavailable": "Die Karte ist nicht verfuegbar. Pruefen Sie Mapbox- oder Geo-Service-Konfiguration."
+    },
     "fields": {
       "business": "Business",
       "owner": "Owner",
@@ -638,6 +650,11 @@
       "filter": "Filtern",
       "save": "Speichern",
       "apply": "Anwenden",
+      "create": "Erstellen",
+      "cancel": "Abbrechen",
+      "previous": "Zurueck",
+      "next": "Weiter",
+      "addBusiness": "Business hinzufuegen",
       "viewAll": "Alle anzeigen",
       "viewPublic": "Oeffentliche Seite",
       "verify": "Verifizieren",
@@ -645,6 +662,17 @@
       "feature": "Hervorheben",
       "unfeature": "Nicht hervorheben",
       "delete": "Loeschen"
+    },
+    "businessWizard": {
+      "identity": "Basis",
+      "classification": "Zuordnung",
+      "translations": "Uebersetzungen",
+      "location": "Standort"
+    },
+    "validation": {
+      "required": "Dieses Feld ist erforderlich.",
+      "slug": "Nur Kleinbuchstaben, Zahlen und Bindestriche verwenden.",
+      "sourceBusinessName": "Geben Sie den Business-Namen fuer die gewaehlte Ausgangssprache ein."
     },
     "pagination": {
       "summary": "{total} gesamt / Seite {page} von {totalPages}",

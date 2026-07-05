@@ -49,11 +49,15 @@ function normalizePath(pathname: string) {
   return pathname.replace(/^\/(de|en|fa)(?=\/|$)/, "") || "/";
 }
 
-export function AdminShell({ user, children }: { user: AdminUser; children: React.ReactNode }) {
+export function AdminShell({ user, children, initialTheme }: {
+  user: AdminUser;
+  children: React.ReactNode;
+  initialTheme: "dark" | "light";
+}) {
   const t = useTranslations("Admin");
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(initialTheme === "dark");
   const normalizedPath = normalizePath(pathname);
   const displayName = user.name || user.email || t("shell.fallbackName");
   const initials = displayName.slice(0, 1).toUpperCase();
@@ -138,7 +142,11 @@ export function AdminShell({ user, children }: { user: AdminUser; children: Reac
             <button
               type="button"
               className="admin-icon-button grid h-11 w-11 place-items-center rounded-full border"
-              onClick={() => setDark((current) => !current)}
+              onClick={() => setDark((current) => {
+                const next = !current;
+                document.cookie = `fargo-admin-theme=${next ? "dark" : "light"}; path=/; max-age=31536000; samesite=lax`;
+                return next;
+              })}
               aria-label={dark ? t("shell.lightMode") : t("shell.darkMode")}
             >
               {dark ? <FiSun className="h-5 w-5" /> : <FiMoon className="h-5 w-5" />}

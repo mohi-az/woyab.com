@@ -250,6 +250,128 @@ html[lang="fa"] .admin-shell * {
   opacity: 0.55;
 }
 
+.admin-ant-select {
+  width: 100%;
+}
+
+.admin-ant-select .ant-select-selector {
+  min-height: 44px !important;
+  border-color: var(--admin-field-border) !important;
+  background: var(--admin-field-bg) !important;
+  border-radius: 0.5rem !important;
+  color: var(--admin-text) !important;
+  box-shadow: none !important;
+}
+
+.admin-ant-select .ant-select-selection-item,
+.admin-ant-select .ant-select-selection-placeholder,
+.admin-ant-select .ant-select-arrow,
+.admin-ant-select .ant-select-clear {
+  color: var(--admin-muted) !important;
+}
+
+.admin-ant-select .ant-select-selection-item {
+  color: var(--admin-text) !important;
+  font-weight: 700;
+}
+
+.admin-ant-select .ant-select-selection-search-input {
+  height: 42px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--admin-text) !important;
+  box-shadow: none !important;
+}
+
+.admin-ant-select-dropdown {
+  background: var(--admin-surface) !important;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem !important;
+}
+
+.admin-ant-select-dropdown .ant-select-item {
+  color: var(--admin-text) !important;
+}
+
+.admin-ant-select-dropdown .ant-select-item-option-active,
+.admin-ant-select-dropdown .ant-select-item-option-selected {
+  background: var(--admin-row-hover) !important;
+}
+
+.admin-wizard-step {
+  background: color-mix(in srgb, var(--admin-surface-strong) 72%, var(--admin-surface));
+  border-color: var(--admin-border);
+  color: var(--admin-muted);
+  text-align: start;
+}
+
+.admin-wizard-step-active {
+  background: color-mix(in srgb, #38bdf8 18%, var(--admin-surface));
+  border-color: color-mix(in srgb, #38bdf8 46%, transparent);
+  color: var(--admin-text);
+}
+
+.admin-wizard-card,
+.admin-form-field {
+  background: color-mix(in srgb, var(--admin-surface-strong) 68%, var(--admin-surface));
+  border-color: var(--admin-border);
+}
+
+.admin-form-field {
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.admin-form-field:focus-within {
+  border-color: color-mix(in srgb, #38bdf8 54%, var(--admin-border));
+  box-shadow: 0 0 0 3px rgb(56 189 248 / 0.10);
+}
+
+.admin-form-field-error {
+  border-color: color-mix(in srgb, #fb7185 70%, var(--admin-border));
+  box-shadow: 0 0 0 3px rgb(244 63 94 / 0.10);
+}
+
+.admin-shell .ant-steps .ant-steps-item-title {
+  color: var(--admin-muted) !important;
+  font-weight: 800;
+}
+
+.admin-shell .ant-steps .ant-steps-item-process .ant-steps-item-title,
+.admin-shell .ant-steps .ant-steps-item-finish .ant-steps-item-title {
+  color: var(--admin-text) !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-icon {
+  background: var(--admin-field-bg) !important;
+  border-color: var(--admin-border) !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-icon .ant-steps-icon {
+  color: var(--admin-muted) !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-process .ant-steps-item-icon {
+  background: #0ea5e9 !important;
+  border-color: #38bdf8 !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-process .ant-steps-icon {
+  color: #ffffff !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-finish .ant-steps-item-icon {
+  background: color-mix(in srgb, #10b981 18%, var(--admin-field-bg)) !important;
+  border-color: #10b981 !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-finish .ant-steps-icon {
+  color: #34d399 !important;
+}
+
+.admin-shell .ant-steps .ant-steps-item-tail::after {
+  background: var(--admin-border) !important;
+}
+
 .admin-status-badge {
   background: rgb(148 163 184 / 0.16);
   color: #cbd5e1;
@@ -365,6 +487,12 @@ html[lang="fa"] .admin-shell * {
 .admin-shell[data-admin-theme="light"] input::placeholder,
 .admin-shell[data-admin-theme="light"] textarea::placeholder {
   color: #94a3b8 !important;
+}
+
+.admin-shell .admin-ant-select .ant-select-selection-search-input {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .admin-shell[data-admin-theme="light"] .text-white,
