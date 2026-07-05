@@ -25,6 +25,9 @@ export async function POST(request: Request, context: RouteContext) {
   const existing = await prisma.review.findUnique({ where: { businessId_userId: { businessId, userId } } });
   if (existing) return NextResponse.json({ error: "You have already reviewed this business." }, { status: 409 });
 
-  const review = await prisma.review.create({ data: { businessId, userId, ...parsed.data } });
-  return NextResponse.json({ success: true, data: review }, { status: 201 });
+  const review = await prisma.review.create({ data: { businessId, userId, status: "PENDING", ...parsed.data } });
+  return NextResponse.json(
+    { success: true, message: "Thank you. Your review will be published after review and approval.", data: review },
+    { status: 201 },
+  );
 }

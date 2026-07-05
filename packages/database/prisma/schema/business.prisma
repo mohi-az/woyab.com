@@ -98,6 +98,7 @@ model Business {
   directoryReports DirectoryReport[]
   claims        BusinessClaim[]
   contactMessages ContactMessage[]
+  viewStats     BusinessViewDaily[]
 
   @@index([slug])
   @@index([cityId])

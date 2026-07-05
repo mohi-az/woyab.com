@@ -11,6 +11,11 @@ export const reviewRepository = {
       include: {
         user: { select: { id: true, name: true, avatarUrl: true } },
         images: true,
+        ownerReply: {
+          include: {
+            owner: { select: { id: true, name: true, avatarUrl: true } },
+          },
+        },
       },
     }),
 
@@ -24,6 +29,11 @@ export const reviewRepository = {
         user: { select: { id: true, name: true, avatarUrl: true } },
         business: { select: { id: true, slug: true, businessName: true } },
         images: true,
+        ownerReply: {
+          include: {
+            owner: { select: { id: true, name: true, avatarUrl: true } },
+          },
+        },
       },
     }),
 

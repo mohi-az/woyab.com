@@ -26,11 +26,40 @@ model Review {
 
   images ReviewImage[]
   reports DirectoryReport[]
+  ownerReply ReviewOwnerReply?
 
   @@unique([businessId, userId])
   @@index([businessId])
   @@index([status])
   @@map("reviews")
+}
+
+model ReviewOwnerReply {
+  id        String   @id @default(cuid())
+  reviewId  String   @unique
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  ownerId   String?
+  owner     User?    @relation("ReviewOwnerReplyOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@map("review_owner_replies")
+}
+
+model BusinessViewDaily {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  day        DateTime
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([businessId, day])
+  @@index([day])
+  @@map("business_view_daily")
 }
 
 model ReviewImage {

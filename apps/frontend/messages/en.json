@@ -211,7 +211,8 @@
       "eyebrow": "Community feedback",
       "title": "Customer reviews",
       "verified": "Verified",
-      "empty": "No reviews have been posted yet."
+      "empty": "No reviews have been posted yet.",
+      "ownerReply": "Owner reply"
     },
     "reviewsForm": {
       "title": "Write a review",
@@ -354,6 +355,8 @@
       "favorites": "Favorites",
       "addresses": "My addresses",
       "reviews": "My reviews",
+      "owner": "Owner dashboard",
+      "addBusiness": "Add business",
       "security": "Account security"
     },
     "profile": {
@@ -489,9 +492,10 @@
       "businesses": "Listings",
       "reviews": "Reviews",
       "users": "Users",
+      "owners": "Business owners",
       "taxonomy": "Taxonomy",
       "reports": "Reports",
-      "claims": "Claims",
+      "claims": "Ownership claims",
       "messages": "Messages",
       "tickets": "Tickets",
       "settings": "Settings",
@@ -536,9 +540,16 @@
     },
     "users": {
       "title": "User management",
-      "description": "Manage access, active status and owner/admin roles.",
       "list": "Users",
-      "activity": "{businesses} businesses / {reviews} reviews"
+      "activity": "{reviews} reviews / {favorites} favorites"
+    },
+    "owners": {
+      "title": "Business owners",
+      "description": "Track owners, their listings, claims and listing quality signals.",
+      "list": "Owners",
+      "totalListings": "{count} total",
+      "activeListings": "{count} active",
+      "pendingListings": "{count} pending"
     },
     "taxonomy": {
       "title": "Taxonomy",
@@ -625,6 +636,12 @@
       "shortDescription": "Short description",
       "description": "Description",
       "review": "Review",
+      "rating": "Rating",
+      "reviews": "Reviews",
+      "businesses": "Businesses",
+      "claims": "Claims",
+      "contact": "Contact",
+      "joined": "Joined",
       "author": "Author",
       "user": "User",
       "role": "Role",
@@ -661,7 +678,8 @@
       "unverify": "Unverify",
       "feature": "Feature",
       "unfeature": "Unfeature",
-      "delete": "Delete"
+      "delete": "Delete",
+      "clear": "Clear"
     },
     "businessWizard": {
       "identity": "Identity",
@@ -676,6 +694,7 @@
     },
     "pagination": {
       "summary": "{total} total / page {page} of {totalPages}",
+      "range": "{from}-{to} of {total}",
       "previous": "Previous",
       "next": "Next"
     },

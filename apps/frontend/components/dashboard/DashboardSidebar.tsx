@@ -8,6 +8,8 @@ type DashboardUser = {
   name: string;
   email: string | null;
   avatarUrl: string | null;
+  role: "USER" | "OWNER" | "ADMIN" | "SUPER_ADMIN";
+  businessCount: number;
 };
 
 const links = [
@@ -19,11 +21,17 @@ const links = [
   ["/dashboard/security", "security"],
 ] as const;
 
+const ownerLinks = [
+  ["/dashboard/owner", "owner"],
+  ["/dashboard/owner/new", "addBusiness"],
+] as const;
+
 export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }) {
   const t = useTranslations("Dashboard.sidebar");
   const [user, setUser] = useState(initialUser);
   const displayName = user.name || t("fallbackName");
   const initials = displayName.trim().slice(0, 1).toUpperCase();
+  const hasOwnerAccess = user.role === "OWNER" || user.role === "ADMIN" || user.role === "SUPER_ADMIN" || user.businessCount > 0;
 
   useEffect(() => {
     function updateAvatar(event: Event) {
@@ -56,6 +64,15 @@ export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }
             {t(labelKey)}
           </Link>
         ))}
+        {hasOwnerAccess ? (
+          <div className="col-span-2 mt-2 border-t border-slate-100 pt-2 lg:col-span-1">
+            {ownerLinks.map(([href, labelKey]) => (
+              <Link key={href} href={href} className="block rounded-xl px-3 py-3 text-sm font-bold text-slate-600 hover:bg-primary/5 hover:text-primary">
+                {t(labelKey)}
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </nav>
     </aside>
   );

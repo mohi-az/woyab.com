@@ -160,6 +160,17 @@ type ReviewApiItem = {
     name?: string | null;
     avatarUrl?: string | null;
   } | null;
+  ownerReply?: {
+    id: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    owner?: {
+      id: string;
+      name?: string | null;
+      avatarUrl?: string | null;
+    } | null;
+  } | null;
 };
 
 type PaginatedResponse<T> = {
@@ -304,6 +315,13 @@ export type BusinessReviewItem = {
     name: string;
     avatarUrl?: string | null;
   };
+  ownerReply?: {
+    id: string;
+    content: string;
+    createdAt: string;
+    ownerName: string;
+    ownerAvatarUrl?: string | null;
+  } | null;
 };
 
 export type CurrentUser = {
@@ -640,6 +658,15 @@ export async function fetchBusinessReviews(businessId: string): Promise<Business
         name: review.user?.name?.trim() || "Anonymous",
         avatarUrl: review.user?.avatarUrl,
       },
+      ownerReply: review.ownerReply
+        ? {
+            id: review.ownerReply.id,
+            content: review.ownerReply.content,
+            createdAt: review.ownerReply.createdAt,
+            ownerName: review.ownerReply.owner?.name?.trim() || "Business owner",
+            ownerAvatarUrl: review.ownerReply.owner?.avatarUrl,
+          }
+        : null,
     }));
   } catch {
     return [];

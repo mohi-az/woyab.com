@@ -18,6 +18,7 @@ import {
   FiShield,
   FiSun,
   FiTag,
+  FiUserCheck,
   FiUsers,
   FiX,
 } from "react-icons/fi";
@@ -36,6 +37,7 @@ const navItems = [
   { href: "/admin/businesses", key: "businesses", icon: FiBriefcase },
   { href: "/admin/reviews", key: "reviews", icon: FiCheckSquare },
   { href: "/admin/users", key: "users", icon: FiUsers },
+  { href: "/admin/owners", key: "owners", icon: FiUserCheck },
   { href: "/admin/taxonomy", key: "taxonomy", icon: FiTag },
   { href: "/admin/reports", key: "reports", icon: FiFlag },
   { href: "/admin/claims", key: "claims", icon: FiShield },

@@ -209,7 +209,8 @@
       "eyebrow": "نظر کاربران",
       "title": "دیدگاه مشتریان",
       "verified": "تاییدشده",
-      "empty": "هنوز نظری برای این کسب‌وکار ثبت نشده است."
+      "empty": "هنوز نظری برای این کسب‌وکار ثبت نشده است.",
+      "ownerReply": "پاسخ صاحب کسب‌وکار"
     },
     "reviewsForm": {
       "title": "ثبت نظر",
@@ -352,6 +353,8 @@
       "favorites": "علاقه‌مندی‌ها",
       "addresses": "آدرس‌های من",
       "reviews": "نظرهای من",
+      "owner": "داشبورد صاحب کسب‌وکار",
+      "addBusiness": "افزودن کسب‌وکار",
       "security": "امنیت حساب"
     },
     "profile": {
@@ -487,6 +490,7 @@
       "businesses": "کسب‌وکارها",
       "reviews": "نظرها",
       "users": "کاربران",
+      "owners": "صاحبین کسب‌وکار",
       "taxonomy": "دسته‌بندی‌ها",
       "reports": "گزارش‌ها",
       "claims": "درخواست مالکیت",
@@ -534,9 +538,16 @@
     },
     "users": {
       "title": "مدیریت کاربران",
-      "description": "دسترسی، فعال بودن و نقش‌های مالک/ادمین را مدیریت کن.",
       "list": "کاربران",
-      "activity": "{businesses} کسب‌وکار / {reviews} نظر"
+      "activity": "{reviews} نظر / {favorites} علاقه‌مندی"
+    },
+    "owners": {
+      "title": "صاحبین کسب‌وکار",
+      "description": "صاحبین کسب‌وکار، لیستینگ‌ها، درخواست‌های مالکیت و کیفیت فعالیت آن‌ها را بررسی کن.",
+      "list": "صاحبین کسب‌وکار",
+      "totalListings": "{count} کل",
+      "activeListings": "{count} فعال",
+      "pendingListings": "{count} در انتظار"
     },
     "taxonomy": {
       "title": "دسته‌بندی‌ها",
@@ -623,6 +634,12 @@
       "shortDescription": "توضیح کوتاه",
       "description": "توضیح",
       "review": "نظر",
+      "rating": "امتیاز",
+      "reviews": "نظرها",
+      "businesses": "کسب‌وکارها",
+      "claims": "درخواست‌های مالکیت",
+      "contact": "تماس",
+      "joined": "عضویت",
       "author": "نویسنده",
       "user": "کاربر",
       "role": "نقش",
@@ -659,7 +676,8 @@
       "unverify": "لغو تایید",
       "feature": "ویژه کن",
       "unfeature": "لغو ویژه",
-      "delete": "حذف"
+      "delete": "حذف",
+      "clear": "پاک کردن"
     },
     "businessWizard": {
       "identity": "مشخصات",
@@ -674,6 +692,7 @@
     },
     "pagination": {
       "summary": "{total} مورد / صفحه {page} از {totalPages}",
+      "range": "{from}-{to} از {total}",
       "previous": "قبلی",
       "next": "بعدی"
     },

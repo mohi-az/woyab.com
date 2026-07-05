@@ -372,6 +372,61 @@ html[lang="fa"] .admin-shell * {
   background: var(--admin-border) !important;
 }
 
+.admin-ant-table .ant-table,
+.admin-ant-table .ant-table-container,
+.admin-ant-table .ant-table-content,
+.admin-ant-table .ant-table-tbody > tr > td,
+.admin-ant-table .ant-table-thead > tr > th {
+  background: var(--admin-surface) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-ant-table .ant-table-thead > tr > th {
+  background: var(--admin-table-head) !important;
+  color: var(--admin-muted) !important;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-ant-table .ant-table-tbody > tr:hover > td {
+  background: var(--admin-row-hover) !important;
+}
+
+.admin-ant-table .ant-table-cell {
+  padding: 10px 14px !important;
+}
+
+.admin-ant-table .ant-table-filter-trigger,
+.admin-ant-table .ant-pagination,
+.admin-ant-table .ant-pagination-item a,
+.admin-ant-table .ant-pagination-total-text,
+.admin-ant-table .ant-select-selector,
+.admin-ant-table .ant-select-arrow {
+  color: var(--admin-text) !important;
+}
+
+.admin-ant-table .ant-pagination-item,
+.admin-ant-table .ant-pagination-prev button,
+.admin-ant-table .ant-pagination-next button {
+  background: var(--admin-field-bg) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-ant-table .ant-pagination-item-active {
+  border-color: #38bdf8 !important;
+}
+
+.admin-ant-table .ant-empty-description,
+.admin-ant-table .ant-table-column-sorter {
+  color: var(--admin-muted) !important;
+}
+
+.admin-ant-table .ant-table-filter-trigger.active {
+  color: #38bdf8 !important;
+}
+
 .admin-status-badge {
   background: rgb(148 163 184 / 0.16);
   color: #cbd5e1;

@@ -148,6 +148,13 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     };
   }, []);
 
+  useEffect(() => {
+    void fetch(`/api/businesses/${business.id}/views`, {
+      method: "POST",
+      keepalive: true,
+    }).catch(() => undefined);
+  }, [business.id]);
+
   const activeImage = business.gallery[activeImageIndex] ?? business.gallery[0];
 
   async function submitReview(event: React.FormEvent<HTMLFormElement>) {
@@ -404,6 +411,16 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
                       {review.title ? <p className="mt-4 text-sm font-black text-slate-900">{review.title}</p> : null}
                       {review.comment ? <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{review.comment}</p> : null}
+                      {review.ownerReply ? (
+                        <div className="mt-4 rounded-2xl border border-primary/10 bg-white px-4 py-3">
+                          <div className="flex items-center gap-2 text-xs font-black text-primary">
+                            <FiMessageSquare />
+                            <span>{t("reviewsSection.ownerReply")}</span>
+                          </div>
+                          <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{review.ownerReply.content}</p>
+                          <p className="mt-2 text-xs font-bold text-slate-400">{review.ownerReply.ownerName}</p>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </article>

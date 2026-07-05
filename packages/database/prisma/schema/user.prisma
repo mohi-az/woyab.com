@@ -34,6 +34,7 @@ model User {
   resolvedDirectoryReports DirectoryReport[] @relation("DirectoryReportResolver")
   businessClaims BusinessClaim[] @relation("BusinessClaimClaimant")
   reviewedBusinessClaims BusinessClaim[] @relation("BusinessClaimReviewer")
+  reviewOwnerReplies ReviewOwnerReply[] @relation("ReviewOwnerReplyOwner")
   supportTickets SupportTicket[] @relation("SupportTicketUser")
   assignedSupportTickets SupportTicket[] @relation("SupportTicketAssignee")
   updatedAdminSettings AdminSetting[] @relation("AdminSettingUpdater")

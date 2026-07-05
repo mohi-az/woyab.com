@@ -211,7 +211,8 @@
       "eyebrow": "Feedback der Community",
       "title": "Kundenbewertungen",
       "verified": "Verifiziert",
-      "empty": "Bisher wurden noch keine Bewertungen veroffentlicht."
+      "empty": "Bisher wurden noch keine Bewertungen veroffentlicht.",
+      "ownerReply": "Antwort des Inhabers"
     },
     "reviewsForm": {
       "title": "Bewertung schreiben",
@@ -354,6 +355,8 @@
       "favorites": "Favoriten",
       "addresses": "Meine Adressen",
       "reviews": "Meine Bewertungen",
+      "owner": "Inhaber-Dashboard",
+      "addBusiness": "Eintrag hinzufugen",
       "security": "Kontosicherheit"
     },
     "profile": {
@@ -489,9 +492,10 @@
       "businesses": "Eintraege",
       "reviews": "Bewertungen",
       "users": "Benutzer",
+      "owners": "Business-Owner",
       "taxonomy": "Taxonomie",
       "reports": "Meldungen",
-      "claims": "Claims",
+      "claims": "Ownership-Claims",
       "messages": "Nachrichten",
       "tickets": "Tickets",
       "settings": "Einstellungen",
@@ -536,9 +540,16 @@
     },
     "users": {
       "title": "Benutzerverwaltung",
-      "description": "Zugriff, Aktivstatus und Owner/Admin-Rollen verwalten.",
       "list": "Benutzer",
-      "activity": "{businesses} Eintraege / {reviews} Bewertungen"
+      "activity": "{reviews} Bewertungen / {favorites} Favoriten"
+    },
+    "owners": {
+      "title": "Business-Owner",
+      "description": "Owner, ihre Eintraege, Claims und Qualitaetssignale verfolgen.",
+      "list": "Owner",
+      "totalListings": "{count} gesamt",
+      "activeListings": "{count} aktiv",
+      "pendingListings": "{count} ausstehend"
     },
     "taxonomy": {
       "title": "Taxonomie",
@@ -625,6 +636,12 @@
       "shortDescription": "Kurzbeschreibung",
       "description": "Beschreibung",
       "review": "Bewertung",
+      "rating": "Bewertung",
+      "reviews": "Bewertungen",
+      "businesses": "Eintraege",
+      "claims": "Claims",
+      "contact": "Kontakt",
+      "joined": "Beigetreten",
       "author": "Autor",
       "user": "Benutzer",
       "role": "Rolle",
@@ -661,7 +678,8 @@
       "unverify": "Verifizierung entfernen",
       "feature": "Hervorheben",
       "unfeature": "Nicht hervorheben",
-      "delete": "Loeschen"
+      "delete": "Loeschen",
+      "clear": "Zuruecksetzen"
     },
     "businessWizard": {
       "identity": "Basis",
@@ -676,6 +694,7 @@
     },
     "pagination": {
       "summary": "{total} gesamt / Seite {page} von {totalPages}",
+      "range": "{from}-{to} von {total}",
       "previous": "Zurueck",
       "next": "Weiter"
     },
