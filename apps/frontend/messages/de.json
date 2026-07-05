@@ -557,6 +557,7 @@
       "categories": "Kategorien",
       "subCategories": "Unterkategorien",
       "specialties": "Spezialgebiete",
+      "tree": "Taxonomie-Baum",
       "categoryCounts": "{businesses} Eintraege / {children} Kinder"
     },
     "reports": {

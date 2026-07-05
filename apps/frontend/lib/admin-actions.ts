@@ -332,6 +332,7 @@ export async function updateSubCategory(formData: FormData) {
       nameFa: value(formData, "nameFa"),
       nameEn: value(formData, "nameEn"),
       slug: value(formData, "slug"),
+      icon: nullableValue(formData, "icon"),
       categoryId: intValue(formData, "categoryId") ?? undefined,
       sortOrder: intValue(formData, "sortOrder") ?? 0,
       active: booleanValue(formData, "active"),

@@ -555,6 +555,7 @@
       "categories": "دسته‌بندی‌ها",
       "subCategories": "زیردسته‌ها",
       "specialties": "تخصص‌ها",
+      "tree": "درخت دسته‌بندی‌ها",
       "categoryCounts": "{businesses} listing / {children} زیرمجموعه"
     },
     "reports": {

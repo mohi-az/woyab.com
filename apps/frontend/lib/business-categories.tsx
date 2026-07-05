@@ -1,127 +1,52 @@
-import { createElement, type ElementType, type SVGProps } from "react";
-import {
-  MdAccountBalance,
-  MdBakeryDining,
-  MdCalculate,
-  MdCameraAlt,
-  MdCarRental,
-  MdCarRepair,
-  MdCelebration,
-  MdCheckroom,
-  MdCleaningServices,
-  MdContentCut,
-  MdDirectionsCar,
-  MdElectricalServices,
-  MdFlight,
-  MdGavel,
-  MdHomeRepairService,
-  MdKitchen,
-  MdLanguage,
-  MdLocalCafe,
-  MdLocalCarWash,
-  MdLocalGroceryStore,
-  MdLocalHospital,
-  MdLocalShipping,
-  MdMedicalServices,
-  MdMusicNote,
-  MdPlumbing,
-  MdPsychology,
-  MdRestaurant,
-  MdSchool,
-  MdShield,
-  MdSpa,
-  MdStorefront,
-  MdTraffic,
-  MdTravelExplore,
-  MdVideocam,
-  MdWorkOutline,
-} from "react-icons/md";
+import type { ElementType } from "react";
+import { DynamicIcon, getDynamicIconComponent, normalizeIconKey } from "@/components/icons/DynamicIcon";
 
 export type CategoryDef = {
   dbId: number;
   labelKey: string;
+  iconKey: string;
   icon: ElementType;
   slug: string;
 };
 
-const ICON_COMPONENTS: Record<string, ElementType> = {
-  accounting: MdCalculate,
-  "aesthetic-clinic": MdMedicalServices,
-  bakery: MdBakeryDining,
-  balance: MdAccountBalance,
-  cafe: MdLocalCafe,
-  camera: MdCameraAlt,
-  car: MdDirectionsCar,
-  "car-dealer": MdDirectionsCar,
-  "car-rental": MdCarRental,
-  "car-repair": MdCarRepair,
-  "car-wash": MdLocalCarWash,
-  celebration: MdCelebration,
-  cleaning: MdCleaningServices,
-  clothing: MdCheckroom,
-  dentist: MdMedicalServices,
-  doctor: MdLocalHospital,
-  "driving-school": MdTraffic,
-  electrical: MdElectricalServices,
-  flight: MdFlight,
-  gavel: MdGavel,
-  grocery: MdLocalGroceryStore,
-  "hair-salon": MdContentCut,
-  "home-appliances": MdKitchen,
-  "home-repair": MdHomeRepairService,
-  insurance: MdShield,
-  language: MdLanguage,
-  medical: MdLocalHospital,
-  music: MdMusicNote,
-  plumbing: MdPlumbing,
-  psychology: MdPsychology,
-  restaurant: MdRestaurant,
-  school: MdSchool,
-  spa: MdSpa,
-  storefront: MdStorefront,
-  transport: MdLocalShipping,
-  travel: MdTravelExplore,
-  video: MdVideocam,
-};
-
 export const FEATURED_CATEGORIES: CategoryDef[] = [
-  { dbId: 1, labelKey: "restaurantCafe", icon: MdRestaurant, slug: "restaurants-cafes" },
-  { dbId: 2, labelKey: "healthBeauty", icon: MdSpa, slug: "beauty-wellness" },
-  { dbId: 4, labelKey: "homeServices", icon: MdHomeRepairService, slug: "home-services" },
-  { dbId: 5, labelKey: "automotive", icon: MdDirectionsCar, slug: "automotive" },
-  { dbId: 6, labelKey: "retail", icon: MdStorefront, slug: "retail" },
-  { dbId: 7, labelKey: "education", icon: MdSchool, slug: "education" },
-  { dbId: 8, labelKey: "medical", icon: MdLocalHospital, slug: "medical" },
-  { dbId: 10, labelKey: "travelTransport", icon: MdFlight, slug: "travel-transport" },
+  { dbId: 1, labelKey: "restaurantCafe", iconKey: "md:MdRestaurant", icon: getDynamicIconComponent("md:MdRestaurant"), slug: "restaurants-cafes" },
+  { dbId: 2, labelKey: "healthBeauty", iconKey: "md:MdSpa", icon: getDynamicIconComponent("md:MdSpa"), slug: "beauty-wellness" },
+  { dbId: 4, labelKey: "homeServices", iconKey: "md:MdHomeRepairService", icon: getDynamicIconComponent("md:MdHomeRepairService"), slug: "home-services" },
+  { dbId: 5, labelKey: "automotive", iconKey: "md:MdDirectionsCar", icon: getDynamicIconComponent("md:MdDirectionsCar"), slug: "automotive" },
+  { dbId: 6, labelKey: "retail", iconKey: "md:MdStorefront", icon: getDynamicIconComponent("md:MdStorefront"), slug: "retail" },
+  { dbId: 7, labelKey: "education", iconKey: "md:MdSchool", icon: getDynamicIconComponent("md:MdSchool"), slug: "education" },
+  { dbId: 8, labelKey: "medical", iconKey: "md:MdLocalHospital", icon: getDynamicIconComponent("md:MdLocalHospital"), slug: "medical" },
+  { dbId: 10, labelKey: "travelTransport", iconKey: "md:MdFlight", icon: getDynamicIconComponent("md:MdFlight"), slug: "travel-transport" },
 ];
 
 export const iconKeyByCategorySlug: Record<string, string> = {
-  "restaurants-cafes": "restaurant",
-  "beauty-wellness": "spa",
-  "legal-financial": "balance",
-  "home-services": "home-repair",
-  automotive: "car",
-  retail: "storefront",
-  education: "school",
-  medical: "medical",
-  "media-events": "celebration",
-  "travel-transport": "flight",
+  "restaurants-cafes": "md:MdRestaurant",
+  "beauty-wellness": "md:MdSpa",
+  "legal-financial": "md:MdAccountBalance",
+  "home-services": "md:MdHomeRepairService",
+  automotive: "md:MdDirectionsCar",
+  retail: "md:MdStorefront",
+  education: "md:MdSchool",
+  medical: "md:MdLocalHospital",
+  "media-events": "md:MdCelebration",
+  "travel-transport": "md:MdFlight",
 };
 
 export function resolveCategoryIconKey(iconKey?: string | null, categorySlug?: string | null) {
-  return iconKey ?? (categorySlug ? iconKeyByCategorySlug[categorySlug] : undefined) ?? "work-outline";
+  return normalizeIconKey(iconKey ?? (categorySlug ? iconKeyByCategorySlug[categorySlug] : undefined));
 }
 
 export function getCategoryIcon(iconKey?: string | null, categorySlug?: string | null): ElementType {
-  const resolvedKey = resolveCategoryIconKey(iconKey, categorySlug);
-  return resolvedKey ? ICON_COMPONENTS[resolvedKey] ?? MdWorkOutline : MdWorkOutline;
+  return getDynamicIconComponent(resolveCategoryIconKey(iconKey, categorySlug));
 }
 
-type CategoryIconProps = SVGProps<SVGSVGElement> & {
+type CategoryIconProps = {
   iconKey?: string | null;
   categorySlug?: string | null;
+  className?: string;
 };
 
-export function CategoryIcon({ iconKey, categorySlug, ...props }: CategoryIconProps) {
-  return createElement(getCategoryIcon(iconKey, categorySlug), props);
+export function CategoryIcon({ iconKey, categorySlug, className }: CategoryIconProps) {
+  return <DynamicIcon iconKey={resolveCategoryIconKey(iconKey, categorySlug)} className={className} />;
 }

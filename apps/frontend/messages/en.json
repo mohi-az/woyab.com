@@ -557,6 +557,7 @@
       "categories": "Categories",
       "subCategories": "Subcategories",
       "specialties": "Specialties",
+      "tree": "Taxonomy tree",
       "categoryCounts": "{businesses} listings / {children} children"
     },
     "reports": {
