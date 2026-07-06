@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
+import { BusinessHoursEditor, type BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
 import { BusinessLocationPicker } from "@/components/location/BusinessLocationPicker";
 
 const statuses = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"] as const;
@@ -66,6 +67,7 @@ export type AdminBusinessRow = {
   status: (typeof statuses)[number];
   verified: boolean;
   featured: boolean;
+  businessHours: BusinessHourValue[];
   category: Option;
   subCategory: Option | null;
   city: Option;
@@ -113,6 +115,7 @@ function stepForField(field: string) {
   if (["slug", "sourceLocale", "status"].includes(field)) return 0;
   if (["categoryId", "cityId"].includes(field)) return 1;
   if (field.startsWith("businessName_")) return 2;
+  if (field.startsWith("hours_")) return 4;
   return 0;
 }
 
@@ -150,23 +153,28 @@ export function AdminBusinessGrid({
   nextHref,
 }: Props) {
   const t = useTranslations("Admin");
+  const tHours = useTranslations("BusinessHours");
   const locale = useLocale();
   const [editing, setEditing] = useState<AdminBusinessRow | null>(emptyBusiness());
   const [creating, setCreating] = useState(false);
   const [wizardStep, setWizardStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [sourceLocaleDraft, setSourceLocaleDraft] = useState<"DE" | "EN" | "FA">("DE");
   const modalOpen = creating || Boolean(editing);
   const modalTranslations = useMemo(() => translationMap(editing), [editing]);
   const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
-  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.classification"), t("businessWizard.translations"), t("businessWizard.location")];
+  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.classification"), t("businessWizard.translations"), t("businessWizard.location"), t("businessWizard.hours")];
 
   function closeModal() {
     setEditing(null);
     setCreating(false);
     setWizardStep(0);
     setErrors({});
+    setSubmitError("");
+    setSaving(false);
     setSourceLocaleDraft("DE");
   }
 
@@ -175,6 +183,8 @@ export function AdminBusinessGrid({
     setCreating(true);
     setWizardStep(0);
     setErrors({});
+    setSubmitError("");
+    setSaving(false);
     setSourceLocaleDraft("DE");
   }
 
@@ -183,6 +193,8 @@ export function AdminBusinessGrid({
     setEditing(business);
     setWizardStep(0);
     setErrors({});
+    setSubmitError("");
+    setSaving(false);
     setSourceLocaleDraft(business.sourceLocale);
   }
 
@@ -238,9 +250,20 @@ export function AdminBusinessGrid({
     if (firstError) {
       event.preventDefault();
       setWizardStep(stepForField(firstError));
-      return;
     }
-    closeModal();
+  }
+
+  async function submitBusinessDetails(formData: FormData) {
+    setSubmitError("");
+    setSaving(true);
+    try {
+      if (creating) await createBusinessDetails(formData);
+      else await updateBusinessDetails(formData);
+      closeModal();
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : t("validation.saveFailed"));
+      setSaving(false);
+    }
   }
 
   return (
@@ -361,7 +384,7 @@ export function AdminBusinessGrid({
               </button>
             </div>
 
-            <form action={creating ? createBusinessDetails : updateBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-80px)] overflow-y-auto p-5">
+            <form action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-80px)] overflow-y-auto p-5">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               <div className="grid gap-5">
                 <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
@@ -377,6 +400,12 @@ export function AdminBusinessGrid({
                     />
                   </div>
                 </ConfigProvider>
+
+                {submitError ? (
+                  <div className="rounded-lg border border-rose-400/35 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200">
+                    {submitError}
+                  </div>
+                ) : null}
 
                 <section className={wizardStep === 0 ? "grid gap-4" : "hidden"}>
                   <div className="grid gap-4 md:grid-cols-3">
@@ -473,6 +502,13 @@ export function AdminBusinessGrid({
                   </fieldset>
                 </section>
 
+                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
+                  <fieldset className="admin-field-panel rounded-lg border p-4">
+                    <legend className="px-2 text-xs font-black text-sky-200">{tHours("title")}</legend>
+                    <BusinessHoursEditor variant="admin" defaultHours={editing?.businessHours ?? []} />
+                  </fieldset>
+                </section>
+
                 <div className="sticky bottom-0 -mx-5 -mb-5 flex flex-wrap justify-between gap-3 border-t border-white/10 bg-[var(--admin-surface)] p-5">
                   <button type="button" onClick={closeModal} className="admin-secondary-link rounded-lg border px-4 py-2 text-sm font-black">{t("actions.cancel")}</button>
                   <div className="flex gap-2">
@@ -480,7 +516,7 @@ export function AdminBusinessGrid({
                     {wizardStep < wizardSteps.length - 1 ? (
                       <button type="button" onClick={() => setWizardStep((step) => Math.min(wizardSteps.length - 1, step + 1))} className="admin-button rounded-lg border px-4 py-2 text-sm font-black">{t("actions.next")}</button>
                     ) : (
-                      <AdminButton tone="success" className="px-4 py-2 text-sm">{creating ? t("actions.create") : t("actions.save")}</AdminButton>
+                      <AdminButton type="submit" disabled={saving} tone="success" className="px-4 py-2 text-sm">{saving ? t("actions.saving") : creating ? t("actions.create") : t("actions.save")}</AdminButton>
                     )}
                   </div>
                 </div>

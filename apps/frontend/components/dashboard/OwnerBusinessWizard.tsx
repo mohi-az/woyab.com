@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { FiBriefcase, FiCheck, FiChevronLeft, FiChevronRight, FiGlobe, FiMapPin, FiTag } from "react-icons/fi";
+import { useTranslations } from "next-intl";
+import { FiBriefcase, FiCheck, FiChevronLeft, FiChevronRight, FiClock, FiGlobe, FiMapPin, FiTag } from "react-icons/fi";
 import { createOwnerBusiness } from "@/lib/owner-actions";
+import { BusinessHoursEditor } from "@/components/dashboard/BusinessHoursEditor";
 import { BusinessLocationPicker } from "@/components/location/BusinessLocationPicker";
 
 type Option = {
@@ -27,10 +29,11 @@ type Props = {
 };
 
 const steps = [
-  { title: "Identity", icon: FiBriefcase },
-  { title: "Category", icon: FiTag },
-  { title: "Content", icon: FiGlobe },
-  { title: "Location", icon: FiMapPin },
+  { titleKey: "ownerSteps.identity", icon: FiBriefcase },
+  { titleKey: "ownerSteps.category", icon: FiTag },
+  { titleKey: "ownerSteps.content", icon: FiGlobe },
+  { titleKey: "ownerSteps.location", icon: FiMapPin },
+  { titleKey: "ownerSteps.hours", icon: FiClock },
 ] as const;
 
 const locales = ["DE", "EN", "FA"] as const;
@@ -63,6 +66,7 @@ const inputClass = "min-h-12 rounded-xl border border-slate-200 bg-slate-50 px-3
 const textareaClass = "min-h-28 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none transition focus:border-primary";
 
 export function OwnerBusinessWizard({ categories, subCategories, specialties, cities }: Props) {
+  const tHours = useTranslations("BusinessHours");
   const [step, setStep] = useState(0);
   const [sourceLocale, setSourceLocale] = useState<"DE" | "EN" | "FA">("DE");
   const [businessName, setBusinessName] = useState("");
@@ -87,7 +91,7 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
             const complete = index < step;
             return (
               <button
-                key={item.title}
+                key={item.titleKey}
                 type="button"
                 onClick={() => setStep(index)}
                 className={`flex min-h-20 items-center gap-3 rounded-2xl border px-3 text-start transition ${
@@ -97,7 +101,7 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/12">
                   {complete ? <FiCheck /> : <Icon />}
                 </span>
-                <span className="text-sm font-black">{item.title}</span>
+                <span className="text-sm font-black">{tHours(item.titleKey)}</span>
               </button>
             );
           })}
@@ -178,6 +182,12 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
         <section className={step === 3 ? "grid gap-4" : "hidden"}>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             {step === 3 ? <BusinessLocationPicker /> : null}
+          </div>
+        </section>
+
+        <section className={step === 4 ? "grid gap-4" : "hidden"}>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <BusinessHoursEditor />
           </div>
         </section>
 

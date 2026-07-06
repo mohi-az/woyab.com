@@ -292,6 +292,49 @@
       "SUNDAY": "یکشنبه"
     }
   },
+  "BusinessHours": {
+    "title": "ساعات کاری",
+    "configuredDays": "{count} روز تنظیم شده",
+    "weekdays": "روزهای کاری",
+    "allDays": "همه روزها",
+    "copyWeekdaysTooltip": "کپی کردن تنظیم این روز برای دوشنبه تا جمعه",
+    "copyAllTooltip": "کپی کردن تنظیم این روز برای کل هفته",
+    "settingsTitle": "تنظیمات زمان‌بندی",
+    "showOnProfile": "نمایش در پروفایل",
+    "open": "باز",
+    "closed": "تعطیل",
+    "unset": "تنظیم نشده",
+    "opens": "شروع",
+    "closes": "پایان",
+    "note": "یادداشت",
+    "notePlaceholder": "استراحت ناهار، فقط با وقت قبلی، توضیح تعطیلات...",
+    "save": "ذخیره ساعات کاری",
+    "ownerSteps": {
+      "identity": "مشخصات",
+      "category": "دسته‌بندی",
+      "content": "محتوا",
+      "location": "موقعیت",
+      "hours": "ساعات کاری"
+    },
+    "days": {
+      "MONDAY": "دوشنبه",
+      "TUESDAY": "سه‌شنبه",
+      "WEDNESDAY": "چهارشنبه",
+      "THURSDAY": "پنجشنبه",
+      "FRIDAY": "جمعه",
+      "SATURDAY": "شنبه",
+      "SUNDAY": "یکشنبه"
+    },
+    "shortDays": {
+      "MONDAY": "دوشنبه",
+      "TUESDAY": "سه‌شنبه",
+      "WEDNESDAY": "چهارشنبه",
+      "THURSDAY": "پنجشنبه",
+      "FRIDAY": "جمعه",
+      "SATURDAY": "شنبه",
+      "SUNDAY": "یکشنبه"
+    }
+  },
   "Footer": {
     "description": "دایرکتوری کاربردی برای پیدا کردن کسب‌وکارها و خدمات معتبر ایرانی در سراسر آلمان.",
     "linksTitle": "لینک‌های مفید",
@@ -705,6 +748,7 @@
     "actions": {
       "filter": "فیلتر",
       "save": "ذخیره",
+      "saving": "در حال ذخیره...",
       "apply": "اعمال",
       "create": "ایجاد",
       "cancel": "انصراف",
@@ -724,12 +768,14 @@
       "identity": "مشخصات",
       "classification": "دسته‌بندی",
       "translations": "ترجمه‌ها",
-      "location": "موقعیت"
+      "location": "موقعیت",
+      "hours": "ساعات کاری"
     },
     "validation": {
       "required": "این فیلد اجباری است.",
       "slug": "فقط حروف کوچک انگلیسی، عدد و خط تیره مجاز است.",
-      "sourceBusinessName": "نام کسب‌وکار را برای زبان مبنا وارد کنید."
+      "sourceBusinessName": "نام کسب‌وکار را برای زبان مبنا وارد کنید.",
+      "saveFailed": "تغییرات ذخیره نشد."
     },
     "pagination": {
       "summary": "{total} مورد / صفحه {page} از {totalPages}",

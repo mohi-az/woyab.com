@@ -1,8 +1,10 @@
 import { FiBarChart2, FiBriefcase, FiEye, FiMessageSquare, FiPlus } from "react-icons/fi";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BusinessHoursEditor } from "@/components/dashboard/BusinessHoursEditor";
 import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
-import { upsertReviewOwnerReply } from "@/lib/owner-actions";
+import { updateOwnerBusinessHours, upsertReviewOwnerReply } from "@/lib/owner-actions";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -37,11 +39,21 @@ function MetricCard({ icon: Icon, label, value }: { icon: typeof FiEye; label: s
 }
 
 export default async function OwnerDashboardPage({ searchParams }: PageProps) {
-  const [userId, params] = await Promise.all([requireUserId(), searchParams]);
+  const [userId, params, tHours] = await Promise.all([requireUserId(), searchParams, getTranslations("BusinessHours")]);
   const businesses = await prisma.business.findMany({
     where: { ownerId: userId },
     orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
-    select: { id: true, slug: true, businessName: true, status: true, reviewCount: true },
+    select: {
+      id: true,
+      slug: true,
+      businessName: true,
+      status: true,
+      reviewCount: true,
+      businessHours: {
+        orderBy: { dayOfWeek: "asc" },
+        select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true },
+      },
+    },
   });
 
   const requestedBusinessId = first(params.businessId);
@@ -150,6 +162,20 @@ export default async function OwnerDashboardPage({ searchParams }: PageProps) {
           ))}
         </div>
       </section>
+
+      {selectedBusiness ? (
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <form action={updateOwnerBusinessHours}>
+            <input type="hidden" name="businessId" value={selectedBusiness.id} />
+            <BusinessHoursEditor defaultHours={selectedBusiness.businessHours} />
+            <div className="mt-5 flex justify-end border-t border-slate-100 pt-5">
+              <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-black text-white">
+                {tHours("save")}
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
 
       <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3">

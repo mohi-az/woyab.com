@@ -591,6 +591,105 @@ html[lang="fa"] .admin-shell * {
   border-color: var(--admin-border);
 }
 
+.business-hours-editor {
+  color: #0f172a;
+}
+
+.business-hours-editor .ant-btn,
+.business-hours-editor .ant-input,
+.business-hours-editor .ant-segmented {
+  border-radius: 0.5rem;
+}
+
+.business-hours-day {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  padding: 10px 12px;
+  color: #0f172a;
+  text-align: start;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.business-hours-day:hover,
+.business-hours-day-active {
+  border-color: #38bdf8;
+  box-shadow: 0 12px 28px rgb(15 23 42 / 0.08);
+  transform: translateY(-1px);
+}
+
+.business-hours-day span {
+  display: grid;
+  gap: 2px;
+}
+
+.business-hours-day strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.business-hours-day small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.business-hours-panel {
+  border-color: #e2e8f0;
+  background: #f8fafc;
+}
+
+.business-hours-editor-admin {
+  color: var(--admin-text);
+}
+
+.business-hours-editor-admin .business-hours-day {
+  border-color: var(--admin-border);
+  background: color-mix(in srgb, var(--admin-surface-strong) 72%, var(--admin-surface));
+  color: var(--admin-text);
+}
+
+.business-hours-editor-admin .business-hours-day:hover,
+.business-hours-editor-admin .business-hours-day-active {
+  border-color: color-mix(in srgb, #38bdf8 58%, var(--admin-border));
+  box-shadow: 0 16px 30px rgb(2 6 23 / 0.16);
+}
+
+.business-hours-editor-admin .business-hours-day small {
+  color: var(--admin-muted);
+}
+
+.business-hours-editor-admin .business-hours-panel {
+  border-color: var(--admin-border);
+  background: color-mix(in srgb, var(--admin-surface-strong) 72%, var(--admin-surface));
+}
+
+.business-hours-editor-admin .ant-input,
+.business-hours-editor-admin .ant-segmented,
+.business-hours-editor-admin .ant-btn {
+  border-color: var(--admin-field-border) !important;
+  background: var(--admin-field-bg) !important;
+  color: var(--admin-text) !important;
+}
+
+.business-hours-editor-admin .ant-input::placeholder {
+  color: var(--admin-muted) !important;
+}
+
+.business-hours-editor-admin .ant-segmented-item {
+  color: var(--admin-muted) !important;
+}
+
+.business-hours-editor-admin .ant-segmented-item-selected {
+  background: color-mix(in srgb, #38bdf8 18%, var(--admin-surface)) !important;
+  color: var(--admin-text) !important;
+}
+
 .admin-shell[data-admin-theme="light"] .admin-field-panel {
   background: #f8fafc;
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import type { BusinessStatus, Prisma, ReviewStatus, UserRole } from "@fargo/database";
+import type { BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@fargo/database";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +9,7 @@ const businessStatuses: BusinessStatus[] = ["PENDING", "ACTIVE", "SUSPENDED", "C
 const reviewStatuses: ReviewStatus[] = ["PENDING", "APPROVED", "REJECTED"];
 const userRoles: UserRole[] = ["USER", "OWNER", "ADMIN", "SUPER_ADMIN"];
 const claimStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
+const daysOfWeek: DayOfWeek[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
 function value(formData: FormData, key: string) {
   const raw = formData.get(key);
@@ -25,7 +26,9 @@ function booleanValue(formData: FormData, key: string) {
 }
 
 function intValue(formData: FormData, key: string) {
-  const parsed = Number(value(formData, key));
+  const raw = value(formData, key);
+  if (!raw) return null;
+  const parsed = Number(raw);
   return Number.isInteger(parsed) ? parsed : null;
 }
 
@@ -34,6 +37,56 @@ function numberValue(formData: FormData, key: string) {
   if (!raw) return null;
   const parsed = Number(raw);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function businessHoursCreateData(formData: FormData) {
+  return daysOfWeek.flatMap((dayOfWeek) => {
+    const enabled = value(formData, `hours_${dayOfWeek}_enabled`) === "true";
+    if (!enabled) return [];
+
+    const isClosed = value(formData, `hours_${dayOfWeek}_isClosed`) === "true";
+    const openTime = nullableValue(formData, `hours_${dayOfWeek}_openTime`);
+    const closeTime = nullableValue(formData, `hours_${dayOfWeek}_closeTime`);
+
+    return [{
+      dayOfWeek,
+      isClosed,
+      openTime: isClosed ? null : openTime,
+      closeTime: isClosed ? null : closeTime,
+      note: nullableValue(formData, `hours_${dayOfWeek}_note`),
+    }];
+  });
+}
+
+async function syncBusinessHours(tx: Prisma.TransactionClient, businessId: string, formData: FormData) {
+  const configuredDays = new Set<DayOfWeek>();
+
+  for (const hour of businessHoursCreateData(formData)) {
+    configuredDays.add(hour.dayOfWeek);
+    await tx.businessHours.upsert({
+      where: { businessId_dayOfWeek: { businessId, dayOfWeek: hour.dayOfWeek } },
+      update: {
+        isClosed: hour.isClosed,
+        openTime: hour.openTime,
+        closeTime: hour.closeTime,
+        note: hour.note,
+      },
+      create: {
+        businessId,
+        ...hour,
+      },
+    });
+  }
+
+  const disabledDays = daysOfWeek.filter((dayOfWeek) => !configuredDays.has(dayOfWeek));
+  if (disabledDays.length) {
+    await tx.businessHours.deleteMany({
+      where: {
+        businessId,
+        dayOfWeek: { in: disabledDays },
+      },
+    });
+  }
 }
 
 async function audit(actorId: string, action: string, entityType: string, entityId?: string | null, metadata?: Prisma.InputJsonValue) {
@@ -179,6 +232,7 @@ export async function updateBusinessDetails(formData: FormData) {
         },
       },
     });
+    await syncBusinessHours(tx, businessId, formData);
     if (ownerId) await promoteUserToOwner(tx, ownerId);
   });
 
@@ -248,6 +302,9 @@ export async function createBusinessDetails(formData: FormData) {
         status,
         verified: booleanValue(formData, "verified"),
         featured: booleanValue(formData, "featured"),
+        businessHours: {
+          create: businessHoursCreateData(formData),
+        },
         translations: {
           create: translations.map((translation) => ({
             locale: translation.locale,

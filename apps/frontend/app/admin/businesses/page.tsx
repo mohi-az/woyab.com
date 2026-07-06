@@ -62,6 +62,10 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
         subCategory: { select: { id: true, nameEn: true, nameFa: true } },
         city: { select: { id: true, nameEn: true, nameFa: true } },
         owner: { select: { email: true, name: true } },
+        businessHours: {
+          orderBy: { dayOfWeek: "asc" },
+          select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true },
+        },
         translations: { select: { locale: true, businessName: true, shortDescription: true, description: true } },
       },
     }),
@@ -113,6 +117,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     status: business.status,
     verified: business.verified,
     featured: business.featured,
+    businessHours: business.businessHours,
     category: business.category,
     subCategory: nullableOption(business.subCategory),
     city: business.city,

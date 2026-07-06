@@ -294,6 +294,49 @@
       "SUNDAY": "Sunday"
     }
   },
+  "BusinessHours": {
+    "title": "Business hours",
+    "configuredDays": "{count} days configured",
+    "weekdays": "Weekdays",
+    "allDays": "All days",
+    "copyWeekdaysTooltip": "Copy this day to Monday-Friday",
+    "copyAllTooltip": "Copy this day to the whole week",
+    "settingsTitle": "Schedule settings",
+    "showOnProfile": "Show on profile",
+    "open": "Open",
+    "closed": "Closed",
+    "unset": "Unset",
+    "opens": "Opens",
+    "closes": "Closes",
+    "note": "Note",
+    "notePlaceholder": "Lunch break, by appointment, holiday note...",
+    "save": "Save business hours",
+    "ownerSteps": {
+      "identity": "Identity",
+      "category": "Category",
+      "content": "Content",
+      "location": "Location",
+      "hours": "Hours"
+    },
+    "days": {
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday",
+      "SUNDAY": "Sunday"
+    },
+    "shortDays": {
+      "MONDAY": "Mon",
+      "TUESDAY": "Tue",
+      "WEDNESDAY": "Wed",
+      "THURSDAY": "Thu",
+      "FRIDAY": "Fri",
+      "SATURDAY": "Sat",
+      "SUNDAY": "Sun"
+    }
+  },
   "Footer": {
     "description": "Discover trusted Iranian-owned businesses and services across Germany in one practical directory.",
     "linksTitle": "Useful links",
@@ -707,6 +750,7 @@
     "actions": {
       "filter": "Filter",
       "save": "Save",
+      "saving": "Saving...",
       "apply": "Apply",
       "create": "Create",
       "cancel": "Cancel",
@@ -726,12 +770,14 @@
       "identity": "Identity",
       "classification": "Classification",
       "translations": "Translations",
-      "location": "Location"
+      "location": "Location",
+      "hours": "Hours"
     },
     "validation": {
       "required": "This field is required.",
       "slug": "Use lowercase letters, numbers and hyphens only.",
-      "sourceBusinessName": "Enter the business name for the selected source language."
+      "sourceBusinessName": "Enter the business name for the selected source language.",
+      "saveFailed": "Changes could not be saved."
     },
     "pagination": {
       "summary": "{total} total / page {page} of {totalPages}",

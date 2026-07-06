@@ -294,6 +294,49 @@
       "SUNDAY": "Sonntag"
     }
   },
+  "BusinessHours": {
+    "title": "Oeffnungszeiten",
+    "configuredDays": "{count} Tage konfiguriert",
+    "weekdays": "Werktage",
+    "allDays": "Alle Tage",
+    "copyWeekdaysTooltip": "Diesen Tag auf Montag bis Freitag kopieren",
+    "copyAllTooltip": "Diesen Tag auf die ganze Woche kopieren",
+    "settingsTitle": "Zeitplan-Einstellungen",
+    "showOnProfile": "Im Profil anzeigen",
+    "open": "Geoeffnet",
+    "closed": "Geschlossen",
+    "unset": "Nicht gesetzt",
+    "opens": "Oeffnet",
+    "closes": "Schliesst",
+    "note": "Hinweis",
+    "notePlaceholder": "Mittagspause, nach Vereinbarung, Feiertagshinweis...",
+    "save": "Oeffnungszeiten speichern",
+    "ownerSteps": {
+      "identity": "Basis",
+      "category": "Kategorie",
+      "content": "Inhalt",
+      "location": "Standort",
+      "hours": "Zeiten"
+    },
+    "days": {
+      "MONDAY": "Montag",
+      "TUESDAY": "Dienstag",
+      "WEDNESDAY": "Mittwoch",
+      "THURSDAY": "Donnerstag",
+      "FRIDAY": "Freitag",
+      "SATURDAY": "Samstag",
+      "SUNDAY": "Sonntag"
+    },
+    "shortDays": {
+      "MONDAY": "Mo",
+      "TUESDAY": "Di",
+      "WEDNESDAY": "Mi",
+      "THURSDAY": "Do",
+      "FRIDAY": "Fr",
+      "SATURDAY": "Sa",
+      "SUNDAY": "So"
+    }
+  },
   "Footer": {
     "description": "Entdecken Sie vertrauenswürdige iranische Unternehmen und Dienstleistungen in ganz Deutschland.",
     "linksTitle": "Nützliche Links",
@@ -707,6 +750,7 @@
     "actions": {
       "filter": "Filtern",
       "save": "Speichern",
+      "saving": "Speichern...",
       "apply": "Anwenden",
       "create": "Erstellen",
       "cancel": "Abbrechen",
@@ -726,12 +770,14 @@
       "identity": "Basis",
       "classification": "Zuordnung",
       "translations": "Uebersetzungen",
-      "location": "Standort"
+      "location": "Standort",
+      "hours": "Zeiten"
     },
     "validation": {
       "required": "Dieses Feld ist erforderlich.",
       "slug": "Nur Kleinbuchstaben, Zahlen und Bindestriche verwenden.",
-      "sourceBusinessName": "Geben Sie den Business-Namen fuer die gewaehlte Ausgangssprache ein."
+      "sourceBusinessName": "Geben Sie den Business-Namen fuer die gewaehlte Ausgangssprache ein.",
+      "saveFailed": "Aenderungen konnten nicht gespeichert werden."
     },
     "pagination": {
       "summary": "{total} gesamt / Seite {page} von {totalPages}",
