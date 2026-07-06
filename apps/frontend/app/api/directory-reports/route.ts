@@ -37,18 +37,20 @@ const reportSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const parsed = reportSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ success: false, error: "Please check the report fields." }, { status: 400 });
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, errorCode: "INVALID_FIELDS", error: "Please check the report fields." }, { status: 400 });
+  }
 
   const reporterUserId = await currentUserId();
   const ip = requestIp(request);
   const targetId = parsed.data.businessId ?? parsed.data.reviewId;
   const rateKey = reporterUserId ? `report:user:${reporterUserId}` : `report:ip:${ip}`;
   if (isRateLimited(rateKey, 6, 15 * 60_000)) {
-    return NextResponse.json({ success: false, error: "Too many reports. Please try again later." }, { status: 429 });
+    return NextResponse.json({ success: false, errorCode: "RATE_LIMITED", error: "Too many reports. Please try again later." }, { status: 429 });
   }
 
   if (!reporterUserId && !parsed.data.reporterEmail) {
-    return NextResponse.json({ success: false, error: "Please enter an email address so we can process the report." }, { status: 400 });
+    return NextResponse.json({ success: false, errorCode: "EMAIL_REQUIRED", error: "Please enter an email address so we can process the report." }, { status: 400 });
   }
 
   const target = parsed.data.businessId
@@ -75,7 +77,9 @@ export async function POST(request: NextRequest) {
         },
       });
 
-  if (!target) return NextResponse.json({ success: false, error: "The reported item could not be found." }, { status: 404 });
+  if (!target) {
+    return NextResponse.json({ success: false, errorCode: "TARGET_NOT_FOUND", error: "The reported item could not be found." }, { status: 404 });
+  }
 
   const duplicate = await prisma.directoryReport.findFirst({
     where: {
@@ -92,7 +96,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (duplicate) {
-    return NextResponse.json({ success: false, error: "You already have an open report for this item." }, { status: 409 });
+    return NextResponse.json({ success: false, errorCode: "DUPLICATE_OPEN_REPORT", error: "You already have an open report for this item." }, { status: 409 });
   }
 
   const reason = parsed.data.reason?.trim() || reasonLabels[parsed.data.reasonCode];

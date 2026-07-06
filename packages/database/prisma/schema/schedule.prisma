@@ -1,3 +1,52 @@
+model BusinessHours {
+  id         Int       @id @default(autoincrement())
+  businessId String
+  dayOfWeek  DayOfWeek
+  openTime   String?
+  closeTime  String?
+  isClosed   Boolean   @default(false)
+  note       String?
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, dayOfWeek])
+  @@map("business_hours")
+}
+
+model Branch {
+  id          String        @id @default(cuid())
+  businessId  String
+  name        String
+  phone       String?
+  mobile      String?
+  address     String?
+  latitude    Float?
+  longitude   Float?
+  cityId      Int?
+  districtId  Int?
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  branchHours BranchHours[]
+  business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  city        City?         @relation(fields: [cityId], references: [id])
+  district    District?     @relation(fields: [districtId], references: [id])
+
+  @@map("branches")
+}
+
+model BranchHours {
+  id        Int       @id @default(autoincrement())
+  branchId  String
+  dayOfWeek DayOfWeek
+  openTime  String?
+  closeTime String?
+  isClosed  Boolean   @default(false)
+  branch    Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, dayOfWeek])
+  @@map("branch_hours")
+}
+
 enum DayOfWeek {
   MONDAY
   TUESDAY
@@ -8,54 +57,4 @@ enum DayOfWeek {
   SUNDAY
 
   @@map("day_of_week")
-}
-
-model BusinessHours {
-  id         Int       @id @default(autoincrement())
-  businessId String
-  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  dayOfWeek  DayOfWeek
-  openTime   String?
-  closeTime  String?
-  isClosed   Boolean   @default(false)
-  note       String?
-
-  @@unique([businessId, dayOfWeek])
-  @@map("business_hours")
-}
-
-model Branch {
-  id         String    @id @default(cuid())
-  businessId String
-  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  name       String
-  phone      String?
-  mobile     String?
-  address    String?
-  latitude   Float?
-  longitude  Float?
-  cityId     Int?
-  city       City?     @relation(fields: [cityId], references: [id])
-  districtId Int?
-  district   District? @relation(fields: [districtId], references: [id])
-  active     Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  branchHours BranchHours[]
-
-  @@map("branches")
-}
-
-model BranchHours {
-  id        Int       @id @default(autoincrement())
-  branchId  String
-  branch    Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  dayOfWeek DayOfWeek
-  openTime  String?
-  closeTime String?
-  isClosed  Boolean   @default(false)
-
-  @@unique([branchId, dayOfWeek])
-  @@map("branch_hours")
 }

@@ -1,3 +1,91 @@
+model Business {
+  id                  String                @id @default(cuid())
+  slug                String                @unique
+  businessName        String
+  legalName           String?
+  shortDescription    String?
+  description         String?
+  logoUrl             String?
+  coverImageUrl       String?
+  categoryId          Int
+  subCategoryId       Int?
+  specialtyId         Int?
+  ownerId             String?
+  establishedYear     Int?
+  priceRange          PriceRange?
+  phone               String?
+  mobile              String?
+  whatsapp            String?
+  email               String?
+  website             String?
+  instagram           String?
+  telegram            String?
+  facebook            String?
+  youtube             String?
+  linkedin            String?
+  latitude            Float?
+  longitude           Float?
+  cityId              Int
+  districtId          Int?
+  address             String?
+  postalCode          String?
+  status              BusinessStatus        @default(PENDING)
+  verified            Boolean               @default(false)
+  featured            Boolean               @default(false)
+  averageRating       Float                 @default(0)
+  reviewCount         Int                   @default(0)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  sourceLocale        ContentLocale         @default(DE)
+  branches            Branch[]
+  attributes          BusinessAttribute[]
+  business_claims     business_claims[]
+  businessHours       BusinessHours[]
+  images              BusinessImage[]
+  tags                BusinessTag[]
+  translations        BusinessTranslation[]
+  videos              BusinessVideo[]
+  business_view_daily business_view_daily[]
+  category            Category              @relation(fields: [categoryId], references: [id])
+  city                City                  @relation(fields: [cityId], references: [id])
+  district            District?             @relation(fields: [districtId], references: [id])
+  owner               User?                 @relation(fields: [ownerId], references: [id])
+  specialty           Specialty?            @relation(fields: [specialtyId], references: [id])
+  subCategory         SubCategory?          @relation(fields: [subCategoryId], references: [id])
+  contact_messages    contact_messages[]
+  directory_reports   directory_reports[]
+  documents           Document[]
+  favorites           favorites[]
+  posts               Post[]
+  reviews             Review[]
+  services            Service[]
+
+  @@index([slug])
+  @@index([cityId])
+  @@index([categoryId])
+  @@index([subCategoryId])
+  @@index([featured])
+  @@index([averageRating])
+  @@index([status])
+  @@map("businesses")
+}
+
+model BusinessTranslation {
+  id               String        @id @default(cuid())
+  businessId       String
+  locale           ContentLocale
+  businessName     String
+  shortDescription String?
+  description      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
+  business         Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, locale])
+  @@index([locale])
+  @@map("business_translations")
+}
+
 enum BusinessStatus {
   PENDING
   ACTIVE
@@ -23,105 +111,4 @@ enum ContentLocale {
   FA
 
   @@map("content_locale")
-}
-
-model Business {
-  id               String         @id @default(cuid())
-  slug             String         @unique
-
-  sourceLocale     ContentLocale  @default(DE)
-  businessName     String
-  legalName        String?
-  shortDescription String?
-  description      String?
-
-  logoUrl          String?
-  coverImageUrl    String?
-
-  categoryId    Int
-  category      Category     @relation(fields: [categoryId], references: [id])
-  subCategoryId Int?
-  subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
-  specialtyId   Int?
-  specialty     Specialty?   @relation(fields: [specialtyId], references: [id])
-
-  ownerId       String?
-  owner         User?        @relation(fields: [ownerId], references: [id])
-
-  establishedYear Int?
-  priceRange      PriceRange?
-
-  phone     String?
-  mobile    String?
-  whatsapp  String?
-  email     String?
-  website   String?
-
-  instagram  String?
-  telegram   String?
-  facebook   String?
-  youtube    String?
-  linkedin   String?
-
-  latitude   Float?
-  longitude  Float?
-  cityId     Int
-  city       City      @relation(fields: [cityId], references: [id])
-  districtId Int?
-  district   District? @relation(fields: [districtId], references: [id])
-  address    String?
-  postalCode String?
-
-  status    BusinessStatus @default(PENDING)
-  verified  Boolean        @default(false)
-  featured  Boolean        @default(false)
-
-  averageRating Float @default(0)
-  reviewCount   Int   @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  services      Service[]
-  reviews       Review[]
-  favoritedBy   Favorite[]
-  images        BusinessImage[]
-  videos        BusinessVideo[]
-  documents     Document[]
-  businessHours BusinessHours[]
-  branches      Branch[]
-  locations     BusinessLocation[]
-  posts         Post[]
-  tags          BusinessTag[]
-  attributes    BusinessAttribute[]
-  translations  BusinessTranslation[]
-  directoryReports DirectoryReport[]
-  claims        BusinessClaim[]
-  contactMessages ContactMessage[]
-  viewStats     BusinessViewDaily[]
-
-  @@index([slug])
-  @@index([cityId])
-  @@index([categoryId])
-  @@index([subCategoryId])
-  @@index([featured])
-  @@index([averageRating])
-  @@index([status])
-  @@map("businesses")
-}
-
-model BusinessTranslation {
-  id               String        @id @default(cuid())
-  businessId       String
-  business         Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  locale           ContentLocale
-  businessName     String
-  shortDescription String?
-  description      String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-
-  @@unique([businessId, locale])
-  @@index([locale])
-  @@map("business_translations")
 }

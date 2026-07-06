@@ -2,23 +2,21 @@ model Country {
   id        Int        @id @default(autoincrement())
   nameFa    String
   nameEn    String
-  code      String     @unique // ISO 3166-1 alpha-2, e.g. "DE"
+  code      String     @unique
   active    Boolean    @default(true)
-
   provinces Province[]
 
   @@map("countries")
 }
 
 model Province {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   nameFa    String
   nameEn    String
-  slug      String   @unique
+  slug      String  @unique
   countryId Int
-  country   Country  @relation(fields: [countryId], references: [id])
-
   cities    City[]
+  country   Country @relation(fields: [countryId], references: [id])
 
   @@map("provinces")
 }
@@ -29,30 +27,24 @@ model City {
   nameEn     String
   slug       String     @unique
   provinceId Int
-  province   Province   @relation(fields: [provinceId], references: [id])
   latitude   Float?
   longitude  Float?
-
-  districts  District[]
-  businesses Business[]
   branches   Branch[]
-  businessLocations BusinessLocation[]
-  savedLocations    UserSavedLocation[]
+  businesses Business[]
+  province   Province   @relation(fields: [provinceId], references: [id])
+  districts  District[]
 
   @@map("cities")
 }
 
 model District {
-  id      Int     @id @default(autoincrement())
-  nameFa  String
-  nameEn  String?
-  cityId  Int
-  city    City    @relation(fields: [cityId], references: [id])
-
-  businesses Business[]
+  id         Int        @id @default(autoincrement())
+  nameFa     String
+  nameEn     String?
+  cityId     Int
   branches   Branch[]
-  businessLocations BusinessLocation[]
-  savedLocations    UserSavedLocation[]
+  businesses Business[]
+  city       City       @relation(fields: [cityId], references: [id])
 
   @@map("districts")
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { FiFlag, FiX } from "react-icons/fi";
 import type { CurrentUser } from "@/lib/api";
@@ -34,6 +35,14 @@ const reasons: ReportReason[] = [
   "OTHER",
 ];
 
+const errorKeyByCode: Record<string, string> = {
+  INVALID_FIELDS: "invalidFields",
+  RATE_LIMITED: "rateLimited",
+  EMAIL_REQUIRED: "emailRequired",
+  TARGET_NOT_FOUND: "targetNotFound",
+  DUPLICATE_OPEN_REPORT: "duplicateOpenReport",
+};
+
 export function DirectoryReportButton({ targetType, targetId, targetLabel, currentUser, variant = "review" }: Props) {
   const t = useTranslations("BusinessDetail.report");
   const [open, setOpen] = useState(false);
@@ -43,6 +52,7 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
   const [reporterName, setReporterName] = useState("");
   const [reporterEmail, setReporterEmail] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const [pending, setPending] = useState(false);
 
   const isHero = variant === "hero";
@@ -80,10 +90,11 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
           targetUrl: typeof window === "undefined" ? undefined : window.location.href,
         }),
       });
-      const json = await response.json().catch(() => null);
+      const json = await response.json().catch(() => null) as { error?: string; errorCode?: string; data?: { id?: string } } | null;
 
       if (!response.ok) {
-        setFeedback(json?.error ?? t("submitError"));
+        const errorKey = json?.errorCode ? errorKeyByCode[json.errorCode] : null;
+        setFeedback(errorKey ? t(`errors.${errorKey}`) : t("submitError"));
         return;
       }
 
@@ -91,7 +102,9 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
       setMessage("");
       setReporterName("");
       setReporterEmail("");
+      setSubmitted(true);
       setFeedback(t("submitSuccess"));
+      setOpen(false);
     } catch {
       setFeedback(t("submitError"));
     } finally {
@@ -99,109 +112,119 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
     }
   }
 
+  const modal = open ? (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-8 backdrop-blur-sm">
+      <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
+          <div className="min-w-0">
+            <h2 className="text-lg font-black text-slate-950">{t("modalTitle")}</h2>
+            <p className="mt-1 truncate text-sm text-slate-500">{targetLabel}</p>
+          </div>
+          <button
+            type="button"
+            onClick={close}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-100 text-slate-700 transition hover:bg-slate-200"
+            aria-label={t("close")}
+          >
+            <FiX />
+          </button>
+        </div>
+
+        <form className="space-y-4 px-5 py-5" onSubmit={submitReport}>
+          <label className="block">
+            <span className="mb-2 block text-sm font-bold text-slate-700">{t("reasonLabel")}</span>
+            <select
+              value={reasonCode}
+              onChange={(event) => setReasonCode(event.target.value as ReportReason)}
+              className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-primary"
+            >
+              {reasons.map((item) => (
+                <option key={item} value={item}>{t(`reasons.${item}`)}</option>
+              ))}
+            </select>
+          </label>
+
+          {reasonCode === "OTHER" ? (
+            <input
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+              placeholder={t("otherPlaceholder")}
+              className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
+            />
+          ) : null}
+
+          <textarea
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder={t("messagePlaceholder")}
+            rows={5}
+            className="w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary"
+          />
+
+          {!currentUser ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input
+                value={reporterName}
+                onChange={(event) => setReporterName(event.target.value)}
+                placeholder={t("namePlaceholder")}
+                className="min-h-12 rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
+              />
+              <input
+                type="email"
+                value={reporterEmail}
+                onChange={(event) => setReporterEmail(event.target.value)}
+                placeholder={t("emailPlaceholder")}
+                className="min-h-12 rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
+              />
+            </div>
+          ) : null}
+
+          {feedback ? <p className="text-sm font-medium text-slate-600">{feedback}</p> : null}
+
+          <div className="flex flex-wrap justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={close}
+              className="min-h-11 rounded-2xl border border-slate-200 px-5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={pending}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <FiFlag />
+              {pending ? t("submitting") : t("submit")}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          if (!submitted) setOpen(true);
+        }}
+        disabled={submitted}
         className={isHero
-          ? "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-black text-white transition hover:bg-white/15"
-          : "inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-500 transition hover:border-rose-200 hover:text-rose-600"}
+          ? "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-black text-white transition hover:bg-white/15 disabled:cursor-default disabled:opacity-75"
+          : "inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-500 transition hover:border-rose-200 hover:text-rose-600 disabled:cursor-default disabled:border-emerald-100 disabled:text-emerald-700"}
       >
         <FiFlag />
-        {targetType === "business" ? t("buttonBusiness") : t("buttonReview")}
+        {submitted ? t("submittedButton") : targetType === "business" ? t("buttonBusiness") : t("buttonReview")}
       </button>
-
-      {open ? (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/70 px-4 py-8 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl">
-            <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4">
-              <div className="min-w-0">
-                <h2 className="text-lg font-black text-slate-950">{t("modalTitle")}</h2>
-                <p className="mt-1 truncate text-sm text-slate-500">{targetLabel}</p>
-              </div>
-              <button
-                type="button"
-                onClick={close}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-100 text-slate-700 transition hover:bg-slate-200"
-                aria-label={t("close")}
-              >
-                <FiX />
-              </button>
-            </div>
-
-            <form className="space-y-4 px-5 py-5" onSubmit={submitReport}>
-              <label className="block">
-                <span className="mb-2 block text-sm font-bold text-slate-700">{t("reasonLabel")}</span>
-                <select
-                  value={reasonCode}
-                  onChange={(event) => setReasonCode(event.target.value as ReportReason)}
-                  className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-primary"
-                >
-                  {reasons.map((item) => (
-                    <option key={item} value={item}>{t(`reasons.${item}`)}</option>
-                  ))}
-                </select>
-              </label>
-
-              {reasonCode === "OTHER" ? (
-                <input
-                  value={reason}
-                  onChange={(event) => setReason(event.target.value)}
-                  placeholder={t("otherPlaceholder")}
-                  className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
-                />
-              ) : null}
-
-              <textarea
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder={t("messagePlaceholder")}
-                rows={5}
-                className="w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary"
-              />
-
-              {!currentUser ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    value={reporterName}
-                    onChange={(event) => setReporterName(event.target.value)}
-                    placeholder={t("namePlaceholder")}
-                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
-                  />
-                  <input
-                    type="email"
-                    value={reporterEmail}
-                    onChange={(event) => setReporterEmail(event.target.value)}
-                    placeholder={t("emailPlaceholder")}
-                    className="min-h-12 rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
-                  />
-                </div>
-              ) : null}
-
-              {feedback ? <p className="text-sm font-medium text-slate-600">{feedback}</p> : null}
-
-              <div className="flex flex-wrap justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={close}
-                  className="min-h-11 rounded-2xl border border-slate-200 px-5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
-                >
-                  {t("cancel")}
-                </button>
-                <button
-                  type="submit"
-                  disabled={pending}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <FiFlag />
-                  {pending ? t("submitting") : t("submit")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {feedback && !open ? (
+        <span className={isHero ? "text-sm font-bold text-emerald-200" : "text-xs font-bold text-emerald-700"}>
+          {feedback}
+        </span>
       ) : null}
+
+      {modal && typeof document !== "undefined" ? createPortal(modal, document.body) : null}
     </>
   );
 }

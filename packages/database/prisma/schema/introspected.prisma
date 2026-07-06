@@ -1,0 +1,266 @@
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model admin_audit_logs {
+  id         String   @id
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  users      User?    @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
+
+model admin_settings {
+  key         String   @id
+  value       Json
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  users       User?    @relation(fields: [updatedById], references: [id])
+
+  @@index([updatedById])
+}
+
+model business_claims {
+  id                                          String                @id
+  businessId                                  String
+  claimantUserId                              String?
+  claimantName                                String
+  claimantEmail                               String
+  claimantPhone                               String?
+  message                                     String?
+  status                                      business_claim_status @default(PENDING)
+  reviewedById                                String?
+  reviewedAt                                  DateTime?
+  createdAt                                   DateTime              @default(now())
+  updatedAt                                   DateTime
+  businesses                                  Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  users_business_claims_claimantUserIdTousers User?                 @relation("business_claims_claimantUserIdTousers", fields: [claimantUserId], references: [id])
+  users_business_claims_reviewedByIdTousers   User?                 @relation("business_claims_reviewedByIdTousers", fields: [reviewedById], references: [id])
+
+  @@index([businessId])
+  @@index([claimantUserId])
+  @@index([status])
+}
+
+model business_location_hours {
+  id         Int       @id @default(autoincrement())
+  locationId String
+  dayOfWeek  DayOfWeek
+  openTime   String?
+  closeTime  String?
+  isClosed   Boolean   @default(false)
+
+  @@unique([locationId, dayOfWeek])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model business_locations {
+  id              String                    @id
+  businessId      String                    @unique(map: "business_locations_one_primary", where: raw("(\"isPrimary\" = true)"))
+  type            business_location_type
+  legacyBranchId  String?                   @unique
+  name            String?
+  phone           String?
+  mobile          String?
+  address         String?
+  postalCode      String?
+  countryCode     String                    @default("DE")
+  latitude        Float
+  longitude       Float
+  geo_point       Unsupported("geography")? @default(dbgenerated("(st_setsrid(st_makepoint(longitude, latitude), 4326))::geography"))
+  cityId          Int?
+  districtId      Int?
+  provider        location_provider         @default(MANUAL)
+  providerPlaceId String?
+  active          Boolean                   @default(true)
+  isPrimary       Boolean                   @default(false)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @default(now())
+
+  @@index([businessId])
+  @@index([cityId])
+  @@index([districtId])
+}
+
+model business_view_daily {
+  id         String   @id
+  businessId String
+  day        DateTime
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  businesses Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, day])
+  @@index([day])
+}
+
+model contact_messages {
+  id           String                 @id
+  businessId   String
+  name         String
+  email        String
+  phone        String?
+  message      String
+  status       contact_message_status @default(NEW)
+  deliveryMode String?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @default(now())
+  businesses   Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([status])
+}
+
+model directory_reports {
+  id                                            String                  @id
+  businessId                                    String?
+  reviewId                                      String?
+  reporterUserId                                String?
+  reason                                        String
+  message                                       String?
+  status                                        directory_report_status @default(OPEN)
+  resolvedById                                  String?
+  resolvedAt                                    DateTime?
+  createdAt                                     DateTime                @default(now())
+  updatedAt                                     DateTime                @default(now())
+  businesses                                    Business?               @relation(fields: [businessId], references: [id])
+  users_directory_reports_reporterUserIdTousers User?                   @relation("directory_reports_reporterUserIdTousers", fields: [reporterUserId], references: [id])
+  users_directory_reports_resolvedByIdTousers   User?                   @relation("directory_reports_resolvedByIdTousers", fields: [resolvedById], references: [id])
+  reviews                                       Review?                 @relation(fields: [reviewId], references: [id])
+
+  @@index([businessId])
+  @@index([reporterUserId])
+  @@index([reviewId])
+  @@index([status])
+}
+
+model favorites {
+  userId     String
+  businessId String
+  createdAt  DateTime @default(now())
+  businesses Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  users      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, businessId])
+  @@index([businessId])
+}
+
+model review_owner_replies {
+  id        String   @id
+  reviewId  String   @unique
+  ownerId   String?
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  users     User?    @relation(fields: [ownerId], references: [id])
+  reviews   Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+}
+
+model support_tickets {
+  id                                        String                  @id
+  userId                                    String?
+  subject                                   String
+  message                                   String
+  status                                    support_ticket_status   @default(OPEN)
+  priority                                  support_ticket_priority @default(NORMAL)
+  assignedToId                              String?
+  createdAt                                 DateTime                @default(now())
+  updatedAt                                 DateTime                @default(now())
+  users_support_tickets_assignedToIdTousers User?                   @relation("support_tickets_assignedToIdTousers", fields: [assignedToId], references: [id])
+  users_support_tickets_userIdTousers       User?                   @relation("support_tickets_userIdTousers", fields: [userId], references: [id])
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([userId])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model user_saved_locations {
+  id              String              @id
+  userId          String              @unique(map: "user_saved_locations_one_default", where: raw("(\"isDefault\" = true)"))
+  label           String
+  icon            saved_location_icon @default(OTHER)
+  address         String
+  cityName        String?
+  districtName    String?
+  cityId          Int?
+  districtId      Int?
+  latitude        Float
+  longitude       Float
+  provider        location_provider   @default(MANUAL)
+  providerPlaceId String?
+  isDefault       Boolean             @default(false)
+  sortOrder       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @default(now())
+
+  @@unique([userId, label])
+  @@index([userId])
+}
+
+enum business_claim_status {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum business_location_type {
+  PRIMARY
+  BRANCH
+}
+
+enum contact_message_status {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum directory_report_status {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum location_provider {
+  MANUAL
+  MAPBOX
+}
+
+enum saved_location_icon {
+  HOME
+  WORK
+  FAVORITE
+  OTHER
+}
+
+enum support_ticket_priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum support_ticket_status {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}

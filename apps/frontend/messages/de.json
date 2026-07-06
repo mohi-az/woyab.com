@@ -230,9 +230,9 @@
       "submitError": "Ihre Bewertung konnte nicht gesendet werden."
     },
     "report": {
-      "buttonBusiness": "Eintrag melden",
-      "buttonReview": "Melden",
-      "modalTitle": "Inhalt melden",
+      "buttonBusiness": "Problem melden",
+      "buttonReview": "Problem melden",
+      "modalTitle": "Problem melden",
       "close": "Meldeformular schliessen",
       "reasonLabel": "Grund",
       "reasons": {
@@ -253,8 +253,16 @@
       "cancel": "Abbrechen",
       "submit": "Meldung senden",
       "submitting": "Wird gesendet...",
+      "submittedButton": "Gesendet",
       "submitSuccess": "Danke. Die Meldung wurde zur Pruefung eingereicht.",
-      "submitError": "Die Meldung konnte nicht gesendet werden."
+      "submitError": "Die Meldung konnte nicht gesendet werden.",
+      "errors": {
+        "invalidFields": "Bitte pruefen Sie die Angaben zur Meldung.",
+        "rateLimited": "Zu viele Meldungen. Bitte versuchen Sie es spaeter erneut.",
+        "emailRequired": "Bitte geben Sie eine E-Mail-Adresse an, damit wir die Meldung bearbeiten koennen.",
+        "targetNotFound": "Der gemeldete Inhalt wurde nicht gefunden.",
+        "duplicateOpenReport": "Sie haben fuer diesen Inhalt bereits eine offene Meldung."
+      }
     },
     "contactCard": {
       "title": "Kontaktinformationen",
@@ -590,7 +598,12 @@
     "reports": {
       "title": "Meldungen",
       "description": "Nutzer-Meldungen zu Eintraegen oder Bewertungen pruefen.",
-      "list": "Verzeichnis-Meldungen"
+      "list": "Verzeichnis-Meldungen",
+      "reason": "Grund",
+      "details": "Details der Meldung",
+      "decisionReason": "Entscheidungsgrund",
+      "actionTaken": "Massnahme",
+      "moderatorNote": "Interne Notiz"
     },
     "claims": {
       "title": "Business Claims",

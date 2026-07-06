@@ -1,39 +1,37 @@
 model Category {
-  id          Int           @id @default(autoincrement())
-  nameFa      String
-  nameEn      String
-  slug        String        @unique
-  icon        String?
-  image       String?
-  sortOrder   Int           @default(0)
-  active      Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  subCategories     SubCategory[]
-  businesses        Business[]
-  attributeDefs     AttributeDefinition[]
+  id            Int                   @id @default(autoincrement())
+  nameFa        String
+  nameEn        String
+  slug          String                @unique
+  icon          String?
+  image         String?
+  sortOrder     Int                   @default(0)
+  active        Boolean               @default(true)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  attributeDefs AttributeDefinition[]
+  businesses    Business[]
+  subCategories SubCategory[]
 
   @@map("categories")
 }
 
 model SubCategory {
-  id          Int          @id @default(autoincrement())
-  nameFa      String
-  nameEn      String
-  slug        String       @unique
-  icon        String?
-  image       String?
-  categoryId  Int
-  category    Category     @relation(fields: [categoryId], references: [id])
-  sortOrder   Int          @default(0)
-  active      Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  specialties   Specialty[]
-  businesses    Business[]
+  id            Int                   @id @default(autoincrement())
+  nameFa        String
+  nameEn        String
+  slug          String                @unique
+  icon          String?
+  image         String?
+  categoryId    Int
+  sortOrder     Int                   @default(0)
+  active        Boolean               @default(true)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
   attributeDefs AttributeDefinition[]
+  businesses    Business[]
+  specialties   Specialty[]
+  category      Category              @relation(fields: [categoryId], references: [id])
 
   @@map("sub_categories")
 }
@@ -44,11 +42,10 @@ model Specialty {
   nameFa        String
   nameEn        String?
   subCategoryId Int
-  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
   sortOrder     Int         @default(0)
   active        Boolean     @default(true)
-
   businesses    Business[]
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
 
   @@map("specialties")
 }

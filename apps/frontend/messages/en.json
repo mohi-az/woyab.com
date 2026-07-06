@@ -230,9 +230,9 @@
       "submitError": "Your review could not be submitted."
     },
     "report": {
-      "buttonBusiness": "Report business",
-      "buttonReview": "Report",
-      "modalTitle": "Report content",
+      "buttonBusiness": "Report issue",
+      "buttonReview": "Report issue",
+      "modalTitle": "Report an issue",
       "close": "Close report form",
       "reasonLabel": "Reason",
       "reasons": {
@@ -253,8 +253,16 @@
       "cancel": "Cancel",
       "submit": "Submit report",
       "submitting": "Submitting...",
+      "submittedButton": "Submitted",
       "submitSuccess": "Thanks. The report was submitted for review.",
-      "submitError": "The report could not be submitted."
+      "submitError": "The report could not be submitted.",
+      "errors": {
+        "invalidFields": "Please check the report fields.",
+        "rateLimited": "Too many reports. Please try again later.",
+        "emailRequired": "Please enter an email address so we can process the report.",
+        "targetNotFound": "The item you want to report could not be found.",
+        "duplicateOpenReport": "You already have an open report for this item."
+      }
     },
     "contactCard": {
       "title": "Contact information",
@@ -590,7 +598,12 @@
     "reports": {
       "title": "Reports",
       "description": "Review user-submitted reports about listings or reviews.",
-      "list": "Directory reports"
+      "list": "Directory reports",
+      "reason": "Reason",
+      "details": "Report details",
+      "decisionReason": "Decision reason",
+      "actionTaken": "Action taken",
+      "moderatorNote": "Internal note"
     },
     "claims": {
       "title": "Business claims",

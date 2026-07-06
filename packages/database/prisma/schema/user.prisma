@@ -1,4 +1,32 @@
-// User and authentication.
+model User {
+  id                                                        String                 @id @default(cuid())
+  phone                                                     String?                @unique
+  email                                                     String?                @unique
+  name                                                      String?
+  avatarUrl                                                 String?
+  role                                                      UserRole               @default(USER)
+  active                                                    Boolean                @default(true)
+  createdAt                                                 DateTime               @default(now())
+  updatedAt                                                 DateTime               @updatedAt
+  emailVerified                                             DateTime?
+  passwordHash                                              String?
+  passwordChangedAt                                         DateTime?
+  authVersion                                               Int                    @default(0)
+  admin_audit_logs                                          admin_audit_logs[]
+  admin_settings                                            admin_settings[]
+  business_claims_business_claims_claimantUserIdTousers     business_claims[]      @relation("business_claims_claimantUserIdTousers")
+  business_claims_business_claims_reviewedByIdTousers       business_claims[]      @relation("business_claims_reviewedByIdTousers")
+  businesses                                                Business[]
+  directory_reports_directory_reports_reporterUserIdTousers directory_reports[]    @relation("directory_reports_reporterUserIdTousers")
+  directory_reports_directory_reports_resolvedByIdTousers   directory_reports[]    @relation("directory_reports_resolvedByIdTousers")
+  favorites                                                 favorites[]
+  review_owner_replies                                      review_owner_replies[]
+  reviews                                                   Review[]
+  support_tickets_support_tickets_assignedToIdTousers       support_tickets[]      @relation("support_tickets_assignedToIdTousers")
+  support_tickets_support_tickets_userIdTousers             support_tickets[]      @relation("support_tickets_userIdTousers")
+
+  @@map("users")
+}
 
 enum UserRole {
   USER
@@ -7,62 +35,4 @@ enum UserRole {
   SUPER_ADMIN
 
   @@map("user_role")
-}
-
-model User {
-  id          String    @id @default(cuid())
-  phone       String?   @unique
-  email       String?   @unique
-  emailVerified DateTime?
-  passwordHash String?
-  passwordChangedAt DateTime?
-  authVersion Int       @default(0)
-  name        String?
-  avatarUrl   String?
-  role        UserRole  @default(USER)
-  active      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  businesses  Business[]
-  reviews     Review[]
-  favorites   Favorite[]
-  savedLocations UserSavedLocation[]
-  passwordResetTokens PasswordResetToken[]
-  adminAuditLogs AdminAuditLog[] @relation("AdminAuditActor")
-  directoryReports DirectoryReport[] @relation("DirectoryReportReporter")
-  resolvedDirectoryReports DirectoryReport[] @relation("DirectoryReportResolver")
-  businessClaims BusinessClaim[] @relation("BusinessClaimClaimant")
-  reviewedBusinessClaims BusinessClaim[] @relation("BusinessClaimReviewer")
-  reviewOwnerReplies ReviewOwnerReply[] @relation("ReviewOwnerReplyOwner")
-  supportTickets SupportTicket[] @relation("SupportTicketUser")
-  assignedSupportTickets SupportTicket[] @relation("SupportTicketAssignee")
-  updatedAdminSettings AdminSetting[] @relation("AdminSettingUpdater")
-
-  @@map("users")
-}
-
-model PasswordResetToken {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash String    @unique
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
-
-  @@index([userId, expiresAt])
-  @@map("password_reset_tokens")
-}
-
-model Favorite {
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  businessId String
-  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-
-  @@id([userId, businessId])
-  @@index([businessId])
-  @@map("favorites")
 }

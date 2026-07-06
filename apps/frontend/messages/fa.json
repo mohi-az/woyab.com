@@ -228,9 +228,9 @@
       "submitError": "ثبت نظر انجام نشد."
     },
     "report": {
-      "buttonBusiness": "گزارش کسب‌وکار",
-      "buttonReview": "گزارش",
-      "modalTitle": "گزارش محتوا",
+      "buttonBusiness": "اعلام مشکل",
+      "buttonReview": "اعلام مشکل",
+      "modalTitle": "اعلام مشکل",
       "close": "بستن فرم گزارش",
       "reasonLabel": "دلیل",
       "reasons": {
@@ -251,8 +251,16 @@
       "cancel": "انصراف",
       "submit": "ثبت گزارش",
       "submitting": "در حال ثبت...",
+      "submittedButton": "ثبت شد",
       "submitSuccess": "ممنون. گزارش شما برای بررسی ثبت شد.",
-      "submitError": "ثبت گزارش انجام نشد."
+      "submitError": "ثبت گزارش انجام نشد.",
+      "errors": {
+        "invalidFields": "لطفا اطلاعات گزارش را بررسی کنید.",
+        "rateLimited": "تعداد گزارش‌های ثبت‌شده زیاد است. کمی بعد دوباره تلاش کنید.",
+        "emailRequired": "لطفا برای پیگیری گزارش، ایمیل خود را وارد کنید.",
+        "targetNotFound": "موردی که می‌خواهید اعلام کنید پیدا نشد.",
+        "duplicateOpenReport": "شما قبلا برای این مورد یک گزارش باز ثبت کرده‌اید."
+      }
     },
     "contactCard": {
       "title": "اطلاعات تماس",
@@ -588,7 +596,12 @@
     "reports": {
       "title": "گزارش‌ها",
       "description": "گزارش‌های کاربران درباره کسب‌وکارها یا نظرها را بررسی کن.",
-      "list": "گزارش‌های دایرکتوری"
+      "list": "گزارش‌های دایرکتوری",
+      "reason": "دلیل",
+      "details": "جزئیات گزارش",
+      "decisionReason": "دلیل تصمیم",
+      "actionTaken": "اقدام انجام‌شده",
+      "moderatorNote": "یادداشت داخلی"
     },
     "claims": {
       "title": "درخواست‌های مالکیت",
