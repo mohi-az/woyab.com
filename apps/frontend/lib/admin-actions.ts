@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 const businessStatuses: BusinessStatus[] = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"];
 const reviewStatuses: ReviewStatus[] = ["PENDING", "APPROVED", "REJECTED"];
 const userRoles: UserRole[] = ["USER", "OWNER", "ADMIN", "SUPER_ADMIN"];
+const claimStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
 
 function value(formData: FormData, key: string) {
   const raw = formData.get(key);
@@ -65,9 +66,17 @@ async function recalculateBusinessRating(tx: Prisma.TransactionClient, businessI
   });
 }
 
+async function promoteUserToOwner(tx: Prisma.TransactionClient, userId: string) {
+  const user = await tx.user.findUnique({ where: { id: userId }, select: { role: true } });
+  if (user?.role === "USER") {
+    await tx.user.update({ where: { id: userId }, data: { role: "OWNER", authVersion: { increment: 1 } } });
+  }
+}
+
 function refreshAdmin() {
   revalidatePath("/admin", "layout");
   revalidatePath("/businesses", "layout");
+  revalidatePath("/dashboard", "layout");
 }
 
 export async function setBusinessStatus(formData: FormData) {
@@ -104,9 +113,15 @@ export async function updateBusinessDetails(formData: FormData) {
   const subCategoryId = intValue(formData, "subCategoryId");
   const specialtyId = intValue(formData, "specialtyId");
   const status = value(formData, "status") as BusinessStatus;
+  const ownerId = nullableValue(formData, "ownerId");
 
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId || !businessStatuses.includes(status)) {
     throw new Error("Please check the required business fields.");
+  }
+
+  if (ownerId) {
+    const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
+    if (!owner?.active) throw new Error("Selected owner is not an active user.");
   }
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
@@ -119,51 +134,55 @@ export async function updateBusinessDetails(formData: FormData) {
   const source = translations.find((translation) => translation.locale === sourceLocale) ?? translations[0];
   if (!source) throw new Error("At least one translated business name is required.");
 
-  await prisma.business.update({
-    where: { id: businessId },
-    data: {
-      slug: value(formData, "slug"),
-      sourceLocale,
-      businessName: source.businessName,
-      shortDescription: source.shortDescription,
-      description: source.description,
-      legalName: nullableValue(formData, "legalName"),
-      categoryId,
-      subCategoryId,
-      specialtyId,
-      cityId,
-      districtId: intValue(formData, "districtId"),
-      latitude: numberValue(formData, "latitude"),
-      longitude: numberValue(formData, "longitude"),
-      address: nullableValue(formData, "address"),
-      postalCode: nullableValue(formData, "postalCode"),
-      email: nullableValue(formData, "email"),
-      phone: nullableValue(formData, "phone"),
-      mobile: nullableValue(formData, "mobile"),
-      website: nullableValue(formData, "website"),
-      status,
-      verified: booleanValue(formData, "verified"),
-      featured: booleanValue(formData, "featured"),
-      translations: {
-        upsert: translations.map((translation) => ({
-          where: { businessId_locale: { businessId, locale: translation.locale } },
-          update: {
-            businessName: translation.businessName,
-            shortDescription: translation.shortDescription,
-            description: translation.description,
-          },
-          create: {
-            locale: translation.locale,
-            businessName: translation.businessName,
-            shortDescription: translation.shortDescription,
-            description: translation.description,
-          },
-        })),
+  await prisma.$transaction(async (tx) => {
+    await tx.business.update({
+      where: { id: businessId },
+      data: {
+        slug: value(formData, "slug"),
+        sourceLocale,
+        businessName: source.businessName,
+        shortDescription: source.shortDescription,
+        description: source.description,
+        legalName: nullableValue(formData, "legalName"),
+        categoryId,
+        subCategoryId,
+        specialtyId,
+        ownerId,
+        cityId,
+        districtId: intValue(formData, "districtId"),
+        latitude: numberValue(formData, "latitude"),
+        longitude: numberValue(formData, "longitude"),
+        address: nullableValue(formData, "address"),
+        postalCode: nullableValue(formData, "postalCode"),
+        email: nullableValue(formData, "email"),
+        phone: nullableValue(formData, "phone"),
+        mobile: nullableValue(formData, "mobile"),
+        website: nullableValue(formData, "website"),
+        status,
+        verified: booleanValue(formData, "verified"),
+        featured: booleanValue(formData, "featured"),
+        translations: {
+          upsert: translations.map((translation) => ({
+            where: { businessId_locale: { businessId, locale: translation.locale } },
+            update: {
+              businessName: translation.businessName,
+              shortDescription: translation.shortDescription,
+              description: translation.description,
+            },
+            create: {
+              locale: translation.locale,
+              businessName: translation.businessName,
+              shortDescription: translation.shortDescription,
+              description: translation.description,
+            },
+          })),
+        },
       },
-    },
+    });
+    if (ownerId) await promoteUserToOwner(tx, ownerId);
   });
 
-  await audit(actor.id, "business.update", "Business", businessId, { status, sourceLocale });
+  await audit(actor.id, "business.update", "Business", businessId, { status, sourceLocale, ownerId });
   refreshAdmin();
 }
 
@@ -178,10 +197,16 @@ export async function createBusinessDetails(formData: FormData) {
   const subCategoryId = intValue(formData, "subCategoryId");
   const specialtyId = intValue(formData, "specialtyId");
   const status = value(formData, "status") as BusinessStatus;
+  const ownerId = nullableValue(formData, "ownerId");
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId || !businessStatuses.includes(status)) {
     throw new Error("Please check the required business fields.");
+  }
+
+  if (ownerId) {
+    const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
+    if (!owner?.active) throw new Error("Selected owner is not an active user.");
   }
 
   const duplicate = await prisma.business.findUnique({ where: { slug }, select: { id: true } });
@@ -197,43 +222,48 @@ export async function createBusinessDetails(formData: FormData) {
   const source = translations.find((translation) => translation.locale === sourceLocale) ?? translations[0];
   if (!source) throw new Error("At least one translated business name is required.");
 
-  const business = await prisma.business.create({
-    data: {
-      slug,
-      sourceLocale,
-      businessName: source.businessName,
-      shortDescription: source.shortDescription,
-      description: source.description,
-      legalName: nullableValue(formData, "legalName"),
-      categoryId,
-      subCategoryId,
-      specialtyId,
-      cityId,
-      districtId: intValue(formData, "districtId"),
-      latitude: numberValue(formData, "latitude"),
-      longitude: numberValue(formData, "longitude"),
-      address: nullableValue(formData, "address"),
-      postalCode: nullableValue(formData, "postalCode"),
-      email: nullableValue(formData, "email"),
-      phone: nullableValue(formData, "phone"),
-      mobile: nullableValue(formData, "mobile"),
-      website: nullableValue(formData, "website"),
-      status,
-      verified: booleanValue(formData, "verified"),
-      featured: booleanValue(formData, "featured"),
-      translations: {
-        create: translations.map((translation) => ({
-          locale: translation.locale,
-          businessName: translation.businessName,
-          shortDescription: translation.shortDescription,
-          description: translation.description,
-        })),
+  const business = await prisma.$transaction(async (tx) => {
+    const created = await tx.business.create({
+      data: {
+        slug,
+        sourceLocale,
+        businessName: source.businessName,
+        shortDescription: source.shortDescription,
+        description: source.description,
+        legalName: nullableValue(formData, "legalName"),
+        categoryId,
+        subCategoryId,
+        specialtyId,
+        ownerId,
+        cityId,
+        districtId: intValue(formData, "districtId"),
+        latitude: numberValue(formData, "latitude"),
+        longitude: numberValue(formData, "longitude"),
+        address: nullableValue(formData, "address"),
+        postalCode: nullableValue(formData, "postalCode"),
+        email: nullableValue(formData, "email"),
+        phone: nullableValue(formData, "phone"),
+        mobile: nullableValue(formData, "mobile"),
+        website: nullableValue(formData, "website"),
+        status,
+        verified: booleanValue(formData, "verified"),
+        featured: booleanValue(formData, "featured"),
+        translations: {
+          create: translations.map((translation) => ({
+            locale: translation.locale,
+            businessName: translation.businessName,
+            shortDescription: translation.shortDescription,
+            description: translation.description,
+          })),
+        },
       },
-    },
-    select: { id: true },
+      select: { id: true },
+    });
+    if (ownerId) await promoteUserToOwner(tx, ownerId);
+    return created;
   });
 
-  await audit(actor.id, "business.create", "Business", business.id, { status, sourceLocale });
+  await audit(actor.id, "business.create", "Business", business.id, { status, sourceLocale, ownerId });
   refreshAdmin();
 }
 
@@ -388,18 +418,37 @@ export async function updateReportStatus(formData: FormData) {
 export async function updateClaimStatus(formData: FormData) {
   const actor = await requireAdmin();
   const id = value(formData, "id");
-  const status = value(formData, "status") as "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
-  if (!id || !["PENDING", "APPROVED", "REJECTED", "CANCELLED"].includes(status)) throw new Error("Invalid claim status.");
+  const status = value(formData, "status") as (typeof claimStatuses)[number];
+  if (!id || !claimStatuses.includes(status)) throw new Error("Invalid claim status.");
 
-  await prisma.businessClaim.update({
-    where: { id },
-    data: {
-      status,
-      reviewedById: ["APPROVED", "REJECTED"].includes(status) ? actor.id : null,
-      reviewedAt: ["APPROVED", "REJECTED"].includes(status) ? new Date() : null,
-    },
+  const claim = await prisma.$transaction(async (tx) => {
+    const existing = await tx.businessClaim.findUniqueOrThrow({
+      where: { id },
+      select: { businessId: true, claimantUserId: true },
+    });
+    if (status === "APPROVED") {
+      if (!existing.claimantUserId) throw new Error("Approved claims must belong to a registered user.");
+      await tx.business.update({
+        where: { id: existing.businessId },
+        data: { ownerId: existing.claimantUserId, verified: true },
+      });
+      await promoteUserToOwner(tx, existing.claimantUserId);
+    }
+    await tx.businessClaim.update({
+      where: { id },
+      data: {
+        status,
+        reviewedById: ["APPROVED", "REJECTED"].includes(status) ? actor.id : null,
+        reviewedAt: ["APPROVED", "REJECTED"].includes(status) ? new Date() : null,
+      },
+    });
+    return existing;
   });
-  await audit(actor.id, "claim.status", "BusinessClaim", id, { status });
+  await audit(actor.id, "claim.status", "BusinessClaim", id, {
+    status,
+    businessId: claim.businessId,
+    ownerId: status === "APPROVED" ? claim.claimantUserId : null,
+  });
   refreshAdmin();
 }
 

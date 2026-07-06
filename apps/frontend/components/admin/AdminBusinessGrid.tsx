@@ -29,6 +29,11 @@ type SpecialtyOption = {
   subCategoryId: number;
 };
 
+type OwnerOption = {
+  value: string;
+  label: string;
+};
+
 type Translation = {
   locale: "DE" | "EN" | "FA";
   businessName: string;
@@ -41,6 +46,7 @@ export type AdminBusinessRow = {
   slug: string;
   sourceLocale: "DE" | "EN" | "FA";
   businessName: string;
+  ownerId: string | null;
   legalName: string | null;
   shortDescription: string | null;
   description: string | null;
@@ -76,6 +82,7 @@ type Props = {
   subCategories: SubCategoryOption[];
   specialties: SpecialtyOption[];
   cities: Option[];
+  ownerOptions: OwnerOption[];
   canCreate: boolean;
   previousHref: string;
   nextHref: string;
@@ -137,6 +144,7 @@ export function AdminBusinessGrid({
   subCategories,
   specialties,
   cities,
+  ownerOptions,
   canCreate,
   previousHref,
   nextHref,
@@ -391,6 +399,17 @@ export function AdminBusinessGrid({
                     </FieldShell>
                     <FieldShell label={t("fields.featured")}>
                       <select name="featured" defaultValue={String(editing?.featured ?? false)} className={inputClassName}><option value="true">{t("common.yes")}</option><option value="false">{t("common.no")}</option></select>
+                    </FieldShell>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FieldShell label={t("fields.owner")}>
+                      <AdminSearchSelect
+                        name="ownerId"
+                        defaultValue={editing?.ownerId ?? ""}
+                        allowClear
+                        placeholder={t("fields.owner")}
+                        options={ownerOptions}
+                      />
                     </FieldShell>
                   </div>
                 </section>

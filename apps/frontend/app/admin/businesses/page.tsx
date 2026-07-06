@@ -51,7 +51,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     }),
   };
 
-  const [businessesRaw, total, categories, subCategories, specialties, cities] = await Promise.all([
+  const [businessesRaw, total, categories, subCategories, specialties, cities, ownerOptions] = await Promise.all([
     prisma.business.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -70,6 +70,12 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     prisma.subCategory.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, categoryId: true } }),
     prisma.specialty.findMany({ orderBy: [{ sortOrder: "asc" }, { nameFa: "asc" }], select: { id: true, nameFa: true, nameEn: true, subCategoryId: true } }),
     prisma.city.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
+    prisma.user.findMany({
+      where: { active: true },
+      orderBy: [{ role: "asc" }, { name: "asc" }, { email: "asc" }],
+      take: 300,
+      select: { id: true, name: true, email: true, role: true },
+    }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const pageQuery = new URLSearchParams();
@@ -87,6 +93,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     slug: business.slug,
     sourceLocale: business.sourceLocale,
     businessName: business.businessName,
+    ownerId: business.ownerId,
     legalName: business.legalName,
     shortDescription: business.shortDescription,
     description: business.description,
@@ -136,6 +143,10 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
         subCategories={subCategories}
         specialties={specialties}
         cities={cities}
+        ownerOptions={ownerOptions.map((owner) => ({
+          value: owner.id,
+          label: [owner.name, owner.email, owner.role].filter(Boolean).join(" / "),
+        }))}
         canCreate={admin.role === "SUPER_ADMIN"}
         previousHref={pageHref(Math.max(1, page - 1))}
         nextHref={pageHref(Math.min(totalPages, page + 1))}

@@ -13,7 +13,7 @@ export default async function AdminClaimsPage() {
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {
-        business: { select: { businessName: true, slug: true } },
+        business: { select: { businessName: true, slug: true, owner: { select: { name: true, email: true } } } },
         claimant: { select: { name: true, email: true } },
         reviewedBy: { select: { name: true, email: true } },
       },
@@ -30,8 +30,16 @@ export default async function AdminClaimsPage() {
             <tbody className="divide-y divide-white/8">
               {claims.map((claim) => (
                 <tr key={claim.id}>
-                  <td className={tdClassName}><strong className="text-white">{claim.business.businessName}</strong><p className="mt-1 text-xs text-slate-500">{claim.business.slug}</p></td>
-                  <td className={tdClassName}>{claim.claimantName}<br /><span className="text-xs text-slate-400">{claim.claimantEmail}</span></td>
+                  <td className={tdClassName}>
+                    <strong className="text-white">{claim.business.businessName}</strong>
+                    <p className="mt-1 text-xs text-slate-500">{claim.business.slug}</p>
+                    <p className="mt-1 text-xs text-slate-400">Owner: {claim.business.owner?.name || claim.business.owner?.email || "-"}</p>
+                  </td>
+                  <td className={tdClassName}>
+                    {claim.claimantName}<br />
+                    <span className="text-xs text-slate-400">{claim.claimantEmail}</span>
+                    <p className="mt-1 text-xs text-slate-500">{claim.claimant ? "Registered account" : "No account attached"}</p>
+                  </td>
                   <td className={tdClassName}><p className="max-w-xl whitespace-pre-line text-sm text-slate-400">{claim.message || "-"}</p></td>
                   <td className={tdClassName}><StatusBadge status={claim.status} /></td>
                   <td className={tdClassName}>
