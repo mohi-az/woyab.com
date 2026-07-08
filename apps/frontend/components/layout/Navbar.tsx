@@ -55,9 +55,9 @@ export default function Navbar() {
           : "text-slate-700 hover:text-primary",
     );
   const languageTriggerClassName = cn(
-    "h-10 rounded-full border px-3 text-sm shadow-none transition-colors",
+    "h-10 rounded-full border px-3 text-sm shadow-none transition-colors hover:text-current",
     isOverlay
-      ? "border-white/15 bg-white/10 text-white hover:bg-white/15 hover:text-white"
+      ? "border-white/15 bg-white/10 !text-white hover:bg-white/15 hover:!text-white [&_*]:!text-white"
       : "border-slate-200 bg-white text-slate-600 hover:border-primary/20 hover:bg-primary/5 hover:text-primary",
   );
   const secondaryActionClassName = cn(
@@ -67,10 +67,10 @@ export default function Navbar() {
       : "border-slate-200 bg-white text-slate-700 shadow-sm hover:border-primary/25 hover:text-primary",
   );
   const primaryActionClassName = cn(
-    "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-bold transition-all",
+    "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-bold !text-white transition-all [&_*]:!text-white",
     isOverlay
-      ? "bg-white text-slate-950 shadow-[0_12px_30px_rgba(15,23,42,0.18)] hover:bg-orange-50"
-      : "bg-slate-950 text-white shadow-[0_10px_24px_rgba(15,23,42,0.14)] hover:bg-slate-800",
+      ? "bg-white !text-slate-950 shadow-[0_12px_30px_rgba(15,23,42,0.18)] hover:bg-orange-50 [&_*]:!text-slate-950"
+      : "bg-primary shadow-[0_10px_24px_rgba(241,91,63,0.22)] hover:bg-primary-dark",
   );
   const authLinkClassName = isOverlay ? "text-white/80 hover:text-white" : "text-slate-700 hover:text-primary";
 
