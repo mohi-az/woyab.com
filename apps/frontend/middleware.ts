@@ -9,7 +9,7 @@ import {
   stripLocalePrefix,
 } from "@/i18n/config";
 
-const bypassPrefixes = ["/api", "/_next", "/pwa-icons"];
+const bypassPrefixes = ["/api", "/_next", "/pwa-icons", "/monitoring"];
 
 function shouldBypass(pathname: string) {
   return bypassPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))

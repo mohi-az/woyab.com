@@ -1,5 +1,6 @@
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@fargo/database", "@fargo/shared"],
@@ -30,4 +31,11 @@ const nextConfig: NextConfig = {
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-export default withNextIntl(nextConfig);
+export default withSentryConfig(withNextIntl(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  tunnelRoute: "/monitoring",
+  widenClientFileUpload: true,
+  silent: !process.env.CI,
+});
