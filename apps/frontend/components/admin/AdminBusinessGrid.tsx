@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { ConfigProvider, Steps } from "antd";
 import { useLocale, useTranslations } from "next-intl";
-import { FiCheckCircle, FiEdit3, FiEye, FiPlus, FiStar, FiX } from "react-icons/fi";
+import { FiEdit3, FiEye, FiLoader, FiPlus, FiX } from "react-icons/fi";
+import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
@@ -90,6 +91,15 @@ type Props = {
   nextHref: string;
 };
 
+type RowUiState = {
+  status: AdminBusinessRow["status"];
+  verified: boolean;
+  featured: boolean;
+  pendingStatus: boolean;
+  pendingVerified: boolean;
+  pendingFeatured: boolean;
+};
+
 function optionLabel(option: Option | SpecialtyOption) {
   return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
 }
@@ -121,6 +131,18 @@ function stepForField(field: string) {
 
 function requiredLabel(label: string) {
   return <span>{label} <span className="text-rose-400">*</span></span>;
+}
+
+function actionToggleClassName(active: boolean, tone: "verified" | "featured") {
+  if (!active) {
+    return "grid h-9 w-9 place-items-center rounded-lg border border-[var(--admin-border)] bg-transparent text-[var(--admin-muted)] transition hover:border-sky-300/60 hover:bg-white/8 hover:text-white disabled:cursor-not-allowed disabled:opacity-70";
+  }
+
+  if (tone === "verified") {
+    return "grid h-9 w-9 place-items-center rounded-lg border border-emerald-300 bg-emerald-400 text-slate-950 shadow-[0_0_0_3px_rgba(52,211,153,.18)] transition disabled:cursor-not-allowed disabled:opacity-70";
+  }
+
+  return "grid h-9 w-9 place-items-center rounded-lg border border-amber-200 bg-amber-300 text-slate-950 shadow-[0_0_0_3px_rgba(251,191,36,.22)] transition disabled:cursor-not-allowed disabled:opacity-70";
 }
 
 function FieldShell({ label, required, error, children }: {
@@ -160,13 +182,41 @@ export function AdminBusinessGrid({
   const [wizardStep, setWizardStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState("");
+  const [operationError, setOperationError] = useState("");
   const [saving, setSaving] = useState(false);
   const [sourceLocaleDraft, setSourceLocaleDraft] = useState<"DE" | "EN" | "FA">("DE");
+  const [rowUiStates, setRowUiStates] = useState<Record<string, RowUiState>>({});
   const modalOpen = creating || Boolean(editing);
   const modalTranslations = useMemo(() => translationMap(editing), [editing]);
   const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
   const wizardSteps = [t("businessWizard.identity"), t("businessWizard.classification"), t("businessWizard.translations"), t("businessWizard.location"), t("businessWizard.hours")];
+
+  function uiStateFor(business: AdminBusinessRow): RowUiState {
+    return rowUiStates[business.id] ?? {
+      status: business.status,
+      verified: business.verified,
+      featured: business.featured,
+      pendingStatus: false,
+      pendingVerified: false,
+      pendingFeatured: false,
+    };
+  }
+
+  function patchRowState(businessId: string, patch: Partial<RowUiState>) {
+    setRowUiStates((current) => ({
+      ...current,
+      [businessId]: {
+        status: current[businessId]?.status ?? businesses.find((business) => business.id === businessId)?.status ?? "PENDING",
+        verified: current[businessId]?.verified ?? businesses.find((business) => business.id === businessId)?.verified ?? false,
+        featured: current[businessId]?.featured ?? businesses.find((business) => business.id === businessId)?.featured ?? false,
+        pendingStatus: current[businessId]?.pendingStatus ?? false,
+        pendingVerified: current[businessId]?.pendingVerified ?? false,
+        pendingFeatured: current[businessId]?.pendingFeatured ?? false,
+        ...patch,
+      },
+    }));
+  }
 
   function closeModal() {
     setEditing(null);
@@ -266,6 +316,35 @@ export function AdminBusinessGrid({
     }
   }
 
+  async function submitStatusChange(formData: FormData, business: AdminBusinessRow, previousStatus: AdminBusinessRow["status"]) {
+    const nextStatus = String(formData.get("status")) as AdminBusinessRow["status"];
+    setOperationError("");
+    patchRowState(business.id, { status: nextStatus, pendingStatus: true });
+
+    try {
+      await setBusinessStatus(formData);
+      patchRowState(business.id, { status: nextStatus, pendingStatus: false });
+    } catch (error) {
+      patchRowState(business.id, { status: previousStatus, pendingStatus: false });
+      setOperationError(error instanceof Error ? error.message : t("validation.saveFailed"));
+    }
+  }
+
+  async function submitFlagChange(formData: FormData, business: AdminBusinessRow, field: "verified" | "featured", previousValue: boolean) {
+    const enabled = String(formData.get("enabled")) === "true";
+    const pendingField = field === "verified" ? "pendingVerified" : "pendingFeatured";
+    setOperationError("");
+    patchRowState(business.id, { [field]: enabled, [pendingField]: true });
+
+    try {
+      await setBusinessFlag(formData);
+      patchRowState(business.id, { [field]: enabled, [pendingField]: false });
+    } catch (error) {
+      patchRowState(business.id, { [field]: previousValue, [pendingField]: false });
+      setOperationError(error instanceof Error ? error.message : t("validation.saveFailed"));
+    }
+  }
+
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -280,6 +359,11 @@ export function AdminBusinessGrid({
       </div>
 
       <AdminSection title={t("businesses.list")}>
+        {operationError ? (
+          <div className="mb-4 rounded-lg border border-rose-400/35 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200">
+            {operationError}
+          </div>
+        ) : null}
         <AdminTable>
           <table className={tableClassName}>
             <thead>
@@ -292,7 +376,9 @@ export function AdminBusinessGrid({
               </tr>
             </thead>
             <tbody className="divide-y divide-white/8">
-              {businesses.map((business) => (
+              {businesses.map((business) => {
+                const ui = uiStateFor(business);
+                return (
                 <tr key={business.id} className="cursor-pointer" onClick={() => openEdit(business)}>
                   <td className={`${tdClassName} min-w-[260px]`}>
                     <div className="flex items-center gap-3">
@@ -305,45 +391,62 @@ export function AdminBusinessGrid({
                   </td>
                   <td className={tdClassName}>{business.owner?.name || business.owner?.email || "-"}</td>
                   <td className={tdClassName}>{optionLabel(business.category)}<br /><span className="text-xs text-slate-500">{optionLabel(business.city)}</span></td>
-                  <td className={tdClassName}><StatusBadge status={business.status} /></td>
+                  <td className={tdClassName}><StatusBadge status={ui.status} /></td>
                   <td className={tdClassName}>
                     <div className="flex min-w-[230px] items-center gap-2" onClick={(event) => event.stopPropagation()}>
-                      <form action={setBusinessStatus}>
+                      <form action={(formData) => submitStatusChange(formData, business, ui.status)}>
                         <input type="hidden" name="businessId" value={business.id} />
-                        <select
-                          name="status"
-                          defaultValue={business.status}
-                          className="admin-input h-9 w-[118px] rounded-lg px-2 text-xs font-black outline-none focus:border-sky-400"
-                          aria-label={t("fields.status")}
-                          onChange={(event) => event.currentTarget.form?.requestSubmit()}
-                        >
-                          {statuses.map((item) => <option key={item} value={item}>{item}</option>)}
-                        </select>
+                        <div className="relative">
+                          <select
+                            name="status"
+                            value={ui.status}
+                            disabled={ui.pendingStatus}
+                            className="admin-input h-9 w-[118px] rounded-lg px-2 text-xs font-black outline-none focus:border-sky-400 disabled:cursor-not-allowed disabled:opacity-70"
+                            aria-label={t("fields.status")}
+                            aria-busy={ui.pendingStatus}
+                            onChange={(event) => {
+                              const nextStatus = event.currentTarget.value as AdminBusinessRow["status"];
+                              patchRowState(business.id, { status: nextStatus, pendingStatus: true });
+                              event.currentTarget.form?.requestSubmit();
+                            }}
+                          >
+                            {statuses.map((item) => <option key={item} value={item}>{item}</option>)}
+                          </select>
+                          {ui.pendingStatus ? (
+                            <FiLoader className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 animate-spin text-sky-300" />
+                          ) : null}
+                        </div>
                       </form>
-                      <form action={setBusinessFlag}>
+                      <form action={(formData) => submitFlagChange(formData, business, "verified", ui.verified)}>
                         <input type="hidden" name="businessId" value={business.id} />
                         <input type="hidden" name="field" value="verified" />
-                        <input type="hidden" name="enabled" value={String(!business.verified)} />
+                        <input type="hidden" name="enabled" value={String(!ui.verified)} />
                         <button
                           type="submit"
-                          className={`admin-icon-button grid h-9 w-9 place-items-center rounded-lg border ${business.verified ? "text-emerald-400" : ""}`}
-                          title={business.verified ? t("actions.unverify") : t("actions.verify")}
-                          aria-label={business.verified ? t("actions.unverify") : t("actions.verify")}
+                          disabled={ui.pendingVerified}
+                          className={actionToggleClassName(ui.verified, "verified")}
+                          title={ui.verified ? t("actions.unverify") : t("actions.verify")}
+                          aria-label={ui.verified ? t("actions.unverify") : t("actions.verify")}
+                          aria-pressed={ui.verified}
+                          aria-busy={ui.pendingVerified}
                         >
-                          <FiCheckCircle />
+                          {ui.pendingVerified ? <FiLoader className="animate-spin" /> : ui.verified ? <MdVerified className="text-xl" /> : <MdOutlineVerified className="text-xl" />}
                         </button>
                       </form>
-                      <form action={setBusinessFlag}>
+                      <form action={(formData) => submitFlagChange(formData, business, "featured", ui.featured)}>
                         <input type="hidden" name="businessId" value={business.id} />
                         <input type="hidden" name="field" value="featured" />
-                        <input type="hidden" name="enabled" value={String(!business.featured)} />
+                        <input type="hidden" name="enabled" value={String(!ui.featured)} />
                         <button
                           type="submit"
-                          className={`admin-icon-button grid h-9 w-9 place-items-center rounded-lg border ${business.featured ? "text-amber-400" : ""}`}
-                          title={business.featured ? t("actions.unfeature") : t("actions.feature")}
-                          aria-label={business.featured ? t("actions.unfeature") : t("actions.feature")}
+                          disabled={ui.pendingFeatured}
+                          className={actionToggleClassName(ui.featured, "featured")}
+                          title={ui.featured ? t("actions.unfeature") : t("actions.feature")}
+                          aria-label={ui.featured ? t("actions.unfeature") : t("actions.feature")}
+                          aria-pressed={ui.featured}
+                          aria-busy={ui.pendingFeatured}
                         >
-                          <FiStar />
+                          {ui.pendingFeatured ? <FiLoader className="animate-spin" /> : ui.featured ? <MdStar className="text-xl" /> : <MdStarBorder className="text-xl" />}
                         </button>
                       </form>
                       <Link
@@ -357,7 +460,8 @@ export function AdminBusinessGrid({
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </AdminTable>

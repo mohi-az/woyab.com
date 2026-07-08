@@ -86,6 +86,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             reviews: t("card.reviewsTemplate", { count: "{count}" }),
             unknownLocation: t("card.unknownLocation"),
             distance: t("card.distance", { distance: "{distance}" }),
+            featured: t("card.featured"),
           },
           empty: { title: t("empty.title"), description: t("empty.description") },
           pagination: {

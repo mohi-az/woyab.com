@@ -32,6 +32,7 @@ type BusinessApiItem = {
   isFallback?: boolean;
   averageRating?: number | null;
   reviewCount?: number | null;
+  featured?: boolean;
   category?: {
     nameFa: string;
     nameEn: string;
@@ -250,6 +251,7 @@ export type LatestBusinessCardItem = {
   location?: string | null;
   distanceMeters?: number | null;
   matchedLocationName?: string | null;
+  featured?: boolean;
 };
 
 export type BusinessDetailData = {
@@ -333,6 +335,10 @@ export type CurrentUser = {
 
 const API_BASE = process.env.API_URL ?? "http://localhost:4000";
 
+function booleanFlag(value: unknown) {
+  return value === true || value === "true";
+}
+
 function getLocalizedName(
   locale: string,
   item?: { nameFa: string; nameEn: string } | null,
@@ -381,6 +387,7 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       rating: business.averageRating ?? 0,
       reviewCount: business.reviewCount ?? 0,
       location: getLocalizedName(locale, business.city),
+      featured: booleanFlag(business.featured),
     }));
   } catch {
     return [];
@@ -442,6 +449,7 @@ export async function fetchBusinessDirectory(
         location: localizedBusinessLocation(locale, business),
         distanceMeters: business.distanceMeters,
         matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
+        featured: booleanFlag(business.featured),
       })),
     };
   } catch {
@@ -511,6 +519,7 @@ export async function searchBusinessDirectory(
       location: localizedBusinessLocation(locale, business),
       distanceMeters: business.distanceMeters,
       matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
+      featured: booleanFlag(business.featured),
     })),
   };
 }
@@ -621,7 +630,7 @@ export async function fetchBusinessBySlug(
       rating: business.averageRating ?? 0,
       reviewCount: business.reviewCount ?? 0,
       verified: Boolean(business.verified),
-      featured: Boolean(business.featured),
+      featured: booleanFlag(business.featured),
       hours: (business.businessHours ?? []).map((hour) => ({
         dayOfWeek: hour.dayOfWeek,
         openTime: hour.openTime,

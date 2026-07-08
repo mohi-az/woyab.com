@@ -111,6 +111,7 @@
       "description": "نگاهی سریع به آخرین کسب‌وکارهای فعال اضافه‌شده به دایرکتوری داشته باشید.",
       "cta": "همه کسب‌وکارها",
       "favoriteAction": "افزودن به علاقه‌مندی‌ها",
+      "featured": "ویژه",
       "reviews": "{count, plural, =0 {بدون نظر} one {# نظر} other {# نظر}}",
       "unknownLocation": "موقعیت ثبت نشده"
     }
@@ -149,6 +150,7 @@
       "favorite": "افزودن به علاقه‌مندی‌ها",
       "reviews": "{count, plural, =0 {بدون نظر} one {# نظر} other {# نظر}}",
       "reviewsTemplate": "{count} نظر",
+      "featured": "ویژه",
       "unknownLocation": "موقعیت ثبت نشده",
       "distance": "{distance} کیلومتر فاصله"
     },
@@ -194,6 +196,7 @@
     "pageLabel": "صفحه جزئیات کسب‌وکار",
     "back": "بازگشت به همه کسب‌وکارها",
     "verified": "کسب‌وکار تاییدشده",
+    "featured": "کسب‌وکار ویژه",
     "reviewsCount": "{count, plural, =0 {هنوز نظری ثبت نشده} one {# نظر} other {# نظر}}",
     "established": "از {year}",
     "directions": "مسیریابی",

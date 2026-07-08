@@ -49,6 +49,7 @@ export default async function LatestBusinessesSection() {
             favoriteLabel: t("favoriteAction"),
             reviewsLabel: t("reviews", { count: item.reviewCount ?? 0 }),
             locationFallback: t("unknownLocation"),
+            featuredLabel: t("featured"),
           }))}
         />
 

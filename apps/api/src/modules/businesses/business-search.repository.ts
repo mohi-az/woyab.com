@@ -14,6 +14,7 @@ export type SpatialBusinessMatch = {
   cityNameFa: string | null;
   businessName: string;
   shortDescription: string | null;
+  featured: boolean;
 };
 
 function spatialConditions(input: BusinessSearchBody) {
@@ -102,7 +103,7 @@ export async function findNearbyBusinesses(input: BusinessSearchBody) {
       WITH candidates AS (${candidates})
       SELECT
         "businessId", "locationId", "locationType", "locationName",
-        "cityNameEn", "cityNameFa", "businessName", "shortDescription", "distanceMeters"
+        "cityNameEn", "cityNameFa", "businessName", "shortDescription", "featured", "distanceMeters"
       FROM candidates
       WHERE "locationRank" = 1
       ORDER BY ${orderBy}

@@ -33,6 +33,7 @@ type Labels = {
     reviews: string;
     unknownLocation: string;
     distance: string;
+    featured: string;
   };
   empty: { title: string; description: string };
   pagination: { label: string; previous: string; next: string };
@@ -257,6 +258,7 @@ export function BusinessDirectory({
                         reviewsLabel={labels.card.reviews}
                         locationFallback={labels.card.unknownLocation}
                         distanceLabel={distanceLabel}
+                        featuredLabel={labels.card.featured}
                         isFavorite={favoriteBusinessIds.has(business.businessId)}
                         onFavoriteChange={(saved) => setFavoriteBusinessIds((current) => {
                           const next = new Set(current);

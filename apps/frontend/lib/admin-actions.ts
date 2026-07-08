@@ -2,6 +2,7 @@
 
 import type { BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@fargo/database";
 import { revalidatePath } from "next/cache";
+import { appLocales } from "@/i18n/config";
 import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -128,8 +129,14 @@ async function promoteUserToOwner(tx: Prisma.TransactionClient, userId: string) 
 
 function refreshAdmin() {
   revalidatePath("/admin", "layout");
+  revalidatePath("/admin/businesses");
   revalidatePath("/businesses", "layout");
   revalidatePath("/dashboard", "layout");
+  for (const locale of appLocales) {
+    revalidatePath(`/${locale}/admin`, "layout");
+    revalidatePath(`/${locale}/admin/businesses`);
+    revalidatePath(`/${locale}/businesses`, "layout");
+  }
 }
 
 export async function setBusinessStatus(formData: FormData) {

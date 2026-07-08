@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
-import { FiMapPin, FiNavigation } from "react-icons/fi";
+import { FiMapPin, FiNavigation, FiStar } from "react-icons/fi";
 import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
 import { FavoriteButton } from "@/components/business/FavoriteButton";
@@ -24,6 +24,8 @@ export type BusinessCardProps = {
   locationFallback: string;
   distanceLabel?: string | null;
   matchedLocationName?: string | null;
+  featured?: boolean;
+  featuredLabel?: string;
   isFavorite?: boolean;
   onFavoriteChange?: (saved: boolean) => void;
 };
@@ -58,6 +60,8 @@ export function BusinessCard({
   locationFallback,
   distanceLabel,
   matchedLocationName,
+  featured,
+  featuredLabel = "Featured",
   isFavorite,
   onFavoriteChange,
 }: BusinessCardProps) {
@@ -81,6 +85,12 @@ export function BusinessCard({
           <CategoryIcon iconKey={categoryIconKey} categorySlug={categorySlug} className="shrink-0 text-sm text-primary" />
           <span className="truncate">{categoryName ?? "-"}</span>
         </span>
+        {featured === true ? (
+          <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-black text-slate-950 shadow-lg">
+            <FiStar className="shrink-0" />
+            {featuredLabel}
+          </span>
+        ) : null}
       </div>
 
       <div className="space-y-3 p-5 sm:p-6">

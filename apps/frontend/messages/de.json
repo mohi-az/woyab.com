@@ -111,6 +111,7 @@
       "description": "Ein schneller Blick auf die neuesten aktiven Eintrage im Verzeichnis.",
       "cta": "Alle Unternehmen",
       "favoriteAction": "Zu Favoriten hinzufugen",
+      "featured": "Empfohlen",
       "metaLabel": "Neuer Eintrag",
       "priceRangeLabel": "Preisklasse",
       "reviews": "{count, plural, =0 {Keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
@@ -151,6 +152,7 @@
       "favorite": "Zu Favoriten hinzufügen",
       "reviews": "{count, plural, =0 {Keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
       "reviewsTemplate": "{count} Bewertungen",
+      "featured": "Empfohlen",
       "unknownLocation": "Standort nicht verfügbar",
       "distance": "{distance} km entfernt"
     },
@@ -196,6 +198,7 @@
     "pageLabel": "Unternehmensdetailseite",
     "back": "Zuruck zu allen Unternehmen",
     "verified": "Verifiziertes Unternehmen",
+    "featured": "Empfohlenes Unternehmen",
     "reviewsCount": "{count, plural, =0 {Noch keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
     "established": "Seit {year}",
     "directions": "Route planen",

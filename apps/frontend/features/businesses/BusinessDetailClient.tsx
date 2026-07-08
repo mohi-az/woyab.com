@@ -15,6 +15,7 @@ import {
   FiNavigation,
   FiPhone,
   FiSend,
+  FiStar,
 } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTelegramPlane, FaYoutube } from "react-icons/fa";
 import { MdStar, MdStarBorder } from "react-icons/md";
@@ -263,6 +264,12 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   <span className="inline-flex items-center gap-2 text-emerald-300">
                     <FiCheckCircle />
                     {t("verified")}
+                  </span>
+                ) : null}
+                {business.featured ? (
+                  <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/12 px-3 py-1 text-amber-200">
+                    <FiStar />
+                    {t("featured")}
                   </span>
                 ) : null}
               </div>
