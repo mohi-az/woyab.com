@@ -133,8 +133,9 @@ export function BusinessDirectory({
     if (filters.favoritesOnly) params.set("favoritesOnly", "true");
     if (filters.page > 1) params.set("page", String(filters.page));
     const query = params.toString();
-    window.history.replaceState(null, "", query ? `/businesses?${query}` : "/businesses");
-  }, [filters]);
+    const path = `/${locale}/businesses`;
+    window.history.replaceState(null, "", query ? `${path}?${query}` : path);
+  }, [filters, locale]);
 
   useEffect(() => {
     const controller = new AbortController();

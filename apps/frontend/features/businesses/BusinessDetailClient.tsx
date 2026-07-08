@@ -4,9 +4,10 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
+  FiArrowLeft,
+  FiArrowRight,
   FiCalendar,
   FiCheckCircle,
-  FiClock,
   FiExternalLink,
   FiGlobe,
   FiMail,
@@ -90,15 +91,18 @@ function ReviewAvatar({ user }: { user: BusinessReviewItem["user"] }) {
 export default function BusinessDetailClient({ business, initialReviews }: Props) {
   const t = useTranslations("BusinessDetail");
   const locale = useLocale();
+  const BackIcon = locale === "fa" ? FiArrowRight : FiArrowLeft;
   const directionsHref = buildDirectionsUrl({
     address: business.address,
     city: business.location,
     latitude: business.latitude,
     longitude: business.longitude,
   });
+  const categoryHref = business.categoryId ? `/businesses?categoryId=${business.categoryId}` : null;
+  const cityHref = business.cityId ? `/businesses?cityId=${business.cityId}` : null;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const reviews = initialReviews;
+  const reviews = initialReviews.filter((review) => review.status === "APPROVED");
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({ rating: 0, title: "", comment: "" });
   const [contactForm, setContactForm] = useState<ContactFormState>({
     name: "",
@@ -205,7 +209,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
   async function submitContact(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (contactPending) return;
+    if (!currentUser || contactPending) return;
 
     setContactFeedback(null);
     setContactPending(true);
@@ -241,7 +245,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.96)_0%,rgba(10,18,31,.83)_52%,rgba(10,18,31,.68)_100%)]" />
         <div className="relative mx-auto max-w-[1480px]">
           <Link href="/businesses" className="inline-flex items-center gap-2 text-sm font-bold text-primary-light/90 transition hover:text-white">
-            <FiMapPin className="text-base" />
+            <BackIcon className="text-base" />
             {t("back")}
           </Link>
 
@@ -249,19 +253,39 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             <div className="max-w-4xl">
               <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-slate-300">
                 {business.categoryName ? (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5">
-                    <CategoryIcon iconKey={business.categoryIconKey} categorySlug={business.categorySlug} className="text-primary-light" />
-                    {business.categoryName}
-                  </span>
+                  categoryHref ? (
+                    <Link
+                      href={categoryHref}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 transition hover:border-primary-light/50 hover:bg-white/16 hover:text-white"
+                    >
+                      <CategoryIcon iconKey={business.categoryIconKey} categorySlug={business.categorySlug} className="text-primary-light" />
+                      {business.categoryName}
+                    </Link>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5">
+                      <CategoryIcon iconKey={business.categoryIconKey} categorySlug={business.categorySlug} className="text-primary-light" />
+                      {business.categoryName}
+                    </span>
+                  )
                 ) : null}
                 {business.location ? (
-                  <span className="inline-flex items-center gap-2">
-                    <FiMapPin className="text-primary-light" />
-                    {business.location}
-                  </span>
+                  cityHref ? (
+                    <Link
+                      href={cityHref}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 transition hover:border-primary-light/50 hover:bg-white/16 hover:text-white"
+                    >
+                      <FiMapPin className="text-primary-light" />
+                      {business.location}
+                    </Link>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5">
+                      <FiMapPin className="text-primary-light" />
+                      {business.location}
+                    </span>
+                  )
                 ) : null}
                 {business.verified ? (
-                  <span className="inline-flex items-center gap-2 text-emerald-300">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1.5 text-emerald-200">
                     <FiCheckCircle />
                     {t("verified")}
                   </span>
@@ -352,23 +376,33 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             ) : null}
           </section>
 
-          <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] sm:p-8">
-            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-3xl bg-[#fff7f4] p-5">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{t("stats.rating")}</p>
-                <p className="mt-3 text-3xl font-black text-slate-950">{business.rating.toFixed(1)}</p>
+          <section className="rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.rating")}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{business.rating.toFixed(1)}</p>
               </div>
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{t("stats.reviews")}</p>
-                <p className="mt-3 text-3xl font-black text-slate-950">{business.reviewCount}</p>
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.reviews")}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{reviews.length}</p>
               </div>
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{t("stats.category")}</p>
-                <p className="mt-3 text-lg font-black text-slate-950">{business.categoryName ?? "-"}</p>
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.category")}</p>
+                {business.categoryName ? (
+                  categoryHref ? (
+                    <Link href={categoryHref} className="mt-2 inline-flex text-base font-black text-slate-950 transition hover:text-primary">
+                      {business.categoryName}
+                    </Link>
+                  ) : (
+                    <p className="mt-2 text-base font-black text-slate-950">{business.categoryName}</p>
+                  )
+                ) : (
+                  <p className="mt-2 text-base font-black text-slate-950">-</p>
+                )}
               </div>
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{t("stats.specialty")}</p>
-                <p className="mt-3 text-lg font-black text-slate-950">{business.subCategoryName ?? business.specialtyName ?? "-"}</p>
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.specialty")}</p>
+                <p className="mt-2 text-base font-black text-slate-950">{business.subCategoryName ?? business.specialtyName ?? "-"}</p>
               </div>
             </div>
           </section>
@@ -416,11 +450,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                           <StaticStars rating={review.rating} />
-                          {review.verified ? (
-                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-                              {t("reviewsSection.verified")}
-                            </span>
-                          ) : null}
                           <DirectoryReportButton
                             targetType="review"
                             targetId={review.id}
@@ -470,10 +499,14 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                             key={value}
                             type="button"
                             onClick={() => setReviewForm((current) => ({ ...current, rating: value }))}
-                            className="text-3xl text-amber-400 transition hover:scale-110"
+                            className="inline-flex h-8 w-8 items-center justify-center text-amber-400 transition hover:scale-110 sm:h-9 sm:w-9"
                             aria-label={t("reviewsForm.chooseStars", { count: value })}
                           >
-                            {value <= reviewForm.rating ? <MdStar /> : <MdStarBorder className="text-amber-300" />}
+                            {value <= reviewForm.rating ? (
+                              <MdStar className="h-7 w-7 text-amber-400 drop-shadow-[0_4px_10px_rgba(251,191,36,.28)] sm:h-8 sm:w-8" />
+                            ) : (
+                              <MdStarBorder className="h-7 w-7 text-amber-300 sm:h-8 sm:w-8" />
+                            )}
                           </button>
                         );
                       })}
@@ -485,12 +518,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                       value={reviewForm.title}
                       onChange={(event) => setReviewForm((current) => ({ ...current, title: event.target.value }))}
                       placeholder={t("reviewsForm.titlePlaceholder")}
-                      className="min-h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-primary"
-                    />
-                    <input
-                      value={currentUser.name}
-                      readOnly
-                      className="min-h-12 rounded-2xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-500 outline-none"
+                      className="min-h-12 rounded-2xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-primary sm:col-span-2"
                     />
                   </div>
 
@@ -507,7 +535,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   <button
                     type="submit"
                     disabled={reviewPending}
-                    className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-primary px-6 text-sm font-black text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-primary px-6 text-sm font-black !text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {reviewPending ? t("reviewsForm.submitting") : t("reviewsForm.submit")}
                   </button>
@@ -587,52 +615,63 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               <h2 className="text-2xl font-black text-slate-950">{t("contactForm.title")}</h2>
               <p className="mt-2 text-sm leading-7 text-slate-500">{t("contactForm.description")}</p>
 
-              <form className="mt-5 space-y-4" onSubmit={submitContact}>
-                <input
-                  value={contactForm.name}
-                  onChange={(event) => setContactForm((current) => ({ ...current, name: event.target.value }))}
-                  placeholder={t("contactForm.namePlaceholder")}
-                  className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
-                />
-                <input
-                  type="email"
-                  value={contactForm.email}
-                  onChange={(event) => setContactForm((current) => ({ ...current, email: event.target.value }))}
-                  placeholder={t("contactForm.emailPlaceholder")}
-                  className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
-                />
-                <input
-                  value={contactForm.phone}
-                  onChange={(event) => setContactForm((current) => ({ ...current, phone: event.target.value }))}
-                  placeholder={t("contactForm.phonePlaceholder")}
-                  className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
-                />
-                <textarea
-                  value={contactForm.message}
-                  onChange={(event) => setContactForm((current) => ({ ...current, message: event.target.value }))}
-                  placeholder={t("contactForm.messagePlaceholder")}
-                  rows={6}
-                  className="w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary"
-                />
+              {currentUser ? (
+                <form className="mt-5 space-y-4" onSubmit={submitContact}>
+                  <input
+                    value={contactForm.name}
+                    onChange={(event) => setContactForm((current) => ({ ...current, name: event.target.value }))}
+                    placeholder={t("contactForm.namePlaceholder")}
+                    className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
+                  />
+                  <input
+                    type="email"
+                    value={contactForm.email}
+                    onChange={(event) => setContactForm((current) => ({ ...current, email: event.target.value }))}
+                    placeholder={t("contactForm.emailPlaceholder")}
+                    className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
+                  />
+                  <input
+                    value={contactForm.phone}
+                    onChange={(event) => setContactForm((current) => ({ ...current, phone: event.target.value }))}
+                    placeholder={t("contactForm.phonePlaceholder")}
+                    className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 text-sm outline-none transition focus:border-primary"
+                  />
+                  <textarea
+                    value={contactForm.message}
+                    onChange={(event) => setContactForm((current) => ({ ...current, message: event.target.value }))}
+                    placeholder={t("contactForm.messagePlaceholder")}
+                    rows={6}
+                    className="w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary"
+                  />
 
-                {contactFeedback ? <p className="text-sm font-medium text-slate-600">{contactFeedback}</p> : null}
+                  {contactFeedback ? <p className="text-sm font-medium text-slate-600">{contactFeedback}</p> : null}
 
-                <button
-                  type="submit"
-                  disabled={contactPending}
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-sm font-black text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <FiSend />
-                  {contactPending ? t("contactForm.sending") : t("contactForm.submit")}
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    disabled={contactPending}
+                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-sm font-black !text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 [&_*]:!text-white"
+                  >
+                    <FiSend />
+                    {contactPending ? t("contactForm.sending") : t("contactForm.submit")}
+                  </button>
+                </form>
+              ) : (
+                <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-3 rounded-3xl border border-dashed border-slate-200 bg-white px-5 py-6 text-sm leading-7 text-slate-600">
+                  <span>{t("reviewsForm.loginRequired")}</span>
+                  <Link href="/login" className="font-black text-primary transition hover:text-primary-dark">
+                    {t("reviewsForm.loginAction")}
+                  </Link>
+                </div>
+              )}
             </section>
           ) : null}
 
           <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
             <div className="flex items-center gap-3">
-              <FiClock className="text-xl text-primary" />
-              <h2 className="text-2xl font-black text-slate-950">{t("hoursTitle")}</h2>
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <FiCalendar className="text-lg" />
+              </span>
+              <h2 className="leading-none text-2xl font-black text-slate-950">{t("hoursTitle")}</h2>
             </div>
 
             <div className="mt-5 space-y-3">

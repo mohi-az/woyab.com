@@ -3,7 +3,6 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { auth } from "@/auth";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { LocaleObserver } from "@/components/i18n/LocaleObserver";
 import { AuthProvider } from "@/components/auth/AuthProvider";
@@ -64,7 +63,6 @@ export default async function RootLayout({
             <ServiceWorkerRegistration />
             <Navbar />
             <main className="flex-1 pt-16 lg:pt-[4.75rem]">{children}</main>
-            <Footer />
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

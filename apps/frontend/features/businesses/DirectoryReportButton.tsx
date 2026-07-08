@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
-import { FiFlag, FiX } from "react-icons/fi";
+import { FiAlertTriangle, FiX } from "react-icons/fi";
 import type { CurrentUser } from "@/lib/api";
 
 type ReportReason =
@@ -56,6 +56,7 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
   const [pending, setPending] = useState(false);
 
   const isHero = variant === "hero";
+  const buttonLabel = submitted ? t("submittedButton") : targetType === "business" ? t("buttonBusiness") : t("buttonReview");
 
   function close() {
     if (pending) return;
@@ -192,9 +193,9 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
             <button
               type="submit"
               disabled={pending}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black !text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 [&_*]:!text-white"
             >
-              <FiFlag />
+              <FiAlertTriangle />
               {pending ? t("submitting") : t("submit")}
             </button>
           </div>
@@ -205,19 +206,27 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          if (!submitted) setOpen(true);
-        }}
-        disabled={submitted}
-        className={isHero
-          ? "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-black text-white transition hover:bg-white/15 disabled:cursor-default disabled:opacity-75"
-          : "inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-500 transition hover:border-rose-200 hover:text-rose-600 disabled:cursor-default disabled:border-emerald-100 disabled:text-emerald-700"}
-      >
-        <FiFlag />
-        {submitted ? t("submittedButton") : targetType === "business" ? t("buttonBusiness") : t("buttonReview")}
-      </button>
+      <span className="group relative inline-flex">
+        <button
+          type="button"
+          onClick={() => {
+            if (!submitted) setOpen(true);
+          }}
+          disabled={submitted}
+          aria-label={buttonLabel}
+          className={isHero
+            ? "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-black text-white transition hover:bg-white/15 disabled:cursor-default disabled:opacity-75"
+            : "inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:cursor-default disabled:border-emerald-100 disabled:text-emerald-700"}
+        >
+          <FiAlertTriangle />
+          {isHero ? buttonLabel : <span className="sr-only">{buttonLabel}</span>}
+        </button>
+        {!isHero ? (
+          <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-bold text-white shadow-lg group-hover:block group-focus-within:block">
+            {buttonLabel}
+          </span>
+        ) : null}
+      </span>
       {feedback && !open ? (
         <span className={isHero ? "text-sm font-bold text-emerald-200" : "text-xs font-bold text-emerald-700"}>
           {feedback}

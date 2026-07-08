@@ -1,10 +1,13 @@
-import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { FaClipboardList } from "react-icons/fa";
 import { FiArrowRight, FiClock, FiMail, FiMapPin } from "react-icons/fi";
-import { Link } from "@/i18n/navigation";
+import { isAppLocale, localizePathname } from "@/i18n/config";
 
 export default async function Footer() {
-  const t = await getTranslations("Footer");
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Footer")]);
+  const appLocale = isAppLocale(locale) ? locale : "de";
+  const href = (pathname: string) => localizePathname(pathname, appLocale);
 
   return (
     <footer className="relative overflow-hidden bg-[#111827] text-white">
@@ -13,7 +16,7 @@ export default async function Footer() {
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 lg:grid-cols-[1.3fr_.75fr_.9fr_1.25fr] lg:gap-12 lg:py-20">
         <div>
-          <Link href="/" className="inline-flex items-center gap-3 text-2xl font-black">
+          <Link href={href("/")} className="inline-flex items-center gap-3 text-2xl font-black">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white">
               <FaClipboardList />
             </span>
@@ -25,8 +28,8 @@ export default async function Footer() {
         <div>
           <h2 className="text-lg font-extrabold">{t("linksTitle")}</h2>
           <nav className="mt-5 flex flex-col items-start gap-3 text-sm text-slate-300">
-            <Link href="/" className="transition hover:text-white">{t("home")}</Link>
-            <Link href="/businesses" className="transition hover:text-white">{t("businesses")}</Link>
+            <Link href={href("/")} className="transition hover:text-white">{t("home")}</Link>
+            <Link href={href("/businesses")} className="transition hover:text-white">{t("businesses")}</Link>
           </nav>
         </div>
 

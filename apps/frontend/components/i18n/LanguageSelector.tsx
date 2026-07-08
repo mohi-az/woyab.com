@@ -110,7 +110,7 @@ export function LanguageSelector({
         <button
           type="button"
           className={cn(
-            "btn btn-ghost btn-sm gap-1.5 font-medium text-gray-600 hover:text-primary",
+            "inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold text-gray-600 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-60",
             triggerClassName,
           )}
           aria-label={t("label")}

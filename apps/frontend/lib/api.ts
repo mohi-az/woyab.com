@@ -269,10 +269,12 @@ export type BusinessDetailData = {
     caption?: string | null;
   }>;
   categoryName?: string | null;
+  categoryId?: number | null;
   categorySlug?: string | null;
   categoryIconKey?: string | null;
   subCategoryName?: string | null;
   specialtyName?: string | null;
+  cityId?: number | null;
   location?: string | null;
   address?: string | null;
   latitude?: number | null;
@@ -604,10 +606,12 @@ export async function fetchBusinessBySlug(
       coverImageUrl: business.coverImageUrl,
       gallery,
       categoryName: localizedText(locale, business.category),
+      categoryId: business.category?.id,
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
       subCategoryName: localizedText(locale, business.subCategory),
       specialtyName: localizedText(locale, business.specialty),
+      cityId: business.city?.id,
       location: localizedText(locale, business.city),
       address: business.address,
       latitude: business.latitude,
