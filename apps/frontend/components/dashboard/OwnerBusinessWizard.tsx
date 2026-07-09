@@ -1,11 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
-import { FiBriefcase, FiCheck, FiChevronLeft, FiChevronRight, FiClock, FiGlobe, FiMapPin, FiTag } from "react-icons/fi";
+import { useLocale, useTranslations } from "next-intl";
+import { FiBriefcase, FiCheck, FiChevronLeft, FiChevronRight, FiClock, FiGlobe, FiMapPin, FiSliders, FiTag } from "react-icons/fi";
 import { createOwnerBusiness } from "@/lib/owner-actions";
+import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
+import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor } from "@/components/dashboard/BusinessHoursEditor";
 import { BusinessLocationPicker } from "@/components/location/BusinessLocationPicker";
+import type { BusinessAttributeDefinition } from "@/lib/business-attributes";
+import type { BusinessTagOption } from "@/lib/business-tags";
 
 type Option = {
   id: number;
@@ -26,12 +30,16 @@ type Props = {
   subCategories: SubCategoryOption[];
   specialties: SpecialtyOption[];
   cities: Option[];
+  attributeDefinitions: BusinessAttributeDefinition[];
+  tagOptions: BusinessTagOption[];
 };
 
 const steps = [
   { titleKey: "ownerSteps.identity", icon: FiBriefcase },
   { titleKey: "ownerSteps.category", icon: FiTag },
   { titleKey: "ownerSteps.content", icon: FiGlobe },
+  { titleKey: "features", icon: FiSliders },
+  { titleKey: "tags", icon: FiTag },
   { titleKey: "ownerSteps.location", icon: FiMapPin },
   { titleKey: "ownerSteps.hours", icon: FiClock },
 ] as const;
@@ -65,8 +73,21 @@ function Field({ label, children, required }: { label: string; children: React.R
 const inputClass = "min-h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-primary";
 const textareaClass = "min-h-28 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none transition focus:border-primary";
 
-export function OwnerBusinessWizard({ categories, subCategories, specialties, cities }: Props) {
+function localizedFeatureText(locale: string) {
+  if (locale === "fa") return "\u0627\u0645\u06a9\u0627\u0646\u0627\u062a";
+  if (locale === "fa") return "امکانات";
+  if (locale === "de") return "Ausstattung";
+  return "Amenities and features";
+}
+
+function localizedTagText(locale: string) {
+  if (locale === "fa") return "\u0628\u0631\u0686\u0633\u0628\u200c\u0647\u0627";
+  return "Tags";
+}
+
+export function OwnerBusinessWizard({ categories, subCategories, specialties, cities, attributeDefinitions, tagOptions }: Props) {
   const tHours = useTranslations("BusinessHours");
+  const locale = useLocale();
   const [step, setStep] = useState(0);
   const [sourceLocale, setSourceLocale] = useState<"DE" | "EN" | "FA">("DE");
   const [businessName, setBusinessName] = useState("");
@@ -101,7 +122,7 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/12">
                   {complete ? <FiCheck /> : <Icon />}
                 </span>
-                <span className="text-sm font-black">{tHours(item.titleKey)}</span>
+                <span className="text-sm font-black">{item.titleKey === "features" ? localizedFeatureText(locale) : item.titleKey === "tags" ? localizedTagText(locale) : tHours(item.titleKey)}</span>
               </button>
             );
           })}
@@ -180,12 +201,24 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
         </section>
 
         <section className={step === 3 ? "grid gap-4" : "hidden"}>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            {step === 3 ? <BusinessLocationPicker /> : null}
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <BusinessAttributeFields definitions={attributeDefinitions} />
           </div>
         </section>
 
         <section className={step === 4 ? "grid gap-4" : "hidden"}>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <BusinessTagFields tags={tagOptions} />
+          </div>
+        </section>
+
+        <section className={step === 5 ? "grid gap-4" : "hidden"}>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            {step === 5 ? <BusinessLocationPicker /> : null}
+          </div>
+        </section>
+
+        <section className={step === 6 ? "grid gap-4" : "hidden"}>
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <BusinessHoursEditor />
           </div>

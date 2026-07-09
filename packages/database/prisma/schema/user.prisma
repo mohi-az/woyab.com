@@ -1,29 +1,30 @@
 model User {
-  id                                                        String                 @id @default(cuid())
-  phone                                                     String?                @unique
-  email                                                     String?                @unique
-  name                                                      String?
-  avatarUrl                                                 String?
-  role                                                      UserRole               @default(USER)
-  active                                                    Boolean                @default(true)
-  createdAt                                                 DateTime               @default(now())
-  updatedAt                                                 DateTime               @updatedAt
-  emailVerified                                             DateTime?
-  passwordHash                                              String?
-  passwordChangedAt                                         DateTime?
-  authVersion                                               Int                    @default(0)
-  admin_audit_logs                                          admin_audit_logs[]
-  admin_settings                                            admin_settings[]
-  business_claims_business_claims_claimantUserIdTousers     business_claims[]      @relation("business_claims_claimantUserIdTousers")
-  business_claims_business_claims_reviewedByIdTousers       business_claims[]      @relation("business_claims_reviewedByIdTousers")
-  businesses                                                Business[]
-  directory_reports_directory_reports_reporterUserIdTousers directory_reports[]    @relation("directory_reports_reporterUserIdTousers")
-  directory_reports_directory_reports_resolvedByIdTousers   directory_reports[]    @relation("directory_reports_resolvedByIdTousers")
-  favorites                                                 favorites[]
-  review_owner_replies                                      review_owner_replies[]
-  reviews                                                   Review[]
-  support_tickets_support_tickets_assignedToIdTousers       support_tickets[]      @relation("support_tickets_assignedToIdTousers")
-  support_tickets_support_tickets_userIdTousers             support_tickets[]      @relation("support_tickets_userIdTousers")
+  id                       String              @id @default(cuid())
+  phone                    String?             @unique
+  email                    String?             @unique
+  name                     String?
+  avatarUrl                String?
+  role                     UserRole            @default(USER)
+  active                   Boolean             @default(true)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  emailVerified            DateTime?
+  passwordHash             String?
+  passwordChangedAt        DateTime?
+  authVersion              Int                 @default(0)
+  adminAuditLogs           AdminAuditLog[]
+  adminSettings            AdminSetting[]
+  businessClaims           BusinessClaim[]     @relation("BusinessClaimClaimant")
+  reviewedBusinessClaims   BusinessClaim[]     @relation("BusinessClaimReviewer")
+  businesses               Business[]
+  directoryReports         DirectoryReport[]   @relation("DirectoryReportReporter")
+  resolvedDirectoryReports DirectoryReport[]   @relation("DirectoryReportResolver")
+  favorites                Favorite[]
+  reviewOwnerReplies       ReviewOwnerReply[]
+  reviews                  Review[]
+  assignedSupportTickets   SupportTicket[]     @relation("SupportTicketAssignee")
+  supportTickets           SupportTicket[]     @relation("SupportTicketUser")
+  savedLocations           UserSavedLocation[]
 
   @@map("users")
 }

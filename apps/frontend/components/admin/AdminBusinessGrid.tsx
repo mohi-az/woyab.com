@@ -9,8 +9,12 @@ import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
+import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
+import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor, type BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
 import { BusinessLocationPicker } from "@/components/location/BusinessLocationPicker";
+import type { BusinessAttributeDefinition, BusinessAttributeValue } from "@/lib/business-attributes";
+import type { BusinessTagOption, BusinessTagValue } from "@/lib/business-tags";
 
 const statuses = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"] as const;
 const locales = ["DE", "EN", "FA"] as const;
@@ -74,6 +78,8 @@ export type AdminBusinessRow = {
   city: Option;
   owner: { name: string | null; email: string | null } | null;
   translations: Translation[];
+  attributes: BusinessAttributeValue[];
+  tags: BusinessTagValue[];
 };
 
 type Props = {
@@ -86,6 +92,8 @@ type Props = {
   specialties: SpecialtyOption[];
   cities: Option[];
   ownerOptions: OwnerOption[];
+  attributeDefinitions: BusinessAttributeDefinition[];
+  tagOptions: BusinessTagOption[];
   canCreate: boolean;
   previousHref: string;
   nextHref: string;
@@ -125,12 +133,26 @@ function stepForField(field: string) {
   if (["slug", "sourceLocale", "status"].includes(field)) return 0;
   if (["categoryId", "cityId"].includes(field)) return 1;
   if (field.startsWith("businessName_")) return 2;
-  if (field.startsWith("hours_")) return 4;
+  if (field.startsWith("attribute_")) return 3;
+  if (field === "tagIds") return 4;
+  if (field.startsWith("hours_")) return 6;
   return 0;
 }
 
 function requiredLabel(label: string) {
   return <span>{label} <span className="text-rose-400">*</span></span>;
+}
+
+function localizedFeatureText(locale: string) {
+  if (locale === "fa") return "\u0627\u0645\u06a9\u0627\u0646\u0627\u062a";
+  if (locale === "fa") return "امکانات";
+  if (locale === "de") return "Ausstattung";
+  return "Amenities and features";
+}
+
+function localizedTagText(locale: string) {
+  if (locale === "fa") return "\u0628\u0631\u0686\u0633\u0628\u200c\u0647\u0627";
+  return "Tags";
 }
 
 function actionToggleClassName(active: boolean, tone: "verified" | "featured") {
@@ -170,6 +192,8 @@ export function AdminBusinessGrid({
   specialties,
   cities,
   ownerOptions,
+  attributeDefinitions,
+  tagOptions,
   canCreate,
   previousHref,
   nextHref,
@@ -190,7 +214,9 @@ export function AdminBusinessGrid({
   const modalTranslations = useMemo(() => translationMap(editing), [editing]);
   const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
-  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.classification"), t("businessWizard.translations"), t("businessWizard.location"), t("businessWizard.hours")];
+  const featureText = localizedFeatureText(locale);
+  const tagText = localizedTagText(locale);
+  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.classification"), t("businessWizard.translations"), featureText, tagText, t("businessWizard.location"), t("businessWizard.hours")];
 
   function uiStateFor(business: AdminBusinessRow): RowUiState {
     return rowUiStates[business.id] ?? {
@@ -595,8 +621,30 @@ export function AdminBusinessGrid({
 
                 <section className={wizardStep === 3 ? "grid gap-4" : "hidden"}>
                   <fieldset className="admin-field-panel rounded-lg border p-4">
+                    <legend className="px-2 text-xs font-black text-sky-200">{featureText}</legend>
+                    <BusinessAttributeFields
+                      variant="admin"
+                      definitions={attributeDefinitions}
+                      values={editing?.attributes ?? []}
+                    />
+                  </fieldset>
+                </section>
+
+                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
+                  <fieldset className="admin-field-panel rounded-lg border p-4">
+                    <legend className="px-2 text-xs font-black text-sky-200">{tagText}</legend>
+                    <BusinessTagFields
+                      variant="admin"
+                      tags={tagOptions}
+                      values={editing?.tags ?? []}
+                    />
+                  </fieldset>
+                </section>
+
+                <section className={wizardStep === 5 ? "grid gap-4" : "hidden"}>
+                  <fieldset className="admin-field-panel rounded-lg border p-4">
                     <legend className="px-2 text-xs font-black text-sky-200">{t("location.title")}</legend>
-                    {wizardStep === 3 ? (
+                    {wizardStep === 5 ? (
                       <BusinessLocationPicker
                         defaultAddress={editing?.address}
                         defaultLatitude={editing?.latitude}
@@ -606,7 +654,7 @@ export function AdminBusinessGrid({
                   </fieldset>
                 </section>
 
-                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
+                <section className={wizardStep === 6 ? "grid gap-4" : "hidden"}>
                   <fieldset className="admin-field-panel rounded-lg border p-4">
                     <legend className="px-2 text-xs font-black text-sky-200">{tHours("title")}</legend>
                     <BusinessHoursEditor variant="admin" defaultHours={editing?.businessHours ?? []} />

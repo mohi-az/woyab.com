@@ -166,7 +166,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
 
       // Add user location control
       class UserLocationControl {
-        onAdd(_map: mapboxgl.Map) {
+        onAdd() {
           const container = document.createElement("div");
           container.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
           
@@ -405,11 +405,13 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
       }
     });
 
+    const savedMarkers = savedMarkersRef.current;
+
     return () => {
       cancelled = true;
       popupRef.current?.remove();
-      savedMarkersRef.current.forEach((marker) => marker.remove());
-      savedMarkersRef.current.clear();
+      savedMarkers.forEach((marker) => marker.remove());
+      savedMarkers.clear();
       mapRef.current?.remove();
       mapRef.current = null;
     };

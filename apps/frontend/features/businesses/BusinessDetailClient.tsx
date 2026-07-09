@@ -16,6 +16,7 @@ import {
   FiNavigation,
   FiPhone,
   FiSend,
+  FiSliders,
   FiStar,
 } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTelegramPlane, FaYoutube } from "react-icons/fa";
@@ -74,6 +75,17 @@ function formatReviewDate(value: string, locale: string) {
     month: "long",
     day: "numeric",
   }).format(new Date(value));
+}
+
+function formatAttributeValue(attribute: BusinessDetailData["attributes"][number]) {
+  if (attribute.dataType === "BOOLEAN") return attribute.label;
+  return `${attribute.label}: ${attribute.value}`;
+}
+
+function localizedTagTitle(locale: string) {
+  if (locale === "fa") return "برچسب‌ها";
+  if (locale === "de") return "Tags";
+  return "Tags";
 }
 
 function ReviewAvatar({ user }: { user: BusinessReviewItem["user"] }) {
@@ -416,12 +428,15 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             )}
 
             {business.tags.length ? (
-              <div className="mt-8 flex flex-wrap gap-3">
-                {business.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700">
-                    {tag}
-                  </span>
-                ))}
+              <div className="mt-8">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{localizedTagTitle(locale)}</p>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {business.tags.map((tag) => (
+                    <span key={tag} className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             ) : null}
           </section>
@@ -663,6 +678,26 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   </Link>
                 </div>
               )}
+            </section>
+          ) : null}
+
+          {business.attributes.length ? (
+            <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <FiSliders className="text-lg" />
+                </span>
+                <h2 className="leading-none text-2xl font-black text-slate-950">{locale === "fa" ? "امکانات" : locale === "de" ? "Ausstattung" : "Amenities"}</h2>
+              </div>
+
+              <div className="mt-5 grid gap-3">
+                {business.attributes.map((attribute) => (
+                  <div key={attribute.id} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+                    <FiCheckCircle className="shrink-0 text-primary" />
+                    <span>{formatAttributeValue(attribute)}</span>
+                  </div>
+                ))}
+              </div>
             </section>
           ) : null}
 

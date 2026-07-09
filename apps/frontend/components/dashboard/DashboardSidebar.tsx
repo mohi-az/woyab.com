@@ -47,7 +47,11 @@ export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }
     <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-28">
       <div className="flex items-center gap-3 border-b border-slate-100 px-3 pb-4">
         {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt={displayName} className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/15" />
+          <span
+            aria-label={displayName}
+            className="h-12 w-12 rounded-full bg-cover bg-center ring-2 ring-primary/15"
+            style={{ backgroundImage: `url(${user.avatarUrl})` }}
+          />
         ) : (
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-black text-primary">
             {initials}

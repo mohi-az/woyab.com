@@ -7,52 +7,55 @@ model spatial_ref_sys {
   proj4text String? @db.VarChar(2048)
 }
 
-model admin_audit_logs {
-  id         String   @id
+model AdminAuditLog {
+  id         String   @id @default(cuid())
   actorId    String?
   action     String
   entityType String
   entityId   String?
   metadata   Json?
   createdAt  DateTime @default(now())
-  users      User?    @relation(fields: [actorId], references: [id])
+  actor      User?    @relation(fields: [actorId], references: [id])
 
   @@index([actorId])
   @@index([createdAt])
   @@index([entityType, entityId])
+  @@map("admin_audit_logs")
 }
 
-model admin_settings {
+model AdminSetting {
   key         String   @id
   value       Json
   updatedById String?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
-  users       User?    @relation(fields: [updatedById], references: [id])
+  updatedAt   DateTime @default(now()) @updatedAt
+  updatedBy   User?    @relation(fields: [updatedById], references: [id])
 
   @@index([updatedById])
+  @@map("admin_settings")
 }
 
-model business_claims {
-  id                                          String                @id
-  businessId                                  String
-  claimantUserId                              String?
-  claimantName                                String
-  claimantEmail                               String
-  claimantPhone                               String?
-  message                                     String?
-  status                                      business_claim_status @default(PENDING)
-  reviewedById                                String?
-  reviewedAt                                  DateTime?
-  createdAt                                   DateTime              @default(now())
-  updatedAt                                   DateTime
-  businesses                                  Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  users_business_claims_claimantUserIdTousers User?                 @relation("business_claims_claimantUserIdTousers", fields: [claimantUserId], references: [id])
-  users_business_claims_reviewedByIdTousers   User?                 @relation("business_claims_reviewedByIdTousers", fields: [reviewedById], references: [id])
+model BusinessClaim {
+  id             String                @id @default(cuid())
+  businessId     String
+  claimantUserId String?
+  claimantName   String
+  claimantEmail  String
+  claimantPhone  String?
+  message        String?
+  status         business_claim_status @default(PENDING)
+  reviewedById   String?
+  reviewedAt     DateTime?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @default(now()) @updatedAt
+  business       Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  claimant       User?                 @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id])
+  reviewedBy     User?                 @relation("BusinessClaimReviewer", fields: [reviewedById], references: [id])
 
   @@index([businessId])
   @@index([claimantUserId])
   @@index([status])
+  @@map("business_claims")
 }
 
 model business_location_hours {
@@ -95,21 +98,22 @@ model business_locations {
   @@index([districtId])
 }
 
-model business_view_daily {
-  id         String   @id
+model BusinessViewDaily {
+  id         String   @id @default(cuid())
   businessId String
   day        DateTime
   views      Int      @default(0)
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now())
-  businesses Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  updatedAt  DateTime @default(now()) @updatedAt
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@unique([businessId, day])
   @@index([day])
+  @@map("business_view_daily")
 }
 
-model contact_messages {
-  id           String                 @id
+model ContactMessage {
+  id           String                 @id @default(cuid())
   businessId   String
   name         String
   email        String
@@ -118,81 +122,97 @@ model contact_messages {
   status       contact_message_status @default(NEW)
   deliveryMode String?
   createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @default(now())
-  businesses   Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  updatedAt    DateTime               @default(now()) @updatedAt
+  business     Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([status])
+  @@map("contact_messages")
 }
 
-model directory_reports {
-  id                                            String                  @id
-  businessId                                    String?
-  reviewId                                      String?
-  reporterUserId                                String?
-  reason                                        String
-  message                                       String?
-  status                                        directory_report_status @default(OPEN)
-  resolvedById                                  String?
-  resolvedAt                                    DateTime?
-  createdAt                                     DateTime                @default(now())
-  updatedAt                                     DateTime                @default(now())
-  businesses                                    Business?               @relation(fields: [businessId], references: [id])
-  users_directory_reports_reporterUserIdTousers User?                   @relation("directory_reports_reporterUserIdTousers", fields: [reporterUserId], references: [id])
-  users_directory_reports_resolvedByIdTousers   User?                   @relation("directory_reports_resolvedByIdTousers", fields: [resolvedById], references: [id])
-  reviews                                       Review?                 @relation(fields: [reviewId], references: [id])
+model DirectoryReport {
+  id             String                  @id @default(cuid())
+  businessId     String?
+  reviewId       String?
+  reporterUserId String?
+  reporterName   String?
+  reporterEmail  String?
+  reasonCode     directory_report_reason @default(OTHER)
+  reason         String
+  message        String?
+  status         directory_report_status @default(OPEN)
+  targetUrl      String?
+  targetSnapshot Json?
+  resolvedById   String?
+  resolvedAt     DateTime?
+  moderatorNote  String?
+  decisionReason String?
+  actionTaken    String?
+  notifiedAt     DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @default(now()) @updatedAt
+  business       Business?               @relation(fields: [businessId], references: [id])
+  reporter       User?                   @relation("DirectoryReportReporter", fields: [reporterUserId], references: [id])
+  resolvedBy     User?                   @relation("DirectoryReportResolver", fields: [resolvedById], references: [id])
+  review         Review?                 @relation(fields: [reviewId], references: [id])
 
   @@index([businessId])
+  @@index([createdAt])
   @@index([reporterUserId])
+  @@index([reasonCode])
   @@index([reviewId])
   @@index([status])
+  @@map("directory_reports")
 }
 
-model favorites {
+model Favorite {
   userId     String
   businessId String
   createdAt  DateTime @default(now())
-  businesses Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  users      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, businessId])
   @@index([businessId])
+  @@map("favorites")
 }
 
-model review_owner_replies {
-  id        String   @id
+model ReviewOwnerReply {
+  id        String   @id @default(cuid())
   reviewId  String   @unique
   ownerId   String?
   content   String
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  users     User?    @relation(fields: [ownerId], references: [id])
-  reviews   Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @default(now()) @updatedAt
+  owner     User?    @relation(fields: [ownerId], references: [id])
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
+  @@map("review_owner_replies")
 }
 
-model support_tickets {
-  id                                        String                  @id
-  userId                                    String?
-  subject                                   String
-  message                                   String
-  status                                    support_ticket_status   @default(OPEN)
-  priority                                  support_ticket_priority @default(NORMAL)
-  assignedToId                              String?
-  createdAt                                 DateTime                @default(now())
-  updatedAt                                 DateTime                @default(now())
-  users_support_tickets_assignedToIdTousers User?                   @relation("support_tickets_assignedToIdTousers", fields: [assignedToId], references: [id])
-  users_support_tickets_userIdTousers       User?                   @relation("support_tickets_userIdTousers", fields: [userId], references: [id])
+model SupportTicket {
+  id           String                  @id @default(cuid())
+  userId       String?
+  subject      String
+  message      String
+  status       support_ticket_status   @default(OPEN)
+  priority     support_ticket_priority @default(NORMAL)
+  assignedToId String?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @default(now()) @updatedAt
+  assignedTo   User?                   @relation("SupportTicketAssignee", fields: [assignedToId], references: [id])
+  user         User?                   @relation("SupportTicketUser", fields: [userId], references: [id])
 
   @@index([assignedToId])
   @@index([status])
   @@index([userId])
+  @@map("support_tickets")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model user_saved_locations {
-  id              String              @id
+model UserSavedLocation {
+  id              String              @id @default(cuid())
   userId          String              @unique(map: "user_saved_locations_one_default", where: raw("(\"isDefault\" = true)"))
   label           String
   icon            saved_location_icon @default(OTHER)
@@ -208,10 +228,12 @@ model user_saved_locations {
   isDefault       Boolean             @default(false)
   sortOrder       Int                 @default(0)
   createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @default(now())
+  updatedAt       DateTime            @default(now()) @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, label])
   @@index([userId])
+  @@map("user_saved_locations")
 }
 
 enum business_claim_status {
@@ -237,6 +259,17 @@ enum directory_report_status {
   REVIEWING
   RESOLVED
   DISMISSED
+}
+
+enum directory_report_reason {
+  SPAM
+  FAKE_OR_MANIPULATED
+  WRONG_BUSINESS
+  ILLEGAL_CONTENT
+  PERSONAL_DATA
+  HATE_OR_HARASSMENT
+  COPYRIGHT
+  OTHER
 }
 
 enum location_provider {

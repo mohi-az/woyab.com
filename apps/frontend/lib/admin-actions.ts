@@ -1,9 +1,11 @@
 "use server";
 
-import type { BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@fargo/database";
+import type { AttributeDataType, BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@fargo/database";
 import { revalidatePath } from "next/cache";
 import { appLocales } from "@/i18n/config";
 import { requireAdmin } from "@/lib/admin-auth";
+import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
+import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 
 const businessStatuses: BusinessStatus[] = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"];
@@ -11,6 +13,9 @@ const reviewStatuses: ReviewStatus[] = ["PENDING", "APPROVED", "REJECTED"];
 const userRoles: UserRole[] = ["USER", "OWNER", "ADMIN", "SUPER_ADMIN"];
 const claimStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
 const daysOfWeek: DayOfWeek[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+const attributeDataTypes: AttributeDataType[] = ["TEXT", "NUMBER", "BOOLEAN"];
+
+type TaxonomyEntity = "category" | "subcategory" | "specialty" | "tag" | "feature";
 
 function value(formData: FormData, key: string) {
   const raw = formData.get(key);
@@ -38,6 +43,82 @@ function numberValue(formData: FormData, key: string) {
   if (!raw) return null;
   const parsed = Number(raw);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function slugValue(formData: FormData, key: string) {
+  const raw = value(formData, key);
+  if (!raw || !/^[a-z0-9-]+$/.test(raw)) return "";
+  return raw;
+}
+
+function keyValue(formData: FormData, key: string) {
+  const raw = value(formData, key);
+  if (!raw || !/^[a-z0-9_]+$/.test(raw)) return "";
+  return raw;
+}
+
+function prismaErrorCode(error: unknown) {
+  if (error && typeof error === "object" && "code" in error && typeof error.code === "string") return error.code;
+  return "";
+}
+
+function prismaErrorTarget(error: unknown) {
+  if (error && typeof error === "object" && "meta" in error && error.meta && typeof error.meta === "object" && "target" in error.meta) {
+    return error.meta.target;
+  }
+  return undefined;
+}
+
+function targetIncludes(error: unknown, field: string) {
+  const target = prismaErrorTarget(error);
+  if (Array.isArray(target)) return target.includes(field);
+  return String(target ?? "").includes(field);
+}
+
+function taxonomyActionError(error: unknown, entity: TaxonomyEntity) {
+  if (error instanceof Error && !prismaErrorCode(error)) return error;
+
+  const labels: Record<TaxonomyEntity, string> = {
+    category: "دسته",
+    subcategory: "زیر‌دسته",
+    specialty: "تخصص",
+    tag: "برچسب",
+    feature: "امکان",
+  };
+  const label = labels[entity];
+  const code = prismaErrorCode(error);
+
+  if (code === "P2002") {
+    if (targetIncludes(error, "key")) return new Error("این کلید قبلا ثبت شده است. یک کلید یکتا وارد کنید.");
+    if (targetIncludes(error, "slug")) return new Error("این اسلاگ قبلا ثبت شده است. یک اسلاگ یکتا وارد کنید.");
+    return new Error(`این ${label} قبلا با مقدار مشابه ثبت شده است.`);
+  }
+
+  if (code === "P2025") return new Error(`${label} پیدا نشد یا قبلا حذف شده است.`);
+  if (code === "P2003") return new Error(`این ${label} در بخش‌های دیگر استفاده شده و فعلا قابل حذف نیست.`);
+
+  return new Error(`عملیات ${label} انجام نشد. لطفا دوباره تلاش کنید.`);
+}
+
+function attributeDefinitionData(formData: FormData) {
+  const key = keyValue(formData, "key");
+  const labelFa = value(formData, "labelFa");
+  const dataType = value(formData, "dataType") as AttributeDataType;
+  if (!key || !labelFa || !attributeDataTypes.includes(dataType)) {
+    throw new Error("کلید، عنوان فارسی و نوع امکان را درست وارد کنید.");
+  }
+
+  return {
+    key,
+    labelFa,
+    labelEn: nullableValue(formData, "labelEn"),
+    labelDe: nullableValue(formData, "labelDe"),
+    dataType,
+    unit: null,
+    options: null,
+    sortOrder: intValue(formData, "sortOrder") ?? 0,
+    active: booleanValue(formData, "active"),
+  };
 }
 
 function businessHoursCreateData(formData: FormData) {
@@ -130,11 +211,13 @@ async function promoteUserToOwner(tx: Prisma.TransactionClient, userId: string) 
 function refreshAdmin() {
   revalidatePath("/admin", "layout");
   revalidatePath("/admin/businesses");
+  revalidatePath("/admin/taxonomy");
   revalidatePath("/businesses", "layout");
   revalidatePath("/dashboard", "layout");
   for (const locale of appLocales) {
     revalidatePath(`/${locale}/admin`, "layout");
     revalidatePath(`/${locale}/admin/businesses`);
+    revalidatePath(`/${locale}/admin/taxonomy`);
     revalidatePath(`/${locale}/businesses`, "layout");
   }
 }
@@ -239,6 +322,13 @@ export async function updateBusinessDetails(formData: FormData) {
         },
       },
     });
+    const attributeDefinitions = await tx.attributeDefinition.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }],
+      select: businessAttributeDefinitionSelect,
+    });
+    await syncBusinessAttributes(tx, businessId, attributeDefinitions, formData);
+    await syncBusinessTags(tx, businessId, formData);
     await syncBusinessHours(tx, businessId, formData);
     if (ownerId) await promoteUserToOwner(tx, ownerId);
   });
@@ -323,6 +413,13 @@ export async function createBusinessDetails(formData: FormData) {
       },
       select: { id: true },
     });
+    const attributeDefinitions = await tx.attributeDefinition.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }],
+      select: businessAttributeDefinitionSelect,
+    });
+    await syncBusinessAttributes(tx, created.id, attributeDefinitions, formData);
+    await syncBusinessTags(tx, created.id, formData);
     if (ownerId) await promoteUserToOwner(tx, ownerId);
     return created;
   });
@@ -400,19 +497,23 @@ export async function updateCategory(formData: FormData) {
   const id = intValue(formData, "id");
   if (!id) throw new Error("Category is required.");
 
-  await prisma.category.update({
-    where: { id },
-    data: {
-      nameFa: value(formData, "nameFa"),
-      nameEn: value(formData, "nameEn"),
-      slug: value(formData, "slug"),
-      icon: nullableValue(formData, "icon"),
-      sortOrder: intValue(formData, "sortOrder") ?? 0,
-      active: booleanValue(formData, "active"),
-    },
-  });
-  await audit(actor.id, "taxonomy.category.update", "Category", String(id));
-  refreshAdmin();
+  try {
+    await prisma.category.update({
+      where: { id },
+      data: {
+        nameFa: value(formData, "nameFa"),
+        nameEn: value(formData, "nameEn"),
+        slug: value(formData, "slug"),
+        icon: nullableValue(formData, "icon"),
+        sortOrder: intValue(formData, "sortOrder") ?? 0,
+        active: booleanValue(formData, "active"),
+      },
+    });
+    await audit(actor.id, "taxonomy.category.update", "Category", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "category");
+  }
 }
 
 export async function updateSubCategory(formData: FormData) {
@@ -420,20 +521,24 @@ export async function updateSubCategory(formData: FormData) {
   const id = intValue(formData, "id");
   if (!id) throw new Error("Subcategory is required.");
 
-  await prisma.subCategory.update({
-    where: { id },
-    data: {
-      nameFa: value(formData, "nameFa"),
-      nameEn: value(formData, "nameEn"),
-      slug: value(formData, "slug"),
-      icon: nullableValue(formData, "icon"),
-      categoryId: intValue(formData, "categoryId") ?? undefined,
-      sortOrder: intValue(formData, "sortOrder") ?? 0,
-      active: booleanValue(formData, "active"),
-    },
-  });
-  await audit(actor.id, "taxonomy.subcategory.update", "SubCategory", String(id));
-  refreshAdmin();
+  try {
+    await prisma.subCategory.update({
+      where: { id },
+      data: {
+        nameFa: value(formData, "nameFa"),
+        nameEn: value(formData, "nameEn"),
+        slug: value(formData, "slug"),
+        icon: nullableValue(formData, "icon"),
+        categoryId: intValue(formData, "categoryId") ?? undefined,
+        sortOrder: intValue(formData, "sortOrder") ?? 0,
+        active: booleanValue(formData, "active"),
+      },
+    });
+    await audit(actor.id, "taxonomy.subcategory.update", "SubCategory", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "subcategory");
+  }
 }
 
 export async function updateSpecialty(formData: FormData) {
@@ -441,18 +546,140 @@ export async function updateSpecialty(formData: FormData) {
   const id = intValue(formData, "id");
   if (!id) throw new Error("Specialty is required.");
 
-  await prisma.specialty.update({
-    where: { id },
-    data: {
-      nameFa: value(formData, "nameFa"),
-      nameEn: nullableValue(formData, "nameEn"),
-      subCategoryId: intValue(formData, "subCategoryId") ?? undefined,
-      sortOrder: intValue(formData, "sortOrder") ?? 0,
-      active: booleanValue(formData, "active"),
-    },
-  });
-  await audit(actor.id, "taxonomy.specialty.update", "Specialty", String(id));
-  refreshAdmin();
+  try {
+    await prisma.specialty.update({
+      where: { id },
+      data: {
+        nameFa: value(formData, "nameFa"),
+        nameEn: nullableValue(formData, "nameEn"),
+        subCategoryId: intValue(formData, "subCategoryId") ?? undefined,
+        sortOrder: intValue(formData, "sortOrder") ?? 0,
+        active: booleanValue(formData, "active"),
+      },
+    });
+    await audit(actor.id, "taxonomy.specialty.update", "Specialty", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "specialty");
+  }
+}
+
+export async function createTag(formData: FormData) {
+  const actor = await requireAdmin();
+  const nameFa = value(formData, "nameFa");
+  const slug = slugValue(formData, "slug");
+  if (!nameFa || !slug) throw new Error("عنوان فارسی و اسلاگ برچسب را درست وارد کنید.");
+
+  try {
+    const tag = await prisma.tag.create({
+      data: {
+        nameFa,
+        nameEn: nullableValue(formData, "nameEn"),
+        slug,
+      },
+      select: { id: true },
+    });
+    await audit(actor.id, "taxonomy.tag.create", "Tag", String(tag.id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "tag");
+  }
+}
+
+export async function updateTag(formData: FormData) {
+  const actor = await requireAdmin();
+  const id = intValue(formData, "id");
+  const nameFa = value(formData, "nameFa");
+  const slug = slugValue(formData, "slug");
+  if (!id || !nameFa || !slug) throw new Error("عنوان فارسی و اسلاگ برچسب را درست وارد کنید.");
+
+  try {
+    await prisma.tag.update({
+      where: { id },
+      data: {
+        nameFa,
+        nameEn: nullableValue(formData, "nameEn"),
+        slug,
+      },
+    });
+    await audit(actor.id, "taxonomy.tag.update", "Tag", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "tag");
+  }
+}
+
+export async function deleteTag(formData: FormData) {
+  const actor = await requireAdmin();
+  const id = intValue(formData, "id");
+  if (!id) throw new Error("برچسب انتخاب نشده است.");
+
+  try {
+    await prisma.tag.delete({ where: { id } });
+    await audit(actor.id, "taxonomy.tag.delete", "Tag", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "tag");
+  }
+}
+
+export async function createAttributeDefinition(formData: FormData) {
+  const actor = await requireAdmin();
+  const data = attributeDefinitionData(formData);
+
+  try {
+    const attribute = await prisma.attributeDefinition.create({
+      data,
+      select: { id: true },
+    });
+    await audit(actor.id, "taxonomy.attribute.create", "AttributeDefinition", String(attribute.id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "feature");
+  }
+}
+
+export async function updateAttributeDefinition(formData: FormData) {
+  const actor = await requireAdmin();
+  const id = intValue(formData, "id");
+  if (!id) throw new Error("امکان انتخاب نشده است.");
+  const data = attributeDefinitionData(formData);
+
+  try {
+    const previous = await prisma.attributeDefinition.findUnique({
+      where: { id },
+      select: { dataType: true },
+    });
+
+    await prisma.$transaction(async (tx) => {
+      await tx.attributeDefinition.update({
+        where: { id },
+        data,
+      });
+
+      if (previous && previous.dataType !== data.dataType) {
+        await tx.businessAttribute.deleteMany({ where: { attributeId: id } });
+      }
+    });
+    await audit(actor.id, "taxonomy.attribute.update", "AttributeDefinition", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "feature");
+  }
+}
+
+export async function deleteAttributeDefinition(formData: FormData) {
+  const actor = await requireAdmin();
+  const id = intValue(formData, "id");
+  if (!id) throw new Error("امکان انتخاب نشده است.");
+
+  try {
+    await prisma.attributeDefinition.delete({ where: { id } });
+    await audit(actor.id, "taxonomy.attribute.delete", "AttributeDefinition", String(id));
+    refreshAdmin();
+  } catch (error) {
+    throw taxonomyActionError(error, "feature");
+  }
 }
 
 export async function updateReportStatus(formData: FormData) {

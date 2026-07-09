@@ -1,11 +1,14 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { AdminAttributesManager, type AdminAttributeDefinitionRow } from "@/components/admin/AdminAttributesManager";
+import { AdminTagsManager, type AdminTagRow } from "@/components/admin/AdminTagsManager";
 import { AdminTaxonomyTree, type CategoryTreeRow } from "@/components/admin/AdminTaxonomyTree";
 import { AdminSection } from "@/components/admin/AdminPrimitives";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminTaxonomyPage() {
-  const [t, categories] = await Promise.all([
+  const [t, locale, categories, tags, attributes] = await Promise.all([
     getTranslations("Admin"),
+    getLocale(),
     prisma.category.findMany({
       orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }],
       include: {
@@ -20,6 +23,26 @@ export default async function AdminTaxonomyPage() {
             },
           },
         },
+      },
+    }),
+    prisma.tag.findMany({
+      orderBy: [{ nameEn: "asc" }, { nameFa: "asc" }],
+      include: { _count: { select: { businesses: true } } },
+    }),
+    prisma.attributeDefinition.findMany({
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }, { labelFa: "asc" }],
+      select: {
+        id: true,
+        key: true,
+        labelFa: true,
+        labelEn: true,
+        labelDe: true,
+        dataType: true,
+        unit: true,
+        options: true,
+        sortOrder: true,
+        active: true,
+        _count: { select: { values: true } },
       },
     }),
   ]);
@@ -54,6 +77,29 @@ export default async function AdminTaxonomyPage() {
     })),
   }));
 
+  const tagRows: AdminTagRow[] = tags.map((tag) => ({
+    id: tag.id,
+    nameFa: tag.nameFa,
+    nameEn: tag.nameEn,
+    slug: tag.slug,
+    businesses: tag._count.businesses,
+  }));
+  const attributeRows: AdminAttributeDefinitionRow[] = attributes.map((attribute) => ({
+    id: attribute.id,
+    key: attribute.key,
+    labelFa: attribute.labelFa,
+    labelEn: attribute.labelEn,
+    labelDe: attribute.labelDe,
+    dataType: attribute.dataType,
+    unit: attribute.unit,
+    options: attribute.options,
+    sortOrder: attribute.sortOrder,
+    active: attribute.active,
+    values: attribute._count.values,
+  }));
+  const tagSectionTitle = locale === "fa" ? "\u0628\u0631\u0686\u0633\u0628\u200c\u0647\u0627" : "Tags";
+  const attributeSectionTitle = locale === "fa" ? "\u0627\u0645\u06a9\u0627\u0646\u0627\u062a" : "Amenities and features";
+
   return (
     <div className="space-y-6">
       <div>
@@ -62,6 +108,14 @@ export default async function AdminTaxonomyPage() {
 
       <AdminSection title={t("taxonomy.tree")}>
         <AdminTaxonomyTree categories={treeRows} />
+      </AdminSection>
+
+      <AdminSection title={tagSectionTitle}>
+        <AdminTagsManager tags={tagRows} />
+      </AdminSection>
+
+      <AdminSection title={attributeSectionTitle}>
+        <AdminAttributesManager attributes={attributeRows} />
       </AdminSection>
     </div>
   );

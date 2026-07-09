@@ -1,15 +1,14 @@
 model Category {
-  id            Int                   @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   nameFa        String
   nameEn        String
-  slug          String                @unique
+  slug          String        @unique
   icon          String?
   image         String?
-  sortOrder     Int                   @default(0)
-  active        Boolean               @default(true)
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
-  attributeDefs AttributeDefinition[]
+  sortOrder     Int           @default(0)
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   businesses    Business[]
   subCategories SubCategory[]
 
@@ -17,21 +16,20 @@ model Category {
 }
 
 model SubCategory {
-  id            Int                   @id @default(autoincrement())
-  nameFa        String
-  nameEn        String
-  slug          String                @unique
-  icon          String?
-  image         String?
-  categoryId    Int
-  sortOrder     Int                   @default(0)
-  active        Boolean               @default(true)
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
-  attributeDefs AttributeDefinition[]
-  businesses    Business[]
-  specialties   Specialty[]
-  category      Category              @relation(fields: [categoryId], references: [id])
+  id          Int         @id @default(autoincrement())
+  nameFa      String
+  nameEn      String
+  slug        String      @unique
+  icon        String?
+  image       String?
+  categoryId  Int
+  sortOrder   Int         @default(0)
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  businesses  Business[]
+  specialties Specialty[]
+  category    Category    @relation(fields: [categoryId], references: [id])
 
   @@map("sub_categories")
 }

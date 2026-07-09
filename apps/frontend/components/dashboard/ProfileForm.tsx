@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
@@ -110,7 +111,11 @@ export function ProfileForm({ initial }: { initial: Profile }) {
           <div className="mx-auto flex max-w-[240px] flex-col items-center text-center">
             <div className="relative h-36 w-36 overflow-hidden rounded-full bg-primary/10 ring-4 ring-white shadow-md">
               {previewImage ? (
-                <img src={previewImage} alt={displayName} className="h-full w-full object-cover" />
+                <span
+                  aria-label={displayName}
+                  className="block h-full w-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${previewImage})` }}
+                />
               ) : (
                 <span className="flex h-full w-full items-center justify-center text-5xl font-black text-primary">
                   {initials}
@@ -141,12 +146,15 @@ export function ProfileForm({ initial }: { initial: Profile }) {
                 {t("cropTitle")}
               </div>
               <div className="mt-4 grid gap-5 md:grid-cols-[220px_1fr]">
-                <div className="mx-auto h-52 w-52 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
-                  <img
+                <div className="relative mx-auto h-52 w-52 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+                  <Image
                     ref={imageRef}
                     src={selectedImage}
                     alt={t("previewAlt")}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="208px"
+                    unoptimized
+                    className="object-cover"
                     style={{
                       transform: `translate(${crop.x}px, ${crop.y}px) scale(${crop.zoom})`,
                     }}

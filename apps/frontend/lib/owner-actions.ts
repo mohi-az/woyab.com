@@ -4,6 +4,8 @@ import type { DayOfWeek, Prisma } from "@fargo/database";
 import { revalidatePath } from "next/cache";
 import { redirectWithLocale } from "@/i18n/server";
 import { requireUserId } from "@/lib/auth-user";
+import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
+import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 
 const locales = ["DE", "EN", "FA"] as const;
@@ -154,6 +156,13 @@ export async function createOwnerBusiness(formData: FormData) {
       },
       select: { id: true, slug: true },
     });
+    const attributeDefinitions = await tx.attributeDefinition.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }],
+      select: businessAttributeDefinitionSelect,
+    });
+    await syncBusinessAttributes(tx, created.id, attributeDefinitions, formData);
+    await syncBusinessTags(tx, created.id, formData);
 
     await tx.user.update({
       where: { id: userId },
@@ -215,6 +224,47 @@ export async function updateOwnerBusinessHours(formData: FormData) {
 
   await prisma.$transaction((tx) => syncBusinessHours(tx, businessId, formData));
   await ownerAudit(userId, "owner.business_hours.update", "Business", businessId);
+  revalidatePath("/dashboard/owner");
+  revalidatePath(`/businesses/${business.slug}`);
+}
+
+export async function updateOwnerBusinessAttributes(formData: FormData) {
+  const userId = await requireUserId();
+  const businessId = value(formData, "businessId");
+  if (!businessId) throw new Error("Business is required.");
+
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { id: true, ownerId: true, slug: true },
+  });
+  if (!business || business.ownerId !== userId) throw new Error("You can only edit features for your own businesses.");
+
+  await prisma.$transaction(async (tx) => {
+    const attributeDefinitions = await tx.attributeDefinition.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }],
+      select: businessAttributeDefinitionSelect,
+    });
+    await syncBusinessAttributes(tx, businessId, attributeDefinitions, formData);
+  });
+  await ownerAudit(userId, "owner.business_attributes.update", "Business", businessId);
+  revalidatePath("/dashboard/owner");
+  revalidatePath(`/businesses/${business.slug}`);
+}
+
+export async function updateOwnerBusinessTags(formData: FormData) {
+  const userId = await requireUserId();
+  const businessId = value(formData, "businessId");
+  if (!businessId) throw new Error("Business is required.");
+
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { id: true, ownerId: true, slug: true },
+  });
+  if (!business || business.ownerId !== userId) throw new Error("You can only edit tags for your own businesses.");
+
+  await prisma.$transaction((tx) => syncBusinessTags(tx, businessId, formData));
+  await ownerAudit(userId, "owner.business_tags.update", "Business", businessId);
   revalidatePath("/dashboard/owner");
   revalidatePath(`/businesses/${business.slug}`);
 }

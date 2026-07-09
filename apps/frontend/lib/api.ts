@@ -124,6 +124,19 @@ type BusinessDetailApiResponse = {
       isClosed: boolean;
       note?: string | null;
     }>;
+    attributes?: Array<{
+      attributeId: number;
+      value: string;
+      attribute: {
+        id: number;
+        key: string;
+        labelFa: string;
+        labelEn?: string | null;
+        labelDe?: string | null;
+        dataType: "TEXT" | "NUMBER" | "BOOLEAN";
+        unit?: string | null;
+      };
+    }>;
     tags?: Array<{
       tag: {
         id: number;
@@ -303,6 +316,14 @@ export type BusinessDetailData = {
     note?: string | null;
   }>;
   tags: string[];
+  attributes: Array<{
+    id: number;
+    key: string;
+    label: string;
+    value: string;
+    dataType: "TEXT" | "NUMBER" | "BOOLEAN";
+    unit?: string | null;
+  }>;
 };
 
 export type BusinessReviewItem = {
@@ -339,6 +360,14 @@ const API_BASE = process.env.API_URL ?? "http://localhost:4000";
 
 function booleanFlag(value: unknown) {
   return value === true || value === "true";
+}
+
+function compatibleAttributeValue(dataType: string, value: string) {
+  if (!value) return false;
+  if (dataType === "BOOLEAN") return value === "true";
+  if (value === "true" || value === "false") return false;
+  if (dataType === "NUMBER") return Number.isFinite(Number(value));
+  return dataType === "TEXT";
 }
 
 function getLocalizedName(
@@ -643,6 +672,21 @@ export async function fetchBusinessBySlug(
         note: hour.note,
       })),
       tags: (business.tags ?? []).map((entry) => localizedText(locale, entry.tag) ?? entry.tag.nameEn),
+      attributes: (business.attributes ?? []).flatMap((entry) => {
+        if (!compatibleAttributeValue(entry.attribute.dataType, entry.value)) return [];
+        return [{
+          id: entry.attribute.id,
+          key: entry.attribute.key,
+          label: locale === "fa"
+            ? entry.attribute.labelFa
+            : locale === "de"
+              ? entry.attribute.labelDe || entry.attribute.labelEn || entry.attribute.labelFa
+              : entry.attribute.labelEn || entry.attribute.labelDe || entry.attribute.labelFa,
+          value: entry.value,
+          dataType: entry.attribute.dataType,
+          unit: entry.attribute.unit,
+        }];
+      }),
     };
   } catch {
     return null;

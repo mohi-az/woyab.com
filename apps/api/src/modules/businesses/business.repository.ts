@@ -16,6 +16,25 @@ const businessDetailInclude = {
   city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
   district: { select: { id: true, nameFa: true, nameEn: true } },
   businessHours: { orderBy: { dayOfWeek: "asc" as const } },
+  attributes: {
+    include: {
+      attribute: {
+        select: {
+          id: true,
+          key: true,
+          labelFa: true,
+          labelEn: true,
+          labelDe: true,
+          dataType: true,
+          unit: true,
+          options: true,
+          sortOrder: true,
+          active: true,
+        },
+      },
+    },
+    orderBy: { attribute: { sortOrder: "asc" as const } },
+  },
   tags: { include: { tag: { select: { id: true, nameFa: true, nameEn: true, slug: true } } } },
   images: { orderBy: { sortOrder: "asc" as const } },
   translations: { select: businessTranslationSelect },

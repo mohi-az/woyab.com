@@ -1,10 +1,14 @@
 import { FiBarChart2, FiBriefcase, FiEye, FiMessageSquare, FiPlus } from "react-icons/fi";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
+import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor } from "@/components/dashboard/BusinessHoursEditor";
 import { requireUserId } from "@/lib/auth-user";
+import { businessAttributeDefinitionSelect, businessAttributeValueSelect } from "@/lib/business-attributes";
+import { businessTagOptionSelect, businessTagValueSelect } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
-import { updateOwnerBusinessHours, upsertReviewOwnerReply } from "@/lib/owner-actions";
+import { updateOwnerBusinessAttributes, updateOwnerBusinessHours, updateOwnerBusinessTags, upsertReviewOwnerReply } from "@/lib/owner-actions";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -38,23 +42,54 @@ function MetricCard({ icon: Icon, label, value }: { icon: typeof FiEye; label: s
   );
 }
 
+function localizedFeatureText(locale: string) {
+  if (locale === "fa") return { title: "امکانات", save: "ذخیره امکانات" };
+  if (locale === "de") return { title: "Ausstattung", save: "Ausstattung speichern" };
+  return { title: "Amenities and features", save: "Save features" };
+}
+
+function localizedTagText(locale: string) {
+  if (locale === "fa") return { title: "برچسب‌ها", save: "ذخیره برچسب‌ها" };
+  if (locale === "de") return { title: "Tags", save: "Tags speichern" };
+  return { title: "Tags", save: "Save tags" };
+}
+
 export default async function OwnerDashboardPage({ searchParams }: PageProps) {
-  const [userId, params, tHours] = await Promise.all([requireUserId(), searchParams, getTranslations("BusinessHours")]);
-  const businesses = await prisma.business.findMany({
-    where: { ownerId: userId },
-    orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
-    select: {
-      id: true,
-      slug: true,
-      businessName: true,
-      status: true,
-      reviewCount: true,
-      businessHours: {
-        orderBy: { dayOfWeek: "asc" },
-        select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true },
+  const [userId, params, tHours, locale] = await Promise.all([requireUserId(), searchParams, getTranslations("BusinessHours"), getLocale()]);
+  const featureText = localizedFeatureText(locale);
+  const tagText = localizedTagText(locale);
+  const [businesses, attributeDefinitions, tagOptions] = await Promise.all([
+    prisma.business.findMany({
+      where: { ownerId: userId },
+      orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+      select: {
+        id: true,
+        slug: true,
+        businessName: true,
+        status: true,
+        reviewCount: true,
+        businessHours: {
+          orderBy: { dayOfWeek: "asc" },
+          select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true },
+        },
+        attributes: {
+          select: businessAttributeValueSelect,
+        },
+        tags: {
+          select: businessTagValueSelect,
+        },
       },
-    },
-  });
+    }),
+    prisma.attributeDefinition.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }],
+      select: businessAttributeDefinitionSelect,
+    }),
+    prisma.tag.findMany({
+      orderBy: [{ nameEn: "asc" }, { nameFa: "asc" }],
+      select: businessTagOptionSelect,
+    }),
+  ]);
 
   const requestedBusinessId = first(params.businessId);
   const ownedIds = businesses.map((business) => business.id);
@@ -162,6 +197,44 @@ export default async function OwnerDashboardPage({ searchParams }: PageProps) {
           ))}
         </div>
       </section>
+
+      {selectedBusiness ? (
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <form action={updateOwnerBusinessAttributes}>
+            <input type="hidden" name="businessId" value={selectedBusiness.id} />
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-slate-950">{featureText.title}</h2>
+              </div>
+              <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-black text-white">
+                {featureText.save}
+              </button>
+            </div>
+            <div className="mt-5">
+              <BusinessAttributeFields definitions={attributeDefinitions} values={selectedBusiness.attributes} />
+            </div>
+          </form>
+        </section>
+      ) : null}
+
+      {selectedBusiness ? (
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <form action={updateOwnerBusinessTags}>
+            <input type="hidden" name="businessId" value={selectedBusiness.id} />
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-slate-950">{tagText.title}</h2>
+              </div>
+              <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-black text-white">
+                {tagText.save}
+              </button>
+            </div>
+            <div className="mt-5">
+              <BusinessTagFields tags={tagOptions} values={selectedBusiness.tags} />
+            </div>
+          </form>
+        </section>
+      ) : null}
 
       {selectedBusiness ? (
         <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">

@@ -115,6 +115,19 @@ function buildCreateData(data: CreateBusinessBody) {
     status: data.status,
     verified: data.verified,
     featured: data.featured,
+    ...(data.attributes !== undefined && {
+      attributes: {
+        create: data.attributes.map((attribute) => ({
+          attributeId: attribute.attributeId,
+          value: attribute.value,
+        })),
+      },
+    }),
+    ...(data.tagIds !== undefined && {
+      tags: {
+        create: [...new Set(data.tagIds)].map((tagId) => ({ tagId })),
+      },
+    }),
     translations: {
       create: [...translations.values()].map((translation) => ({
         locale: appLocaleToContentLocale(translation.locale),
@@ -239,6 +252,21 @@ function buildUpdateData(
     ...(data.status !== undefined && { status: data.status }),
     ...(data.verified !== undefined && { verified: data.verified }),
     ...(data.featured !== undefined && { featured: data.featured }),
+    ...(data.attributes !== undefined && {
+      attributes: {
+        deleteMany: {},
+        create: data.attributes.map((attribute) => ({
+          attributeId: attribute.attributeId,
+          value: attribute.value,
+        })),
+      },
+    }),
+    ...(data.tagIds !== undefined && {
+      tags: {
+        deleteMany: {},
+        create: [...new Set(data.tagIds)].map((tagId) => ({ tagId })),
+      },
+    }),
   };
 }
 

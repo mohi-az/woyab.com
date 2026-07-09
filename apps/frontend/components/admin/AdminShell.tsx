@@ -89,7 +89,11 @@ export function AdminShell({ user, children, initialTheme }: {
         <div className="admin-sidebar-border border-b px-4 py-5">
           <div className="flex items-center gap-3">
             {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt={displayName} className="h-12 w-12 rounded-full object-cover ring-2 ring-sky-400/30" />
+              <span
+                aria-label={displayName}
+                className="h-12 w-12 rounded-full bg-cover bg-center ring-2 ring-sky-400/30"
+                style={{ backgroundImage: `url(${user.avatarUrl})` }}
+              />
             ) : (
               <span className="admin-avatar-fallback grid h-12 w-12 place-items-center rounded-full text-lg font-black">{initials}</span>
             )}

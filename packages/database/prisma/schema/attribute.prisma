@@ -1,21 +1,17 @@
-/// Defines a possible attribute for a category or sub-category.
+/// Defines a possible business attribute such as parking, delivery, or online booking.
 model AttributeDefinition {
-  id            Int                 @id @default(autoincrement())
-  key           String
-  labelFa       String
-  labelEn       String?
-  dataType      AttributeDataType
-  unit          String?
-  options       String?
-  categoryId    Int?
-  subCategoryId Int?
-  sortOrder     Int                 @default(0)
-  active        Boolean             @default(true)
-  category      Category?           @relation(fields: [categoryId], references: [id])
-  subCategory   SubCategory?        @relation(fields: [subCategoryId], references: [id])
-  values        BusinessAttribute[]
+  id        Int                 @id @default(autoincrement())
+  key       String              @unique
+  labelFa   String
+  labelEn   String?
+  labelDe   String?
+  dataType  AttributeDataType
+  unit      String?
+  options   String?
+  sortOrder Int                 @default(0)
+  active    Boolean             @default(true)
+  values    BusinessAttribute[]
 
-  @@unique([key, subCategoryId])
   @@map("attribute_definitions")
 }
 

@@ -10,6 +10,11 @@ const businessTranslationInputSchema = z.object({
   description: z.string().optional(),
 });
 
+const businessAttributeInputSchema = z.object({
+  attributeId: z.number().int().positive(),
+  value: z.string().min(1).max(500),
+});
+
 export const createBusinessBodySchema = z.object({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   businessName: z.string().min(1),
@@ -18,6 +23,8 @@ export const createBusinessBodySchema = z.object({
   shortDescription: z.string().max(300).optional(),
   description: z.string().optional(),
   translations: z.array(businessTranslationInputSchema).max(3).optional(),
+  attributes: z.array(businessAttributeInputSchema).max(100).optional(),
+  tagIds: z.array(z.number().int().positive()).max(100).optional(),
   logoUrl: z.string().optional(),
   coverImageUrl: z.string().optional(),
   categoryId: z.number().int().positive(),

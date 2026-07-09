@@ -1,64 +1,64 @@
 model Business {
-  id                  String                @id @default(cuid())
-  slug                String                @unique
-  businessName        String
-  legalName           String?
-  shortDescription    String?
-  description         String?
-  logoUrl             String?
-  coverImageUrl       String?
-  categoryId          Int
-  subCategoryId       Int?
-  specialtyId         Int?
-  ownerId             String?
-  establishedYear     Int?
-  priceRange          PriceRange?
-  phone               String?
-  mobile              String?
-  whatsapp            String?
-  email               String?
-  website             String?
-  instagram           String?
-  telegram            String?
-  facebook            String?
-  youtube             String?
-  linkedin            String?
-  latitude            Float?
-  longitude           Float?
-  cityId              Int
-  districtId          Int?
-  address             String?
-  postalCode          String?
-  status              BusinessStatus        @default(PENDING)
-  verified            Boolean               @default(false)
-  featured            Boolean               @default(false)
-  averageRating       Float                 @default(0)
-  reviewCount         Int                   @default(0)
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  sourceLocale        ContentLocale         @default(DE)
-  branches            Branch[]
-  attributes          BusinessAttribute[]
-  business_claims     business_claims[]
-  businessHours       BusinessHours[]
-  images              BusinessImage[]
-  tags                BusinessTag[]
-  translations        BusinessTranslation[]
-  videos              BusinessVideo[]
-  business_view_daily business_view_daily[]
-  category            Category              @relation(fields: [categoryId], references: [id])
-  city                City                  @relation(fields: [cityId], references: [id])
-  district            District?             @relation(fields: [districtId], references: [id])
-  owner               User?                 @relation(fields: [ownerId], references: [id])
-  specialty           Specialty?            @relation(fields: [specialtyId], references: [id])
-  subCategory         SubCategory?          @relation(fields: [subCategoryId], references: [id])
-  contact_messages    contact_messages[]
-  directory_reports   directory_reports[]
-  documents           Document[]
-  favorites           favorites[]
-  posts               Post[]
-  reviews             Review[]
-  services            Service[]
+  id                String                @id @default(cuid())
+  slug              String                @unique
+  businessName      String
+  legalName         String?
+  shortDescription  String?
+  description       String?
+  logoUrl           String?
+  coverImageUrl     String?
+  categoryId        Int
+  subCategoryId     Int?
+  specialtyId       Int?
+  ownerId           String?
+  establishedYear   Int?
+  priceRange        PriceRange?
+  phone             String?
+  mobile            String?
+  whatsapp          String?
+  email             String?
+  website           String?
+  instagram         String?
+  telegram          String?
+  facebook          String?
+  youtube           String?
+  linkedin          String?
+  latitude          Float?
+  longitude         Float?
+  cityId            Int
+  districtId        Int?
+  address           String?
+  postalCode        String?
+  status            BusinessStatus        @default(PENDING)
+  verified          Boolean               @default(false)
+  featured          Boolean               @default(false)
+  averageRating     Float                 @default(0)
+  reviewCount       Int                   @default(0)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  sourceLocale      ContentLocale         @default(DE)
+  branches          Branch[]
+  attributes        BusinessAttribute[]
+  businessClaims    BusinessClaim[]
+  businessHours     BusinessHours[]
+  images            BusinessImage[]
+  tags              BusinessTag[]
+  translations      BusinessTranslation[]
+  videos            BusinessVideo[]
+  businessViewDaily BusinessViewDaily[]
+  category          Category              @relation(fields: [categoryId], references: [id])
+  city              City                  @relation(fields: [cityId], references: [id])
+  district          District?             @relation(fields: [districtId], references: [id])
+  owner             User?                 @relation(fields: [ownerId], references: [id])
+  specialty         Specialty?            @relation(fields: [specialtyId], references: [id])
+  subCategory       SubCategory?          @relation(fields: [subCategoryId], references: [id])
+  contactMessages   ContactMessage[]
+  directoryReports  DirectoryReport[]
+  documents         Document[]
+  favorites         Favorite[]
+  posts             Post[]
+  reviews           Review[]
+  services          Service[]
 
   @@index([slug])
   @@index([cityId])

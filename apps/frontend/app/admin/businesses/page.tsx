@@ -3,6 +3,8 @@ import { AdminBusinessFilters } from "@/components/admin/AdminBusinessFilters";
 import { AdminBusinessGrid, type AdminBusinessRow } from "@/components/admin/AdminBusinessGrid";
 import { AdminSection } from "@/components/admin/AdminPrimitives";
 import { requireAdmin } from "@/lib/admin-auth";
+import { businessAttributeDefinitionSelect, businessAttributeValueSelect } from "@/lib/business-attributes";
+import { businessTagOptionSelect, businessTagValueSelect } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 
 const PAGE_SIZE = 15;
@@ -51,7 +53,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     }),
   };
 
-  const [businessesRaw, total, categories, subCategories, specialties, cities, ownerOptions] = await Promise.all([
+  const [businessesRaw, total, categories, subCategories, specialties, cities, ownerOptions, attributeDefinitions, tagOptions] = await Promise.all([
     prisma.business.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -67,6 +69,12 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
           select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true },
         },
         translations: { select: { locale: true, businessName: true, shortDescription: true, description: true } },
+        attributes: {
+          select: businessAttributeValueSelect,
+        },
+        tags: {
+          select: businessTagValueSelect,
+        },
       },
     }),
     prisma.business.count({ where }),
@@ -79,6 +87,15 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
       orderBy: [{ role: "asc" }, { name: "asc" }, { email: "asc" }],
       take: 300,
       select: { id: true, name: true, email: true, role: true },
+    }),
+    prisma.attributeDefinition.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: "asc" }, { labelEn: "asc" }],
+      select: businessAttributeDefinitionSelect,
+    }),
+    prisma.tag.findMany({
+      orderBy: [{ nameEn: "asc" }, { nameFa: "asc" }],
+      select: businessTagOptionSelect,
     }),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -123,6 +140,8 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     city: business.city,
     owner: business.owner,
     translations: business.translations,
+    attributes: business.attributes,
+    tags: business.tags,
   }));
 
   return (
@@ -152,6 +171,8 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
           value: owner.id,
           label: [owner.name, owner.email, owner.role].filter(Boolean).join(" / "),
         }))}
+        attributeDefinitions={attributeDefinitions}
+        tagOptions={tagOptions}
         canCreate={admin.role === "SUPER_ADMIN"}
         previousHref={pageHref(Math.max(1, page - 1))}
         nextHref={pageHref(Math.min(totalPages, page + 1))}
