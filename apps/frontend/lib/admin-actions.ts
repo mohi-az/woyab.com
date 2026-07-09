@@ -2,6 +2,7 @@
 
 import type { AttributeDataType, BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@fargo/database";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { appLocales } from "@/i18n/config";
 import { requireAdmin } from "@/lib/admin-auth";
 import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
@@ -14,6 +15,17 @@ const userRoles: UserRole[] = ["USER", "OWNER", "ADMIN", "SUPER_ADMIN"];
 const claimStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
 const daysOfWeek: DayOfWeek[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 const attributeDataTypes: AttributeDataType[] = ["TEXT", "NUMBER", "BOOLEAN"];
+const phonePattern = /^\+?[0-9\s().-]{6,24}$/;
+const postalCodePattern = /^[A-Za-z0-9][A-Za-z0-9\s-]{2,12}$/;
+const websitePattern = /^https?:\/\/[^\s]+\.[^\s]+$/i;
+
+const businessContactSchema = z.object({
+  email: z.string().trim().max(254).refine((input) => !input || z.email().safeParse(input).success, "Enter a valid email address.").transform((input) => input || null),
+  phone: z.string().trim().max(24).refine((input) => !input || phonePattern.test(input), "Enter a valid phone number.").transform((input) => input || null),
+  mobile: z.string().trim().max(24).refine((input) => !input || phonePattern.test(input), "Enter a valid mobile number.").transform((input) => input || null),
+  website: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid website URL starting with http:// or https://.").transform((input) => input || null),
+  postalCode: z.string().trim().max(16).refine((input) => !input || postalCodePattern.test(input), "Enter a valid postal code.").transform((input) => input || null),
+});
 
 type TaxonomyEntity = "category" | "subcategory" | "specialty" | "tag" | "feature";
 
@@ -38,11 +50,33 @@ function intValue(formData: FormData, key: string) {
   return Number.isInteger(parsed) ? parsed : null;
 }
 
+function intValues(formData: FormData, key: string) {
+  return [...new Set(formData.getAll(key)
+    .map((item) => Number(typeof item === "string" ? item.trim() : item))
+    .filter((item) => Number.isInteger(item) && item > 0))];
+}
+
 function numberValue(formData: FormData, key: string) {
   const raw = value(formData, key);
   if (!raw) return null;
   const parsed = Number(raw);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function businessContactData(formData: FormData) {
+  const parsed = businessContactSchema.safeParse({
+    email: value(formData, "email"),
+    phone: value(formData, "phone"),
+    mobile: value(formData, "mobile"),
+    website: value(formData, "website"),
+    postalCode: value(formData, "postalCode"),
+  });
+
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0]?.message ?? "Please check contact fields.");
+  }
+
+  return parsed.data;
 }
 
 function slugValue(formData: FormData, key: string) {
@@ -171,6 +205,18 @@ async function syncBusinessHours(tx: Prisma.TransactionClient, businessId: strin
   }
 }
 
+async function syncBusinessSpecialties(tx: Prisma.TransactionClient, businessId: string, specialtyIds: number[]) {
+  await tx.$executeRaw`DELETE FROM "business_specialties" WHERE "businessId" = ${businessId}`;
+
+  for (const specialtyId of specialtyIds) {
+    await tx.$executeRaw`
+      INSERT INTO "business_specialties" ("businessId", "specialtyId")
+      VALUES (${businessId}, ${specialtyId})
+      ON CONFLICT DO NOTHING
+    `;
+  }
+}
+
 async function audit(actorId: string, action: string, entityType: string, entityId?: string | null, metadata?: Prisma.InputJsonValue) {
   await prisma.adminAuditLog.create({
     data: {
@@ -254,11 +300,12 @@ export async function updateBusinessDetails(formData: FormData) {
   const categoryId = intValue(formData, "categoryId");
   const cityId = intValue(formData, "cityId");
   const subCategoryId = intValue(formData, "subCategoryId");
-  const specialtyId = intValue(formData, "specialtyId");
-  const status = value(formData, "status") as BusinessStatus;
+  const specialtyIds = intValues(formData, "specialtyIds");
+  const specialtyId = specialtyIds[0] ?? null;
   const ownerId = nullableValue(formData, "ownerId");
+  const contact = businessContactData(formData);
 
-  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId || !businessStatuses.includes(status)) {
+  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
   }
 
@@ -296,14 +343,11 @@ export async function updateBusinessDetails(formData: FormData) {
         latitude: numberValue(formData, "latitude"),
         longitude: numberValue(formData, "longitude"),
         address: nullableValue(formData, "address"),
-        postalCode: nullableValue(formData, "postalCode"),
-        email: nullableValue(formData, "email"),
-        phone: nullableValue(formData, "phone"),
-        mobile: nullableValue(formData, "mobile"),
-        website: nullableValue(formData, "website"),
-        status,
-        verified: booleanValue(formData, "verified"),
-        featured: booleanValue(formData, "featured"),
+        postalCode: contact.postalCode,
+        email: contact.email,
+        phone: contact.phone,
+        mobile: contact.mobile,
+        website: contact.website,
         translations: {
           upsert: translations.map((translation) => ({
             where: { businessId_locale: { businessId, locale: translation.locale } },
@@ -329,11 +373,12 @@ export async function updateBusinessDetails(formData: FormData) {
     });
     await syncBusinessAttributes(tx, businessId, attributeDefinitions, formData);
     await syncBusinessTags(tx, businessId, formData);
+    await syncBusinessSpecialties(tx, businessId, specialtyIds);
     await syncBusinessHours(tx, businessId, formData);
     if (ownerId) await promoteUserToOwner(tx, ownerId);
   });
 
-  await audit(actor.id, "business.update", "Business", businessId, { status, sourceLocale, ownerId });
+  await audit(actor.id, "business.update", "Business", businessId, { sourceLocale, ownerId });
   refreshAdmin();
 }
 
@@ -346,12 +391,13 @@ export async function createBusinessDetails(formData: FormData) {
   const categoryId = intValue(formData, "categoryId");
   const cityId = intValue(formData, "cityId");
   const subCategoryId = intValue(formData, "subCategoryId");
-  const specialtyId = intValue(formData, "specialtyId");
-  const status = value(formData, "status") as BusinessStatus;
+  const specialtyIds = intValues(formData, "specialtyIds");
+  const specialtyId = specialtyIds[0] ?? null;
   const ownerId = nullableValue(formData, "ownerId");
+  const contact = businessContactData(formData);
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
-  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId || !businessStatuses.includes(status)) {
+  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
   }
 
@@ -391,14 +437,11 @@ export async function createBusinessDetails(formData: FormData) {
         latitude: numberValue(formData, "latitude"),
         longitude: numberValue(formData, "longitude"),
         address: nullableValue(formData, "address"),
-        postalCode: nullableValue(formData, "postalCode"),
-        email: nullableValue(formData, "email"),
-        phone: nullableValue(formData, "phone"),
-        mobile: nullableValue(formData, "mobile"),
-        website: nullableValue(formData, "website"),
-        status,
-        verified: booleanValue(formData, "verified"),
-        featured: booleanValue(formData, "featured"),
+        postalCode: contact.postalCode,
+        email: contact.email,
+        phone: contact.phone,
+        mobile: contact.mobile,
+        website: contact.website,
         businessHours: {
           create: businessHoursCreateData(formData),
         },
@@ -420,11 +463,12 @@ export async function createBusinessDetails(formData: FormData) {
     });
     await syncBusinessAttributes(tx, created.id, attributeDefinitions, formData);
     await syncBusinessTags(tx, created.id, formData);
+    await syncBusinessSpecialties(tx, created.id, specialtyIds);
     if (ownerId) await promoteUserToOwner(tx, ownerId);
     return created;
   });
 
-  await audit(actor.id, "business.create", "Business", business.id, { status, sourceLocale, ownerId });
+  await audit(actor.id, "business.create", "Business", business.id, { status: "PENDING", sourceLocale, ownerId });
   refreshAdmin();
 }
 

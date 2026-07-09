@@ -43,6 +43,7 @@ model Specialty {
   sortOrder     Int         @default(0)
   active        Boolean     @default(true)
   businesses    Business[]
+  businessLinks  BusinessSpecialty[]
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
 
   @@map("specialties")

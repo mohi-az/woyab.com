@@ -780,6 +780,10 @@
       "required": "This field is required.",
       "slug": "Use lowercase letters, numbers and hyphens only.",
       "sourceBusinessName": "Enter the business name for the selected source language.",
+      "email": "Enter a valid email address.",
+      "phone": "Enter a valid phone number.",
+      "website": "Enter a valid website URL starting with http:// or https://.",
+      "postalCode": "Enter a valid postal code.",
       "saveFailed": "Changes could not be saved."
     },
     "pagination": {

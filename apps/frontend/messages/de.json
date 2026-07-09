@@ -780,6 +780,10 @@
       "required": "Dieses Feld ist erforderlich.",
       "slug": "Nur Kleinbuchstaben, Zahlen und Bindestriche verwenden.",
       "sourceBusinessName": "Geben Sie den Business-Namen fuer die gewaehlte Ausgangssprache ein.",
+      "email": "Geben Sie eine gueltige E-Mail-Adresse ein.",
+      "phone": "Geben Sie eine gueltige Telefonnummer ein.",
+      "website": "Geben Sie eine gueltige Website-URL mit http:// oder https:// ein.",
+      "postalCode": "Geben Sie eine gueltige Postleitzahl ein.",
       "saveFailed": "Aenderungen konnten nicht gespeichert werden."
     },
     "pagination": {

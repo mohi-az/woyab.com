@@ -271,10 +271,16 @@ html[lang="fa"] .admin-shell * {
 
 .admin-ant-select {
   width: 100%;
+  min-width: 0;
+}
+
+.admin-ant-select .ant-select {
+  max-width: 100%;
 }
 
 .admin-ant-select .ant-select-selector {
   min-height: 44px !important;
+  max-width: 100% !important;
   border-color: var(--admin-field-border) !important;
   background: var(--admin-field-bg) !important;
   border-radius: 0.5rem !important;
@@ -292,6 +298,10 @@ html[lang="fa"] .admin-shell * {
 .admin-ant-select .ant-select-selection-item {
   color: var(--admin-text) !important;
   font-weight: 700;
+}
+
+.admin-ant-select .ant-select-selection-overflow {
+  max-width: 100%;
 }
 
 .admin-ant-select .ant-select-selection-search-input {
@@ -391,6 +401,91 @@ html[lang="fa"] .admin-shell * {
 
 .admin-shell .ant-steps .ant-steps-item-tail::after {
   background: var(--admin-border) !important;
+}
+
+.admin-business-modal .ant-modal-content,
+.admin-business-modal .ant-modal-header {
+  background: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-business-modal .ant-modal-content {
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 24px 70px rgb(2 6 23 / 0.45);
+}
+
+.admin-business-modal .ant-modal-header {
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--admin-border);
+  padding-bottom: 16px;
+}
+
+.admin-business-modal .ant-modal-close {
+  color: var(--admin-muted) !important;
+}
+
+.admin-business-modal .ant-modal-close:hover {
+  background: var(--admin-row-hover) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-business-modal .ant-btn-default {
+  border-color: var(--admin-border);
+  background: var(--admin-field-bg);
+  color: var(--admin-text);
+}
+
+.admin-business-modal .ant-btn-default:disabled {
+  border-color: var(--admin-border);
+  background: var(--admin-field-bg);
+  color: var(--admin-muted);
+}
+
+.admin-business-tabs .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
+.admin-business-tabs .ant-tabs-tab {
+  color: var(--admin-muted);
+  font-weight: 900;
+}
+
+.admin-business-tabs .ant-tabs-tab:hover,
+.admin-business-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--admin-text) !important;
+}
+
+.admin-business-tabs .ant-tabs-ink-bar {
+  background: #38bdf8;
+}
+
+.admin-business-tabs .ant-tabs-nav::before {
+  border-color: var(--admin-border) !important;
+}
+
+.admin-business-collapse {
+  border-color: var(--admin-border) !important;
+  background: transparent !important;
+}
+
+.admin-business-collapse .ant-collapse-item {
+  border-color: var(--admin-border) !important;
+}
+
+.admin-business-collapse .ant-collapse-header {
+  color: var(--admin-text) !important;
+  font-weight: 900;
+}
+
+.admin-business-collapse .ant-collapse-content {
+  border-color: var(--admin-border) !important;
+  background: color-mix(in srgb, var(--admin-surface-strong) 72%, var(--admin-surface)) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-business-collapse .ant-collapse-content-box {
+  padding: 16px !important;
 }
 
 .admin-ant-table .ant-table,

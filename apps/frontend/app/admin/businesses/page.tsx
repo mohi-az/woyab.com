@@ -32,12 +32,18 @@ function nullableOption<T extends { id: number; nameEn?: string | null; nameFa?:
   return item ? { id: item.id, nameEn: item.nameEn ?? null, nameFa: item.nameFa ?? null } : null;
 }
 
+type BusinessSpecialtyRow = {
+  businessId: string;
+  specialtyId: number;
+};
+
 export default async function AdminBusinessesPage({ searchParams }: PageProps) {
   const [params, t, admin] = await Promise.all([searchParams, getTranslations("Admin"), requireAdmin()]);
   const page = positiveInt(first(params.page));
   const status = first(params.status);
   const categoryId = optionalPositiveInt(first(params.categoryId));
   const cityId = optionalPositiveInt(first(params.cityId));
+  const createOpen = first(params.create) === "1";
   const q = first(params.q)?.trim();
   const validStatus = statuses.includes(status as (typeof statuses)[number]) ? status as (typeof statuses)[number] : null;
   const where = {
@@ -98,6 +104,18 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
       select: businessTagOptionSelect,
     }),
   ]);
+  const businessIds = businessesRaw.map((business) => business.id);
+  const specialtyRows = businessIds.length
+    ? await prisma.$queryRaw<BusinessSpecialtyRow[]>`
+        SELECT "businessId", "specialtyId"
+        FROM "business_specialties"
+        WHERE "businessId" = ANY(${businessIds})
+      `
+    : [];
+  const specialtyIdsByBusiness = new Map<string, number[]>();
+  for (const row of specialtyRows) {
+    specialtyIdsByBusiness.set(row.businessId, [...(specialtyIdsByBusiness.get(row.businessId) ?? []), row.specialtyId]);
+  }
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const pageQuery = new URLSearchParams();
   if (validStatus) pageQuery.set("status", validStatus);
@@ -121,6 +139,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     categoryId: business.categoryId,
     subCategoryId: business.subCategoryId,
     specialtyId: business.specialtyId,
+    specialtyIds: specialtyIdsByBusiness.get(business.id) ?? (business.specialtyId ? [business.specialtyId] : []),
     cityId: business.cityId,
     districtId: business.districtId,
     latitude: business.latitude,
@@ -174,6 +193,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
         attributeDefinitions={attributeDefinitions}
         tagOptions={tagOptions}
         canCreate={admin.role === "SUPER_ADMIN"}
+        initialCreateOpen={admin.role === "SUPER_ADMIN" && createOpen}
         previousHref={pageHref(Math.max(1, page - 1))}
         nextHref={pageHref(Math.min(totalPages, page + 1))}
       />

@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ConfigProvider, Steps } from "antd";
+import { Alert, Button, Collapse, ConfigProvider, Modal, Tabs } from "antd";
 import { useLocale, useTranslations } from "next-intl";
-import { FiEdit3, FiEye, FiLoader, FiPlus, FiX } from "react-icons/fi";
+import { FiEdit3, FiEye, FiLoader, FiPlus } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
-import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
-import { AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
+import { AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
+import { AdminMultiSelect, AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
 import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor, type BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
@@ -59,6 +59,7 @@ export type AdminBusinessRow = {
   categoryId: number;
   subCategoryId: number | null;
   specialtyId: number | null;
+  specialtyIds: number[];
   cityId: number;
   districtId: number | null;
   latitude: number | null;
@@ -95,6 +96,7 @@ type Props = {
   attributeDefinitions: BusinessAttributeDefinition[];
   tagOptions: BusinessTagOption[];
   canCreate: boolean;
+  initialCreateOpen: boolean;
   previousHref: string;
   nextHref: string;
 };
@@ -130,12 +132,10 @@ function emptyBusiness(): AdminBusinessRow | null {
 }
 
 function stepForField(field: string) {
-  if (["slug", "sourceLocale", "status"].includes(field)) return 0;
-  if (["categoryId", "cityId"].includes(field)) return 1;
-  if (field.startsWith("businessName_")) return 2;
-  if (field.startsWith("attribute_")) return 3;
-  if (field === "tagIds") return 4;
-  if (field.startsWith("hours_")) return 6;
+  if (["slug", "sourceLocale", "status", "categoryId", "cityId"].includes(field)) return 0;
+  if (field.startsWith("businessName_")) return 1;
+  if (field.startsWith("attribute_") || field === "tagIds") return 2;
+  if (field.startsWith("hours_")) return 4;
   return 0;
 }
 
@@ -174,7 +174,7 @@ function FieldShell({ label, required, error, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <label className={`admin-form-field grid gap-2 rounded-lg border p-3 ${error ? "admin-form-field-error" : ""}`}>
+    <label className={`admin-form-field grid min-w-0 gap-2 rounded-lg border p-3 ${error ? "admin-form-field-error" : ""}`}>
       <span className="admin-muted text-xs font-black">{required ? requiredLabel(label) : label}</span>
       {children}
       {error ? <span className="text-xs font-bold text-rose-400">{error}</span> : null}
@@ -195,6 +195,7 @@ export function AdminBusinessGrid({
   attributeDefinitions,
   tagOptions,
   canCreate,
+  initialCreateOpen,
   previousHref,
   nextHref,
 }: Props) {
@@ -202,8 +203,9 @@ export function AdminBusinessGrid({
   const tHours = useTranslations("BusinessHours");
   const locale = useLocale();
   const [editing, setEditing] = useState<AdminBusinessRow | null>(emptyBusiness());
-  const [creating, setCreating] = useState(false);
+  const [creating, setCreating] = useState(initialCreateOpen);
   const [wizardStep, setWizardStep] = useState(0);
+  const [locationPickerMounted, setLocationPickerMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState("");
   const [operationError, setOperationError] = useState("");
@@ -216,7 +218,16 @@ export function AdminBusinessGrid({
   const defaultCityId = cities[0]?.id ?? "";
   const featureText = localizedFeatureText(locale);
   const tagText = localizedTagText(locale);
-  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.classification"), t("businessWizard.translations"), featureText, tagText, t("businessWizard.location"), t("businessWizard.hours")];
+  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.translations"), `${featureText} / ${tagText}`, t("businessWizard.location"), t("businessWizard.hours")];
+
+  function changeWizardStep(step: number) {
+    setWizardStep(step);
+    if (step === 3) setLocationPickerMounted(true);
+  }
+
+  function stepHasError(step: number) {
+    return Object.keys(errors).some((field) => stepForField(field) === step);
+  }
 
   function uiStateFor(business: AdminBusinessRow): RowUiState {
     return rowUiStates[business.id] ?? {
@@ -248,6 +259,7 @@ export function AdminBusinessGrid({
     setEditing(null);
     setCreating(false);
     setWizardStep(0);
+    setLocationPickerMounted(false);
     setErrors({});
     setSubmitError("");
     setSaving(false);
@@ -258,6 +270,7 @@ export function AdminBusinessGrid({
     setEditing(null);
     setCreating(true);
     setWizardStep(0);
+    setLocationPickerMounted(false);
     setErrors({});
     setSubmitError("");
     setSaving(false);
@@ -268,6 +281,7 @@ export function AdminBusinessGrid({
     setCreating(false);
     setEditing(business);
     setWizardStep(0);
+    setLocationPickerMounted(false);
     setErrors({});
     setSubmitError("");
     setSaving(false);
@@ -311,10 +325,20 @@ export function AdminBusinessGrid({
     if (!slug) nextErrors.slug = t("validation.required");
     else if (!/^[a-z0-9-]+$/.test(slug)) nextErrors.slug = t("validation.slug");
     if (!formData.get("sourceLocale")) nextErrors.sourceLocale = t("validation.required");
-    if (!formData.get("status")) nextErrors.status = t("validation.required");
     if (!formData.get("categoryId")) nextErrors.categoryId = t("validation.required");
     if (!formData.get("cityId")) nextErrors.cityId = t("validation.required");
     if (!sourceBusinessName) nextErrors[sourceBusinessNameKey] = t("validation.sourceBusinessName");
+    const email = String(formData.get("email") ?? "").trim();
+    const phone = String(formData.get("phone") ?? "").trim();
+    const mobile = String(formData.get("mobile") ?? "").trim();
+    const website = String(formData.get("website") ?? "").trim();
+    const postalCode = String(formData.get("postalCode") ?? "").trim();
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextErrors.email = t("validation.email");
+    if (phone && !/^\+?[0-9\s().-]{6,24}$/.test(phone)) nextErrors.phone = t("validation.phone");
+    if (mobile && !/^\+?[0-9\s().-]{6,24}$/.test(mobile)) nextErrors.mobile = t("validation.phone");
+    if (website && !/^https?:\/\/[^\s]+\.[^\s]+$/i.test(website)) nextErrors.website = t("validation.website");
+    if (postalCode && !/^[A-Za-z0-9][A-Za-z0-9\s-]{2,12}$/.test(postalCode)) nextErrors.postalCode = t("validation.postalCode");
 
     return nextErrors;
   }
@@ -325,7 +349,7 @@ export function AdminBusinessGrid({
     const firstError = Object.keys(nextErrors)[0];
     if (firstError) {
       event.preventDefault();
-      setWizardStep(stepForField(firstError));
+      changeWizardStep(stepForField(firstError));
     }
   }
 
@@ -501,44 +525,54 @@ export function AdminBusinessGrid({
         </div>
       </AdminSection>
 
-      {modalOpen ? (
-        <div className="fixed inset-0 z-[80] grid place-items-center bg-slate-950/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-          <div className="admin-section max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-lg border shadow-2xl">
-            <div className="admin-section-header flex items-center justify-between gap-4 border-b px-5 py-4">
-              <div>
-                <h2 className="admin-title text-xl font-black">{creating ? t("businesses.createTitle") : t("businesses.editTitle")}</h2>
-                <p className="admin-muted mt-1 text-sm">{creating ? t("businesses.createDescription") : editing?.businessName}</p>
-              </div>
-              <button type="button" onClick={closeModal} className="admin-icon-button grid h-10 w-10 place-items-center rounded-lg border" aria-label={t("actions.cancel")}>
-                <FiX />
-              </button>
+      <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
+        <Modal
+          open={modalOpen}
+          onCancel={closeModal}
+          footer={null}
+          title={(
+            <div>
+              <h2 className="admin-title text-xl font-black">{creating ? t("businesses.createTitle") : t("businesses.editTitle")}</h2>
+              <p className="admin-muted mt-1 text-sm">{creating ? t("businesses.createDescription") : editing?.businessName}</p>
             </div>
-
-            <form action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-80px)] overflow-y-auto p-5">
+          )}
+          width={1080}
+          centered
+          destroyOnHidden
+          getContainer={false}
+          className="admin-business-modal"
+        >
+            <form action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] overflow-y-auto pt-1">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
-              <div className="grid gap-5">
-                <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
-                  <div className="admin-wizard-card rounded-lg border p-4">
-                    <Steps
-                      current={wizardStep}
-                      onChange={setWizardStep}
-                      responsive
-                      items={wizardSteps.map((label, index) => ({
-                        title: label,
-                        status: Object.keys(errors).some((field) => stepForField(field) === index) ? "error" : wizardStep === index ? "process" : index < wizardStep ? "finish" : "wait",
-                      }))}
-                    />
-                  </div>
-                </ConfigProvider>
+              {!locationPickerMounted ? (
+                <>
+                  <input type="hidden" name="latitude" value={editing?.latitude ?? ""} />
+                  <input type="hidden" name="longitude" value={editing?.longitude ?? ""} />
+                  <input type="hidden" name="address" value={editing?.address ?? ""} />
+                </>
+              ) : null}
+              <div className="grid gap-5 px-1 pb-1">
+                <Tabs
+                  activeKey={String(wizardStep)}
+                  onChange={(key) => changeWizardStep(Number(key))}
+                  className="admin-business-tabs"
+                  items={wizardSteps.map((label, index) => ({
+                    key: String(index),
+                    label: (
+                      <span className={stepHasError(index) ? "text-rose-300" : ""}>
+                        {label}
+                      </span>
+                    ),
+                  }))}
+                />
 
                 {submitError ? (
-                  <div className="rounded-lg border border-rose-400/35 bg-rose-500/10 px-4 py-3 text-sm font-bold text-rose-200">
-                    {submitError}
-                  </div>
+                  <Alert type="error" showIcon message={submitError} />
                 ) : null}
 
                 <section className={wizardStep === 0 ? "grid gap-4" : "hidden"}>
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+                    <div className="grid gap-4 md:grid-cols-2">
                     <FieldShell label={t("fields.slug")} required error={errors.slug}>
                       <input name="slug" defaultValue={editing?.slug ?? ""} className={inputClassName} placeholder="example-business-name" />
                     </FieldShell>
@@ -548,19 +582,9 @@ export function AdminBusinessGrid({
                     <FieldShell label={t("fields.sourceLocale")} required error={errors.sourceLocale}>
                       <select name="sourceLocale" defaultValue={editing?.sourceLocale ?? "DE"} className={inputClassName}>{locales.map((item) => <option key={item} value={item}>{item}</option>)}</select>
                     </FieldShell>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <FieldShell label={t("fields.status")} required error={errors.status}>
-                      <select name="status" defaultValue={editing?.status ?? "PENDING"} className={inputClassName}>{statuses.map((item) => <option key={item} value={item}>{item}</option>)}</select>
-                    </FieldShell>
-                    <FieldShell label={t("fields.verified")}>
-                      <select name="verified" defaultValue={String(editing?.verified ?? false)} className={inputClassName}><option value="true">{t("common.yes")}</option><option value="false">{t("common.no")}</option></select>
-                    </FieldShell>
-                    <FieldShell label={t("fields.featured")}>
-                      <select name="featured" defaultValue={String(editing?.featured ?? false)} className={inputClassName}><option value="true">{t("common.yes")}</option><option value="false">{t("common.no")}</option></select>
-                    </FieldShell>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
+                    <input type="hidden" name="status" value={editing?.status ?? "PENDING"} />
+                    <input type="hidden" name="verified" value={String(editing?.verified ?? false)} />
+                    <input type="hidden" name="featured" value={String(editing?.featured ?? false)} />
                     <FieldShell label={t("fields.owner")}>
                       <AdminSearchSelect
                         name="ownerId"
@@ -570,11 +594,8 @@ export function AdminBusinessGrid({
                         options={ownerOptions}
                       />
                     </FieldShell>
-                  </div>
-                </section>
-
-                <section className={wizardStep === 1 ? "grid gap-4" : "hidden"}>
-                  <div className="grid gap-4 md:grid-cols-2">
+                    </div>
+                    <div className="grid content-start gap-4">
                     <FieldShell label={t("fields.category")} required error={errors.categoryId}>
                       <AdminSearchSelect name="categoryId" defaultValue={editing?.categoryId ?? defaultCategoryId} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
                     </FieldShell>
@@ -582,44 +603,62 @@ export function AdminBusinessGrid({
                       <AdminSearchSelect name="subCategoryId" defaultValue={editing?.subCategoryId ?? ""} allowClear options={subCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
                     </FieldShell>
                     <FieldShell label={t("fields.specialty")}>
-                      <AdminSearchSelect name="specialtyId" defaultValue={editing?.specialtyId ?? ""} allowClear options={specialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                      <AdminMultiSelect name="specialtyIds" defaultValue={editing?.specialtyIds ?? (editing?.specialtyId ? [editing.specialtyId] : [])} options={specialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
                     </FieldShell>
                     <FieldShell label={t("fields.city")} required error={errors.cityId}>
                       <AdminSearchSelect name="cityId" defaultValue={editing?.cityId ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
                     </FieldShell>
+                    </div>
                   </div>
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <FieldShell label={t("fields.email")}><input name="email" defaultValue={editing?.email ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.phone")}><input name="phone" defaultValue={editing?.phone ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.mobile")}><input name="mobile" defaultValue={editing?.mobile ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.website")}><input name="website" defaultValue={editing?.website ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.postalCode")}><input name="postalCode" defaultValue={editing?.postalCode ?? ""} className={inputClassName} /></FieldShell>
+                  <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
+                    <FieldShell label={t("fields.email")} error={errors.email}><input name="email" defaultValue={editing?.email ?? ""} className={inputClassName} /></FieldShell>
+                    <FieldShell label={t("fields.phone")} error={errors.phone}><input name="phone" defaultValue={editing?.phone ?? ""} className={inputClassName} /></FieldShell>
+                    <FieldShell label={t("fields.mobile")} error={errors.mobile}><input name="mobile" defaultValue={editing?.mobile ?? ""} className={inputClassName} /></FieldShell>
+                    <FieldShell label={t("fields.website")} error={errors.website}><input name="website" defaultValue={editing?.website ?? ""} className={inputClassName} /></FieldShell>
+                    <FieldShell label={t("fields.postalCode")} error={errors.postalCode}><input name="postalCode" defaultValue={editing?.postalCode ?? ""} className={inputClassName} /></FieldShell>
                   </div>
+                </section>
+
+                <section className={wizardStep === 1 ? "grid gap-4" : "hidden"}>
+                  <Collapse
+                    className="admin-business-collapse"
+                    defaultActiveKey={[sourceLocaleDraft]}
+                    items={locales.map((locale) => {
+                      const translation = modalTranslations.get(locale);
+                      return {
+                        key: locale,
+                        label: (
+                          <span className={errors[`businessName_${locale}`] ? "text-rose-300" : ""}>
+                            {locale}
+                          </span>
+                        ),
+                        children: (
+                          <div className="grid gap-3">
+                            <FieldShell label={t("fields.businessName")} required={locale === sourceLocaleDraft} error={errors[`businessName_${locale}`]}>
+                              <input name={`businessName_${locale}`} defaultValue={translation?.businessName ?? ""} placeholder={t("fields.businessName")} className={inputClassName} />
+                            </FieldShell>
+                            <FieldShell label={t("fields.shortDescription")}>
+                              <input name={`shortDescription_${locale}`} defaultValue={translation?.shortDescription ?? ""} placeholder={t("fields.shortDescription")} className={inputClassName} />
+                            </FieldShell>
+                            <FieldShell label={t("fields.description")}>
+                              <textarea name={`description_${locale}`} defaultValue={translation?.description ?? ""} placeholder={t("fields.description")} rows={3} className={textAreaClassName} />
+                            </FieldShell>
+                          </div>
+                        ),
+                      };
+                    })}
+                  />
                 </section>
 
                 <section className={wizardStep === 2 ? "grid gap-4" : "hidden"}>
-                  {locales.map((locale) => {
-                    const translation = modalTranslations.get(locale);
-                    return (
-                      <fieldset key={locale} className="admin-field-panel rounded-lg border p-4">
-                        <legend className="px-2 text-xs font-black text-sky-200">{locale}</legend>
-                        <div className="grid gap-3">
-                          <FieldShell label={t("fields.businessName")} required={locale === sourceLocaleDraft} error={errors[`businessName_${locale}`]}>
-                            <input name={`businessName_${locale}`} defaultValue={translation?.businessName ?? ""} placeholder={t("fields.businessName")} className={inputClassName} />
-                          </FieldShell>
-                          <FieldShell label={t("fields.shortDescription")}>
-                            <input name={`shortDescription_${locale}`} defaultValue={translation?.shortDescription ?? ""} placeholder={t("fields.shortDescription")} className={inputClassName} />
-                          </FieldShell>
-                          <FieldShell label={t("fields.description")}>
-                            <textarea name={`description_${locale}`} defaultValue={translation?.description ?? ""} placeholder={t("fields.description")} rows={3} className={textAreaClassName} />
-                          </FieldShell>
-                        </div>
-                      </fieldset>
-                    );
-                  })}
-                </section>
-
-                <section className={wizardStep === 3 ? "grid gap-4" : "hidden"}>
+                  <fieldset className="admin-field-panel rounded-lg border p-4">
+                    <legend className="px-2 text-xs font-black text-sky-200">{tagText}</legend>
+                    <BusinessTagFields
+                      variant="admin"
+                      tags={tagOptions}
+                      values={editing?.tags ?? []}
+                    />
+                  </fieldset>
                   <fieldset className="admin-field-panel rounded-lg border p-4">
                     <legend className="px-2 text-xs font-black text-sky-200">{featureText}</legend>
                     <BusinessAttributeFields
@@ -630,21 +669,10 @@ export function AdminBusinessGrid({
                   </fieldset>
                 </section>
 
-                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
-                  <fieldset className="admin-field-panel rounded-lg border p-4">
-                    <legend className="px-2 text-xs font-black text-sky-200">{tagText}</legend>
-                    <BusinessTagFields
-                      variant="admin"
-                      tags={tagOptions}
-                      values={editing?.tags ?? []}
-                    />
-                  </fieldset>
-                </section>
-
-                <section className={wizardStep === 5 ? "grid gap-4" : "hidden"}>
+                <section className={wizardStep === 3 ? "grid gap-4" : "hidden"}>
                   <fieldset className="admin-field-panel rounded-lg border p-4">
                     <legend className="px-2 text-xs font-black text-sky-200">{t("location.title")}</legend>
-                    {wizardStep === 5 ? (
+                    {locationPickerMounted ? (
                       <BusinessLocationPicker
                         defaultAddress={editing?.address}
                         defaultLatitude={editing?.latitude}
@@ -654,29 +682,25 @@ export function AdminBusinessGrid({
                   </fieldset>
                 </section>
 
-                <section className={wizardStep === 6 ? "grid gap-4" : "hidden"}>
+                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
                   <fieldset className="admin-field-panel rounded-lg border p-4">
                     <legend className="px-2 text-xs font-black text-sky-200">{tHours("title")}</legend>
                     <BusinessHoursEditor variant="admin" defaultHours={editing?.businessHours ?? []} />
                   </fieldset>
                 </section>
 
-                <div className="sticky bottom-0 -mx-5 -mb-5 flex flex-wrap justify-between gap-3 border-t border-white/10 bg-[var(--admin-surface)] p-5">
-                  <button type="button" onClick={closeModal} className="admin-secondary-link rounded-lg border px-4 py-2 text-sm font-black">{t("actions.cancel")}</button>
+                <div className="sticky bottom-0 -mx-1 flex flex-wrap justify-between gap-3 border-t border-white/10 bg-[var(--admin-surface)] px-1 py-4">
+                  <Button onClick={closeModal}>{t("actions.cancel")}</Button>
                   <div className="flex gap-2">
-                    <button type="button" disabled={wizardStep === 0} onClick={() => setWizardStep((step) => Math.max(0, step - 1))} className="admin-secondary-link rounded-lg border px-4 py-2 text-sm font-black disabled:cursor-not-allowed disabled:opacity-50">{t("actions.previous")}</button>
-                    {wizardStep < wizardSteps.length - 1 ? (
-                      <button type="button" onClick={() => setWizardStep((step) => Math.min(wizardSteps.length - 1, step + 1))} className="admin-button rounded-lg border px-4 py-2 text-sm font-black">{t("actions.next")}</button>
-                    ) : (
-                      <AdminButton type="submit" disabled={saving} tone="success" className="px-4 py-2 text-sm">{saving ? t("actions.saving") : creating ? t("actions.create") : t("actions.save")}</AdminButton>
-                    )}
+                    <Button disabled={wizardStep === 0} onClick={() => changeWizardStep(Math.max(0, wizardStep - 1))}>{t("actions.previous")}</Button>
+                    <Button disabled={wizardStep === wizardSteps.length - 1} onClick={() => changeWizardStep(Math.min(wizardSteps.length - 1, wizardStep + 1))}>{t("actions.next")}</Button>
+                    <Button htmlType="submit" loading={saving} type="primary">{saving ? t("actions.saving") : creating ? t("actions.create") : t("actions.save")}</Button>
                   </div>
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-      ) : null}
+        </Modal>
+      </ConfigProvider>
     </>
   );
 }

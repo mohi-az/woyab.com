@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { AdminMultiSelect } from "@/components/admin/AdminSearchSelect";
 import { businessTagLabel, type BusinessTagOption, type BusinessTagValue } from "@/lib/business-tags";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 export function BusinessTagFields({ tags, values = [], variant = "owner" }: Props) {
   const locale = useLocale();
   const selected = new Set(values.map((item) => item.tagId));
+  const selectedValues = values.map((item) => item.tagId);
   const checkboxClassName = variant === "admin"
     ? "h-4 w-4 rounded border-white/20 bg-transparent text-sky-400 focus:ring-sky-400"
     : "h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary";
@@ -20,6 +22,17 @@ export function BusinessTagFields({ tags, values = [], variant = "owner" }: Prop
     : "flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-bold text-slate-700";
 
   if (!tags.length) return null;
+
+  if (variant === "admin") {
+    return (
+      <AdminMultiSelect
+        name="tagIds"
+        defaultValue={selectedValues}
+        placeholder={locale === "fa" ? "برچسب‌ها" : "Tags"}
+        options={tags.map((tag) => ({ value: String(tag.id), label: businessTagLabel(tag, locale) }))}
+      />
+    );
+  }
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
