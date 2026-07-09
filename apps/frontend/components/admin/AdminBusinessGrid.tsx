@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Alert, Button, Collapse, ConfigProvider, Modal, Tabs } from "antd";
 import { useLocale, useTranslations } from "next-intl";
-import { FiEdit3, FiEye, FiLoader, FiPlus } from "react-icons/fi";
+import { FiAlertCircle, FiCheck, FiClock, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
@@ -219,6 +219,10 @@ export function AdminBusinessGrid({
   const featureText = localizedFeatureText(locale);
   const tagText = localizedTagText(locale);
   const wizardSteps = [t("businessWizard.identity"), t("businessWizard.translations"), `${featureText} / ${tagText}`, t("businessWizard.location"), t("businessWizard.hours")];
+  const cardBasicInfo = locale === "fa" ? "اطلاعات پایه" : "Basic Information";
+  const cardTaxonomy = locale === "fa" ? "دسته‌بندی و تخصص" : "Category & Taxonomy";
+  const cardContactInfo = locale === "fa" ? "اطلاعات تماس" : "Contact Information";
+  const cardTranslations = locale === "fa" ? "ترجمه نام و توضیحات کسب‌وکار" : "Business Translations";
 
   function changeWizardStep(step: number) {
     setWizardStep(step);
@@ -531,18 +535,18 @@ export function AdminBusinessGrid({
           onCancel={closeModal}
           footer={null}
           title={(
-            <div>
-              <h2 className="admin-title text-xl font-black">{creating ? t("businesses.createTitle") : t("businesses.editTitle")}</h2>
-              <p className="admin-muted mt-1 text-sm">{creating ? t("businesses.createDescription") : editing?.businessName}</p>
+            <div className="border-b border-[var(--admin-border)] pb-4">
+              <h2 className="admin-title text-2xl font-black">{creating ? t("businesses.createTitle") : t("businesses.editTitle")}</h2>
+              <p className="admin-muted mt-1.5 text-sm">{creating ? t("businesses.createDescription") : editing?.businessName}</p>
             </div>
           )}
           width={1080}
           centered
-          destroyOnHidden
+          destroyOnClose
           getContainer={false}
           className="admin-business-modal"
         >
-            <form action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] overflow-y-auto pt-1">
+            <form action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {!locationPickerMounted ? (
                 <>
@@ -551,127 +555,181 @@ export function AdminBusinessGrid({
                   <input type="hidden" name="address" value={editing?.address ?? ""} />
                 </>
               ) : null}
-              <div className="grid gap-5 px-1 pb-1">
-                <Tabs
-                  activeKey={String(wizardStep)}
-                  onChange={(key) => changeWizardStep(Number(key))}
-                  className="admin-business-tabs"
-                  items={wizardSteps.map((label, index) => ({
-                    key: String(index),
-                    label: (
-                      <span className={stepHasError(index) ? "text-rose-300" : ""}>
-                        {label}
-                      </span>
-                    ),
-                  }))}
-                />
+              <div className="grid gap-6 px-1 pb-1">
+                {/* Modern Custom Wizard Steps */}
+                <div className="admin-wizard-steps">
+                  {wizardSteps.map((label, index) => {
+                    const isActive = wizardStep === index;
+                    const isCompleted = index < wizardStep;
+                    const hasError = stepHasError(index);
+                    
+                    const StepIcon = [
+                      FiInfo,
+                      FiGlobe,
+                      FiTag,
+                      FiMapPin,
+                      FiClock,
+                    ][index] || FiInfo;
+
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => changeWizardStep(index)}
+                        className={`admin-wizard-step ${isActive ? "active" : ""} ${isCompleted && !hasError ? "completed" : ""} ${hasError ? "error" : ""}`}
+                      >
+                        <div className="admin-wizard-step-bubble">
+                          {hasError ? (
+                            <FiAlertCircle className="h-5 w-5" />
+                          ) : isCompleted ? (
+                            <FiCheck className="h-5 w-5" />
+                          ) : (
+                            <StepIcon className="h-5 w-5" />
+                          )}
+                        </div>
+                        <span className="admin-wizard-step-label">
+                          {label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
 
                 {submitError ? (
-                  <Alert type="error" showIcon message={submitError} />
+                  <Alert type="error" showIcon message={submitError} className="mb-4" />
                 ) : null}
 
-                <section className={wizardStep === 0 ? "grid gap-4" : "hidden"}>
-                  <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-                    <div className="grid gap-4 md:grid-cols-2">
-                    <FieldShell label={t("fields.slug")} required error={errors.slug}>
-                      <input name="slug" defaultValue={editing?.slug ?? ""} className={inputClassName} placeholder="example-business-name" />
-                    </FieldShell>
-                    <FieldShell label={t("fields.legalName")}>
-                      <input name="legalName" defaultValue={editing?.legalName ?? ""} className={inputClassName} />
-                    </FieldShell>
-                    <FieldShell label={t("fields.sourceLocale")} required error={errors.sourceLocale}>
-                      <select name="sourceLocale" defaultValue={editing?.sourceLocale ?? "DE"} className={inputClassName}>{locales.map((item) => <option key={item} value={item}>{item}</option>)}</select>
-                    </FieldShell>
-                    <input type="hidden" name="status" value={editing?.status ?? "PENDING"} />
-                    <input type="hidden" name="verified" value={String(editing?.verified ?? false)} />
-                    <input type="hidden" name="featured" value={String(editing?.featured ?? false)} />
-                    <FieldShell label={t("fields.owner")}>
-                      <AdminSearchSelect
-                        name="ownerId"
-                        defaultValue={editing?.ownerId ?? ""}
-                        allowClear
-                        placeholder={t("fields.owner")}
-                        options={ownerOptions}
-                      />
-                    </FieldShell>
+                {/* Step 0: Identity */}
+                <section className={wizardStep === 0 ? "grid gap-6" : "hidden"}>
+                  <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                    <div className="admin-wizard-card-group flex flex-col gap-4">
+                      <h3 className="admin-wizard-card-title">{cardBasicInfo}</h3>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <FieldShell label={t("fields.slug")} required error={errors.slug}>
+                          <input name="slug" defaultValue={editing?.slug ?? ""} className={inputClassName} placeholder="example-business-name" />
+                        </FieldShell>
+                        <FieldShell label={t("fields.legalName")}>
+                          <input name="legalName" defaultValue={editing?.legalName ?? ""} className={inputClassName} />
+                        </FieldShell>
+                        <FieldShell label={t("fields.sourceLocale")} required error={errors.sourceLocale}>
+                          <select name="sourceLocale" defaultValue={editing?.sourceLocale ?? "DE"} className={inputClassName}>
+                            {locales.map((item) => <option key={item} value={item}>{item}</option>)}
+                          </select>
+                        </FieldShell>
+                        <input type="hidden" name="status" value={editing?.status ?? "PENDING"} />
+                        <input type="hidden" name="verified" value={String(editing?.verified ?? false)} />
+                        <input type="hidden" name="featured" value={String(editing?.featured ?? false)} />
+                        <FieldShell label={t("fields.owner")}>
+                          <AdminSearchSelect
+                            name="ownerId"
+                            defaultValue={editing?.ownerId ?? ""}
+                            allowClear
+                            placeholder={t("fields.owner")}
+                            options={ownerOptions}
+                          />
+                        </FieldShell>
+                      </div>
                     </div>
-                    <div className="grid content-start gap-4">
-                    <FieldShell label={t("fields.category")} required error={errors.categoryId}>
-                      <AdminSearchSelect name="categoryId" defaultValue={editing?.categoryId ?? defaultCategoryId} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
-                    </FieldShell>
-                    <FieldShell label={t("fields.subCategory")}>
-                      <AdminSearchSelect name="subCategoryId" defaultValue={editing?.subCategoryId ?? ""} allowClear options={subCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
-                    </FieldShell>
-                    <FieldShell label={t("fields.specialty")}>
-                      <AdminMultiSelect name="specialtyIds" defaultValue={editing?.specialtyIds ?? (editing?.specialtyId ? [editing.specialtyId] : [])} options={specialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
-                    </FieldShell>
-                    <FieldShell label={t("fields.city")} required error={errors.cityId}>
-                      <AdminSearchSelect name="cityId" defaultValue={editing?.cityId ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
-                    </FieldShell>
+
+                    <div className="admin-wizard-card-group flex flex-col gap-4">
+                      <h3 className="admin-wizard-card-title">{cardTaxonomy}</h3>
+                      <div className="grid content-start gap-4">
+                        <FieldShell label={t("fields.category")} required error={errors.categoryId}>
+                          <AdminSearchSelect name="categoryId" defaultValue={editing?.categoryId ?? editing?.category?.id ?? defaultCategoryId} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
+                        </FieldShell>
+                        <FieldShell label={t("fields.subCategory")}>
+                          <AdminSearchSelect name="subCategoryId" defaultValue={editing?.subCategoryId ?? editing?.subCategory?.id ?? ""} allowClear options={subCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                        </FieldShell>
+                        <FieldShell label={t("fields.specialty")}>
+                          <AdminMultiSelect name="specialtyIds" defaultValue={editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])} options={specialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                        </FieldShell>
+                        <FieldShell label={t("fields.city")} required error={errors.cityId}>
+                          <AdminSearchSelect name="cityId" defaultValue={editing?.cityId ?? editing?.city?.id ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
+                        </FieldShell>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
-                    <FieldShell label={t("fields.email")} error={errors.email}><input name="email" defaultValue={editing?.email ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.phone")} error={errors.phone}><input name="phone" defaultValue={editing?.phone ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.mobile")} error={errors.mobile}><input name="mobile" defaultValue={editing?.mobile ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.website")} error={errors.website}><input name="website" defaultValue={editing?.website ?? ""} className={inputClassName} /></FieldShell>
-                    <FieldShell label={t("fields.postalCode")} error={errors.postalCode}><input name="postalCode" defaultValue={editing?.postalCode ?? ""} className={inputClassName} /></FieldShell>
+
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{cardContactInfo}</h3>
+                    <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
+                      <FieldShell label={t("fields.email")} error={errors.email}>
+                        <input name="email" defaultValue={editing?.email ?? ""} className={inputClassName} />
+                      </FieldShell>
+                      <FieldShell label={t("fields.phone")} error={errors.phone}>
+                        <input name="phone" defaultValue={editing?.phone ?? ""} className={inputClassName} />
+                      </FieldShell>
+                      <FieldShell label={t("fields.mobile")} error={errors.mobile}>
+                        <input name="mobile" defaultValue={editing?.mobile ?? ""} className={inputClassName} />
+                      </FieldShell>
+                      <FieldShell label={t("fields.website")} error={errors.website}>
+                        <input name="website" defaultValue={editing?.website ?? ""} className={inputClassName} />
+                      </FieldShell>
+                      <FieldShell label={t("fields.postalCode")} error={errors.postalCode}>
+                        <input name="postalCode" defaultValue={editing?.postalCode ?? ""} className={inputClassName} />
+                      </FieldShell>
+                    </div>
                   </div>
                 </section>
 
+                {/* Step 1: Translations */}
                 <section className={wizardStep === 1 ? "grid gap-4" : "hidden"}>
-                  <Collapse
-                    className="admin-business-collapse"
-                    defaultActiveKey={[sourceLocaleDraft]}
-                    items={locales.map((locale) => {
-                      const translation = modalTranslations.get(locale);
-                      return {
-                        key: locale,
-                        label: (
-                          <span className={errors[`businessName_${locale}`] ? "text-rose-300" : ""}>
-                            {locale}
-                          </span>
-                        ),
-                        children: (
-                          <div className="grid gap-3">
-                            <FieldShell label={t("fields.businessName")} required={locale === sourceLocaleDraft} error={errors[`businessName_${locale}`]}>
-                              <input name={`businessName_${locale}`} defaultValue={translation?.businessName ?? ""} placeholder={t("fields.businessName")} className={inputClassName} />
-                            </FieldShell>
-                            <FieldShell label={t("fields.shortDescription")}>
-                              <input name={`shortDescription_${locale}`} defaultValue={translation?.shortDescription ?? ""} placeholder={t("fields.shortDescription")} className={inputClassName} />
-                            </FieldShell>
-                            <FieldShell label={t("fields.description")}>
-                              <textarea name={`description_${locale}`} defaultValue={translation?.description ?? ""} placeholder={t("fields.description")} rows={3} className={textAreaClassName} />
-                            </FieldShell>
-                          </div>
-                        ),
-                      };
-                    })}
-                  />
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{cardTranslations}</h3>
+                    <Collapse
+                      className="admin-business-collapse border-0 bg-transparent"
+                      defaultActiveKey={[sourceLocaleDraft]}
+                      items={locales.map((locale) => {
+                        const translation = modalTranslations.get(locale);
+                        return {
+                          key: locale,
+                          label: (
+                            <span className={errors[`businessName_${locale}`] ? "text-rose-400 font-bold" : ""}>
+                              {locale === "FA" ? "Farsi / فارسی" : locale === "DE" ? "German / آلمانی" : "English / انگلیسی"}
+                            </span>
+                          ),
+                          children: (
+                            <div className="grid gap-4">
+                              <FieldShell label={t("fields.businessName")} required={locale === sourceLocaleDraft} error={errors[`businessName_${locale}`]}>
+                                <input name={`businessName_${locale}`} defaultValue={translation?.businessName ?? ""} placeholder={t("fields.businessName")} className={inputClassName} />
+                              </FieldShell>
+                              <FieldShell label={t("fields.shortDescription")}>
+                                <input name={`shortDescription_${locale}`} defaultValue={translation?.shortDescription ?? ""} placeholder={t("fields.shortDescription")} className={inputClassName} />
+                              </FieldShell>
+                              <FieldShell label={t("fields.description")}>
+                                <textarea name={`description_${locale}`} defaultValue={translation?.description ?? ""} placeholder={t("fields.description")} rows={4} className={textAreaClassName} />
+                              </FieldShell>
+                            </div>
+                          ),
+                        };
+                      })}
+                    />
+                  </div>
                 </section>
 
-                <section className={wizardStep === 2 ? "grid gap-4" : "hidden"}>
-                  <fieldset className="admin-field-panel rounded-lg border p-4">
-                    <legend className="px-2 text-xs font-black text-sky-200">{tagText}</legend>
+                {/* Step 2: Features / Tags */}
+                <section className={wizardStep === 2 ? "grid gap-6" : "hidden"}>
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{tagText}</h3>
                     <BusinessTagFields
                       variant="admin"
                       tags={tagOptions}
                       values={editing?.tags ?? []}
                     />
-                  </fieldset>
-                  <fieldset className="admin-field-panel rounded-lg border p-4">
-                    <legend className="px-2 text-xs font-black text-sky-200">{featureText}</legend>
+                  </div>
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{featureText}</h3>
                     <BusinessAttributeFields
                       variant="admin"
                       definitions={attributeDefinitions}
                       values={editing?.attributes ?? []}
                     />
-                  </fieldset>
+                  </div>
                 </section>
 
+                {/* Step 3: Location */}
                 <section className={wizardStep === 3 ? "grid gap-4" : "hidden"}>
-                  <fieldset className="admin-field-panel rounded-lg border p-4">
-                    <legend className="px-2 text-xs font-black text-sky-200">{t("location.title")}</legend>
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{t("location.title")}</h3>
                     {locationPickerMounted ? (
                       <BusinessLocationPicker
                         defaultAddress={editing?.address}
@@ -679,22 +737,48 @@ export function AdminBusinessGrid({
                         defaultLongitude={editing?.longitude}
                       />
                     ) : null}
-                  </fieldset>
+                  </div>
                 </section>
 
+                {/* Step 4: Hours */}
                 <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
-                  <fieldset className="admin-field-panel rounded-lg border p-4">
-                    <legend className="px-2 text-xs font-black text-sky-200">{tHours("title")}</legend>
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{tHours("title")}</h3>
                     <BusinessHoursEditor variant="admin" defaultHours={editing?.businessHours ?? []} />
-                  </fieldset>
+                  </div>
                 </section>
 
-                <div className="sticky bottom-0 -mx-1 flex flex-wrap justify-between gap-3 border-t border-white/10 bg-[var(--admin-surface)] px-1 py-4">
-                  <Button onClick={closeModal}>{t("actions.cancel")}</Button>
+                {/* Sticky Footer Action Buttons */}
+                <div className="sticky bottom-0 -mx-1 mt-4 flex flex-wrap justify-between gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-1 py-4 z-20">
+                  <Button
+                    onClick={closeModal}
+                    className="h-10 rounded-lg px-4 border-[var(--admin-border)] hover:bg-white/5 transition-all text-sm font-bold text-[var(--admin-text)]"
+                  >
+                    {t("actions.cancel")}
+                  </Button>
                   <div className="flex gap-2">
-                    <Button disabled={wizardStep === 0} onClick={() => changeWizardStep(Math.max(0, wizardStep - 1))}>{t("actions.previous")}</Button>
-                    <Button disabled={wizardStep === wizardSteps.length - 1} onClick={() => changeWizardStep(Math.min(wizardSteps.length - 1, wizardStep + 1))}>{t("actions.next")}</Button>
-                    <Button htmlType="submit" loading={saving} type="primary">{saving ? t("actions.saving") : creating ? t("actions.create") : t("actions.save")}</Button>
+                    <Button
+                      disabled={wizardStep === 0}
+                      onClick={() => changeWizardStep(Math.max(0, wizardStep - 1))}
+                      className="h-10 rounded-lg px-4 border-[var(--admin-border)] hover:bg-white/5 transition-all text-sm font-bold text-[var(--admin-text)]"
+                    >
+                      {t("actions.previous")}
+                    </Button>
+                    <Button
+                      disabled={wizardStep === wizardSteps.length - 1}
+                      onClick={() => changeWizardStep(Math.min(wizardSteps.length - 1, wizardStep + 1))}
+                      className="h-10 rounded-lg px-4 bg-sky-500 hover:bg-sky-400 border-0 text-white font-bold transition-all shadow-md"
+                    >
+                      {t("actions.next")}
+                    </Button>
+                    <Button
+                      htmlType="submit"
+                      loading={saving}
+                      type="primary"
+                      className="h-10 rounded-lg px-5 bg-emerald-500 hover:bg-emerald-400 border-0 text-white font-bold transition-all shadow-md shadow-emerald-500/10"
+                    >
+                      {saving ? t("actions.saving") : creating ? t("actions.create") : t("actions.save")}
+                    </Button>
                   </div>
                 </div>
               </div>

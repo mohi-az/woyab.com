@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FiActivity,
   FiBarChart2,
@@ -60,6 +60,10 @@ export function AdminShell({ user, children, initialTheme }: {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dark, setDark] = useState(initialTheme === "dark");
+
+  useEffect(() => {
+    document.body.setAttribute("data-admin-theme", dark ? "dark" : "light");
+  }, [dark]);
   const normalizedPath = normalizePath(pathname);
   const displayName = user.name || user.email || t("shell.fallbackName");
   const initials = displayName.slice(0, 1).toUpperCase();

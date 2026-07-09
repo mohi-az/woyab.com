@@ -59,6 +59,7 @@ html[lang="fa"] .admin-shell * {
   font-family: var(--font-dirooz);
 }
 
+body,
 .admin-shell {
   --admin-page-bg: #171d31;
   --admin-surface: #20283d;
@@ -75,10 +76,9 @@ html[lang="fa"] .admin-shell * {
   --admin-brand: #fb5c73;
   --admin-active-bg: #ffffff;
   --admin-active-text: #20283d;
-  background: var(--admin-page-bg);
-  color: var(--admin-text);
 }
 
+body[data-admin-theme="light"],
 .admin-shell[data-admin-theme="light"] {
   --admin-page-bg: #eef3f9;
   --admin-surface: #ffffff;
@@ -95,6 +95,11 @@ html[lang="fa"] .admin-shell * {
   --admin-brand: #fb5c73;
   --admin-active-bg: #0f172a;
   --admin-active-text: #ffffff;
+}
+
+.admin-shell {
+  background: var(--admin-page-bg);
+  color: var(--admin-text);
 }
 
 .admin-main {
@@ -1313,3 +1318,262 @@ html[dir="rtl"] .mapboxgl-popup-content {
 html[dir="rtl"] .address-map-popup {
   padding: 14px 16px 14px 44px;
 }
+
+/* --- Modern Admin Wizard UI/UX Improvements --- */
+.admin-wizard-steps {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  position: relative;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.admin-wizard-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.admin-wizard-step::after {
+  content: '';
+  position: absolute;
+  top: calc(1.5rem - 1px); /* half of bubble height minus half of line height */
+  left: calc(50% + 1.5rem); /* Start exactly from the edge of the bubble */
+  width: calc(100% - 3rem); /* Reach exactly to the edge of the next bubble */
+  height: 2px;
+  background: var(--admin-border);
+  z-index: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-wizard-step:last-child::after {
+  display: none;
+}
+
+html[lang="fa"] .admin-wizard-step::after {
+  left: auto;
+  right: calc(50% + 1.5rem);
+}
+
+.admin-wizard-step-bubble {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: var(--admin-field-bg);
+  border: 2px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--admin-muted);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.admin-wizard-step-label {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--admin-muted);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+/* States */
+.admin-wizard-step.active .admin-wizard-step-bubble {
+  border-color: #38bdf8;
+  background: color-mix(in srgb, #38bdf8 15%, var(--admin-field-bg));
+  color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18), 0 10px 15px -3px rgba(56, 189, 248, 0.15);
+  transform: scale(1.05);
+}
+
+.admin-wizard-step.active .admin-wizard-step-label {
+  color: var(--admin-text);
+  font-weight: 900;
+}
+
+.admin-wizard-step.completed .admin-wizard-step-bubble {
+  border-color: #10b981;
+  background: color-mix(in srgb, #10b981 12%, var(--admin-field-bg));
+  color: #10b981;
+}
+
+.admin-wizard-step.completed .admin-wizard-step-label {
+  color: var(--admin-text);
+}
+
+.admin-wizard-step.completed::after {
+  background: #10b981;
+}
+
+.admin-wizard-step.error .admin-wizard-step-bubble {
+  border-color: #f43f5e;
+  background: color-mix(in srgb, #f43f5e 12%, var(--admin-field-bg));
+  color: #f43f5e;
+  animation: admin-shake 0.5s ease-in-out;
+}
+
+.admin-wizard-step.error .admin-wizard-step-label {
+  color: #f43f5e;
+}
+
+@keyframes admin-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Ant Design overrides for absolute visual consistency */
+.admin-shell .ant-modal .ant-modal-content {
+  background-color: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
+  border: 1px solid var(--admin-border) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5) !important;
+  overflow: hidden;
+}
+
+.admin-shell .ant-modal .ant-modal-header {
+  background-color: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+  margin-bottom: 1.5rem !important;
+  padding: 1.5rem 1.5rem 1rem !important;
+}
+
+.admin-shell .ant-modal .ant-modal-close {
+  color: var(--admin-muted) !important;
+  transition: all 0.2s ease;
+}
+
+.admin-shell .ant-modal .ant-modal-close:hover {
+  background-color: var(--admin-row-hover) !important;
+  color: var(--admin-text) !important;
+}
+
+.admin-shell .ant-modal .ant-modal-body {
+  background-color: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
+  padding: 0 1.5rem 1.5rem !important;
+}
+
+/* Theme fixes for Ant Select inputs */
+.admin-ant-select .ant-select-selector {
+  background-color: var(--admin-field-bg) !important;
+  color: var(--admin-text) !important;
+  border: 1px solid var(--admin-field-border) !important;
+  border-radius: 0.5rem !important;
+  min-height: 44px !important;
+  transition: all 0.2s ease !important;
+}
+
+.admin-ant-select .ant-select-selector:hover {
+  border-color: #38bdf8 !important;
+}
+
+.admin-ant-select.ant-select-focused .ant-select-selector {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+}
+
+.admin-ant-select .ant-select-selection-item,
+.admin-ant-select .ant-select-selection-placeholder {
+  color: var(--admin-text) !important;
+  line-height: 42px !important;
+}
+
+.admin-ant-select .ant-select-selection-placeholder {
+  color: var(--admin-muted) !important;
+  opacity: 0.8;
+}
+
+/* Specialty Tags in Select */
+.admin-ant-select .ant-select-selection-overflow-item .ant-select-selection-item {
+  background-color: color-mix(in srgb, var(--admin-surface-strong) 60%, var(--admin-surface)) !important;
+  border: 1px solid var(--admin-border) !important;
+  border-radius: 0.375rem !important;
+  color: var(--admin-text) !important;
+  height: 28px !important;
+  line-height: 26px !important;
+  margin-top: 6px !important;
+}
+
+.admin-ant-select .ant-select-selection-overflow-item .ant-select-selection-item-remove {
+  color: var(--admin-muted) !important;
+}
+
+.admin-ant-select .ant-select-selection-overflow-item .ant-select-selection-item-remove:hover {
+  color: #f43f5e !important;
+}
+
+/* Theme fixes for dropdown menus */
+.admin-ant-select-dropdown {
+  background-color: var(--admin-surface) !important;
+  border: 1px solid var(--admin-border) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3) !important;
+}
+
+.admin-ant-select-dropdown .ant-select-item-option {
+  color: var(--admin-text) !important;
+  border-radius: 0.25rem !important;
+  margin: 0.125rem 0.25rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.admin-ant-select-dropdown .ant-select-item-option-content {
+  color: var(--admin-text) !important;
+}
+
+.admin-ant-select-dropdown .ant-select-item-option-active {
+  background-color: var(--admin-row-hover) !important;
+}
+
+.admin-ant-select-dropdown .ant-select-item-option-selected {
+  background-color: color-mix(in srgb, #38bdf8 15%, var(--admin-surface)) !important;
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+}
+
+/* Native select element theme */
+.admin-shell select.admin-input {
+  background-color: var(--admin-field-bg) !important;
+  color: var(--admin-text) !important;
+  border-color: var(--admin-field-border) !important;
+}
+
+.admin-shell select.admin-input option {
+  background-color: var(--admin-surface) !important;
+  color: var(--admin-text) !important;
+}
+
+/* Custom layout enhancements for wizard cards */
+.admin-wizard-card-group {
+  background: color-mix(in srgb, var(--admin-surface-strong) 60%, var(--admin-surface));
+  border: 1px solid var(--admin-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+}
+
+.admin-wizard-card-group:hover {
+  border-color: color-mix(in srgb, var(--admin-border) 80%, var(--admin-text));
+}
+
+.admin-wizard-card-title {
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #38bdf8;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--admin-border);
+  letter-spacing: 0.05em;
+}
+
