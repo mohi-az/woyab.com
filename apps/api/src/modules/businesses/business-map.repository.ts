@@ -57,6 +57,14 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
     Prisma.sql`bl."active" = TRUE`,
+    Prisma.sql`(
+      city."latitude" IS NULL OR city."longitude" IS NULL OR
+      ST_DWithin(
+        bl."geo_point",
+        ST_SetSRID(ST_MakePoint(city."longitude", city."latitude"), 4326)::geography,
+        100000
+      )
+    )`,
   ];
   let originPoint: Prisma.Sql | null = null;
 

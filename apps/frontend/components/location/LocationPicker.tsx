@@ -106,13 +106,16 @@ export function LocationPicker({
         Number.isFinite(parsed.value.longitude)
       ) {
         skipFirstPersistRef.current = true;
-        window.setTimeout(() => {
+        const operation = operationRef.current;
+        const restoreTimer = window.setTimeout(() => {
+          if (operation !== operationRef.current) return;
           setQuery(parsed.value!.label);
           onChange(parsed.value!);
           if (parsed.radiusKm === null || RADIUS_OPTIONS.includes(parsed.radiusKm ?? 5)) {
             onRadiusChange(parsed.radiusKm === null ? null : parsed.radiusKm ?? 5);
           }
         }, 0);
+        return () => window.clearTimeout(restoreTimer);
       }
     } catch {
       sessionStorage.removeItem(storageKey);
@@ -246,7 +249,10 @@ export function LocationPicker({
             ? labels.timeout
             : labels.unavailable);
       },
-      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
+      // A cached fix can belong to a previous network/location (for example,
+      // Cologne after the user has moved to Berlin). Always request a fresh
+      // reading when the user explicitly clicks the current-location button.
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 },
     );
   }
 
@@ -385,9 +391,6 @@ export function LocationPicker({
             )) : <p className="p-4 text-center text-sm text-gray-500">{labels.noResults}</p>}
           </div>
         ) : null}
-        <p className="mt-1.5 text-[10px] text-gray-400">
-          Location data: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" className="underline hover:text-gray-600">GeoNames</a>
-        </p>
       </div>
 
       {error ? <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">{error}</p> : null}

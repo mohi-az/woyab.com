@@ -26,6 +26,17 @@ function spatialConditions(input: BusinessSearchBody) {
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
     Prisma.sql`bl."active" = TRUE`,
+    // Do not surface corrupt locations whose coordinates are hundreds of
+    // kilometres away from their assigned city. Keep the check permissive
+    // enough for metro areas and records whose city has no coordinates.
+    Prisma.sql`(
+      city."latitude" IS NULL OR city."longitude" IS NULL OR
+      ST_DWithin(
+        bl."geo_point",
+        ST_SetSRID(ST_MakePoint(city."longitude", city."latitude"), 4326)::geography,
+        100000
+      )
+    )`,
   ];
 
   if (origin.radiusKm !== undefined) {
