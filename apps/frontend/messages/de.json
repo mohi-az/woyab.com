@@ -557,6 +557,14 @@
       }
     }
   },
+  "Analytics": {
+    "title": "Besucheranalyse", "adminDescription": "Besuche nach Unternehmen, Städten und Kategorien analysieren.", "ownerDescription": "Besuche Ihrer Unternehmenseinträge verfolgen.",
+    "ranges": { "7": "Letzte 7 Tage", "30": "Letzte 30 Tage", "90": "Letzte 90 Tage", "365": "Letzte 12 Monate" },
+    "allCities": "Alle Städte", "allCategories": "Alle Kategorien", "allBusinesses": "Alle Unternehmen", "apply": "Anwenden",
+    "totalViews": "Aufrufe gesamt", "uniqueVisitors": "Eindeutige Besucher", "sessions": "Sitzungen", "activeBusinesses": "Besuchte Unternehmen", "dailyAverage": "Tagesdurchschnitt", "coveredCities": "Erreichte Städte",
+    "trend": "Besucherverlauf", "trendDescription": "Tägliche Aufrufe öffentlicher Unternehmensseiten.", "topBusinesses": "Top-Unternehmen", "topCities": "Top-Städte", "topCategories": "Top-Kategorien", "empty": "Keine Besuchsdaten für diesen Zeitraum",
+    "openBusinessReport": "Vollständigen Unternehmensbericht öffnen", "businessReportTitle": "Unternehmensleistung", "businessReportDescription": "Detaillierter 30-Tage-Vergleich von Reichweite und wiederkehrenden Besuchen aller aktiven Unternehmen.", "searchBusinesses": "Unternehmen, Stadt oder Kategorie suchen", "periodChange": "30-Tage-Änderung", "viewsPerVisitor": "Aufrufe / Besucher", "business": "Unternehmen"
+  },
   "Admin": {
     "shell": {
       "fallbackName": "Fargo Admin",
@@ -570,6 +578,7 @@
     },
     "nav": {
       "overview": "Dashboard",
+      "analytics": "Besucheranalyse",
       "businesses": "Eintraege",
       "reviews": "Bewertungen",
       "users": "Benutzer",

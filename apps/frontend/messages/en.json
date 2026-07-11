@@ -557,6 +557,14 @@
       }
     }
   },
+  "Analytics": {
+    "title": "Visitor analytics", "adminDescription": "Explore visits across businesses, cities and categories.", "ownerDescription": "Track visits to your business listings.",
+    "ranges": { "7": "Last 7 days", "30": "Last 30 days", "90": "Last 90 days", "365": "Last 12 months" },
+    "allCities": "All cities", "allCategories": "All categories", "allBusinesses": "All businesses", "apply": "Apply",
+    "totalViews": "Total views", "uniqueVisitors": "Unique visitors", "sessions": "Sessions", "activeBusinesses": "Viewed businesses", "dailyAverage": "Daily average", "coveredCities": "Cities reached",
+    "trend": "Visit trend", "trendDescription": "Daily public business-page views.", "topBusinesses": "Top businesses", "topCities": "Top cities", "topCategories": "Top categories", "empty": "No visit data for this period",
+    "openBusinessReport": "Open full business report", "businessReportTitle": "Business performance", "businessReportDescription": "A detailed 30-day comparison of reach, repeat visits and engagement across every active business.", "searchBusinesses": "Search business, city or category", "periodChange": "30-day change", "viewsPerVisitor": "Views / visitor", "business": "Business"
+  },
   "Admin": {
     "shell": {
       "fallbackName": "Fargo admin",
@@ -570,6 +578,7 @@
     },
     "nav": {
       "overview": "Dashboard",
+      "analytics": "Visitor analytics",
       "businesses": "Listings",
       "reviews": "Reviews",
       "users": "Users",

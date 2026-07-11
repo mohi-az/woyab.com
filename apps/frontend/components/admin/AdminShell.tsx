@@ -34,6 +34,7 @@ type AdminUser = {
 
 const navItems = [
   { href: "/admin", key: "overview", icon: FiGrid },
+  { href: "/admin/analytics", key: "analytics", icon: FiBarChart2 },
   { href: "/admin/businesses", key: "businesses", icon: FiBriefcase },
   { href: "/admin/reviews", key: "reviews", icon: FiCheckSquare },
   { href: "/admin/users", key: "users", icon: FiUsers },

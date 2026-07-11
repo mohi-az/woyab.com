@@ -157,6 +157,9 @@ export default async function OwnerDashboardPage({ searchParams }: PageProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <Link href="/dashboard/owner/analytics" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-5 text-sm font-black text-white">
+            <FiBarChart2 /> Visitor analytics
+          </Link>
           <form>
             <select name="businessId" defaultValue={selectedBusinessId} className="min-h-12 rounded-2xl border border-white/10 bg-white px-4 text-sm font-black text-slate-900" onChange={(event) => event.currentTarget.form?.requestSubmit()}>
               {businesses.length > 1 ? <option value="all">All businesses</option> : null}

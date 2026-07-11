@@ -167,8 +167,21 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   }, []);
 
   useEffect(() => {
+    const visitorKey = "fargo_analytics_visitor";
+    const sessionKey = "fargo_analytics_session";
+    const sessionActivityKey = "fargo_analytics_session_activity";
+    const now = Date.now();
+    const newId = () => crypto.randomUUID().replaceAll("-", "");
+    let visitorId = localStorage.getItem(visitorKey);
+    if (!visitorId) { visitorId = newId(); localStorage.setItem(visitorKey, visitorId); }
+    const lastActivity = Number(localStorage.getItem(sessionActivityKey) || 0);
+    let sessionId = localStorage.getItem(sessionKey);
+    if (!sessionId || now - lastActivity > 30 * 60 * 1000) { sessionId = newId(); localStorage.setItem(sessionKey, sessionId); }
+    localStorage.setItem(sessionActivityKey, String(now));
     void fetch(`/api/businesses/${business.id}/views`, {
       method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ visitorId, sessionId }),
       keepalive: true,
     }).catch(() => undefined);
   }, [business.id]);

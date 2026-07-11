@@ -112,6 +112,21 @@ model BusinessViewDaily {
   @@map("business_view_daily")
 }
 
+model BusinessAnalyticsEvent {
+  id         String   @id @default(cuid())
+  businessId String
+  visitorId  String
+  sessionId  String
+  occurredAt DateTime @default(now())
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([occurredAt])
+  @@index([businessId, occurredAt])
+  @@index([visitorId, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@map("business_analytics_events")
+}
+
 model ContactMessage {
   id           String                 @id @default(cuid())
   businessId   String

@@ -46,6 +46,7 @@ model Business {
   translations      BusinessTranslation[]
   videos            BusinessVideo[]
   businessViewDaily BusinessViewDaily[]
+  analyticsEvents   BusinessAnalyticsEvent[]
   category          Category              @relation(fields: [categoryId], references: [id])
   city              City                  @relation(fields: [cityId], references: [id])
   district          District?             @relation(fields: [districtId], references: [id])

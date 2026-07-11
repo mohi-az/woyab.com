@@ -555,6 +555,14 @@
       }
     }
   },
+  "Analytics": {
+    "title": "تحلیل بازدید", "adminDescription": "بازدیدها را به تفکیک کسب‌وکار، شهر و دسته‌بندی تحلیل کنید.", "ownerDescription": "بازدید از صفحه کسب‌وکارهای خود را دنبال کنید.",
+    "ranges": { "7": "۷ روز گذشته", "30": "۳۰ روز گذشته", "90": "۹۰ روز گذشته", "365": "۱۲ ماه گذشته" },
+    "allCities": "همه شهرها", "allCategories": "همه دسته‌بندی‌ها", "allBusinesses": "همه کسب‌وکارها", "apply": "اعمال",
+    "totalViews": "کل بازدیدها", "uniqueVisitors": "بازدیدکنندگان یکتا", "sessions": "نشست‌ها", "activeBusinesses": "کسب‌وکارهای دیده‌شده", "dailyAverage": "میانگین روزانه", "coveredCities": "شهرهای فعال",
+    "trend": "روند بازدید", "trendDescription": "بازدید روزانه صفحات عمومی کسب‌وکارها.", "topBusinesses": "برترین کسب‌وکارها", "topCities": "برترین شهرها", "topCategories": "برترین دسته‌بندی‌ها", "empty": "در این بازه داده‌ای برای نمایش وجود ندارد",
+    "openBusinessReport": "مشاهده گزارش کامل کسب‌وکارها", "businessReportTitle": "عملکرد کسب‌وکارها", "businessReportDescription": "مقایسه تحلیلی ۳۰ روزه میزان دیده‌شدن، بازدید مجدد و تعامل تمام کسب‌وکارهای فعال.", "searchBusinesses": "جستجوی کسب‌وکار، شهر یا دسته‌بندی", "periodChange": "تغییر ۳۰ روزه", "viewsPerVisitor": "بازدید / کاربر", "business": "کسب‌وکار"
+  },
   "Admin": {
     "shell": {
       "fallbackName": "مدیر فارگو",
@@ -568,6 +576,7 @@
     },
     "nav": {
       "overview": "داشبورد",
+      "analytics": "تحلیل بازدید",
       "businesses": "کسب‌وکارها",
       "reviews": "نظرها",
       "users": "کاربران",
