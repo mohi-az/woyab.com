@@ -280,9 +280,10 @@
       "messagePlaceholder": "Schreiben Sie Ihre Nachricht",
       "submit": "Nachricht senden",
       "sending": "Wird gesendet...",
-      "submitSuccess": "Ihre Nachricht wurde gesendet.",
-      "submitSuccessMock": "Die Nachricht wurde im Mock-Modus akzeptiert. Fugen Sie die E-Mail-Env-Werte hinzu, um echte Zustellung zu aktivieren.",
-      "submitError": "Ihre Nachricht konnte nicht gesendet werden."
+      "submitSuccess": "Ihre Nachricht wurde im Postfach des Unternehmens gespeichert.",
+      "submitSuccessMock": "Ihre Nachricht wurde im Postfach des Unternehmens gespeichert.",
+      "submitError": "Ihre Nachricht konnte nicht gesendet werden.",
+      "unavailable": "Direktnachrichten sind für dieses Unternehmen noch nicht verfügbar. Bitte prüfen Sie die Angaben auf dieser Seite oder versuchen Sie es später erneut."
     },
     "hoursTitle": "Offnungszeiten",
     "hoursUnavailable": "Offnungszeiten sind noch nicht verfugbar.",
@@ -437,8 +438,14 @@
       "addresses": "Meine Adressen",
       "reviews": "Meine Bewertungen",
       "owner": "Inhaber-Dashboard",
+      "ownerMessages": "Unternehmensnachrichten",
+      "supportTickets": "Support-Tickets",
       "addBusiness": "Eintrag hinzufugen",
       "security": "Kontosicherheit"
+    },
+    "ownerMessages": {
+      "title": "Unternehmensnachrichten", "description": "Nachrichten an Ihre Unternehmen lesen und verwalten.", "allBusinesses": "Alle Unternehmen", "allStatuses": "Alle Status", "filter": "Filtern", "open": "Nachricht öffnen", "empty": "Keine Nachrichten gefunden.", "selectMessage": "Wählen Sie eine Nachricht aus.", "from": "Von", "contact": "Kontaktdaten", "emailDelivery": "E-Mail-Benachrichtigung", "reply": "Per E-Mail antworten", "archive": "Archivieren", "close": "Schließen",
+      "statuses": { "NEW": "Neu", "READ": "Gelesen", "ARCHIVED": "Archiviert" }, "emailStatuses": { "PENDING": "Ausstehend", "SENT": "Gesendet", "FAILED": "Fehlgeschlagen", "NOT_CONFIGURED": "Nicht verfügbar" }
     },
     "profile": {
       "title": "Mein Profil",

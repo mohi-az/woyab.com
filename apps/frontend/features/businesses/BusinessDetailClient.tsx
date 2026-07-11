@@ -253,9 +253,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
       }
 
       setContactForm((current) => ({ ...current, phone: "", message: "" }));
-      setContactFeedback(
-        json?.deliveryMode === "mock" ? t("contactForm.submitSuccessMock") : t("contactForm.submitSuccess"),
-      );
+      setContactFeedback(t("contactForm.submitSuccess"));
     } catch {
       setContactFeedback(t("contactForm.submitError"));
     } finally {
@@ -638,7 +636,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             ) : null}
           </section>
 
-          {business.email ? (
+          {business.hasOwner ? (
             <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
               <h2 className="text-2xl font-black text-slate-950">{t("contactForm.title")}</h2>
               <p className="mt-2 text-sm leading-7 text-slate-500">{t("contactForm.description")}</p>
@@ -692,7 +690,14 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 </div>
               )}
             </section>
-          ) : null}
+          ) : (
+            <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+              <h2 className="text-2xl font-black text-slate-950">{t("contactForm.title")}</h2>
+              <p className="mt-3 rounded-3xl border border-slate-200 bg-slate-50 px-5 py-6 text-sm leading-7 text-slate-600">
+                {t("contactForm.unavailable")}
+              </p>
+            </section>
+          )}
 
           {business.attributes.length ? (
             <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">

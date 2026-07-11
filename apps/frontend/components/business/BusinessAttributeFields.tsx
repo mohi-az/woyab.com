@@ -29,7 +29,7 @@ export function BusinessAttributeFields({ definitions, values = [], variant = "o
     ? "h-4 w-4 rounded border-white/20 bg-transparent text-sky-400 focus:ring-sky-400"
     : "h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary";
   const itemClassName = variant === "admin"
-    ? "flex min-h-12 items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-sm font-bold text-white"
+    ? "flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 text-sm font-bold text-white transition hover:border-sky-400/60 hover:bg-sky-400/10 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-400/20"
     : "flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-bold text-slate-700";
 
   if (!definitions.length) return null;

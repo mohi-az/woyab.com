@@ -57,7 +57,7 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
       <AdminSearchSelect name="cityId" defaultValue={cityId || ""} className="admin-analytics-filter" allowClear placeholder={t("allCities")} options={cities.map(c => ({ value: String(c.id), label: locale === "fa" ? c.nameFa : c.nameEn }))} />
       <AdminSearchSelect name="categoryId" defaultValue={categoryId || ""} className="admin-analytics-filter" allowClear placeholder={t("allCategories")} options={categories.map(c => ({ value: String(c.id), label: locale === "fa" ? c.nameFa : c.nameEn }))} />
       <AdminSearchSelect name="businessId" defaultValue={businessId} className="admin-analytics-filter" allowClear placeholder={t("allBusinesses")} options={businesses.map(b => ({ value: b.id, label: b.businessName }))} />
-      <button className="min-h-11 rounded-xl bg-sky-500 px-5 font-black text-white transition hover:bg-sky-400 sm:col-span-2 xl:col-span-1">{t("apply")}</button>
+      <button className="admin-button min-h-11 rounded-lg border px-5 font-black sm:col-span-2 xl:col-span-1">{t("apply")}</button>
     </form>
     <div className="grid grid-cols-2 gap-3 xl:grid-cols-4"><AnalyticsMetric icon={FiEye} label={t("totalViews")} value={total} /><AnalyticsMetric icon={FiBriefcase} label={t("uniqueVisitors")} value={uniqueVisitors} accent="violet" /><AnalyticsMetric icon={FiCalendar} label={t("sessions")} value={sessions} accent="emerald" /><AnalyticsMetric icon={FiMapPin} label={t("dailyAverage")} value={Math.round(total/days)} accent="amber" /></div>
     <AnalyticsCard title={t("trend")} description={t("trendDescription")}><TrendChart data={trend} emptyLabel={t("empty")} ariaLabel={t("trend")} /></AnalyticsCard>

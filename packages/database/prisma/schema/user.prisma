@@ -24,6 +24,7 @@ model User {
   reviews                  Review[]
   assignedSupportTickets   SupportTicket[]     @relation("SupportTicketAssignee")
   supportTickets           SupportTicket[]     @relation("SupportTicketUser")
+  supportTicketReplies     SupportTicketReply[]
   savedLocations           UserSavedLocation[]
 
   @@map("users")

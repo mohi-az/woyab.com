@@ -66,5 +66,5 @@ export const thClassName = "admin-th whitespace-nowrap px-4 py-2.5 text-start te
 export const tdClassName = "admin-td align-middle px-4 py-2.5";
 
 export function AdminButton({ children, tone = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { tone?: "default" | "danger" | "success" }) {
-  return <button {...props} data-tone={tone} className={cn("admin-button rounded-lg border px-3 py-2 text-xs font-black transition", props.className)}>{children}</button>;
+  return <button {...props} data-tone={tone} className={cn("admin-button inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-black", props.className)}>{children}</button>;
 }

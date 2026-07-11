@@ -23,6 +23,8 @@ const links = [
 
 const ownerLinks = [
   ["/dashboard/owner", "owner"],
+  ["/dashboard/owner/messages", "ownerMessages"],
+  ["/dashboard/owner/support", "supportTickets"],
   ["/dashboard/owner/new", "addBusiness"],
 ] as const;
 

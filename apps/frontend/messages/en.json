@@ -280,9 +280,10 @@
       "messagePlaceholder": "Write your message",
       "submit": "Send message",
       "sending": "Sending...",
-      "submitSuccess": "Your message was sent.",
-      "submitSuccessMock": "The message was accepted in mock mode. Add the email env values to deliver it for real.",
-      "submitError": "Your message could not be sent."
+      "submitSuccess": "Your message has been saved in the business inbox.",
+      "submitSuccessMock": "Your message has been saved in the business inbox.",
+      "submitError": "Your message could not be sent.",
+      "unavailable": "Direct messaging is not available for this business yet. Please review the information on this page or check back later."
     },
     "hoursTitle": "Business hours",
     "hoursUnavailable": "Business hours are not available yet.",
@@ -437,8 +438,14 @@
       "addresses": "My addresses",
       "reviews": "My reviews",
       "owner": "Owner dashboard",
+      "ownerMessages": "Business messages",
+      "supportTickets": "Support tickets",
       "addBusiness": "Add business",
       "security": "Account security"
+    },
+    "ownerMessages": {
+      "title": "Business messages", "description": "Read and manage messages sent to your businesses.", "allBusinesses": "All businesses", "allStatuses": "All statuses", "filter": "Filter", "open": "Open message", "empty": "No messages found.", "selectMessage": "Select a message to read it.", "from": "From", "contact": "Contact details", "emailDelivery": "Email notification", "reply": "Reply by email", "archive": "Archive", "close": "Close",
+      "statuses": { "NEW": "New", "READ": "Read", "ARCHIVED": "Archived" }, "emailStatuses": { "PENDING": "Pending", "SENT": "Sent", "FAILED": "Failed", "NOT_CONFIGURED": "Not available" }
     },
     "profile": {
       "title": "My profile",

@@ -227,6 +227,8 @@ body[data-admin-theme="light"],
 .admin-icon-button:hover,
 .admin-secondary-link:hover {
   background: color-mix(in srgb, var(--admin-text) 8%, var(--admin-surface));
+  border-color: color-mix(in srgb, #38bdf8 55%, var(--admin-border));
+  color: #7dd3fc;
 }
 
 .admin-section,
@@ -277,13 +279,32 @@ body[data-admin-theme="light"],
 }
 
 .admin-button {
-  background: color-mix(in srgb, #38bdf8 12%, transparent);
-  border-color: color-mix(in srgb, #38bdf8 42%, transparent);
-  color: #bae6fd;
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 7px 18px rgb(2 132 199 / 0.24);
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
-.admin-button:hover {
-  background: color-mix(in srgb, #38bdf8 20%, transparent);
+.admin-button:hover:not(:disabled) {
+  background: #0ea5e9;
+  border-color: #7dd3fc;
+  box-shadow: 0 11px 24px rgb(2 132 199 / 0.34);
+  transform: translateY(-2px);
+}
+
+.admin-button:active:not(:disabled) {
+  background: #0369a1;
+  box-shadow: 0 4px 10px rgb(2 132 199 / 0.24);
+  transform: translateY(0);
+}
+
+.admin-button:focus-visible,
+.admin-icon-button:focus-visible,
+.admin-secondary-link:focus-visible {
+  outline: 3px solid rgb(56 189 248 / 0.38);
+  outline-offset: 2px;
 }
 
 .admin-primary-action {
@@ -306,34 +327,109 @@ body[data-admin-theme="light"],
 }
 
 .admin-button[data-tone="success"] {
-  background: color-mix(in srgb, #10b981 13%, transparent);
-  border-color: color-mix(in srgb, #10b981 44%, transparent);
-  color: #a7f3d0;
+  background: #059669;
+  border-color: #34d399;
+  color: #ffffff;
+  box-shadow: 0 7px 18px rgb(5 150 105 / 0.22);
 }
 
 .admin-button[data-tone="danger"] {
-  background: color-mix(in srgb, #f43f5e 13%, transparent);
-  border-color: color-mix(in srgb, #f43f5e 44%, transparent);
-  color: #fecdd3;
+  background: #e11d48;
+  border-color: #fb7185;
+  color: #ffffff;
+  box-shadow: 0 7px 18px rgb(225 29 72 / 0.22);
+}
+
+.admin-button[data-tone="success"]:hover:not(:disabled) { background: #10b981; border-color: #6ee7b7; }
+.admin-button[data-tone="danger"]:hover:not(:disabled) { background: #f43f5e; border-color: #fda4af; }
+
+.admin-icon-button {
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-icon-button:hover:not(:disabled) {
+  box-shadow: 0 8px 18px rgb(2 132 199 / 0.16);
+  transform: translateY(-2px);
+}
+
+.admin-icon-button:active:not(:disabled) { transform: translateY(0); }
+
+/* Keep Ant Design actions visually consistent throughout every admin submenu. */
+.admin-shell .ant-btn {
+  min-height: 36px;
+  border-radius: 0.5rem;
+  font-weight: 800;
+  box-shadow: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-shell .ant-btn:not(:disabled):hover {
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 8px 18px rgb(2 132 199 / 0.16);
+  transform: translateY(-2px);
+}
+
+.admin-shell .ant-btn-primary {
+  border-color: #38bdf8 !important;
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 7px 18px rgb(2 132 199 / 0.22);
+}
+
+.admin-shell .ant-btn-primary:not(:disabled):hover {
+  border-color: #7dd3fc !important;
+  background: #0ea5e9 !important;
+  color: #ffffff !important;
+  box-shadow: 0 11px 24px rgb(2 132 199 / 0.32);
+}
+
+.admin-shell .ant-btn-dangerous:not(:disabled):hover {
+  border-color: #fb7185 !important;
+  background: #e11d48 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgb(225 29 72 / 0.22);
+}
+
+.admin-shell .ant-btn:focus-visible {
+  outline: 3px solid rgb(56 189 248 / 0.38);
+  outline-offset: 2px;
+}
+
+.admin-shell .ant-btn:disabled,
+.admin-shell button:disabled {
+  box-shadow: none !important;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 .admin-shell[data-admin-theme="light"] .admin-button {
-  background: #e0f2fe;
-  border-color: #7dd3fc;
-  color: #075985;
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
 }
 
 .admin-shell[data-admin-theme="light"] .admin-button[data-tone="success"] {
-  background: #dcfce7;
-  border-color: #86efac;
-  color: #166534;
+  background: #059669;
+  border-color: #34d399;
+  color: #ffffff;
 }
 
 .admin-shell[data-admin-theme="light"] .admin-button[data-tone="danger"] {
-  background: #fff1f2;
-  border-color: #fda4af;
-  color: #9f1239;
+  background: #e11d48;
+  border-color: #fb7185;
+  color: #ffffff;
 }
+
+.admin-shell[data-admin-theme="light"] .admin-button:hover:not(:disabled) {
+  background: #0ea5e9;
+  border-color: #7dd3fc;
+  color: #ffffff;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-button[data-tone="success"]:hover:not(:disabled) { background: #10b981; color: #ffffff; }
+.admin-shell[data-admin-theme="light"] .admin-button[data-tone="danger"]:hover:not(:disabled) { background: #f43f5e; color: #ffffff; }
 
 .admin-button:disabled {
   cursor: not-allowed;
@@ -847,6 +943,24 @@ body[data-admin-theme="light"],
   color: var(--admin-muted) !important;
 }
 
+.business-hours-editor-admin .ant-btn:hover {
+  border-color: #38bdf8 !important;
+  background: color-mix(in srgb, #38bdf8 14%, var(--admin-field-bg)) !important;
+  color: #7dd3fc !important;
+  transform: translateY(-1px);
+}
+
+.business-hours-editor-admin .ant-btn:focus-visible,
+.business-hours-editor-admin .business-hours-day:focus-visible {
+  outline: 3px solid rgb(56 189 248 / 0.3);
+  outline-offset: 2px;
+}
+
+.business-hours-editor-admin .ant-segmented-item:hover:not(.ant-segmented-item-selected) {
+  background: color-mix(in srgb, #38bdf8 10%, transparent) !important;
+  color: var(--admin-text) !important;
+}
+
 .business-hours-editor-admin .ant-segmented-item {
   color: var(--admin-muted) !important;
 }
@@ -927,15 +1041,15 @@ body[data-admin-theme="light"],
 }
 
 .admin-shell[data-admin-theme="light"] .admin-button {
-  color: #075985 !important;
+  color: #ffffff !important;
 }
 
 .admin-shell[data-admin-theme="light"] .admin-button[data-tone="success"] {
-  color: #166534 !important;
+  color: #ffffff !important;
 }
 
 .admin-shell[data-admin-theme="light"] .admin-button[data-tone="danger"] {
-  color: #9f1239 !important;
+  color: #ffffff !important;
 }
 
 html[dir="rtl"] body {
@@ -1403,6 +1517,24 @@ html[dir="rtl"] .address-map-popup {
   min-width: 0;
   cursor: pointer;
   z-index: 10;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  padding: 0;
+}
+
+.admin-wizard-step:hover .admin-wizard-step-bubble {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 0 0 4px rgb(56 189 248 / 0.12), 0 10px 20px rgb(2 132 199 / 0.12);
+}
+
+.admin-wizard-step:hover .admin-wizard-step-label { color: var(--admin-text); }
+.admin-wizard-step:focus-visible { outline: none; }
+.admin-wizard-step:focus-visible .admin-wizard-step-bubble {
+  outline: 3px solid rgb(56 189 248 / 0.4);
+  outline-offset: 3px;
 }
 
 .admin-wizard-step::after {

@@ -135,12 +135,16 @@ model ContactMessage {
   phone        String?
   message      String
   status       contact_message_status @default(NEW)
+  emailStatus  contact_message_email_status @default(PENDING)
+  ownerViewedAt DateTime?
+  emailError   String?
   deliveryMode String?
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @default(now()) @updatedAt
   business     Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
+  @@index([emailStatus])
   @@index([status])
   @@map("contact_messages")
 }
@@ -218,11 +222,26 @@ model SupportTicket {
   updatedAt    DateTime                @default(now()) @updatedAt
   assignedTo   User?                   @relation("SupportTicketAssignee", fields: [assignedToId], references: [id])
   user         User?                   @relation("SupportTicketUser", fields: [userId], references: [id])
+  replies      SupportTicketReply[]
 
   @@index([assignedToId])
   @@index([status])
   @@index([userId])
   @@map("support_tickets")
+}
+
+model SupportTicketReply {
+  id        String        @id @default(cuid())
+  ticketId  String
+  authorId  String
+  message   String
+  createdAt DateTime      @default(now())
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([ticketId, createdAt])
+  @@map("support_ticket_replies")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -267,6 +286,13 @@ enum contact_message_status {
   NEW
   READ
   ARCHIVED
+}
+
+enum contact_message_email_status {
+  PENDING
+  SENT
+  FAILED
+  NOT_CONFIGURED
 }
 
 enum directory_report_status {

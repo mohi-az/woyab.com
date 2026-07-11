@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Alert, Button, Collapse, ConfigProvider, Modal, Tabs } from "antd";
+import { Alert, Button, Collapse, ConfigProvider, Modal } from "antd";
 import { useLocale, useTranslations } from "next-intl";
 import { FiAlertCircle, FiCheck, FiClock, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
-import { AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
+import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminMultiSelect, AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
 import { BusinessTagFields } from "@/components/business/BusinessTagFields";
@@ -161,10 +161,10 @@ function actionToggleClassName(active: boolean, tone: "verified" | "featured") {
   }
 
   if (tone === "verified") {
-    return "grid h-9 w-9 place-items-center rounded-lg border border-emerald-300 bg-emerald-400 text-slate-950 shadow-[0_0_0_3px_rgba(52,211,153,.18)] transition disabled:cursor-not-allowed disabled:opacity-70";
+    return "grid h-9 w-9 place-items-center rounded-lg border border-emerald-300 bg-emerald-400 text-slate-950 shadow-[0_0_0_3px_rgba(52,211,153,.18)] transition hover:-translate-y-0.5 hover:bg-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-70";
   }
 
-  return "grid h-9 w-9 place-items-center rounded-lg border border-amber-200 bg-amber-300 text-slate-950 shadow-[0_0_0_3px_rgba(251,191,36,.22)] transition disabled:cursor-not-allowed disabled:opacity-70";
+  return "grid h-9 w-9 place-items-center rounded-lg border border-amber-200 bg-amber-300 text-slate-950 shadow-[0_0_0_3px_rgba(251,191,36,.22)] transition hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200 disabled:cursor-not-allowed disabled:opacity-70";
 }
 
 function FieldShell({ label, required, error, children }: {
@@ -406,9 +406,9 @@ export function AdminBusinessGrid({
           <h1 className="text-3xl font-black text-white">{t("businesses.title")}</h1>
         </div>
         {canCreate ? (
-          <button type="button" className="admin-button rounded-lg border px-4 py-3 text-sm font-black" onClick={openCreate}>
+          <AdminButton type="button" className="min-h-11 px-5" onClick={openCreate}>
             <span className="inline-flex items-center gap-2"><FiPlus />{t("actions.addBusiness")}</span>
-          </button>
+          </AdminButton>
         ) : null}
       </div>
 
@@ -433,10 +433,10 @@ export function AdminBusinessGrid({
               {businesses.map((business) => {
                 const ui = uiStateFor(business);
                 return (
-                <tr key={business.id} className="cursor-pointer" onClick={() => openEdit(business)}>
+                <tr key={business.id} className="group cursor-pointer transition-colors duration-150" onClick={() => openEdit(business)}>
                   <td className={`${tdClassName} min-w-[260px]`}>
                     <div className="flex items-center gap-3">
-                      <span className="admin-icon-button grid h-8 w-8 shrink-0 place-items-center rounded-lg border"><FiEdit3 /></span>
+                      <span className="admin-icon-button grid h-8 w-8 shrink-0 place-items-center rounded-lg border transition-transform group-hover:scale-105 group-hover:border-sky-400 group-hover:text-sky-300"><FiEdit3 /></span>
                       <div className="min-w-0">
                         <div className="font-black text-white">{business.businessName}</div>
                         <div className="truncate text-xs text-slate-400">{business.slug}</div>
@@ -523,8 +523,8 @@ export function AdminBusinessGrid({
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400">
           <span>{t("pagination.summary", { total, page, totalPages })}</span>
           <div className="flex gap-2">
-            <Link href={previousHref} className="admin-secondary-link rounded-lg border px-3 py-2 font-bold">{t("pagination.previous")}</Link>
-            <Link href={nextHref} className="admin-secondary-link rounded-lg border px-3 py-2 font-bold">{t("pagination.next")}</Link>
+            {page > 1 ? <Link href={previousHref} className="admin-secondary-link rounded-lg border px-3 py-2 font-bold transition hover:-translate-y-0.5">{t("pagination.previous")}</Link> : <span aria-disabled="true" className="admin-secondary-link cursor-not-allowed rounded-lg border px-3 py-2 font-bold opacity-40">{t("pagination.previous")}</span>}
+            {page < totalPages ? <Link href={nextHref} className="admin-secondary-link rounded-lg border px-3 py-2 font-bold transition hover:-translate-y-0.5">{t("pagination.next")}</Link> : <span aria-disabled="true" className="admin-secondary-link cursor-not-allowed rounded-lg border px-3 py-2 font-bold opacity-40">{t("pagination.next")}</span>}
           </div>
         </div>
       </AdminSection>
@@ -572,10 +572,12 @@ export function AdminBusinessGrid({
                     ][index] || FiInfo;
 
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={index}
                         onClick={() => changeWizardStep(index)}
                         className={`admin-wizard-step ${isActive ? "active" : ""} ${isCompleted && !hasError ? "completed" : ""} ${hasError ? "error" : ""}`}
+                        aria-current={isActive ? "step" : undefined}
                       >
                         <div className="admin-wizard-step-bubble">
                           {hasError ? (
@@ -589,7 +591,7 @@ export function AdminBusinessGrid({
                         <span className="admin-wizard-step-label">
                           {label}
                         </span>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>

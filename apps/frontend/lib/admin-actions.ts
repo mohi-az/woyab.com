@@ -791,7 +791,7 @@ export async function updateContactMessageStatus(formData: FormData) {
   const actor = await requireAdmin();
   const id = value(formData, "id");
   const status = value(formData, "status") as "NEW" | "READ" | "ARCHIVED";
-  if (!id || !["NEW", "READ", "ARCHIVED"].includes(status)) throw new Error("Invalid message status.");
+  if (!id || status !== "ARCHIVED") throw new Error("Administrators may only archive contact messages.");
 
   await prisma.contactMessage.update({ where: { id }, data: { status } });
   await audit(actor.id, "message.status", "ContactMessage", id, { status });
@@ -810,6 +810,23 @@ export async function updateTicketStatus(formData: FormData) {
   await prisma.supportTicket.update({ where: { id }, data: { status, priority, assignedToId: actor.id } });
   await audit(actor.id, "ticket.update", "SupportTicket", id, { status, priority });
   refreshAdmin();
+}
+
+export async function replyToTicket(formData: FormData) {
+  const actor = await requireAdmin();
+  const ticketId = value(formData, "ticketId");
+  const message = value(formData, "message");
+  if (!ticketId || message.length < 2 || message.length > 4000) throw new Error("Please enter a valid reply.");
+  const ticket = await prisma.supportTicket.findUnique({ where: { id: ticketId }, select: { id: true, status: true } });
+  if (!ticket) throw new Error("Ticket not found.");
+  if (ticket.status === "CLOSED") throw new Error("Reopen the ticket before replying.");
+  await prisma.$transaction([
+    prisma.supportTicketReply.create({ data: { ticketId, authorId: actor.id, message } }),
+    prisma.supportTicket.update({ where: { id: ticketId }, data: { status: "PENDING", assignedToId: actor.id } }),
+  ]);
+  await audit(actor.id, "ticket.reply", "SupportTicket", ticketId);
+  refreshAdmin();
+  revalidatePath("/dashboard/owner/support");
 }
 
 export async function updateAdminSetting(formData: FormData) {

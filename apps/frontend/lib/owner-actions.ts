@@ -8,6 +8,31 @@ import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib
 import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 
+export async function openOwnerContactMessage(formData: FormData) {
+  const userId = await requireUserId();
+  const id = value(formData, "id");
+  const message = await prisma.contactMessage.findFirst({
+    where: { id, business: { ownerId: userId } },
+    select: { id: true, status: true },
+  });
+  if (!message) throw new Error("Message not found.");
+  if (message.status === "NEW") {
+    await prisma.contactMessage.update({ where: { id }, data: { status: "READ", ownerViewedAt: new Date() } });
+  }
+  await redirectWithLocale(`/dashboard/owner/messages?messageId=${encodeURIComponent(id)}`);
+}
+
+export async function archiveOwnerContactMessage(formData: FormData) {
+  const userId = await requireUserId();
+  const id = value(formData, "id");
+  const result = await prisma.contactMessage.updateMany({
+    where: { id, business: { ownerId: userId } },
+    data: { status: "ARCHIVED" },
+  });
+  if (!result.count) throw new Error("Message not found.");
+  revalidatePath("/dashboard/owner/messages");
+}
+
 const locales = ["DE", "EN", "FA"] as const;
 const daysOfWeek: DayOfWeek[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
@@ -89,6 +114,59 @@ async function ownerAudit(actorId: string, action: string, entityType: string, e
   await prisma.adminAuditLog.create({
     data: { actorId, action, entityType, entityId, metadata },
   });
+}
+
+async function requireOwner(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true, _count: { select: { businesses: true } } },
+  });
+  if (!user || (user.role === "USER" && user._count.businesses === 0)) {
+    throw new Error("Support tickets are available to business owners.");
+  }
+}
+
+export async function createSupportTicket(formData: FormData) {
+  const userId = await requireUserId();
+  await requireOwner(userId);
+  const subject = value(formData, "subject");
+  const message = value(formData, "message");
+  if (subject.length < 3 || subject.length > 160 || message.length < 10 || message.length > 4000) {
+    throw new Error("Please check the ticket subject and message.");
+  }
+  const ticket = await prisma.supportTicket.create({
+    data: { userId, subject, message, priority: "NORMAL" },
+    select: { id: true },
+  });
+  await ownerAudit(userId, "owner.ticket.create", "SupportTicket", ticket.id);
+  revalidatePath("/dashboard/owner/support");
+  await redirectWithLocale(`/dashboard/owner/support?ticketId=${encodeURIComponent(ticket.id)}`);
+}
+
+export async function replyToSupportTicket(formData: FormData) {
+  const userId = await requireUserId();
+  await requireOwner(userId);
+  const ticketId = value(formData, "ticketId");
+  const message = value(formData, "message");
+  if (!ticketId || message.length < 2 || message.length > 4000) throw new Error("Please enter a valid reply.");
+  const ticket = await prisma.supportTicket.findFirst({ where: { id: ticketId, userId }, select: { id: true, status: true } });
+  if (!ticket) throw new Error("Ticket not found.");
+  if (ticket.status === "CLOSED") throw new Error("Closed tickets cannot receive replies.");
+  await prisma.$transaction([
+    prisma.supportTicketReply.create({ data: { ticketId, authorId: userId, message } }),
+    prisma.supportTicket.update({ where: { id: ticketId }, data: { status: "OPEN" } }),
+  ]);
+  await ownerAudit(userId, "owner.ticket.reply", "SupportTicket", ticketId);
+  revalidatePath("/dashboard/owner/support");
+}
+
+export async function closeSupportTicket(formData: FormData) {
+  const userId = await requireUserId();
+  const ticketId = value(formData, "ticketId");
+  const result = await prisma.supportTicket.updateMany({ where: { id: ticketId, userId }, data: { status: "CLOSED" } });
+  if (!result.count) throw new Error("Ticket not found.");
+  await ownerAudit(userId, "owner.ticket.close", "SupportTicket", ticketId);
+  revalidatePath("/dashboard/owner/support");
 }
 
 export async function createOwnerBusiness(formData: FormData) {

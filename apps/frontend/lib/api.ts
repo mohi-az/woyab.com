@@ -86,6 +86,7 @@ type BusinessDetailApiResponse = {
     reviewCount?: number | null;
     verified?: boolean;
     featured?: boolean;
+    owner?: { id: string } | null;
     category?: {
       id: number;
       nameFa: string;
@@ -308,6 +309,7 @@ export type BusinessDetailData = {
   reviewCount: number;
   verified: boolean;
   featured: boolean;
+  hasOwner: boolean;
   hours: Array<{
     dayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
     openTime?: string | null;
@@ -664,6 +666,7 @@ export async function fetchBusinessBySlug(
       reviewCount: business.reviewCount ?? 0,
       verified: Boolean(business.verified),
       featured: booleanFlag(business.featured),
+      hasOwner: Boolean(business.owner),
       hours: (business.businessHours ?? []).map((hour) => ({
         dayOfWeek: hour.dayOfWeek,
         openTime: hour.openTime,

@@ -182,13 +182,13 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
         {visibleSuggestions.length ? (
           <div className="admin-section absolute inset-x-0 top-full z-20 mt-2 max-h-60 overflow-y-auto rounded-lg border p-2 shadow-xl">
             {visibleSuggestions.map((suggestion) => (
-              <button key={suggestion.id} type="button" className="block w-full rounded-lg px-3 py-2 text-start text-sm hover:bg-slate-500/10" onClick={() => {
+              <button key={suggestion.id} type="button" className="group block w-full rounded-lg border border-transparent px-3 py-2 text-start text-sm transition hover:border-sky-400/40 hover:bg-sky-400/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400" onClick={() => {
                 setAddress(suggestion.label);
                 setQuery(suggestion.label);
                 setSuggestions([]);
                 moveTo(suggestion.latitude, suggestion.longitude, false);
               }}>
-                <strong className="admin-title block">{suggestion.primaryText}</strong>
+                <strong className="admin-title block transition group-hover:text-sky-300">{suggestion.primaryText}</strong>
                 <span className="admin-muted text-xs">{suggestion.secondaryText}</span>
               </button>
             ))}
@@ -200,7 +200,7 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
         <div ref={containerRef} className="h-[320px] w-full" />
         <div className={`address-center-pin ${status === "resolving" ? "address-center-pin--loading" : ""}`} aria-hidden="true"><span /></div>
         <div className="address-center-target" aria-hidden="true" />
-        <button type="button" onClick={useCurrentLocation} className="admin-icon-button absolute end-3 top-3 z-30 grid h-10 w-10 place-items-center rounded-lg border" aria-label={t("currentLocation")}>
+        <button type="button" onClick={useCurrentLocation} disabled={status === "locating"} className="admin-icon-button absolute end-3 top-3 z-30 grid h-10 w-10 place-items-center rounded-lg border transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-70" aria-label={t("currentLocation")} aria-busy={status === "locating"}>
           {status === "locating" ? <FiLoader className="animate-spin" /> : <MdMyLocation />}
         </button>
         {status === "loading" ? <div className="absolute inset-0 z-20 grid place-items-center bg-slate-950/20 text-sm font-bold text-white">{t("loading")}</div> : null}

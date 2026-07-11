@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
-import { updateTicketStatus } from "@/lib/admin-actions";
+import { replyToTicket, updateTicketStatus } from "@/lib/admin-actions";
 import { prisma } from "@/lib/prisma";
 
 const statuses = ["OPEN", "PENDING", "RESOLVED", "CLOSED"] as const;
@@ -16,6 +16,7 @@ export default async function AdminTicketsPage() {
       include: {
         user: { select: { name: true, email: true } },
         assignedTo: { select: { name: true, email: true } },
+        replies: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, email: true, role: true } } } },
       },
     }),
   ]);
@@ -30,7 +31,7 @@ export default async function AdminTicketsPage() {
             <tbody className="divide-y divide-white/8">
               {tickets.map((ticket) => (
                 <tr key={ticket.id}>
-                  <td className={tdClassName}><strong className="text-white">{ticket.subject}</strong><p className="mt-2 max-w-xl whitespace-pre-line text-sm text-slate-400">{ticket.message}</p></td>
+                  <td className={tdClassName}><strong className="text-white">{ticket.subject}</strong><div className="mt-3 max-w-xl space-y-2"><p className="whitespace-pre-line rounded-lg bg-white/5 p-3 text-sm text-slate-300">{ticket.message}</p>{ticket.replies.map((reply) => <div key={reply.id} className={`rounded-lg p-3 text-sm ${reply.author.role === "ADMIN" || reply.author.role === "SUPER_ADMIN" ? "bg-sky-400/10 text-sky-100" : "bg-white/5 text-slate-300"}`}><p className="whitespace-pre-line">{reply.message}</p><span className="mt-1 block text-xs opacity-60">{reply.author.name || reply.author.email || "-"}</span></div>)}</div></td>
                   <td className={tdClassName}>{ticket.user?.name || ticket.user?.email || "-"}</td>
                   <td className={tdClassName}>{ticket.priority}</td>
                   <td className={tdClassName}><StatusBadge status={ticket.status} /></td>
@@ -41,6 +42,7 @@ export default async function AdminTicketsPage() {
                       <select name="priority" defaultValue={ticket.priority} className={inputClassName}>{priorities.map((priority) => <option key={priority} value={priority}>{priority}</option>)}</select>
                       <AdminButton tone="success">{t("actions.save")}</AdminButton>
                     </form>
+                    {ticket.status !== "CLOSED" ? <form action={replyToTicket} className="mt-3 grid gap-2"><input type="hidden" name="ticketId" value={ticket.id} /><textarea name="message" required minLength={2} maxLength={4000} rows={3} placeholder="Write a reply…" className={`${inputClassName} h-auto py-2`} /><AdminButton>Reply</AdminButton></form> : null}
                   </td>
                 </tr>
               ))}
