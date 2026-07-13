@@ -27,6 +27,7 @@ export const createBusinessBodySchema = z.object({
   tagIds: z.array(z.number().int().positive()).max(100).optional(),
   logoUrl: z.string().optional(),
   coverImageUrl: z.string().optional(),
+  googlePlaceId: z.string().optional(),
   categoryId: z.number().int().positive(),
   subCategoryId: z.number().int().positive().optional(),
   specialtyId: z.number().int().positive().optional(),

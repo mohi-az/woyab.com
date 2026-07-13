@@ -26,6 +26,7 @@ type BusinessApiItem = {
   slug: string;
   businessName: string;
   coverImageUrl?: string | null;
+  googlePlaceId?: string | null;
   shortDescription?: string | null;
   description?: string | null;
   contentLocale?: "de" | "en" | "fa";
@@ -66,6 +67,7 @@ type BusinessDetailApiResponse = {
     isFallback?: boolean;
     logoUrl?: string | null;
     coverImageUrl?: string | null;
+    googlePlaceId?: string | null;
     phone?: string | null;
     mobile?: string | null;
     whatsapp?: string | null;
@@ -266,6 +268,7 @@ export type LatestBusinessCardItem = {
   distanceMeters?: number | null;
   matchedLocationName?: string | null;
   featured?: boolean;
+  googlePlaceId?: string | null;
 };
 
 export type BusinessDetailData = {
@@ -282,6 +285,7 @@ export type BusinessDetailData = {
     imageUrl: string;
     caption?: string | null;
   }>;
+  googlePlaceId?: string | null;
   categoryName?: string | null;
   categoryId?: number | null;
   categorySlug?: string | null;
@@ -421,6 +425,7 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       reviewCount: business.reviewCount ?? 0,
       location: getLocalizedName(locale, business.city),
       featured: booleanFlag(business.featured),
+      googlePlaceId: business.googlePlaceId,
     }));
   } catch {
     return [];
@@ -483,6 +488,7 @@ export async function fetchBusinessDirectory(
         distanceMeters: business.distanceMeters,
         matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
         featured: booleanFlag(business.featured),
+        googlePlaceId: business.googlePlaceId,
       })),
     };
   } catch {
@@ -553,6 +559,7 @@ export async function searchBusinessDirectory(
       distanceMeters: business.distanceMeters,
       matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
       featured: booleanFlag(business.featured),
+      googlePlaceId: business.googlePlaceId,
     })),
   };
 }
@@ -612,7 +619,7 @@ export async function fetchBusinessBySlug(
 
     const json = (await localizedRes.json()) as BusinessDetailApiResponse;
     const business = json.data;
-    const gallery = (business.images ?? []).map((image) => ({
+    let gallery = (business.images ?? []).map((image) => ({
       id: image.id,
       imageUrl: image.imageUrl,
       caption: image.caption,
@@ -626,6 +633,40 @@ export async function fetchBusinessBySlug(
       });
     }
 
+    // Fetch Google Places photos if googlePlaceId exists and gallery is empty or we want to prefer Google photos
+    if (business.googlePlaceId) {
+      try {
+        const googlePhotosRes = await fetch(
+          `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
+          { cache: "no-store" },
+        );
+        if (googlePhotosRes.ok) {
+          const googleData = (await googlePhotosRes.json()) as {
+            success: boolean;
+            data: {
+              photos: Array<{
+                photoReference: string;
+                width: number;
+                height: number;
+                htmlAttributions: string[];
+              }>;
+            };
+          };
+          const googlePhotos = googleData.data?.photos ?? [];
+          if (googlePhotos.length > 0) {
+            // Replace gallery with Google photos (at least 2 if available)
+            gallery = googlePhotos.map((photo, index) => ({
+              id: `google-${index}`,
+              imageUrl: `${API_BASE}/v1/google-photos/${photo.photoReference}?maxWidth=800`,
+              caption: photo.htmlAttributions[0] ?? business.businessName,
+            }));
+          }
+        }
+      } catch {
+        // Fallback to local images silently
+      }
+    }
+
     return {
       id: business.id,
       slug: business.slug,
@@ -635,6 +676,7 @@ export async function fetchBusinessBySlug(
       description: business.description,
       logoUrl: business.logoUrl,
       coverImageUrl: business.coverImageUrl,
+      googlePlaceId: business.googlePlaceId,
       gallery,
       categoryName: localizedText(locale, business.category),
       categoryId: business.category?.id,

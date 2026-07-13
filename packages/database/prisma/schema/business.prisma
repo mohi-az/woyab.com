@@ -7,6 +7,7 @@ model Business {
   description       String?
   logoUrl           String?
   coverImageUrl     String?
+  googlePlaceId     String?
   categoryId        Int
   subCategoryId     Int?
   specialtyId       Int?

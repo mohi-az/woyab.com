@@ -161,6 +161,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     translations: business.translations,
     attributes: business.attributes,
     tags: business.tags,
+    googlePlaceId: business.googlePlaceId,
   }));
 
   return (

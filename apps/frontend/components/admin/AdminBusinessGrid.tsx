@@ -81,6 +81,7 @@ export type AdminBusinessRow = {
   translations: Translation[];
   attributes: BusinessAttributeValue[];
   tags: BusinessTagValue[];
+  googlePlaceId: string | null;
 };
 
 type Props = {
@@ -611,6 +612,9 @@ export function AdminBusinessGrid({
                         </FieldShell>
                         <FieldShell label={t("fields.legalName")}>
                           <input name="legalName" defaultValue={editing?.legalName ?? ""} className={inputClassName} />
+                        </FieldShell>
+                        <FieldShell label="Google Place ID">
+                          <input name="googlePlaceId" defaultValue={editing?.googlePlaceId ?? ""} className={inputClassName} placeholder="ChIJ..." />
                         </FieldShell>
                         <FieldShell label={t("fields.sourceLocale")} required error={errors.sourceLocale}>
                           <select name="sourceLocale" defaultValue={editing?.sourceLocale ?? "DE"} className={inputClassName}>

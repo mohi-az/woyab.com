@@ -50,6 +50,7 @@ const businessCardSelect = {
   description: true,
   logoUrl: true,
   coverImageUrl: true,
+  googlePlaceId: true,
   categoryId: true,
   category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
   subCategoryId: true,

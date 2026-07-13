@@ -13,6 +13,7 @@ const envSchema = z.object({
   NOMINATIM_USER_AGENT: z.string().min(8).default("Fargo/1.0 (https://fargo.local)"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
+  GOOGLE_PLACES_API_KEY: z.string().min(1).optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
