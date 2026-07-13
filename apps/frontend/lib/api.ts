@@ -258,6 +258,7 @@ export type LatestBusinessCardItem = {
   href: string;
   title: string;
   imageUrl?: string | null;
+  fallbackImageUrl?: string | null;
   shortDescription?: string | null;
   categoryName?: string | null;
   categorySlug?: string | null;
@@ -364,6 +365,17 @@ export type CurrentUser = {
 
 const API_BASE = process.env.API_URL ?? "http://localhost:4000";
 
+function businessCardImageProps(business: Pick<BusinessApiItem, "id" | "coverImageUrl" | "googlePlaceId">) {
+  if (!business.googlePlaceId) {
+    return { imageUrl: business.coverImageUrl, fallbackImageUrl: null };
+  }
+
+  return {
+    imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photo-thumbnail?maxWidth=640`,
+    fallbackImageUrl: business.coverImageUrl,
+  };
+}
+
 function booleanFlag(value: unknown) {
   return value === true || value === "true";
 }
@@ -416,7 +428,7 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       slug: business.slug,
       href: `/businesses/${business.slug}`,
       title: business.businessName,
-      imageUrl: business.coverImageUrl,
+      ...businessCardImageProps(business),
       shortDescription: business.shortDescription,
       categoryName: getLocalizedName(locale, business.category),
       categorySlug: business.category?.slug,
@@ -477,7 +489,7 @@ export async function fetchBusinessDirectory(
         slug: business.slug,
         href: `/businesses/${business.slug}`,
         title: business.businessName,
-        imageUrl: business.coverImageUrl,
+        ...businessCardImageProps(business),
         shortDescription: business.shortDescription,
         categoryName: getLocalizedName(locale, business.category),
         categorySlug: business.category?.slug,
@@ -548,7 +560,7 @@ export async function searchBusinessDirectory(
       slug: business.slug,
       href: `/businesses/${business.slug}`,
       title: business.businessName,
-      imageUrl: business.coverImageUrl,
+      ...businessCardImageProps(business),
       shortDescription: business.shortDescription,
       categoryName: getLocalizedName(locale, business.category),
       categorySlug: business.category?.slug,
@@ -657,7 +669,7 @@ export async function fetchBusinessBySlug(
             // Replace gallery with Google photos (at least 2 if available)
             gallery = googlePhotos.map((photo, index) => ({
               id: `google-${index}`,
-              imageUrl: `${API_BASE}/v1/google-photos/${photo.photoReference}?maxWidth=800`,
+              imageUrl: `/api/google-photos/${photo.photoReference}?maxWidth=800`,
               caption: photo.htmlAttributions[0] ?? business.businessName,
             }));
           }

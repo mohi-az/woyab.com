@@ -212,6 +212,8 @@ export function AdminBusinessGrid({
   const [operationError, setOperationError] = useState("");
   const [saving, setSaving] = useState(false);
   const [sourceLocaleDraft, setSourceLocaleDraft] = useState<"DE" | "EN" | "FA">("DE");
+  const [categoryIdDraft, setCategoryIdDraft] = useState(String(categories[0]?.id ?? ""));
+  const [subCategoryIdDraft, setSubCategoryIdDraft] = useState("");
   const [rowUiStates, setRowUiStates] = useState<Record<string, RowUiState>>({});
   const modalOpen = creating || Boolean(editing);
   const modalTranslations = useMemo(() => translationMap(editing), [editing]);
@@ -219,6 +221,8 @@ export function AdminBusinessGrid({
   const defaultCityId = cities[0]?.id ?? "";
   const featureText = localizedFeatureText(locale);
   const tagText = localizedTagText(locale);
+  const visibleSubCategories = subCategories.filter((item) => String(item.categoryId) === categoryIdDraft);
+  const visibleSpecialties = specialties.filter((item) => String(item.subCategoryId) === subCategoryIdDraft);
   const wizardSteps = [t("businessWizard.identity"), t("businessWizard.translations"), `${featureText} / ${tagText}`, t("businessWizard.location"), t("businessWizard.hours")];
   const cardBasicInfo = locale === "fa" ? "اطلاعات پایه" : "Basic Information";
   const cardTaxonomy = locale === "fa" ? "دسته‌بندی و تخصص" : "Category & Taxonomy";
@@ -269,6 +273,8 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(false);
     setSourceLocaleDraft("DE");
+    setCategoryIdDraft(String(defaultCategoryId));
+    setSubCategoryIdDraft("");
   }
 
   function openCreate() {
@@ -280,6 +286,8 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(false);
     setSourceLocaleDraft("DE");
+    setCategoryIdDraft(String(defaultCategoryId));
+    setSubCategoryIdDraft("");
   }
 
   function openEdit(business: AdminBusinessRow) {
@@ -291,6 +299,8 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(false);
     setSourceLocaleDraft(business.sourceLocale);
+    setCategoryIdDraft(String(business.categoryId));
+    setSubCategoryIdDraft(business.subCategoryId ? String(business.subCategoryId) : "");
   }
 
   function clearError(field: string) {
@@ -608,7 +618,7 @@ export function AdminBusinessGrid({
                       <h3 className="admin-wizard-card-title">{cardBasicInfo}</h3>
                       <div className="grid gap-4 md:grid-cols-2">
                         <FieldShell label={t("fields.slug")} required error={errors.slug}>
-                          <input name="slug" defaultValue={editing?.slug ?? ""} className={inputClassName} placeholder="example-business-name" />
+                          <input name="slug" dir="ltr" defaultValue={editing?.slug ?? ""} className={`${inputClassName} text-left`} placeholder="example-business-name" />
                         </FieldShell>
                         <FieldShell label={t("fields.legalName")}>
                           <input name="legalName" defaultValue={editing?.legalName ?? ""} className={inputClassName} />
@@ -640,13 +650,17 @@ export function AdminBusinessGrid({
                       <h3 className="admin-wizard-card-title">{cardTaxonomy}</h3>
                       <div className="grid content-start gap-4">
                         <FieldShell label={t("fields.category")} required error={errors.categoryId}>
-                          <AdminSearchSelect name="categoryId" defaultValue={editing?.categoryId ?? editing?.category?.id ?? defaultCategoryId} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
+                          <AdminSearchSelect name="categoryId" defaultValue={categoryIdDraft} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {
+                            clearError(name);
+                            setCategoryIdDraft(value);
+                            setSubCategoryIdDraft("");
+                          }} />
                         </FieldShell>
                         <FieldShell label={t("fields.subCategory")}>
-                          <AdminSearchSelect name="subCategoryId" defaultValue={editing?.subCategoryId ?? editing?.subCategory?.id ?? ""} allowClear options={subCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                          <AdminSearchSelect key={`subcategory-${categoryIdDraft}`} name="subCategoryId" defaultValue={subCategoryIdDraft} allowClear options={visibleSubCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(_, value) => setSubCategoryIdDraft(value)} />
                         </FieldShell>
                         <FieldShell label={t("fields.specialty")}>
-                          <AdminMultiSelect name="specialtyIds" defaultValue={editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])} options={specialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                          <AdminMultiSelect key={`specialty-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={subCategoryIdDraft && String(editing?.subCategoryId ?? "") === subCategoryIdDraft ? (editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])) : []} options={visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
                         </FieldShell>
                         <FieldShell label={t("fields.city")} required error={errors.cityId}>
                           <AdminSearchSelect name="cityId" defaultValue={editing?.cityId ?? editing?.city?.id ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
@@ -659,19 +673,19 @@ export function AdminBusinessGrid({
                     <h3 className="admin-wizard-card-title">{cardContactInfo}</h3>
                     <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
                       <FieldShell label={t("fields.email")} error={errors.email}>
-                        <input name="email" defaultValue={editing?.email ?? ""} className={inputClassName} />
+                        <input name="email" type="email" dir="ltr" defaultValue={editing?.email ?? ""} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.phone")} error={errors.phone}>
-                        <input name="phone" defaultValue={editing?.phone ?? ""} className={inputClassName} />
+                        <input name="phone" type="tel" dir="ltr" defaultValue={editing?.phone ?? ""} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.mobile")} error={errors.mobile}>
-                        <input name="mobile" defaultValue={editing?.mobile ?? ""} className={inputClassName} />
+                        <input name="mobile" type="tel" dir="ltr" defaultValue={editing?.mobile ?? ""} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.website")} error={errors.website}>
-                        <input name="website" defaultValue={editing?.website ?? ""} className={inputClassName} />
+                        <input name="website" type="url" dir="ltr" defaultValue={editing?.website ?? ""} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.postalCode")} error={errors.postalCode}>
-                        <input name="postalCode" defaultValue={editing?.postalCode ?? ""} className={inputClassName} />
+                        <input name="postalCode" dir="ltr" defaultValue={editing?.postalCode ?? ""} className={`${inputClassName} text-left`} />
                       </FieldShell>
                     </div>
                   </div>

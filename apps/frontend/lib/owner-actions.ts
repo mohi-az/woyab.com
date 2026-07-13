@@ -60,6 +60,27 @@ function numberValue(formData: FormData, key: string) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+async function validateTaxonomySelection(categoryId: number, subCategoryId: number | null, specialtyId: number | null) {
+  if (!subCategoryId) {
+    if (specialtyId) throw new Error("Select a subcategory before selecting a specialty.");
+    return;
+  }
+
+  const subCategory = await prisma.subCategory.findFirst({
+    where: { id: subCategoryId, categoryId, active: true },
+    select: { id: true },
+  });
+  if (!subCategory) throw new Error("The selected subcategory does not belong to this category.");
+
+  if (specialtyId) {
+    const specialty = await prisma.specialty.findFirst({
+      where: { id: specialtyId, subCategoryId, active: true },
+      select: { id: true },
+    });
+    if (!specialty) throw new Error("The selected specialty does not belong to this subcategory.");
+  }
+}
+
 function businessHoursCreateData(formData: FormData) {
   return daysOfWeek.flatMap((dayOfWeek) => {
     const enabled = value(formData, `hours_${dayOfWeek}_enabled`) === "true";
@@ -180,6 +201,7 @@ export async function createOwnerBusiness(formData: FormData) {
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
   if (!locales.includes(sourceLocale) || !categoryId || !cityId) throw new Error("Please check the required business fields.");
+  await validateTaxonomySelection(categoryId, subCategoryId, specialtyId);
 
   const duplicate = await prisma.business.findUnique({ where: { slug }, select: { id: true } });
   if (duplicate) throw new Error("This business slug already exists.");

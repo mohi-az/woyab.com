@@ -70,8 +70,9 @@ function Field({ label, children, required }: { label: string; children: React.R
   );
 }
 
-const inputClass = "min-h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-primary";
+const inputClass = "min-h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-primary [&>option]:bg-white [&>option]:text-slate-950";
 const textareaClass = "min-h-28 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none transition focus:border-primary";
+const ltrInputClass = `${inputClass} text-left`;
 
 function localizedFeatureText(locale: string) {
   if (locale === "fa") return "\u0627\u0645\u06a9\u0627\u0646\u0627\u062a";
@@ -91,9 +92,19 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
   const [step, setStep] = useState(0);
   const [sourceLocale, setSourceLocale] = useState<"DE" | "EN" | "FA">("DE");
   const [businessName, setBusinessName] = useState("");
+  const [categoryId, setCategoryId] = useState(String(categories[0]?.id ?? ""));
+  const [subCategoryId, setSubCategoryId] = useState("");
+  const [specialtyId, setSpecialtyId] = useState("");
   const generatedSlug = useMemo(() => slugify(businessName), [businessName]);
-  const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
+  const visibleSubCategories = useMemo(
+    () => subCategories.filter((item) => String(item.categoryId) === categoryId),
+    [categoryId, subCategories],
+  );
+  const visibleSpecialties = useMemo(
+    () => specialties.filter((item) => String(item.subCategoryId) === subCategoryId),
+    [specialties, subCategoryId],
+  );
 
   return (
     <form action={createOwnerBusiness} className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,.08)]">
@@ -136,7 +147,7 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
               <input name={`businessName_${sourceLocale}`} value={businessName} onChange={(event) => setBusinessName(event.target.value)} required className={inputClass} placeholder="Fargo Cafe" />
             </Field>
             <Field label="Slug" required>
-              <input name="slug" defaultValue={generatedSlug} key={generatedSlug} required pattern="[a-z0-9-]+" className={inputClass} placeholder="fargo-cafe" />
+              <input name="slug" dir="ltr" defaultValue={generatedSlug} key={generatedSlug} required pattern="[a-z0-9-]+" className={ltrInputClass} placeholder="fargo-cafe" />
             </Field>
             <Field label="Source language" required>
               <select name="sourceLocale" value={sourceLocale} onChange={(event) => setSourceLocale(event.target.value as typeof sourceLocale)} className={inputClass}>
@@ -152,7 +163,11 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
         <section className={step === 1 ? "grid gap-4" : "hidden"}>
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Category" required>
-              <select name="categoryId" required defaultValue={defaultCategoryId} className={inputClass}>
+              <select name="categoryId" required value={categoryId} onChange={(event) => {
+                setCategoryId(event.target.value);
+                setSubCategoryId("");
+                setSpecialtyId("");
+              }} className={inputClass}>
                 {categories.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
               </select>
             </Field>
@@ -162,24 +177,27 @@ export function OwnerBusinessWizard({ categories, subCategories, specialties, ci
               </select>
             </Field>
             <Field label="Subcategory">
-              <select name="subCategoryId" className={inputClass} defaultValue="">
+              <select name="subCategoryId" className={inputClass} value={subCategoryId} onChange={(event) => {
+                setSubCategoryId(event.target.value);
+                setSpecialtyId("");
+              }}>
                 <option value="">No subcategory</option>
-                {subCategories.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
+                {visibleSubCategories.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
               </select>
             </Field>
             <Field label="Specialty">
-              <select name="specialtyId" className={inputClass} defaultValue="">
+              <select name="specialtyId" className={inputClass} value={specialtyId} onChange={(event) => setSpecialtyId(event.target.value)} disabled={!subCategoryId}>
                 <option value="">No specialty</option>
-                {specialties.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
+                {visibleSpecialties.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
               </select>
             </Field>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            <Field label="Email"><input name="email" type="email" className={inputClass} /></Field>
-            <Field label="Phone"><input name="phone" className={inputClass} /></Field>
-            <Field label="Mobile"><input name="mobile" className={inputClass} /></Field>
-            <Field label="Website"><input name="website" className={inputClass} placeholder="https://example.com" /></Field>
-            <Field label="Postal code"><input name="postalCode" className={inputClass} /></Field>
+            <Field label="Email"><input name="email" type="email" dir="ltr" className={ltrInputClass} /></Field>
+            <Field label="Phone"><input name="phone" type="tel" dir="ltr" className={ltrInputClass} /></Field>
+            <Field label="Mobile"><input name="mobile" type="tel" dir="ltr" className={ltrInputClass} /></Field>
+            <Field label="Website"><input name="website" type="url" dir="ltr" className={ltrInputClass} placeholder="https://example.com" /></Field>
+            <Field label="Postal code"><input name="postalCode" dir="ltr" className={ltrInputClass} /></Field>
           </div>
         </section>
 

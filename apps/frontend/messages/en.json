@@ -710,6 +710,9 @@
       "title": "Map location",
       "address": "Address",
       "searchPlaceholder": "Search city, district or address",
+      "coordinates": "Latitude, longitude",
+      "applyCoordinates": "Apply",
+      "invalidCoordinates": "Enter valid coordinates, for example 52.4573881,13.3208078.",
       "currentLocation": "Current location",
       "loading": "Preparing map",
       "mapUnavailable": "The map is unavailable. Check Mapbox or geo service configuration."

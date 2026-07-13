@@ -79,6 +79,24 @@ function businessContactData(formData: FormData) {
   return parsed.data;
 }
 
+async function validateBusinessTaxonomy(categoryId: number, subCategoryId: number | null, specialtyIds: number[]) {
+  if (!subCategoryId) {
+    if (specialtyIds.length) throw new Error("Select a subcategory before selecting specialties.");
+    return;
+  }
+
+  const [subCategory, matchingSpecialties] = await Promise.all([
+    prisma.subCategory.findFirst({ where: { id: subCategoryId, categoryId }, select: { id: true } }),
+    specialtyIds.length
+      ? prisma.specialty.count({ where: { id: { in: specialtyIds }, subCategoryId } })
+      : Promise.resolve(0),
+  ]);
+  if (!subCategory) throw new Error("The selected subcategory does not belong to this category.");
+  if (matchingSpecialties !== specialtyIds.length) {
+    throw new Error("One or more selected specialties do not belong to this subcategory.");
+  }
+}
+
 function slugValue(formData: FormData, key: string) {
   const raw = value(formData, key);
   if (!raw || !/^[a-z0-9-]+$/.test(raw)) return "";
@@ -308,6 +326,7 @@ export async function updateBusinessDetails(formData: FormData) {
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
   }
+  await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
 
   if (ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
@@ -401,6 +420,7 @@ export async function createBusinessDetails(formData: FormData) {
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
   }
+  await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
 
   if (ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });

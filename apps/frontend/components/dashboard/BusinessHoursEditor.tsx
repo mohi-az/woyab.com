@@ -201,11 +201,14 @@ export function BusinessHoursEditor({ defaultHours = [], variant = "owner" }: Pr
                   { label: t("open"), value: "open" },
                   { label: t("closed"), value: "closed" },
                 ]}
-                onChange={(value) => updateDay(selectedDay, { enabled: true, isClosed: value === "closed" })}
+                onChange={(value) => updateDay(selectedDay, value === "closed"
+                  ? { enabled: true, isClosed: true, openTime: "", closeTime: "", note: "" }
+                  : { enabled: true, isClosed: false, openTime: selectedDraft.openTime || "09:00", closeTime: selectedDraft.closeTime || "17:00" })}
               />
-              <Segmented options={presets} onChange={applyPreset} />
+              {!selectedDraft.isClosed ? <Segmented options={presets} onChange={applyPreset} /> : null}
             </div>
 
+            {!selectedDraft.isClosed ? <>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <label className="grid gap-2 text-sm font-bold">
                 <span className={isAdmin ? "text-slate-300" : "text-slate-700"}>{t("opens")}</span>
@@ -236,6 +239,7 @@ export function BusinessHoursEditor({ defaultHours = [], variant = "owner" }: Pr
                 onChange={(event) => updateDay(selectedDay, { note: event.target.value })}
               />
             </label>
+            </> : null}
           </div>
         </div>
       </div>

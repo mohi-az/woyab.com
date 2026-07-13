@@ -708,6 +708,9 @@
       "title": "موقعیت روی نقشه",
       "address": "آدرس",
       "searchPlaceholder": "جستجوی شهر، محله یا آدرس",
+      "coordinates": "عرض و طول جغرافیایی",
+      "applyCoordinates": "اعمال",
+      "invalidCoordinates": "مختصات معتبر وارد کنید؛ برای نمونه 52.4573881,13.3208078.",
       "currentLocation": "موقعیت فعلی",
       "loading": "در حال آماده‌سازی نقشه",
       "mapUnavailable": "نقشه در دسترس نیست. تنظیمات Mapbox یا سرویس geo را بررسی کنید."

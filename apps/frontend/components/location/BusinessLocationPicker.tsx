@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { FiLoader, FiMapPin, FiSearch } from "react-icons/fi";
+import { FiCrosshair, FiLoader, FiMapPin, FiSearch } from "react-icons/fi";
 import { MdMyLocation } from "react-icons/md";
 import type mapboxgl from "mapbox-gl";
 import { isAppLocale } from "@/i18n/config";
@@ -35,6 +35,7 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
   const [latitude, setLatitude] = useState(initialLatitude);
   const [longitude, setLongitude] = useState(initialLongitude);
   const [query, setQuery] = useState(defaultAddress ?? "");
+  const [coordinates, setCoordinates] = useState(`${initialLatitude}, ${initialLongitude}`);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "searching" | "locating" | "resolving">("loading");
   const [error, setError] = useState("");
@@ -66,11 +67,30 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
   const moveTo = useCallback((nextLatitude: number, nextLongitude: number, resolveAddress = true) => {
     setLatitude(nextLatitude);
     setLongitude(nextLongitude);
+    setCoordinates(`${nextLatitude}, ${nextLongitude}`);
     skipNextReverseRef.current = resolveAddress;
     const map = mapRef.current;
     map?.easeTo({ center: [nextLongitude, nextLatitude], zoom: Math.max(map.getZoom(), 14), duration: 500 });
     if (resolveAddress) void reverseGeocode(nextLatitude, nextLongitude);
   }, [reverseGeocode]);
+
+  function applyCoordinates() {
+    const match = coordinates.trim().match(/^(-?\d+(?:\.\d+)?)\s*[,;]\s*(-?\d+(?:\.\d+)?)$/);
+    if (!match) {
+      setError(t("invalidCoordinates"));
+      return;
+    }
+
+    const nextLatitude = Number(match[1]);
+    const nextLongitude = Number(match[2]);
+    if (nextLatitude < -90 || nextLatitude > 90 || nextLongitude < -180 || nextLongitude > 180) {
+      setError(t("invalidCoordinates"));
+      return;
+    }
+
+    setError("");
+    moveTo(nextLatitude, nextLongitude, true);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -96,6 +116,7 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
         const center = map.getCenter();
         setLatitude(center.lat);
         setLongitude(center.lng);
+        setCoordinates(`${center.lat}, ${center.lng}`);
         if (skipNextReverseRef.current) {
           skipNextReverseRef.current = false;
           return;
@@ -195,6 +216,28 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
           </div>
         ) : null}
       </div>
+
+      <label className="admin-muted grid gap-2 text-xs font-bold">
+        {t("coordinates")}
+        <span className="flex gap-2" dir="ltr">
+          <input
+            value={coordinates}
+            onChange={(event) => setCoordinates(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                applyCoordinates();
+              }
+            }}
+            inputMode="decimal"
+            placeholder="52.4573881,13.3208078"
+            className="admin-input h-10 min-w-0 flex-1 rounded-lg px-3 text-left text-sm outline-none focus:border-sky-400"
+          />
+          <button type="button" onClick={applyCoordinates} className="admin-button inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-black">
+            <FiCrosshair /> {t("applyCoordinates")}
+          </button>
+        </span>
+      </label>
 
       <div className="relative overflow-hidden rounded-lg border border-[var(--admin-border)]">
         <div ref={containerRef} className="h-[320px] w-full" />

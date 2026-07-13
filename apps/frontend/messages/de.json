@@ -710,6 +710,9 @@
       "title": "Position auf der Karte",
       "address": "Adresse",
       "searchPlaceholder": "Stadt, Viertel oder Adresse suchen",
+      "coordinates": "Breitengrad, Laengengrad",
+      "applyCoordinates": "Uebernehmen",
+      "invalidCoordinates": "Gueltige Koordinaten eingeben, z. B. 52.4573881,13.3208078.",
       "currentLocation": "Aktueller Standort",
       "loading": "Karte wird vorbereitet",
       "mapUnavailable": "Die Karte ist nicht verfuegbar. Pruefen Sie Mapbox- oder Geo-Service-Konfiguration."

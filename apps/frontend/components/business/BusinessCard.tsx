@@ -1,6 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
+import { useState } from "react";
 import { FiMapPin, FiNavigation, FiStar } from "react-icons/fi";
 import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
@@ -12,6 +13,7 @@ export type BusinessCardProps = {
   title: string;
   href?: string;
   imageUrl?: string | null;
+  fallbackImageUrl?: string | null;
   categoryName?: string | null;
   categorySlug?: string | null;
   categoryIconKey?: string | null;
@@ -48,6 +50,7 @@ export function BusinessCard({
   title,
   href,
   imageUrl,
+  fallbackImageUrl,
   categoryName,
   categorySlug,
   categoryIconKey,
@@ -65,15 +68,27 @@ export function BusinessCard({
   isFavorite,
   onFavoriteChange,
 }: BusinessCardProps) {
+  const [failedImageUrls, setFailedImageUrls] = useState<string[]>([]);
+  const displayImageUrl = imageUrl && !failedImageUrls.includes(imageUrl)
+    ? imageUrl
+    : fallbackImageUrl && !failedImageUrls.includes(fallbackImageUrl)
+      ? fallbackImageUrl
+      : null;
+
   const content = (
     <>
       <div className="relative aspect-[4/2.75] overflow-hidden bg-slate-100">
-        {imageUrl ? (
+        {displayImageUrl ? (
           <img
-            src={imageUrl}
+            src={displayImageUrl}
             alt={title}
             className="business-card-media h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
+            onError={() => {
+              setFailedImageUrls((current) =>
+                current.includes(displayImageUrl) ? current : [...current, displayImageUrl],
+              );
+            }}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#ffe4dc] via-[#fff7f4] to-slate-100 text-sm font-bold text-slate-500">
