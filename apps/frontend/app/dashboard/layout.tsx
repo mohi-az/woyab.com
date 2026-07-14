@@ -1,6 +1,11 @@
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const userId = await requireUserId();

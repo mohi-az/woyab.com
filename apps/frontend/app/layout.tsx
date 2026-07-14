@@ -21,10 +21,64 @@ export const viewport: Viewport = {
   userScalable: true,
 };
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de";
+
 export const metadata: Metadata = {
-  title: "Fargo - Iranian Businesses in Germany",
-  description: "Directory for Iranian businesses in Germany",
-  keywords: ["Iranian businesses", "Germany", "Fargo", "Persian", "Deutsch"],
+  metadataBase: new URL(appUrl),
+  title: {
+    default: "Fargo — Iranische Unternehmen in Deutschland",
+    template: "%s | Fargo",
+  },
+  description:
+    "Fargo ist das umfassende Verzeichnis iranischer Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
+  keywords: [
+    "Iranian businesses Germany",
+    "iranische Unternehmen Deutschland",
+    "کسب‌وکار ایرانی آلمان",
+    "Persian directory",
+    "Fargo",
+    "iranische Restaurants",
+    "iranische Ärzte",
+    "persische Dienstleistungen",
+  ],
+  authors: [{ name: "Fargo" }],
+  creator: "Fargo",
+  publisher: "Fargo",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Fargo",
+    title: "Fargo — Iranische Unternehmen in Deutschland",
+    description:
+      "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland. Restaurants, Ärzte, Anwälte und mehr.",
+    locale: "de_DE",
+    alternateLocale: ["en_US", "fa_IR"],
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fargo — Iranische Unternehmen in Deutschland",
+    description:
+      "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland.",
+  },
+  alternates: {
+    canonical: "/",
+    languages: {
+      de: "/de",
+      en: "/en",
+      fa: "/fa",
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

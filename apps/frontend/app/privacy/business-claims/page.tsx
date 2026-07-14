@@ -103,9 +103,24 @@ const copy = {
   },
 } as const;
 
+export async function generateMetadata() {
+  const locale = await getLocale();
+  const appLocale = locale === "fa" ? "fa" : locale === "en" ? "en" : "de";
+  const c = copy[appLocale];
+  return {
+    title: c.title,
+    description: c.intro,
+    openGraph: {
+      title: c.title,
+      description: c.intro,
+    },
+  };
+}
+
 export default async function BusinessClaimPrivacyPage() {
   const locale = await getLocale();
-  const text = copy[locale === "fa" ? "fa" : locale === "en" ? "en" : "de"];
+  const appLocale = locale === "fa" ? "fa" : locale === "en" ? "en" : "de";
+  const text = copy[appLocale];
   const config = getPublicLegalConfig();
   const hasController = Boolean(config.controllerName || config.controllerAddress || config.privacyEmail);
 

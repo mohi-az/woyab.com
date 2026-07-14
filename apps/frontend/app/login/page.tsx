@@ -2,6 +2,12 @@ import { auth } from "@/auth";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { redirectWithLocale } from "@/i18n/server";
 import { safeCallbackPath } from "@/lib/safe-callback-url";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login",
+  robots: { index: false, follow: false },
+};
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string | string[] }> }) {
   const callbackUrl = safeCallbackPath((await searchParams).callbackUrl);

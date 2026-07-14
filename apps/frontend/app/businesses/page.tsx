@@ -24,6 +24,18 @@ function positiveInt(value: string | undefined) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+export async function generateMetadata() {
+  const t = await getTranslations("Businesses");
+  return {
+    title: t("title"),
+    description: t("description"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+    },
+  };
+}
+
 export default async function BusinessesPage({ searchParams }: PageProps) {
   const [params, requestedLocale, t] = await Promise.all([
     searchParams,

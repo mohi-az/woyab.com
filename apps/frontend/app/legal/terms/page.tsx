@@ -58,7 +58,7 @@ const copy = {
     legalIntro: "Die Anbieterangaben für Fargo werden nachfolgend angezeigt, soweit sie für die öffentliche Bereitstellung konfiguriert sind.",
     operator: "Diensteanbieter und Kontakt",
     contentResponsibility: "Inhaltliche Verantwortung",
-    contentResponsibilityText: "Der oben genannte Diensteanbieter ist für die eigenen redaktionellen Inhalte von Fargo verantwortlich. Unternehmensangaben und Nutzerbeiträge werden entsprechend ihrer Herkunft und den anwendbaren rechtlichen Vorgaben gekennzeichnet und moderiert.",
+    contentResponsibilityText: "Der oben genannte Diensteanbieter ist für Fargos eigene redaktionelle Inhalte verantwortlich. Unternehmensangaben und Nutzerbeiträge werden entsprechend ihrer Herkunft und den geltenden gesetzlichen Vorgaben gekennzeichnet und moderiert.",
   },
   fa: {
     title: "شرایط استفاده و اطلاعات حقوقی",
@@ -90,9 +90,23 @@ const copy = {
   },
 } as const;
 
+export async function generateMetadata() {
+  const locale = await getLocale();
+  const appLocale = locale === "fa" ? "fa" : locale === "en" ? "en" : "de";
+  const c = copy[appLocale];
+  return {
+    title: c.title,
+    description: c.intro,
+    openGraph: {
+      title: c.title,
+      description: c.intro,
+    },
+  };
+}
+
 export default async function TermsAndLegalPage() {
   const locale = await getLocale();
-  const appLocale = isAppLocale(locale) ? locale : "de";
+  const appLocale = locale === "fa" ? "fa" : locale === "en" ? "en" : "de";
   const text = copy[appLocale];
   const config = getPublicLegalConfig();
   const hasOperator = Boolean(config.controllerName || config.controllerAddress || config.privacyEmail);
