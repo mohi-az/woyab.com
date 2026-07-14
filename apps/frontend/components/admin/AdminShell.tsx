@@ -1,6 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { ConfigProvider, theme as antTheme } from "antd";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
@@ -16,6 +17,7 @@ import {
   FiMoon,
   FiSettings,
   FiShield,
+  FiTrash2,
   FiSun,
   FiTag,
   FiUserCheck,
@@ -42,6 +44,8 @@ const navItems = [
   { href: "/admin/taxonomy", key: "taxonomy", icon: FiTag },
   { href: "/admin/reports", key: "reports", icon: FiFlag },
   { href: "/admin/claims", key: "claims", icon: FiShield },
+  { href: "/admin/change-requests", key: "changeRequests", icon: FiCheckSquare },
+  { href: "/admin/retention", key: "retention", icon: FiTrash2 },
   { href: "/admin/messages", key: "messages", icon: FiInbox },
   { href: "/admin/tickets", key: "tickets", icon: FiMessageSquare },
   { href: "/admin/settings", key: "settings", icon: FiSettings },
@@ -58,6 +62,7 @@ export function AdminShell({ user, children, initialTheme }: {
   initialTheme: "dark" | "light";
 }) {
   const t = useTranslations("Admin");
+  const locale = useLocale();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dark, setDark] = useState(initialTheme === "dark");
@@ -70,7 +75,20 @@ export function AdminShell({ user, children, initialTheme }: {
   const initials = displayName.slice(0, 1).toUpperCase();
 
   return (
-    <div data-admin-theme={dark ? "dark" : "light"} className="admin-shell fixed inset-0 z-[60] overflow-hidden">
+    <ConfigProvider
+      direction={locale === "fa" ? "rtl" : "ltr"}
+      theme={{
+        algorithm: dark ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
+        token: {
+          colorBgContainer: dark ? "#171d31" : "#ffffff",
+          colorBgElevated: dark ? "#20283d" : "#ffffff",
+          colorBorder: dark ? "rgba(255, 255, 255, 0.10)" : "#cbd5e1",
+          colorText: dark ? "#ffffff" : "#0f172a",
+          colorTextPlaceholder: dark ? "#94a3b8" : "#64748b",
+        },
+      }}
+    >
+      <div data-admin-theme={dark ? "dark" : "light"} className="admin-shell fixed inset-0 z-[60] overflow-hidden">
       <aside
         className={cn(
           "admin-sidebar fixed inset-y-0 z-40 flex w-[298px] flex-col border-r shadow-2xl transition-transform lg:translate-x-0",
@@ -172,6 +190,7 @@ export function AdminShell({ user, children, initialTheme }: {
           <div className="mx-auto max-w-[1540px]">{children}</div>
         </main>
       </div>
-    </div>
+      </div>
+    </ConfigProvider>
   );
 }

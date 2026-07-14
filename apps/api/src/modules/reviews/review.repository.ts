@@ -4,7 +4,7 @@ import type { CreateReviewBody, UpdateReviewBody } from "./review.schema.js";
 export const reviewRepository = {
   findMany: (businessId: string, skip: number, take: number, where: { status?: "PENDING" | "APPROVED" | "REJECTED" } = {}) =>
     prisma.review.findMany({
-      where: { businessId, ...where },
+      where: { businessId, ...where, business: { removedAt: null } },
       skip,
       take,
       orderBy: { createdAt: "desc" },
@@ -20,11 +20,11 @@ export const reviewRepository = {
     }),
 
   count: (businessId: string, where: { status?: "PENDING" | "APPROVED" | "REJECTED" } = {}) =>
-    prisma.review.count({ where: { businessId, ...where } }),
+    prisma.review.count({ where: { businessId, ...where, business: { removedAt: null } } }),
 
   findById: (id: string) =>
-    prisma.review.findUnique({
-      where: { id },
+    prisma.review.findFirst({
+      where: { id, business: { removedAt: null } },
       include: {
         user: { select: { id: true, name: true, avatarUrl: true } },
         business: { select: { id: true, slug: true, businessName: true } },

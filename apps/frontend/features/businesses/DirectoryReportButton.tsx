@@ -124,7 +124,7 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
           <button
             type="button"
             onClick={close}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-100 text-slate-700 transition hover:bg-slate-200"
+            className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-2xl bg-slate-100 text-slate-700 transition hover:bg-slate-200"
             aria-label={t("close")}
           >
             <FiX />
@@ -186,14 +186,14 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
             <button
               type="button"
               onClick={close}
-              className="min-h-11 rounded-2xl border border-slate-200 px-5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+              className="min-h-11 cursor-pointer rounded-2xl border border-slate-200 px-5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
             >
               {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={pending}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black !text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 [&_*]:!text-white"
+              className="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-sm font-black !text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 [&_*]:!text-white"
             >
               <FiAlertTriangle />
               {pending ? t("submitting") : t("submit")}
@@ -215,17 +215,15 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
           disabled={submitted}
           aria-label={buttonLabel}
           className={isHero
-            ? "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-black text-white transition hover:bg-white/15 disabled:cursor-default disabled:opacity-75"
-            : "inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:cursor-default disabled:border-emerald-100 disabled:text-emerald-700"}
+            ? "inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white transition hover:border-white/25 hover:bg-white/15 disabled:cursor-default disabled:opacity-75"
+            : "inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:cursor-default disabled:border-emerald-100 disabled:text-emerald-700"}
         >
           <FiAlertTriangle />
-          {isHero ? buttonLabel : <span className="sr-only">{buttonLabel}</span>}
+          <span className="sr-only">{buttonLabel}</span>
         </button>
-        {!isHero ? (
-          <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-bold text-white shadow-lg group-hover:block group-focus-within:block">
-            {buttonLabel}
-          </span>
-        ) : null}
+        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-bold text-white shadow-lg group-hover:block group-focus-within:block">
+          {buttonLabel}
+        </span>
       </span>
       {feedback && !open ? (
         <span className={isHero ? "text-sm font-bold text-emerald-200" : "text-xs font-bold text-emerald-700"}>

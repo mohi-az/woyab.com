@@ -9,7 +9,7 @@ export async function PUT(_request: Request, { params }: Context) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { businessId } = await params;
 
-  const business = await prisma.business.findUnique({ where: { id: businessId }, select: { id: true } });
+  const business = await prisma.business.findFirst({ where: { id: businessId, removedAt: null }, select: { id: true } });
   if (!business) return NextResponse.json({ error: "Business not found" }, { status: 404 });
 
   await prisma.favorite.upsert({

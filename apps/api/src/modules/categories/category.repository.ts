@@ -17,7 +17,7 @@ export const categoryRepository = {
       skip,
       take,
       orderBy: { sortOrder: "asc" },
-      include: { _count: { select: { subCategories: true, businesses: true } } },
+      include: { _count: { select: { subCategories: true, businesses: { where: { status: "ACTIVE", removedAt: null } } } } },
     }),
 
   count: (where: { active?: boolean } = {}) => prisma.category.count({ where }),
@@ -27,7 +27,7 @@ export const categoryRepository = {
       where: { id },
       include: {
         subCategories: { orderBy: { sortOrder: "asc" } },
-        _count: { select: { businesses: true } },
+        _count: { select: { businesses: { where: { status: "ACTIVE", removedAt: null } } } },
       },
     }),
 
@@ -52,7 +52,7 @@ export const subCategoryRepository = {
       orderBy: { sortOrder: "asc" },
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        _count: { select: { specialties: true, businesses: true } },
+        _count: { select: { specialties: true, businesses: { where: { status: "ACTIVE", removedAt: null } } } },
       },
     }),
 
@@ -65,7 +65,7 @@ export const subCategoryRepository = {
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
         specialties: { orderBy: { sortOrder: "asc" } },
-        _count: { select: { businesses: true } },
+        _count: { select: { businesses: { where: { status: "ACTIVE", removedAt: null } } } },
       },
     }),
 
@@ -90,7 +90,7 @@ export const specialtyRepository = {
       orderBy: { sortOrder: "asc" },
       include: {
         subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        _count: { select: { businesses: true } },
+        _count: { select: { businesses: { where: { status: "ACTIVE", removedAt: null } } } },
       },
     }),
 

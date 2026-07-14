@@ -26,6 +26,8 @@ import { CategoryIcon } from "@/lib/business-categories";
 import type { BusinessDetailData, BusinessReviewItem, CurrentUser } from "@/lib/api";
 import { buildDirectionsUrl } from "@/lib/directions";
 import { DirectoryReportButton } from "@/features/businesses/DirectoryReportButton";
+import { BusinessEditButton } from "@/features/businesses/BusinessEditButton";
+import { getCookieConsent, onCookieConsentChange } from "@/lib/cookie-consent";
 
 type Props = {
   business: BusinessDetailData;
@@ -167,23 +169,35 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   }, []);
 
   useEffect(() => {
-    const visitorKey = "fargo_analytics_visitor";
-    const sessionKey = "fargo_analytics_session";
-    const sessionActivityKey = "fargo_analytics_session_activity";
-    const now = Date.now();
-    const newId = () => crypto.randomUUID().replaceAll("-", "");
-    let visitorId = localStorage.getItem(visitorKey);
-    if (!visitorId) { visitorId = newId(); localStorage.setItem(visitorKey, visitorId); }
-    const lastActivity = Number(localStorage.getItem(sessionActivityKey) || 0);
-    let sessionId = localStorage.getItem(sessionKey);
-    if (!sessionId || now - lastActivity > 30 * 60 * 1000) { sessionId = newId(); localStorage.setItem(sessionKey, sessionId); }
-    localStorage.setItem(sessionActivityKey, String(now));
-    void fetch(`/api/businesses/${business.id}/views`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ visitorId, sessionId }),
-      keepalive: true,
-    }).catch(() => undefined);
+    let recorded = false;
+
+    const recordView = () => {
+      if (recorded || !getCookieConsent()?.analytics) return;
+      recorded = true;
+
+      const visitorKey = "fargo_analytics_visitor";
+      const sessionKey = "fargo_analytics_session";
+      const sessionActivityKey = "fargo_analytics_session_activity";
+      const now = Date.now();
+      const newId = () => crypto.randomUUID().replaceAll("-", "");
+      let visitorId = localStorage.getItem(visitorKey);
+      if (!visitorId) { visitorId = newId(); localStorage.setItem(visitorKey, visitorId); }
+      const lastActivity = Number(localStorage.getItem(sessionActivityKey) || 0);
+      let sessionId = localStorage.getItem(sessionKey);
+      if (!sessionId || now - lastActivity > 30 * 60 * 1000) { sessionId = newId(); localStorage.setItem(sessionKey, sessionId); }
+      localStorage.setItem(sessionActivityKey, String(now));
+      void fetch(`/api/businesses/${business.id}/views`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ visitorId, sessionId }),
+        keepalive: true,
+      }).catch(() => undefined);
+    };
+
+    recordView();
+    return onCookieConsentChange((nextConsent) => {
+      if (nextConsent.analytics) recordView();
+    });
   }, [business.id]);
 
   const activeImage = business.gallery[activeImageIndex] ?? business.gallery[0];
@@ -262,7 +276,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   }
 
   return (
-    <div className="bg-[#f8f5f1] pb-16">
+    <div className="bg-[#f8f5f1] pb-16 [&_button:not(:disabled)]:cursor-pointer">
       <section className="hero-theme relative isolate -mt-16 overflow-hidden bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 lg:-mt-[4.75rem] lg:pt-36">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(241,91,63,.26),transparent_26%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.96)_0%,rgba(10,18,31,.83)_52%,rgba(10,18,31,.68)_100%)]" />
@@ -351,11 +365,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                     <FiNavigation />
                     {t("directions")}
                   </a>
-                ) : null}
-                {business.address ? (
-                  <span className="inline-flex min-h-12 items-center rounded-2xl border border-white/12 bg-white/8 px-4 text-sm text-slate-200">
-                    {business.address}
-                  </span>
                 ) : null}
                 <DirectoryReportButton
                   targetType="business"
@@ -578,27 +587,27 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           </section>
         </div>
 
-        <aside className="space-y-6">
-          <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
-            <h2 className="text-2xl font-black text-slate-950">{t("contactCard.title")}</h2>
+        <aside className="flex flex-col gap-6">
+          <section className="order-1 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+            <h2 className={`text-2xl font-black text-slate-950 ${locale === "fa" ? "text-right" : ""}`}>{t("contactCard.title")}</h2>
 
-            <div className="mt-6 space-y-4 text-sm text-slate-600">
+            <div dir={locale === "fa" ? "ltr" : undefined} className={`mt-6 space-y-4 text-sm text-slate-600 ${locale === "fa" ? "text-left" : ""}`}>
               {business.address ? (
                 <p className="flex items-start gap-3">
                   <FiMapPin className="mt-0.5 shrink-0 text-primary" />
-                  <span>{business.address}</span>
+                  <span dir="auto">{business.address}</span>
                 </p>
               ) : null}
               {business.phone ? (
                 <p className="flex items-center gap-3">
                   <FiPhone className="shrink-0 text-primary" />
-                  <span>{business.phone}</span>
+                  <span dir="ltr">{business.phone}</span>
                 </p>
               ) : null}
               {business.email ? (
                 <p className="flex items-center gap-3">
                   <FiMail className="shrink-0 text-primary" />
-                  <span>{business.email}</span>
+                  <span dir="ltr">{business.email}</span>
                 </p>
               ) : null}
               {business.website ? (
@@ -609,14 +618,14 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   className="flex items-center gap-3 font-bold text-primary transition hover:text-primary-dark"
                 >
                   <FiGlobe className="shrink-0" />
-                  <span>{t("contactCard.website")}</span>
+                  <span dir={locale === "fa" ? "rtl" : undefined}>{t("contactCard.website")}</span>
                   <FiExternalLink />
                 </a>
               ) : null}
             </div>
 
             {business.socialLinks.length ? (
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div dir={locale === "fa" ? "ltr" : undefined} className="mt-6 flex flex-wrap gap-3">
                 {business.socialLinks.map((item) => {
                   const Icon = socialIcons[item.key];
                   return (
@@ -634,10 +643,12 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 })}
               </div>
             ) : null}
+
+            <BusinessEditButton business={business} currentUser={currentUser} />
           </section>
 
           {business.hasOwner ? (
-            <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+            <section className="order-5 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
               <h2 className="text-2xl font-black text-slate-950">{t("contactForm.title")}</h2>
               <p className="mt-2 text-sm leading-7 text-slate-500">{t("contactForm.description")}</p>
 
@@ -691,7 +702,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               )}
             </section>
           ) : (
-            <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+            <section className="order-5 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
               <h2 className="text-2xl font-black text-slate-950">{t("contactForm.title")}</h2>
               <p className="mt-3 rounded-3xl border border-slate-200 bg-slate-50 px-5 py-6 text-sm leading-7 text-slate-600">
                 {t("contactForm.unavailable")}
@@ -700,7 +711,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           )}
 
           {business.attributes.length ? (
-            <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+            <section className="order-2 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                   <FiSliders className="text-lg" />
@@ -719,7 +730,20 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             </section>
           ) : null}
 
-          <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+          {business.services.length ? (
+            <section className="order-3 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+              <h2 className="text-2xl font-black text-slate-950">{locale === "fa" ? "خدمات و منو" : locale === "de" ? "Leistungen und Angebot" : "Services and menu"}</h2>
+              <div className="mt-5 grid gap-3">
+                {business.services.map((service) => <article key={service.id} className="rounded-2xl bg-slate-50 p-4">
+                  <div className="flex items-start justify-between gap-4"><h3 className="font-black text-slate-900">{service.title}</h3>{service.price != null ? <span className="whitespace-nowrap font-black text-primary">{Number(service.price).toLocaleString(locale)} {service.currency}</span> : null}</div>
+                  {service.description ? <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p> : null}
+                  {service.duration || service.unit ? <p className="mt-2 text-xs font-bold text-slate-400">{service.duration ? `${service.duration} min` : ""}{service.duration && service.unit ? " · " : ""}{service.unit}</p> : null}
+                </article>)}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="order-4 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <FiCalendar className="text-lg" />

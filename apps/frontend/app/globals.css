@@ -1661,8 +1661,13 @@ html[lang="fa"] .admin-wizard-step::after {
   padding: 0 1.5rem 1.5rem !important;
 }
 
-/* Theme fixes for Ant Select inputs */
+/* Theme fixes for Ant Select inputs (Ant Design 6 and legacy markup) */
+.admin-ant-select,
 .admin-ant-select .ant-select-selector {
+  --ant-select-color: var(--admin-text) !important;
+  --ant-select-affix-color: var(--admin-muted) !important;
+  --ant-select-background-color: var(--admin-field-bg) !important;
+  --ant-select-border-color: var(--admin-field-border) !important;
   background-color: var(--admin-field-bg) !important;
   color: var(--admin-text) !important;
   border: 1px solid var(--admin-field-border) !important;
@@ -1671,24 +1676,67 @@ html[lang="fa"] .admin-wizard-step::after {
   transition: all 0.2s ease !important;
 }
 
+.admin-ant-select:hover,
 .admin-ant-select .ant-select-selector:hover {
   border-color: #38bdf8 !important;
 }
 
+.admin-ant-select.ant-select-focused,
 .admin-ant-select.ant-select-focused .ant-select-selector {
   border-color: #38bdf8 !important;
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
 }
 
+.admin-ant-select .ant-select-content,
+.admin-ant-select .ant-select-content-value,
 .admin-ant-select .ant-select-selection-item,
+.admin-ant-select .ant-select-placeholder,
 .admin-ant-select .ant-select-selection-placeholder {
   color: var(--admin-text) !important;
+}
+
+.admin-ant-select .ant-select-selection-item,
+.admin-ant-select .ant-select-selection-placeholder {
   line-height: 42px !important;
 }
 
+.admin-ant-select .ant-select-placeholder,
 .admin-ant-select .ant-select-selection-placeholder {
   color: var(--admin-muted) !important;
   opacity: 0.8;
+}
+
+.admin-ant-select .ant-select-content-value {
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--admin-text);
+}
+
+.admin-shell[data-admin-theme="light"] .admin-ant-select .ant-select-input,
+.admin-shell[data-admin-theme="dark"] .admin-ant-select .ant-select-input {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--admin-text) !important;
+  box-shadow: none !important;
+}
+
+.admin-shell[data-admin-theme="light"] .admin-ant-select .ant-select-content {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a;
+}
+
+.admin-ant-select .admin-ant-select-label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  overflow: hidden;
+  color: var(--admin-text) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-text-fill-color: var(--admin-text);
+}
+
+.admin-ant-select .ant-select-suffix {
+  color: var(--admin-muted) !important;
 }
 
 /* Specialty Tags in Select */

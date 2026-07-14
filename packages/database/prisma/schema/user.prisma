@@ -1,29 +1,32 @@
 model User {
-  id                       String              @id @default(cuid())
-  phone                    String?             @unique
-  email                    String?             @unique
+  id                       String                  @id @default(cuid())
+  phone                    String?                 @unique
+  email                    String?                 @unique
   name                     String?
   avatarUrl                String?
-  role                     UserRole            @default(USER)
-  active                   Boolean             @default(true)
-  createdAt                DateTime            @default(now())
-  updatedAt                DateTime            @updatedAt
+  role                     UserRole                @default(USER)
+  active                   Boolean                 @default(true)
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
   emailVerified            DateTime?
   passwordHash             String?
   passwordChangedAt        DateTime?
-  authVersion              Int                 @default(0)
+  authVersion              Int                     @default(0)
   adminAuditLogs           AdminAuditLog[]
   adminSettings            AdminSetting[]
-  businessClaims           BusinessClaim[]     @relation("BusinessClaimClaimant")
-  reviewedBusinessClaims   BusinessClaim[]     @relation("BusinessClaimReviewer")
+  businessClaims           BusinessClaim[]         @relation("BusinessClaimClaimant")
+  reviewedBusinessClaims   BusinessClaim[]         @relation("BusinessClaimReviewer")
+  businessChangeRequests   BusinessChangeRequest[] @relation("BusinessChangeRequestSubmitter")
+  reviewedChangeRequests   BusinessChangeRequest[] @relation("BusinessChangeRequestReviewer")
+  businessRemovals         Business[]              @relation("BusinessRemovedBy")
   businesses               Business[]
-  directoryReports         DirectoryReport[]   @relation("DirectoryReportReporter")
-  resolvedDirectoryReports DirectoryReport[]   @relation("DirectoryReportResolver")
+  directoryReports         DirectoryReport[]       @relation("DirectoryReportReporter")
+  resolvedDirectoryReports DirectoryReport[]       @relation("DirectoryReportResolver")
   favorites                Favorite[]
   reviewOwnerReplies       ReviewOwnerReply[]
   reviews                  Review[]
-  assignedSupportTickets   SupportTicket[]     @relation("SupportTicketAssignee")
-  supportTickets           SupportTicket[]     @relation("SupportTicketUser")
+  assignedSupportTickets   SupportTicket[]         @relation("SupportTicketAssignee")
+  supportTickets           SupportTicket[]         @relation("SupportTicketUser")
   supportTicketReplies     SupportTicketReply[]
   savedLocations           UserSavedLocation[]
 

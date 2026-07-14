@@ -51,6 +51,7 @@ export function AdminSearchSelect({
         value={value || undefined}
         placeholder={placeholder}
         options={options.map((option) => ({ ...option, value: String(option.value) }))}
+        labelRender={({ label }) => <span className="admin-ant-select-label">{label}</span>}
         className={["admin-ant-select", className].filter(Boolean).join(" ")}
         popupClassName="admin-ant-select-dropdown"
         optionFilterProp="label"

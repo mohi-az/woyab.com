@@ -1,6 +1,6 @@
 model Business {
-  id                String                @id @default(cuid())
-  slug              String                @unique
+  id                String                   @id @default(cuid())
+  slug              String                   @unique
   businessName      String
   legalName         String?
   shortDescription  String?
@@ -30,17 +30,21 @@ model Business {
   districtId        Int?
   address           String?
   postalCode        String?
-  status            BusinessStatus        @default(PENDING)
-  verified          Boolean               @default(false)
-  featured          Boolean               @default(false)
-  averageRating     Float                 @default(0)
-  reviewCount       Int                   @default(0)
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
-  sourceLocale      ContentLocale         @default(DE)
+  status            BusinessStatus           @default(PENDING)
+  verified          Boolean                  @default(false)
+  featured          Boolean                  @default(false)
+  averageRating     Float                    @default(0)
+  reviewCount       Int                      @default(0)
+  removedAt         DateTime?
+  removedById       String?
+  restoredAt        DateTime?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  sourceLocale      ContentLocale            @default(DE)
   branches          Branch[]
   attributes        BusinessAttribute[]
   businessClaims    BusinessClaim[]
+  changeRequests    BusinessChangeRequest[]
   businessHours     BusinessHours[]
   images            BusinessImage[]
   tags              BusinessTag[]
@@ -48,12 +52,13 @@ model Business {
   videos            BusinessVideo[]
   businessViewDaily BusinessViewDaily[]
   analyticsEvents   BusinessAnalyticsEvent[]
-  category          Category              @relation(fields: [categoryId], references: [id])
-  city              City                  @relation(fields: [cityId], references: [id])
-  district          District?             @relation(fields: [districtId], references: [id])
-  owner             User?                 @relation(fields: [ownerId], references: [id])
-  specialty         Specialty?            @relation(fields: [specialtyId], references: [id])
-  subCategory       SubCategory?          @relation(fields: [subCategoryId], references: [id])
+  category          Category                 @relation(fields: [categoryId], references: [id])
+  city              City                     @relation(fields: [cityId], references: [id])
+  district          District?                @relation(fields: [districtId], references: [id])
+  owner             User?                    @relation(fields: [ownerId], references: [id])
+  removedBy         User?                    @relation("BusinessRemovedBy", fields: [removedById], references: [id])
+  specialty         Specialty?               @relation(fields: [specialtyId], references: [id])
+  subCategory       SubCategory?             @relation(fields: [subCategoryId], references: [id])
   contactMessages   ContactMessage[]
   directoryReports  DirectoryReport[]
   documents         Document[]
@@ -70,14 +75,16 @@ model Business {
   @@index([featured])
   @@index([averageRating])
   @@index([status])
+  @@index([removedAt])
+  @@index([removedById])
   @@map("businesses")
 }
 
 model BusinessSpecialty {
-  businessId   String
-  specialtyId  Int
-  business     Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  specialty    Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+  businessId  String
+  specialtyId Int
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  specialty   Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
 
   @@id([businessId, specialtyId])
   @@map("business_specialties")

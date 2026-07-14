@@ -38,7 +38,8 @@ const businessDetailInclude = {
   tags: { include: { tag: { select: { id: true, nameFa: true, nameEn: true, slug: true } } } },
   images: { orderBy: { sortOrder: "asc" as const } },
   translations: { select: businessTranslationSelect },
-  _count: { select: { reviews: true, services: true, branches: true } },
+  _count: { select: { reviews: true, services: { where: { active: true } }, branches: true } },
+  services: { where: { active: true }, orderBy: { sortOrder: "asc" as const } },
 } satisfies Parameters<typeof prisma.business.findUnique>[0]["include"];
 
 const businessCardSelect = {
@@ -71,7 +72,7 @@ const businessCardSelect = {
 export const businessRepository = {
   findMany: (skip: number, take: number, where: BusinessFilter = {}, sortBy?: BusinessSort) =>
     prisma.business.findMany({
-      where,
+      where: { AND: [where, { removedAt: null }] },
       skip,
       take,
       orderBy: sortBy === "latest"
@@ -80,25 +81,25 @@ export const businessRepository = {
       select: businessCardSelect,
     }),
 
-  count: (where: BusinessFilter = {}) => prisma.business.count({ where }),
+  count: (where: BusinessFilter = {}) => prisma.business.count({ where: { AND: [where, { removedAt: null }] } }),
 
   findManyByIds: (ids: string[]) =>
     prisma.business.findMany({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, removedAt: null },
       select: businessCardSelect,
     }),
 
   findById: (id: string) =>
-    prisma.business.findUnique({
-      where: { id },
+    prisma.business.findFirst({
+      where: { id, removedAt: null },
       include: businessDetailInclude,
     }),
 
-  findBySlug: (slug: string) => prisma.business.findUnique({ where: { slug } }),
+  findBySlug: (slug: string) => prisma.business.findFirst({ where: { slug, removedAt: null } }),
 
   findDetailBySlug: (slug: string) =>
-    prisma.business.findUnique({
-      where: { slug },
+    prisma.business.findFirst({
+      where: { slug, removedAt: null },
       include: businessDetailInclude,
     }),
 

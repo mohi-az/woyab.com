@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
   }
 
   const target = parsed.data.businessId
-    ? await prisma.business.findUnique({
-        where: { id: parsed.data.businessId },
+    ? await prisma.business.findFirst({
+        where: { id: parsed.data.businessId, removedAt: null },
         select: {
           id: true,
           slug: true,
@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
           ownerId: true,
         },
       })
-    : await prisma.review.findUnique({
-        where: { id: parsed.data.reviewId },
+    : await prisma.review.findFirst({
+        where: { id: parsed.data.reviewId, business: { removedAt: null } },
         select: {
           id: true,
           rating: true,

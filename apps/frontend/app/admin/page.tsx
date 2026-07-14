@@ -56,7 +56,7 @@ export default async function AdminOverviewPage() {
     prisma.business.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.review.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.directoryReport.count({ where: { status: { in: ["OPEN", "REVIEWING"] } } }),
-    prisma.businessClaim.count({ where: { status: "PENDING" } }),
+    prisma.businessClaim.count({ where: { status: { in: ["PENDING_VERIFICATION", "UNDER_REVIEW"] } } }),
     prisma.contactMessage.count({ where: { status: "NEW" } }),
     prisma.supportTicket.count({ where: { status: { in: ["OPEN", "PENDING"] } } }),
     prisma.business.findMany({ where: { createdAt: { gte: since } }, select: { createdAt: true } }),

@@ -283,7 +283,17 @@
       "submitSuccess": "Your message has been saved in the business inbox.",
       "submitSuccessMock": "Your message has been saved in the business inbox.",
       "submitError": "Your message could not be sent.",
-      "unavailable": "Direct messaging is not available for this business yet. Please review the information on this page or check back later."
+      "unavailable": "Direct messaging is not available for this business yet."
+    },
+    "editBusiness": {
+      "button": "Suggest an edit", "title": "Suggest an edit or claim this business", "close": "Close",
+      "roles": { "owner": "I am the owner", "employee": "I work here", "customer": "I am a customer" },
+      "authRequired": "Sign in or create an account to continue. You will return to this business after authentication.",
+      "signIn": "Sign in to continue", "submitting": "Submitting...",
+      "claim": { "fullName": "Full name", "accountEmail": "Account email", "businessEmail": "Official business email", "officialUrl": "Official website or social media (optional)", "agreement": "I agree to the <terms>Business Terms of Use</terms> and acknowledge the <privacy>Business Claim Privacy Notice</privacy>.", "process": "We will email a six-digit code to the official business address; after verification, the claim is approved or sent to an administrator for review.", "sendCode": "Send verification code", "code": "Six-digit verification code", "verify": "Verify ownership", "resend": "Send a new code", "codeSent": "A one-time code was sent only to the official business email.", "approved": "Ownership was verified. Your owner access is now active.", "review": "The email was verified. This claim is awaiting admin review." },
+      "suggestion": { "field": "Information to change", "value": "Suggested value", "context": "Additional context", "evidence": "Supporting link (optional)", "submit": "Submit suggestion", "submitted": "Your suggestion was submitted for moderation." },
+      "fields": { "businessName": "Business name", "legalName": "Legal name", "shortDescription": "Short description", "description": "Description", "email": "Business email", "phone": "Phone", "mobile": "Mobile", "whatsapp": "WhatsApp", "website": "Website", "instagram": "Instagram", "telegram": "Telegram", "facebook": "Facebook", "youtube": "YouTube", "linkedin": "LinkedIn", "address": "Address", "postalCode": "Postal code", "categoryId": "Category ID", "subCategoryId": "Subcategory ID", "specialtyId": "Specialty ID", "cityId": "City ID", "districtId": "District ID", "latitude": "Latitude", "longitude": "Longitude", "establishedYear": "Established year", "priceRange": "Price range" },
+      "errors": { "submit": "The request could not be submitted.", "verify": "The code could not be verified." }
     },
     "hoursTitle": "Business hours",
     "hoursUnavailable": "Business hours are not available yet.",
@@ -355,7 +365,27 @@
     "emailPlaceholder": "Your email address",
     "comingSoon": "Coming soon",
     "copyright": "© {year} Fargo. All rights reserved.",
-    "madeFor": "Iranian businesses in Germany"
+    "madeFor": "Iranian businesses in Germany",
+    "legal": "Terms of Use & Legal Notice",
+    "privacy": "Business claim privacy",
+    "cookieSettings": "Cookie settings"
+  },
+  "CookieConsent": {
+    "bannerTitle": "Your privacy matters",
+    "bannerDescription": "We use necessary cookies to operate Fargo. Analytics and marketing technologies are activated only with your consent.",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "manage": "Manage preferences",
+    "preferencesTitle": "Cookie preferences",
+    "preferencesDescription": "You can enable or disable optional categories at any time.",
+    "necessaryTitle": "Necessary",
+    "necessaryDescription": "These technologies are required for core functionality and security and cannot be disabled.",
+    "analyticsTitle": "Analytics",
+    "analyticsDescription": "Helps us understand how Fargo is used so we can improve the service.",
+    "marketingTitle": "Marketing",
+    "marketingDescription": "Allows personalized content and campaign measurement. No marketing scripts are currently loaded.",
+    "save": "Save selection",
+    "close": "Close preferences"
   },
   "Offline": {
     "title": "You're offline",
@@ -593,6 +623,8 @@
       "taxonomy": "Taxonomy",
       "reports": "Reports",
       "claims": "Ownership claims",
+      "changeRequests": "Change requests",
+      "retention": "Retention review",
       "messages": "Messages",
       "tickets": "Tickets",
       "settings": "Settings",

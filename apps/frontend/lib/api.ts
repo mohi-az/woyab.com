@@ -154,6 +154,15 @@ type BusinessDetailApiResponse = {
       caption?: string | null;
       sortOrder: number;
     }>;
+    services?: Array<{
+      id: string;
+      title: string;
+      description?: string | null;
+      price?: string | number | null;
+      currency: string;
+      duration?: number | null;
+      unit?: string | null;
+    }>;
     _count?: {
       reviews: number;
       services: number;
@@ -329,6 +338,15 @@ export type BusinessDetailData = {
     label: string;
     value: string;
     dataType: "TEXT" | "NUMBER" | "BOOLEAN";
+    unit?: string | null;
+  }>;
+  services: Array<{
+    id: string;
+    title: string;
+    description?: string | null;
+    price?: string | number | null;
+    currency: string;
+    duration?: number | null;
     unit?: string | null;
   }>;
 };
@@ -669,7 +687,7 @@ export async function fetchBusinessBySlug(
             // Replace gallery with Google photos (at least 2 if available)
             gallery = googlePhotos.map((photo, index) => ({
               id: `google-${index}`,
-              imageUrl: `/api/google-photos/${photo.photoReference}?maxWidth=800`,
+              imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference}?maxWidth=800`,
               caption: photo.htmlAttributions[0] ?? business.businessName,
             }));
           }
@@ -744,6 +762,15 @@ export async function fetchBusinessBySlug(
           unit: entry.attribute.unit,
         }];
       }),
+      services: (business.services ?? []).map((service) => ({
+        id: service.id,
+        title: service.title,
+        description: service.description,
+        price: service.price,
+        currency: service.currency,
+        duration: service.duration,
+        unit: service.unit,
+      })),
     };
   } catch {
     return null;

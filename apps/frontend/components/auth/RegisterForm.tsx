@@ -20,7 +20,7 @@ const passwordChecks = {
   number: (password: string) => /[0-9]/.test(password),
 } as const;
 
-export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
+export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: boolean; callbackUrl: string }) {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const activeLocale = isAppLocale(locale) ? locale : "de";
@@ -110,18 +110,18 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
     });
 
     if (login?.error) {
-      window.location.assign(localizePathname("/login", activeLocale));
+      window.location.assign(localizePathname(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`, activeLocale));
       return;
     }
 
-    window.location.assign(localizePathname("/dashboard", activeLocale));
+    window.location.assign(localizePathname(callbackUrl, activeLocale));
   }
 
   return (
     <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-xl sm:p-9">
       <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
         <Link
-          href="/login"
+          href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
           className="rounded-[calc(1rem-4px)] px-4 py-3 text-center text-sm font-bold text-slate-500 transition hover:text-slate-900"
         >
           {t("tabs.login")}
@@ -142,7 +142,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
         <button
           type="button"
           disabled={!googleEnabled}
-          onClick={() => signIn("google", { redirectTo: localizePathname("/dashboard", activeLocale) })}
+          onClick={() => signIn("google", { redirectTo: localizePathname(callbackUrl, activeLocale) })}
           className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
         >
           <FcGoogle className="text-xl" aria-hidden="true" />
@@ -243,7 +243,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         {t("register.haveAccount")}{" "}
-        <Link href="/login" className="font-bold text-primary">
+        <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary">
           {t("tabs.login")}
         </Link>
       </p>

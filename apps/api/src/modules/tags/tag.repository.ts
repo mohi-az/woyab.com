@@ -12,7 +12,7 @@ export const tagRepository = {
       skip,
       take,
       orderBy: { nameFa: "asc" },
-      include: { _count: { select: { businesses: true } } },
+      include: { _count: { select: { businesses: { where: { business: { status: "ACTIVE", removedAt: null } } } } } },
     }),
 
   count: (where: TagFilter = {}) => prisma.tag.count({ where }),
@@ -20,7 +20,7 @@ export const tagRepository = {
   findById: (id: number) =>
     prisma.tag.findUnique({
       where: { id },
-      include: { _count: { select: { businesses: true } } },
+      include: { _count: { select: { businesses: { where: { business: { status: "ACTIVE", removedAt: null } } } } } },
     }),
 
   findBySlug: (slug: string) => prisma.tag.findUnique({ where: { slug } }),

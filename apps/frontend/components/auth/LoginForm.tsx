@@ -8,7 +8,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 
-export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
+export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boolean; callbackUrl: string }) {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       return;
     }
 
-    window.location.assign(localizePathname("/dashboard", activeLocale));
+    window.location.assign(localizePathname(callbackUrl, activeLocale));
   }
 
   return (
@@ -47,7 +47,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           {t("tabs.login")}
         </Link>
         <Link
-          href="/register"
+          href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`}
           className="rounded-[calc(1rem-4px)] px-4 py-3 text-center text-sm font-bold text-slate-500 transition hover:text-slate-900"
         >
           {t("tabs.register")}
@@ -61,7 +61,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         <button
           type="button"
           disabled={!googleEnabled}
-          onClick={() => signIn("google", { redirectTo: localizePathname("/dashboard", activeLocale) })}
+          onClick={() => signIn("google", { redirectTo: localizePathname(callbackUrl, activeLocale) })}
           className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
         >
           <FcGoogle className="text-xl" aria-hidden="true" />
@@ -105,7 +105,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         {t("login.noAccount")}{" "}
-        <Link href="/register" className="font-bold text-primary">
+        <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary">
           {t("tabs.register")}
         </Link>
       </p>

@@ -6,8 +6,10 @@ import Navbar from "@/components/layout/Navbar";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { LocaleObserver } from "@/components/i18n/LocaleObserver";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { CookieConsent } from "@/components/privacy/CookieConsent";
 import { getDirection, isAppLocale } from "@/i18n/config";
 import { dirooz, geistMono, geistSans } from "@/styles/fonts";
+import { assertProductionConfiguration } from "@/lib/privacy-config";
 import "antd/dist/reset.css";
 import "./globals.css";
 
@@ -44,6 +46,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  assertProductionConfiguration();
   const locale = await getLocale();
   const messages = await getMessages();
   const session = await auth();
@@ -63,6 +66,7 @@ export default async function RootLayout({
             <ServiceWorkerRegistration />
             <Navbar />
             <main className="flex-1 pt-16 lg:pt-[4.75rem]">{children}</main>
+            <CookieConsent />
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

@@ -105,10 +105,15 @@ function readResponse(socket: SmtpSocket, expectedCode: number) {
 
 function buildMessage(from: string, mail: Mail) {
   const boundary = `fargo-${Date.now()}`;
+  const safeFrom = safeHeader(from);
+  const safeTo = safeHeader(mail.to);
+  const safeSubject = safeHeader(mail.subject);
+  const text = dotStuff(mail.text);
+  const html = dotStuff(mail.html);
   return [
-    `From: ${from}`,
-    `To: ${mail.to}`,
-    `Subject: ${mail.subject}`,
+    `From: ${safeFrom}`,
+    `To: ${safeTo}`,
+    `Subject: ${safeSubject}`,
     "MIME-Version: 1.0",
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     "",
@@ -116,17 +121,25 @@ function buildMessage(from: string, mail: Mail) {
     "Content-Type: text/plain; charset=utf-8",
     "Content-Transfer-Encoding: 8bit",
     "",
-    mail.text,
+    text,
     "",
     `--${boundary}`,
     "Content-Type: text/html; charset=utf-8",
     "Content-Transfer-Encoding: 8bit",
     "",
-    mail.html,
+    html,
     "",
     `--${boundary}--`,
     ".",
   ].join("\r\n");
+}
+
+function safeHeader(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+function dotStuff(value: string) {
+  return value.replace(/(^|\r?\n)\./g, "$1..");
 }
 
 function extractEmail(value: string) {

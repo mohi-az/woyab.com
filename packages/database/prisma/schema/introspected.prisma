@@ -36,26 +36,82 @@ model AdminSetting {
 }
 
 model BusinessClaim {
-  id             String                @id @default(cuid())
-  businessId     String
-  claimantUserId String?
-  claimantName   String
-  claimantEmail  String
-  claimantPhone  String?
-  message        String?
-  status         business_claim_status @default(PENDING)
-  reviewedById   String?
-  reviewedAt     DateTime?
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @default(now()) @updatedAt
-  business       Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  claimant       User?                 @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id])
-  reviewedBy     User?                 @relation("BusinessClaimReviewer", fields: [reviewedById], references: [id])
+  id                      String                              @id @default(cuid())
+  businessId              String
+  claimantUserId          String?
+  claimantName            String
+  claimantEmail           String
+  claimantPhone           String?
+  message                 String?
+  officialBusinessEmail   String?
+  officialUrl             String?
+  privacyNoticeVersion    String?
+  privacyNoticeAcceptedAt DateTime?
+  termsVersion            String?
+  termsAcceptedAt         DateTime?
+  otpHash                 String?
+  otpExpiresAt            DateTime?
+  otpAttempts             Int                                 @default(0)
+  otpBlockedUntil         DateTime?
+  otpSentAt               DateTime?
+  otpSendCount            Int                                 @default(0)
+  otpWindowStartedAt      DateTime?
+  verifiedAt              DateTime?
+  verificationMethod      business_claim_verification_method?
+  emailMatchesListing     Boolean                             @default(false)
+  status                  business_claim_status               @default(PENDING_VERIFICATION)
+  reviewedById            String?
+  reviewedAt              DateTime?
+  decisionReason          String?
+  ownershipEndedAt        DateTime?
+  retentionReviewAt       DateTime?
+  legalHoldUntil          DateTime?
+  legalHoldReason         String?
+  anonymizedAt            DateTime?
+  createdAt               DateTime                            @default(now())
+  updatedAt               DateTime                            @default(now()) @updatedAt
+  business                Business                            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  claimant                User?                               @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id])
+  reviewedBy              User?                               @relation("BusinessClaimReviewer", fields: [reviewedById], references: [id])
 
   @@index([businessId])
   @@index([claimantUserId])
   @@index([status])
+  @@index([retentionReviewAt])
   @@map("business_claims")
+}
+
+model BusinessChangeRequest {
+  id                String                             @id @default(cuid())
+  businessId        String
+  submitterUserId   String?
+  submitterRelation business_change_submitter_relation
+  kind              business_change_request_kind
+  payloadVersion    Int                                @default(1)
+  payload           Json
+  snapshot          Json
+  businessUpdatedAt DateTime
+  additionalContext String?
+  evidenceUrl       String?
+  status            business_change_request_status     @default(PENDING)
+  reviewedById      String?
+  reviewedAt        DateTime?
+  decisionReason    String?
+  retentionReviewAt DateTime?
+  legalHoldUntil    DateTime?
+  legalHoldReason   String?
+  anonymizedAt      DateTime?
+  createdAt         DateTime                           @default(now())
+  updatedAt         DateTime                           @default(now()) @updatedAt
+  business          Business                           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  submitter         User?                              @relation("BusinessChangeRequestSubmitter", fields: [submitterUserId], references: [id], onDelete: SetNull)
+  reviewedBy        User?                              @relation("BusinessChangeRequestReviewer", fields: [reviewedById], references: [id])
+
+  @@index([businessId, status])
+  @@index([submitterUserId])
+  @@index([reviewedById])
+  @@index([retentionReviewAt])
+  @@map("business_change_requests")
 }
 
 model business_location_hours {
@@ -128,20 +184,20 @@ model BusinessAnalyticsEvent {
 }
 
 model ContactMessage {
-  id           String                 @id @default(cuid())
-  businessId   String
-  name         String
-  email        String
-  phone        String?
-  message      String
-  status       contact_message_status @default(NEW)
-  emailStatus  contact_message_email_status @default(PENDING)
+  id            String                       @id @default(cuid())
+  businessId    String
+  name          String
+  email         String
+  phone         String?
+  message       String
+  status        contact_message_status       @default(NEW)
+  emailStatus   contact_message_email_status @default(PENDING)
   ownerViewedAt DateTime?
-  emailError   String?
-  deliveryMode String?
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @default(now()) @updatedAt
-  business     Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  emailError    String?
+  deliveryMode  String?
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @default(now()) @updatedAt
+  business      Business                     @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@index([emailStatus])
@@ -271,6 +327,36 @@ model UserSavedLocation {
 }
 
 enum business_claim_status {
+  PENDING_VERIFICATION
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+  SUPERSEDED
+}
+
+enum business_claim_verification_method {
+  EMAIL_OTP
+}
+
+enum business_change_submitter_relation {
+  OWNER
+  EMPLOYEE
+  CUSTOMER
+}
+
+enum business_change_request_kind {
+  DETAILS
+  HOURS
+  ATTRIBUTES
+  TAGS
+  SERVICE_CREATE
+  SERVICE_UPDATE
+  SERVICE_DEACTIVATE
+}
+
+enum business_change_request_status {
   PENDING
   APPROVED
   REJECTED

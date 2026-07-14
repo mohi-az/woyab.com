@@ -3,7 +3,7 @@ import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdC
 import { updateClaimStatus } from "@/lib/admin-actions";
 import { prisma } from "@/lib/prisma";
 
-const statuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
+const statuses = ["UNDER_REVIEW", "APPROVED", "REJECTED", "CANCELLED"] as const;
 const inputClassName = "admin-input h-10 min-w-0 rounded-lg px-3 text-sm outline-none focus:border-sky-400";
 
 export default async function AdminClaimsPage() {
@@ -38,16 +38,19 @@ export default async function AdminClaimsPage() {
                   <td className={tdClassName}>
                     {claim.claimantName}<br />
                     <span className="text-xs text-slate-400">{claim.claimantEmail}</span>
+                    <p className="mt-1 text-xs text-sky-300">Business email: {claim.officialBusinessEmail || "-"}</p>
+                    <p className="mt-1 text-xs text-slate-500">Email verified: {claim.verifiedAt ? claim.verifiedAt.toISOString() : "No"}</p>
                     <p className="mt-1 text-xs text-slate-500">{claim.claimant ? "Registered account" : "No account attached"}</p>
                   </td>
                   <td className={tdClassName}><p className="max-w-xl whitespace-pre-line text-sm text-slate-400">{claim.message || "-"}</p></td>
                   <td className={tdClassName}><StatusBadge status={claim.status} /></td>
                   <td className={tdClassName}>
-                    <form action={updateClaimStatus} className="grid gap-2">
+                    {claim.status === "UNDER_REVIEW" ? <form action={updateClaimStatus} className="grid gap-2">
                       <input type="hidden" name="id" value={claim.id} />
                       <select name="status" defaultValue={claim.status} className={inputClassName}>{statuses.map((status) => <option key={status} value={status}>{status}</option>)}</select>
+                      <textarea name="decisionReason" required minLength={3} placeholder="Decision reason" className="admin-input min-h-20 rounded-lg px-3 py-2 text-sm" />
                       <AdminButton tone="success">{t("actions.save")}</AdminButton>
-                    </form>
+                    </form> : <span className="text-xs text-slate-500">No moderation action is available for this status.</span>}
                   </td>
                 </tr>
               ))}

@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { FaClipboardList } from "react-icons/fa";
 import { FiArrowRight, FiClock, FiMail, FiMapPin } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
+import { CookiePreferencesButton } from "@/components/privacy/CookiePreferencesButton";
 
 export default async function Footer() {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("Footer")]);
@@ -62,7 +63,12 @@ export default async function Footer() {
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-center text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-start">
           <p>{t("copyright", { year: new Date().getFullYear() })}</p>
-          <p>{t("madeFor")}</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
+            <Link href={href("/legal/terms")} className="transition hover:text-white">{t("legal")}</Link>
+            <Link href={href("/privacy/business-claims")} className="transition hover:text-white">{t("privacy")}</Link>
+            <CookiePreferencesButton label={t("cookieSettings")} />
+            <p>{t("madeFor")}</p>
+          </div>
         </div>
       </div>
     </footer>

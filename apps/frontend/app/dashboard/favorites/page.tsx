@@ -11,7 +11,7 @@ export default async function FavoritesPage() {
   const [userId, requestedLocale, t] = await Promise.all([requireUserId(), getLocale(), getTranslations("Dashboard.favorites")]);
   const locale = isAppLocale(requestedLocale) ? requestedLocale : "de";
   const favorites = await prisma.favorite.findMany({
-    where: { userId },
+    where: { userId, business: { removedAt: null } },
     orderBy: { createdAt: "desc" },
     include: {
       business: {

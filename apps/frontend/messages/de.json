@@ -283,7 +283,17 @@
       "submitSuccess": "Ihre Nachricht wurde im Postfach des Unternehmens gespeichert.",
       "submitSuccessMock": "Ihre Nachricht wurde im Postfach des Unternehmens gespeichert.",
       "submitError": "Ihre Nachricht konnte nicht gesendet werden.",
-      "unavailable": "Direktnachrichten sind für dieses Unternehmen noch nicht verfügbar. Bitte prüfen Sie die Angaben auf dieser Seite oder versuchen Sie es später erneut."
+      "unavailable": "Direktnachrichten sind für dieses Unternehmen noch nicht verfügbar."
+    },
+    "editBusiness": {
+      "button": "Änderung vorschlagen", "title": "Änderung vorschlagen oder Inhaberschaft beanspruchen", "close": "Schließen",
+      "roles": { "owner": "Ich bin Inhaber", "employee": "Ich arbeite hier", "customer": "Ich bin Kunde" },
+      "authRequired": "Melden Sie sich an oder erstellen Sie ein Konto. Danach kehren Sie zu diesem Unternehmen zurück.",
+      "signIn": "Anmelden und fortfahren", "submitting": "Wird gesendet...",
+      "claim": { "fullName": "Vollständiger Name", "accountEmail": "Konto-E-Mail", "businessEmail": "Offizielle geschäftliche E-Mail", "officialUrl": "Offizielle Website oder Social-Media-Seite (optional)", "agreement": "Ich stimme den <terms>Nutzungsbedingungen für Unternehmen</terms> zu und bestätige, dass ich den <privacy>Datenschutzhinweis für Unternehmensansprüche</privacy> gelesen habe.", "process": "Wir senden einen sechsstelligen Code an die offizielle Geschäfts-E-Mail; nach der Bestätigung wird der Anspruch genehmigt oder von einem Administrator geprüft.", "sendCode": "Bestätigungscode senden", "code": "Sechsstelliger Bestätigungscode", "verify": "Inhaberschaft bestätigen", "resend": "Neuen Code senden", "codeSent": "Ein Einmalcode wurde ausschließlich an die offizielle Geschäfts-E-Mail gesendet.", "approved": "Die Inhaberschaft wurde bestätigt. Der Inhaberzugang ist aktiv.", "review": "Die E-Mail wurde bestätigt. Der Anspruch wartet auf die Admin-Prüfung." },
+      "suggestion": { "field": "Zu ändernde Information", "value": "Vorgeschlagener Wert", "context": "Zusätzlicher Kontext", "evidence": "Beleg-Link (optional)", "submit": "Vorschlag einreichen", "submitted": "Der Vorschlag wurde zur Moderation eingereicht." },
+      "fields": { "businessName": "Unternehmensname", "legalName": "Rechtlicher Name", "shortDescription": "Kurzbeschreibung", "description": "Beschreibung", "email": "Geschäftliche E-Mail", "phone": "Telefon", "mobile": "Mobil", "whatsapp": "WhatsApp", "website": "Website", "instagram": "Instagram", "telegram": "Telegram", "facebook": "Facebook", "youtube": "YouTube", "linkedin": "LinkedIn", "address": "Adresse", "postalCode": "Postleitzahl", "categoryId": "Kategorie-ID", "subCategoryId": "Unterkategorie-ID", "specialtyId": "Spezialisierungs-ID", "cityId": "Stadt-ID", "districtId": "Bezirk-ID", "latitude": "Breitengrad", "longitude": "Längengrad", "establishedYear": "Gründungsjahr", "priceRange": "Preisklasse" },
+      "errors": { "submit": "Die Anfrage konnte nicht gesendet werden.", "verify": "Der Code konnte nicht bestätigt werden." }
     },
     "hoursTitle": "Offnungszeiten",
     "hoursUnavailable": "Offnungszeiten sind noch nicht verfugbar.",
@@ -355,7 +365,27 @@
     "emailPlaceholder": "Ihre E-Mail-Adresse",
     "comingSoon": "Demnächst",
     "copyright": "© {year} Fargo. Alle Rechte vorbehalten.",
-    "madeFor": "Iranische Unternehmen in Deutschland"
+    "madeFor": "Iranische Unternehmen in Deutschland",
+    "legal": "Nutzungsbedingungen & Impressum",
+    "privacy": "Datenschutz bei Unternehmensansprüchen",
+    "cookieSettings": "Cookie-Einstellungen"
+  },
+  "CookieConsent": {
+    "bannerTitle": "Ihre Privatsphäre ist uns wichtig",
+    "bannerDescription": "Wir verwenden notwendige Cookies für den Betrieb von Fargo. Analyse- und Marketing-Technologien werden nur mit Ihrer Einwilligung aktiviert.",
+    "acceptAll": "Alle akzeptieren",
+    "rejectAll": "Alle ablehnen",
+    "manage": "Einstellungen verwalten",
+    "preferencesTitle": "Cookie-Einstellungen",
+    "preferencesDescription": "Sie können optionale Kategorien jederzeit aktivieren oder deaktivieren.",
+    "necessaryTitle": "Notwendig",
+    "necessaryDescription": "Diese Technologien sind für grundlegende Funktionen und Sicherheit erforderlich und können nicht deaktiviert werden.",
+    "analyticsTitle": "Analyse",
+    "analyticsDescription": "Hilft uns zu verstehen, wie Fargo genutzt wird, damit wir das Angebot verbessern können.",
+    "marketingTitle": "Marketing",
+    "marketingDescription": "Ermöglicht personalisierte Inhalte und die Messung von Kampagnen. Derzeit werden keine Marketing-Skripte geladen.",
+    "save": "Auswahl speichern",
+    "close": "Einstellungen schließen"
   },
   "Offline": {
     "title": "Sie sind offline",
@@ -593,6 +623,8 @@
       "taxonomy": "Taxonomie",
       "reports": "Meldungen",
       "claims": "Ownership-Claims",
+      "changeRequests": "Änderungsanträge",
+      "retention": "Aufbewahrungsprüfung",
       "messages": "Nachrichten",
       "tickets": "Tickets",
       "settings": "Einstellungen",

@@ -37,8 +37,8 @@ const photoQuerySchema = z.object({
 googlePlacesRouter.get("/businesses/:id/google-photos", async (req: Request, res: Response) => {
   const { id } = businessIdSchema.parse(req.params);
 
-  const business = await prisma.business.findUnique({
-    where: { id },
+  const business = await prisma.business.findFirst({
+    where: { id, removedAt: null },
     select: { googlePlaceId: true },
   });
 
@@ -51,12 +51,36 @@ googlePlacesRouter.get("/businesses/:id/google-photos", async (req: Request, res
   res.json({ success: true, data: { photos } });
 });
 
+googlePlacesRouter.get("/businesses/:id/google-photos/*photoReference", async (req: Request, res: Response) => {
+  const { id } = businessIdSchema.parse(req.params);
+  const photoReferenceSegments = (req.params as Record<string, string | string[]>).photoReference;
+  const { photoReference } = photoReferenceSchema.parse({ photoReference: Array.isArray(photoReferenceSegments) ? photoReferenceSegments.join("/") : photoReferenceSegments });
+  const { maxWidth } = photoQuerySchema.parse(req.query);
+  const business = await prisma.business.findFirst({ where: { id, removedAt: null }, select: { googlePlaceId: true } });
+  if (!business?.googlePlaceId) {
+    res.status(404).json({ success: false, error: "Business photo not found" });
+    return;
+  }
+  const allowedPhotos = await getPlacePhotos(business.googlePlaceId);
+  if (!allowedPhotos.some((photo) => photo.photoReference === photoReference)) {
+    res.status(404).json({ success: false, error: "Business photo not found" });
+    return;
+  }
+  const result = await getPhotoBuffer(photoReference, maxWidth);
+  if (!result) {
+    res.status(404).json({ success: false, error: "Business photo not found" });
+    return;
+  }
+  res.set({ "Content-Type": result.contentType, "Cache-Control": "public, max-age=604800, immutable", "Content-Length": String(result.buffer.length) });
+  res.send(result.buffer);
+});
+
 googlePlacesRouter.get("/businesses/:id/google-photo-thumbnail", async (req: Request, res: Response) => {
   const { id } = businessIdSchema.parse(req.params);
   const { maxWidth } = photoQuerySchema.parse(req.query);
 
-  const business = await prisma.business.findUnique({
-    where: { id },
+  const business = await prisma.business.findFirst({
+    where: { id, removedAt: null },
     select: { googlePlaceId: true },
   });
 
@@ -77,53 +101,6 @@ googlePlacesRouter.get("/businesses/:id/google-photo-thumbnail", async (req: Req
     return;
   }
 
-  res.set({
-    "Content-Type": result.contentType,
-    "Cache-Control": "public, max-age=604800, immutable",
-    "Content-Length": String(result.buffer.length),
-  });
-  res.send(result.buffer);
-});
-
-/**
- * @openapi
- * /google-photos/{photoReference}:
- *   get:
- *     summary: Proxy and cache a Google Places photo
- *     tags: [Google Places]
- *     parameters:
- *       - in: path
- *         name: photoReference
- *         required: true
- *         schema: { type: string }
- *       - in: query
- *         name: maxWidth
- *         schema: { type: integer, default: 800 }
- *     responses:
- *       200:
- *         description: Photo binary
- *       404:
- *         description: Photo not found
- */
-googlePlacesRouter.get("/google-photos/*photoReference", async (req: Request, res: Response) => {
-  // The photoReference is the full path after /google-photos/
-  // e.g. "places/ChIJ.../photos/AUacShh..."
-  const photoReferenceSegments = (req.params as Record<string, string | string[]>).photoReference;
-  const { photoReference } = photoReferenceSchema.parse({
-    photoReference: Array.isArray(photoReferenceSegments)
-      ? photoReferenceSegments.join("/")
-      : photoReferenceSegments,
-  });
-
-  const { maxWidth } = photoQuerySchema.parse(req.query);
-  const result = await getPhotoBuffer(photoReference, maxWidth);
-
-  if (!result) {
-    res.status(404).json({ success: false, error: "Photo not found" });
-    return;
-  }
-
-  // Set aggressive caching headers (7 days)
   res.set({
     "Content-Type": result.contentType,
     "Cache-Control": "public, max-age=604800, immutable",

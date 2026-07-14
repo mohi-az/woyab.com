@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   const { favoritesOnly, ...map } = body;
   if (favoritesOnly) {
     const userId = await currentUserId();
-    const favorites = userId ? await prisma.favorite.findMany({ where: { userId }, select: { businessId: true } }) : [];
+    const favorites = userId ? await prisma.favorite.findMany({ where: { userId, business: { removedAt: null } }, select: { businessId: true } }) : [];
     map.favoriteBusinessIds = favorites.map((item) => item.businessId);
   }
   return proxyApi(new NextRequest(request.url, {

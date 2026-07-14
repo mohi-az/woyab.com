@@ -45,7 +45,7 @@ function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: 
 }
 
 function stripTranslations<T extends { translations?: unknown }>(item: T) {
-  const { translations, ...rest } = item;
+  const { translations: _translations, ...rest } = item;
   return rest;
 }
 

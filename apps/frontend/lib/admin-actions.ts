@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { appLocales } from "@/i18n/config";
 import { requireAdmin } from "@/lib/admin-auth";
+import { applyBusinessChangeRequest } from "@/lib/business-change-requests";
+import { ownershipRetentionDate } from "@/lib/business-claims";
+import { sendMail } from "@/lib/mail";
 import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
 import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
@@ -12,7 +15,7 @@ import { prisma } from "@/lib/prisma";
 const businessStatuses: BusinessStatus[] = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"];
 const reviewStatuses: ReviewStatus[] = ["PENDING", "APPROVED", "REJECTED"];
 const userRoles: UserRole[] = ["USER", "OWNER", "ADMIN", "SUPER_ADMIN"];
-const claimStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
+const claimStatuses = ["UNDER_REVIEW", "APPROVED", "REJECTED", "CANCELLED"] as const;
 const daysOfWeek: DayOfWeek[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 const attributeDataTypes: AttributeDataType[] = ["TEXT", "NUMBER", "BOOLEAN"];
 const phonePattern = /^\+?[0-9\s().-]{6,24}$/;
@@ -32,6 +35,10 @@ type TaxonomyEntity = "category" | "subcategory" | "specialty" | "tag" | "featur
 function value(formData: FormData, key: string) {
   const raw = formData.get(key);
   return typeof raw === "string" ? raw.trim() : "";
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
 }
 
 function nullableValue(formData: FormData, key: string) {
@@ -778,13 +785,28 @@ export async function updateClaimStatus(formData: FormData) {
   const status = value(formData, "status") as (typeof claimStatuses)[number];
   if (!id || !claimStatuses.includes(status)) throw new Error("Invalid claim status.");
 
+  const decisionReason = value(formData, "decisionReason");
+  if (["APPROVED", "REJECTED"].includes(status) && decisionReason.length < 3) throw new Error("A decision reason is required.");
+
   const claim = await prisma.$transaction(async (tx) => {
     const existing = await tx.businessClaim.findUniqueOrThrow({
       where: { id },
-      select: { businessId: true, claimantUserId: true },
+      include: {
+        business: { select: { id: true, businessName: true, ownerId: true, owner: { select: { id: true, email: true, name: true } } } },
+        claimant: { select: { id: true, email: true, name: true } },
+      },
     });
+    if (existing.status !== "UNDER_REVIEW") throw new Error("Only a verified claim under review can be decided.");
     if (status === "APPROVED") {
       if (!existing.claimantUserId) throw new Error("Approved claims must belong to a registered user.");
+      if (!existing.verifiedAt || existing.verificationMethod !== "EMAIL_OTP") throw new Error("The business email must be verified before approval.");
+      if (existing.business.ownerId && existing.business.ownerId !== existing.claimantUserId) {
+        const endedAt = new Date();
+        await tx.businessClaim.updateMany({
+          where: { businessId: existing.businessId, claimantUserId: existing.business.ownerId, status: "APPROVED" },
+          data: { status: "SUPERSEDED", ownershipEndedAt: endedAt, retentionReviewAt: ownershipRetentionDate(endedAt) },
+        });
+      }
       await tx.business.update({
         where: { id: existing.businessId },
         data: { ownerId: existing.claimantUserId, verified: true },
@@ -797,16 +819,95 @@ export async function updateClaimStatus(formData: FormData) {
         status,
         reviewedById: ["APPROVED", "REJECTED"].includes(status) ? actor.id : null,
         reviewedAt: ["APPROVED", "REJECTED"].includes(status) ? new Date() : null,
+        decisionReason: decisionReason || null,
+        otpHash: null,
+        otpExpiresAt: null,
+        retentionReviewAt: status === "REJECTED"
+          ? new Date(Date.now() + 180 * 86_400_000)
+          : status === "CANCELLED"
+            ? new Date(Date.now() + 90 * 86_400_000)
+            : undefined,
       },
     });
     return existing;
-  });
+  }, { isolationLevel: "Serializable" });
   await audit(actor.id, "claim.status", "BusinessClaim", id, {
     status,
     businessId: claim.businessId,
     ownerId: status === "APPROVED" ? claim.claimantUserId : null,
+    decisionReason,
   });
+  if (status === "APPROVED") {
+    const recipients = [claim.claimant?.email || claim.claimantEmail, claim.business.owner?.email].filter((email, index, items): email is string => Boolean(email) && items.indexOf(email) === index);
+    const safeBusinessName = escapeHtml(claim.business.businessName);
+    const safeDecisionReason = escapeHtml(decisionReason);
+    await Promise.allSettled(recipients.map((to) => sendMail({
+      to,
+      subject: `Fargo ownership update for ${claim.business.businessName}`,
+      text: `The ownership claim for ${claim.business.businessName} was approved by Fargo administration. Reason: ${decisionReason}`,
+      html: `<p>The ownership claim for <strong>${safeBusinessName}</strong> was approved by Fargo administration.</p><p>Reason: ${safeDecisionReason}</p>`,
+    })));
+  }
   refreshAdmin();
+}
+
+export async function reviewBusinessChangeRequest(formData: FormData) {
+  const actor = await requireAdmin();
+  const id = value(formData, "id");
+  const decision = value(formData, "decision");
+  const decisionReason = value(formData, "decisionReason");
+  if (!id || !["APPROVE", "REJECT"].includes(decision) || decisionReason.length < 3) throw new Error("A decision and reason are required.");
+
+  if (decision === "APPROVE") {
+    await applyBusinessChangeRequest(id, actor.id, decisionReason);
+  } else {
+    const changed = await prisma.businessChangeRequest.updateMany({
+      where: { id, status: "PENDING" },
+      data: { status: "REJECTED", reviewedById: actor.id, reviewedAt: new Date(), decisionReason, retentionReviewAt: new Date(Date.now() + 180 * 86_400_000) },
+    });
+    if (!changed.count) throw new Error("Change request is not pending.");
+    await audit(actor.id, "business.change_request.reject", "BusinessChangeRequest", id, { decisionReason });
+  }
+  refreshAdmin();
+  revalidatePath("/admin/change-requests");
+}
+
+export async function reviewRetentionItem(formData: FormData) {
+  const actor = await requireAdmin();
+  const type = value(formData, "type");
+  const id = value(formData, "id");
+  const action = value(formData, "action");
+  if (!id || !["claim", "changeRequest"].includes(type) || !["ANONYMIZE", "LEGAL_HOLD"].includes(action)) throw new Error("Invalid retention action.");
+
+  const retention = type === "claim"
+    ? await prisma.businessClaim.findUnique({ where: { id }, select: { retentionReviewAt: true, legalHoldUntil: true } })
+    : await prisma.businessChangeRequest.findUnique({ where: { id }, select: { retentionReviewAt: true, legalHoldUntil: true } });
+  if (!retention?.retentionReviewAt) throw new Error("This record has no retention-review deadline.");
+  if (action === "ANONYMIZE" && retention.retentionReviewAt > new Date()) throw new Error("The retention-review deadline has not been reached.");
+  if (action === "ANONYMIZE" && retention.legalHoldUntil && retention.legalHoldUntil > new Date()) throw new Error("This record is under an active legal hold.");
+
+  if (action === "LEGAL_HOLD") {
+    const reason = value(formData, "reason");
+    const until = new Date(value(formData, "until"));
+    if (reason.length < 3 || !Number.isFinite(until.getTime()) || until <= new Date()) throw new Error("A future legal-hold date and reason are required.");
+    if (until.getTime() > Date.now() + 3 * 366 * 86_400_000) throw new Error("A legal hold may not exceed three years. Review and renew it when justified.");
+    if (type === "claim") await prisma.businessClaim.update({ where: { id }, data: { legalHoldUntil: until, legalHoldReason: reason } });
+    else await prisma.businessChangeRequest.update({ where: { id }, data: { legalHoldUntil: until, legalHoldReason: reason } });
+  } else if (type === "claim") {
+    const anonymized = await prisma.businessClaim.updateMany({
+      where: { id, anonymizedAt: null, retentionReviewAt: { lte: new Date() }, OR: [{ legalHoldUntil: null }, { legalHoldUntil: { lte: new Date() } }] },
+      data: { claimantUserId: null, claimantName: "Anonymized", claimantEmail: "anonymized@invalid.local", officialBusinessEmail: null, officialUrl: null, message: null, anonymizedAt: new Date(), retentionReviewAt: null, legalHoldUntil: null, legalHoldReason: null },
+    });
+    if (!anonymized.count) throw new Error("The claim is not eligible for anonymization.");
+  } else {
+    const anonymized = await prisma.businessChangeRequest.updateMany({
+      where: { id, anonymizedAt: null, retentionReviewAt: { lte: new Date() }, OR: [{ legalHoldUntil: null }, { legalHoldUntil: { lte: new Date() } }] },
+      data: { submitterUserId: null, additionalContext: null, evidenceUrl: null, payload: {}, snapshot: {}, anonymizedAt: new Date(), retentionReviewAt: null, legalHoldUntil: null, legalHoldReason: null },
+    });
+    if (!anonymized.count) throw new Error("The change request is not eligible for anonymization.");
+  }
+  await audit(actor.id, `retention.${action.toLowerCase()}`, type === "claim" ? "BusinessClaim" : "BusinessChangeRequest", id);
+  revalidatePath("/admin/retention");
 }
 
 export async function updateContactMessageStatus(formData: FormData) {

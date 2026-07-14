@@ -7,7 +7,7 @@ export async function GET() {
   if (!userId) return NextResponse.json({ data: { favoriteBusinessIds: [], savedLocations: [] } });
 
   const [favorites, savedLocations] = await Promise.all([
-    prisma.favorite.findMany({ where: { userId }, select: { businessId: true } }),
+    prisma.favorite.findMany({ where: { userId, business: { removedAt: null } }, select: { businessId: true } }),
     prisma.userSavedLocation.findMany({
       where: { userId },
       orderBy: [{ isDefault: "desc" }, { sortOrder: "asc" }, { createdAt: "desc" }],

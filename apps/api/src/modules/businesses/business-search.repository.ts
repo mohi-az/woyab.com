@@ -25,6 +25,7 @@ function spatialConditions(input: BusinessSearchBody) {
   const requestedLocale = appLocaleToContentLocale(input.locale);
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
+    Prisma.sql`b."removedAt" IS NULL`,
     Prisma.sql`bl."active" = TRUE`,
     // Do not surface corrupt locations whose coordinates are hundreds of
     // kilometres away from their assigned city. Keep the check permissive

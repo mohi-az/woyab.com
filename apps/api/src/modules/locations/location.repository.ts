@@ -89,7 +89,7 @@ export const cityRepository = {
       orderBy: { nameEn: "asc" },
       include: {
         province: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        _count: { select: { districts: true, businesses: true } },
+        _count: { select: { districts: true, businesses: { where: { status: "ACTIVE", removedAt: null } } } },
       },
     }),
 
