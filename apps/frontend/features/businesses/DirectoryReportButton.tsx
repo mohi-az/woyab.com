@@ -206,7 +206,7 @@ export function DirectoryReportButton({ targetType, targetId, targetLabel, curre
 
   return (
     <>
-      <span className="group relative inline-flex">
+      <span id={isHero && targetType === "business" ? "business-report-trigger" : undefined} className="group relative inline-flex">
         <button
           type="button"
           onClick={() => {

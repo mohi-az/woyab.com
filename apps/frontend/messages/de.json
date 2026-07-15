@@ -17,6 +17,20 @@
       "faq": "FAQ",
       "contact": "Kontakt"
     },
+    "businessMenu": {
+      "label": "Für Unternehmen",
+      "addBusiness": "Unternehmen hinzufügen",
+      "claimBusinessFree": "Unternehmen kostenlos übernehmen",
+      "businessLogin": "Beim Geschäftskonto anmelden"
+    },
+    "businessHeader": {
+      "label": "Für Unternehmen"
+    },
+    "accountMenu": {
+      "menu": "Kontomenü",
+      "settings": "Kontoeinstellungen",
+      "fallbackName": "Mein Konto"
+    },
     "actions": {
       "user": "Nutzer",
       "vendor": "Anbieter"
@@ -37,6 +51,23 @@
       "dashboard": "Dashboard",
       "logout": "Abmelden"
     }
+  },
+  "AddBusinessPage": {
+    "metaTitle": "Unternehmen hinzufügen oder übernehmen | Fargo",
+    "metaDescription": "Suchen Sie Ihr Unternehmen bei Fargo, übernehmen Sie einen verfügbaren Eintrag oder legen Sie ein neues Unternehmen an.",
+    "eyebrow": "Fargo für Unternehmen",
+    "title": "Bringen Sie Ihr Unternehmen zu Fargo.",
+    "description": "Suchen Sie zuerst nach Ihrem Unternehmen. Sie können einen verfügbaren Eintrag übernehmen oder einen neuen anlegen, wenn er noch nicht vorhanden ist.",
+    "fieldLabel": "Name Ihres Unternehmens",
+    "placeholder": "Unternehmensnamen eingeben",
+    "searchHint": "Geben Sie mindestens zwei Zeichen ein, um passende Unternehmen zu sehen.",
+    "addWithName": "Neues Unternehmen mit diesem Namen hinzufügen",
+    "loading": "Unternehmen werden gesucht…",
+    "error": "Die Suche ist vorübergehend nicht verfügbar. Bitte versuchen Sie es erneut.",
+    "noMatches": "Zu diesem Namen gibt es noch keinen passenden Eintrag.",
+    "imageAlt": "Eine lokale Geschäftsinhaberin vor einem Geschäft im Viertel",
+    "artworkEyebrow": "Mit Fargo wachsen",
+    "artworkMessage": "Machen Sie lokale Suchanfragen zu neuen Kunden und sichern Sie Ihrem Unternehmen die Sichtbarkeit, die es zum Wachsen braucht."
   },
   "LocaleSwitcher": {
     "label": "Sprache wechseln",
@@ -286,6 +317,12 @@
       "unavailable": "Direktnachrichten sind für dieses Unternehmen noch nicht verfügbar."
     },
     "editBusiness": {
+      "ownerUnavailable": "Dieses Unternehmen hat bereits einen bestätigten Inhaber und kann nicht übernommen werden.",
+      "ownedGuidance": {
+        "title": "Für diesen Eintrag ist bereits ein Inhaberzugang aktiv.",
+        "description": "Der Inhaberzugang kann nicht automatisch übertragen werden. Wenn Sie der rechtmäßige Inhaber sind oder die Inhaberschaft gewechselt hat, melden Sie einen Eigentumskonflikt und wählen Sie „Sonstiges“. Geben Sie Ihre Kontaktdaten und mögliche Nachweise an, damit Fargo den Fall prüfen kann, bevor der Zugang geändert wird.",
+        "action": "Inhaberschaftsproblem melden"
+      },
       "button": "Änderung vorschlagen", "title": "Änderung vorschlagen oder Inhaberschaft beanspruchen", "close": "Schließen",
       "roles": { "owner": "Ich bin Inhaber", "employee": "Ich arbeite hier", "customer": "Ich bin Kunde" },
       "authRequired": "Melden Sie sich an oder erstellen Sie ein Konto. Danach kehren Sie zu diesem Unternehmen zurück.",

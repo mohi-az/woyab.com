@@ -19,14 +19,6 @@ export async function POST(request: Request) {
   const parsed = businessClaimCreateSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return error("INVALID_FIELDS", "Please check the claim fields.", 400, parsed.error.flatten().fieldErrors);
 
-  let deliverable = false;
-  try {
-    deliverable = await hasDeliverableEmailDomain(parsed.data.officialBusinessEmail);
-  } catch {
-    return error("EMAIL_DOMAIN_UNAVAILABLE", "The email domain could not be checked. Please try again.", 503);
-  }
-  if (!deliverable) return error("EMAIL_DOMAIN_INVALID", "The business email domain cannot receive email.", 400);
-
   const [user, business, activeClaim] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { id: true, email: true, name: true, active: true } }),
     prisma.business.findUnique({ where: { id: parsed.data.businessId }, select: { id: true, businessName: true, email: true, ownerId: true, removedAt: true } }),
@@ -39,7 +31,16 @@ export async function POST(request: Request) {
   if (!user?.active || !user.email) return error("AUTH_REQUIRED", "A valid account email is required.", 401);
   if (!business) return error("BUSINESS_NOT_FOUND", "Business not found.", 404);
   if (business.removedAt) return error("BUSINESS_REMOVED", "This business is not publicly available.", 409);
+  if (business.ownerId) return error("BUSINESS_ALREADY_OWNED", "This business already has a verified owner.", 409);
   if (activeClaim) return error("CLAIM_ALREADY_ACTIVE", "You already have an active claim for this business.", 409, { claimId: activeClaim.id, status: activeClaim.status });
+
+  let deliverable = false;
+  try {
+    deliverable = await hasDeliverableEmailDomain(parsed.data.officialBusinessEmail);
+  } catch {
+    return error("EMAIL_DOMAIN_UNAVAILABLE", "The email domain could not be checked. Please try again.", 503);
+  }
+  if (!deliverable) return error("EMAIL_DOMAIN_INVALID", "The business email domain cannot receive email.", 400);
 
   const now = new Date();
   const otp = createClaimOtp();

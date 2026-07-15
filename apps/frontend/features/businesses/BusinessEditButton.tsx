@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
-import { FiBriefcase, FiEdit3, FiUser, FiUsers, FiX } from "react-icons/fi";
+import { FiAlertCircle, FiBriefcase, FiEdit3, FiUser, FiUsers, FiX } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import type { BusinessDetailData, CurrentUser } from "@/lib/api";
 
@@ -42,6 +42,13 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     setFeedback("");
   }
 
+  function openOwnershipReport() {
+    close();
+    window.setTimeout(() => {
+      document.querySelector<HTMLButtonElement>("#business-report-trigger button")?.click();
+    }, 0);
+  }
+
   async function submitClaim(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!currentUser) return;
@@ -61,7 +68,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     });
     const result = await response.json().catch(() => null);
     setPending(false);
-    if (!response.ok) { setFeedback(result?.error || t("errors.submit")); return; }
+    if (!response.ok) { setFeedback(result?.code === "BUSINESS_ALREADY_OWNED" ? t("ownerUnavailable") : result?.error || t("errors.submit")); return; }
     setClaimId(result.data.id); setFeedback(t("claim.codeSent"));
   }
 
@@ -118,8 +125,23 @@ export function BusinessEditButton({ business, currentUser }: Props) {
         <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[28px] bg-white p-6 text-slate-900 shadow-2xl sm:p-8">
           <div className="flex items-start justify-between gap-4"><div><h2 className="text-2xl font-black">{t("title")}</h2><p className="mt-2 text-sm leading-6 text-slate-500">{business.title}</p></div><button type="button" onClick={close} className="grid h-10 w-10 cursor-pointer place-items-center rounded-full bg-slate-100 transition hover:bg-slate-200" aria-label={t("close")}><FiX /></button></div>
 
-          {!relation ? <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <RoleButton icon={FiBriefcase} label={t("roles.owner")} onClick={() => setRelation("OWNER")} />
+          {business.hasOwner && !relation ? (
+            <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+              <div className="flex items-start gap-3">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-100 text-xl text-amber-800"><FiAlertCircle /></span>
+                <div>
+                  <h3 className="text-lg font-black">{t("ownedGuidance.title")}</h3>
+                  <p className="mt-2 text-sm leading-7 text-amber-900">{t("ownedGuidance.description")}</p>
+                </div>
+              </div>
+              <button type="button" onClick={openOwnershipReport} className="mt-4 inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-amber-900 px-5 text-sm font-black text-white transition hover:bg-amber-950">
+                {t("ownedGuidance.action")}
+              </button>
+            </div>
+          ) : null}
+
+          {!relation ? <div className={`mt-6 grid gap-3 ${business.hasOwner ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
+            {!business.hasOwner ? <RoleButton icon={FiBriefcase} label={t("roles.owner")} onClick={() => setRelation("OWNER")} /> : null}
             <RoleButton icon={FiUsers} label={t("roles.employee")} onClick={() => setRelation("EMPLOYEE")} />
             <RoleButton icon={FiUser} label={t("roles.customer")} onClick={() => setRelation("CUSTOMER")} />
           </div> : null}

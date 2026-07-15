@@ -17,6 +17,20 @@
       "faq": "FAQ",
       "contact": "Contact"
     },
+    "businessMenu": {
+      "label": "For businesses",
+      "addBusiness": "Add a business",
+      "claimBusinessFree": "Claim your business for free",
+      "businessLogin": "Log in to Business Account"
+    },
+    "businessHeader": {
+      "label": "For business"
+    },
+    "accountMenu": {
+      "menu": "Account menu",
+      "settings": "Account settings",
+      "fallbackName": "My account"
+    },
     "actions": {
       "user": "User",
       "vendor": "Vendor"
@@ -37,6 +51,23 @@
       "dashboard": "Dashboard",
       "logout": "Logout"
     }
+  },
+  "AddBusinessPage": {
+    "metaTitle": "Add or claim your business | Fargo",
+    "metaDescription": "Search Fargo for your business, claim an available listing, or add a new business.",
+    "eyebrow": "Fargo for businesses",
+    "title": "Bring your business to Fargo.",
+    "description": "Search for your business first. You can claim an available listing or add a new one if it is not here yet.",
+    "fieldLabel": "Your business name",
+    "placeholder": "Start typing a business name",
+    "searchHint": "Enter at least two characters to see matching businesses.",
+    "addWithName": "Add a new business with this name",
+    "loading": "Searching businesses…",
+    "error": "Search is temporarily unavailable. Please try again.",
+    "noMatches": "No existing listings match this name yet.",
+    "imageAlt": "A local business owner standing outside a neighborhood shop",
+    "artworkEyebrow": "Grow with Fargo",
+    "artworkMessage": "Turn local searches into new customers and give your business the visibility it needs to grow."
   },
   "LocaleSwitcher": {
     "label": "Change language",
@@ -286,6 +317,12 @@
       "unavailable": "Direct messaging is not available for this business yet."
     },
     "editBusiness": {
+      "ownerUnavailable": "This business already has a verified owner and cannot be claimed.",
+      "ownedGuidance": {
+        "title": "This listing already has active owner access.",
+        "description": "Owner access cannot be transferred automatically. If you are the legitimate owner or ownership has changed, report an ownership issue and choose “Other.” Include your contact details and any supporting evidence so Fargo can review the case before changing access.",
+        "action": "Report an ownership issue"
+      },
       "button": "Suggest an edit", "title": "Suggest an edit or claim this business", "close": "Close",
       "roles": { "owner": "I am the owner", "employee": "I work here", "customer": "I am a customer" },
       "authRequired": "Sign in or create an account to continue. You will return to this business after authentication.",

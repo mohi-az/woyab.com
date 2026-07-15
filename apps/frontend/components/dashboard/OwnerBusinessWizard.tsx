@@ -32,6 +32,8 @@ type Props = {
   cities: Option[];
   attributeDefinitions: BusinessAttributeDefinition[];
   tagOptions: BusinessTagOption[];
+  initialBusinessName?: string;
+  initialSourceLocale?: "DE" | "EN" | "FA";
 };
 
 const steps = [
@@ -86,12 +88,12 @@ function localizedTagText(locale: string) {
   return "Tags";
 }
 
-export function OwnerBusinessWizard({ categories, subCategories, specialties, cities, attributeDefinitions, tagOptions }: Props) {
+export function OwnerBusinessWizard({ categories, subCategories, specialties, cities, attributeDefinitions, tagOptions, initialBusinessName = "", initialSourceLocale = "DE" }: Props) {
   const tHours = useTranslations("BusinessHours");
   const locale = useLocale();
   const [step, setStep] = useState(0);
-  const [sourceLocale, setSourceLocale] = useState<"DE" | "EN" | "FA">("DE");
-  const [businessName, setBusinessName] = useState("");
+  const [sourceLocale, setSourceLocale] = useState<"DE" | "EN" | "FA">(initialSourceLocale);
+  const [businessName, setBusinessName] = useState(initialBusinessName);
   const [categoryId, setCategoryId] = useState(String(categories[0]?.id ?? ""));
   const [subCategoryId, setSubCategoryId] = useState("");
   const [specialtyId, setSpecialtyId] = useState("");

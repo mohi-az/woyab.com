@@ -71,6 +71,7 @@ export const businessClaimErrorCodes = [
   "OTP_BLOCKED",
   "EMAIL_DELIVERY_FAILED",
   "OWNER_REVIEW_REQUIRED",
+  "BUSINESS_ALREADY_OWNED",
   "STALE_CHANGE_REQUEST",
   "BUSINESS_REMOVED",
 ] as const;

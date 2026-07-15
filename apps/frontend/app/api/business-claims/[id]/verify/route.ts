@@ -20,6 +20,13 @@ export async function POST(request: Request, context: Context) {
   if (!claim) return reply("CLAIM_NOT_FOUND", "Claim not found.", 404);
   if (claim.status !== "PENDING_VERIFICATION") return reply("CLAIM_NOT_PENDING", "This claim is no longer awaiting a code.", 409, { status: claim.status });
   if (claim.business.removedAt) return reply("BUSINESS_REMOVED", "This business is not publicly available.", 409);
+  if (claim.business.ownerId) {
+    await prisma.businessClaim.updateMany({
+      where: { id, claimantUserId: userId, status: "PENDING_VERIFICATION" },
+      data: { status: "CANCELLED", otpHash: null, otpExpiresAt: null, retentionReviewAt: claimRetentionDate(90) },
+    });
+    return reply("BUSINESS_ALREADY_OWNED", "This business already has a verified owner.", 409);
+  }
   if (claim.otpBlockedUntil && claim.otpBlockedUntil > now) return reply("OTP_BLOCKED", "Too many attempts. Try again after the block ends.", 429, { blockedUntil: claim.otpBlockedUntil });
   if (claim.otpBlockedUntil && claim.otpBlockedUntil <= now) {
     await prisma.businessClaim.updateMany({ where: { id, status: "PENDING_VERIFICATION" }, data: { otpAttempts: 0, otpBlockedUntil: null } });
