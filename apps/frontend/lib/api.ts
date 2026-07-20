@@ -384,7 +384,7 @@ export type CurrentUser = {
 const API_BASE = process.env.API_URL ?? "http://localhost:4000";
 
 function businessCardImageProps(business: Pick<BusinessApiItem, "id" | "coverImageUrl" | "googlePlaceId">) {
-  if (!business.googlePlaceId) {
+  if (business.coverImageUrl || !business.googlePlaceId) {
     return { imageUrl: business.coverImageUrl, fallbackImageUrl: null };
   }
 
@@ -663,8 +663,8 @@ export async function fetchBusinessBySlug(
       });
     }
 
-    // Fetch Google Places photos if googlePlaceId exists and gallery is empty or we want to prefer Google photos
-    if (business.googlePlaceId) {
+    // Google photos are the automatic fallback. A manually managed gallery always wins.
+    if (business.googlePlaceId && gallery.length === 0) {
       try {
         const googlePhotosRes = await fetch(
           `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,

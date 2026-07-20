@@ -20,12 +20,16 @@ type Props = {
   defaultAddress?: string | null;
   defaultLatitude?: number | null;
   defaultLongitude?: number | null;
+  /** Use light-mode portal styles instead of dark admin styles */
+  portalMode?: boolean;
+  /** Called whenever the resolved address text changes */
+  onAddressChange?: (address: string) => void;
 };
 
 const DEFAULT_CENTER = { latitude: 52.52, longitude: 13.405 };
 const REVERSE_IDLE_MS = 1000;
 
-export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaultLongitude }: Props) {
+export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaultLongitude, portalMode = false, onAddressChange }: Props) {
   const rawLocale = useLocale();
   const locale = isAppLocale(rawLocale) ? rawLocale : "de";
   const t = useTranslations("Admin.location");
@@ -40,6 +44,35 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
   const [status, setStatus] = useState<"idle" | "loading" | "searching" | "locating" | "resolving">("loading");
   const [error, setError] = useState("");
   const visibleSuggestions = query.trim().length >= 2 ? suggestions : [];
+  const onAddressChangeRef = useRef(onAddressChange);
+  useEffect(() => { onAddressChangeRef.current = onAddressChange; }, [onAddressChange]);
+  useEffect(() => { onAddressChangeRef.current?.(address); }, [address]);
+
+  // Class tokens that differ between admin and portal modes
+  const cls = portalMode
+    ? {
+        label: "grid gap-2 text-xs font-bold text-slate-600",
+        input: "h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-primary",
+        dropdown: "absolute inset-x-0 top-full z-20 mt-2 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl",
+        suggestionBtn: "group block w-full rounded-xl border border-transparent px-3 py-2 text-start text-sm transition hover:border-primary/30 hover:bg-primary/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary",
+        suggestionTitle: "block font-bold text-slate-900 transition group-hover:text-primary",
+        suggestionSub: "text-xs text-slate-500",
+        applyBtn: "inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 transition hover:border-primary hover:text-primary",
+        iconBtn: "absolute end-3 top-3 z-30 grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-wait disabled:opacity-70",
+        mapBorder: "border-slate-200",
+      }
+    : {
+        label: "admin-muted grid gap-2 text-xs font-bold",
+        input: "admin-input h-10 rounded-lg px-3 text-sm outline-none focus:border-sky-400",
+        dropdown: "admin-section absolute inset-x-0 top-full z-20 mt-2 max-h-60 overflow-y-auto rounded-lg border p-2 shadow-xl",
+        suggestionBtn: "group block w-full rounded-lg border border-transparent px-3 py-2 text-start text-sm transition hover:border-sky-400/40 hover:bg-sky-400/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400",
+        suggestionTitle: "admin-title block transition group-hover:text-sky-300",
+        suggestionSub: "admin-muted text-xs",
+        applyBtn: "admin-button inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-black",
+        iconBtn: "admin-icon-button absolute end-3 top-3 z-30 grid h-10 w-10 place-items-center rounded-lg border transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-70",
+        mapBorder: "border-[var(--admin-border)]",
+      };
+
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const reverseTimeoutRef = useRef<number | null>(null);
@@ -112,6 +145,14 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
       });
       mapRef.current = map;
       map.addControl(new mapbox.NavigationControl({ showCompass: false }), "bottom-left");
+      const normalizeMapControlButtons = () => {
+        containerRef.current?.querySelectorAll("button").forEach((button) => {
+          button.type = "button";
+        });
+      };
+      normalizeMapControlButtons();
+      const controlObserver = new MutationObserver(normalizeMapControlButtons);
+      controlObserver.observe(containerRef.current, { childList: true, subtree: true });
       map.on("moveend", () => {
         const center = map.getCenter();
         setLatitude(center.lat);
@@ -132,7 +173,10 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
       });
       const resizeObserver = new ResizeObserver(() => map.resize());
       resizeObserver.observe(containerRef.current);
-      map.once("remove", () => resizeObserver.disconnect());
+      map.once("remove", () => {
+        resizeObserver.disconnect();
+        controlObserver.disconnect();
+      });
     }).catch(() => {
       if (!cancelled) {
         setError(t("mapUnavailable"));
@@ -192,32 +236,46 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
     <div className="grid gap-3">
       <input type="hidden" name="latitude" value={latitude} />
       <input type="hidden" name="longitude" value={longitude} />
-      <label className="admin-muted grid gap-2 text-xs font-bold">
+      <label className={cls.label}>
         {t("address")}
-        <input name="address" value={address} onChange={(event) => setAddress(event.target.value)} className="admin-input h-10 rounded-lg px-3 text-sm outline-none focus:border-sky-400" />
+        <div className="relative">
+          <input
+            name="address"
+            value={address}
+            onChange={(event) => setAddress(event.target.value)}
+            onKeyDown={(event) => { if (event.key === "Enter") event.preventDefault(); }}
+            className={`${cls.input} pe-8`}
+          />
+          {status === "resolving" ? (
+            <FiLoader className="pointer-events-none absolute end-2.5 top-1/2 -translate-y-1/2 animate-spin text-slate-400" />
+          ) : null}
+        </div>
       </label>
 
       <div className="relative">
         <FiSearch className="pointer-events-none absolute start-3 top-1/2 z-10 -translate-y-1/2 text-slate-400" />
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("searchPlaceholder")} className="admin-input h-10 w-full rounded-lg px-10 text-sm outline-none focus:border-sky-400" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") event.preventDefault(); }} placeholder={t("searchPlaceholder")} className={`${cls.input} w-full px-10`} />
+        {status === "searching" ? (
+          <FiLoader className="pointer-events-none absolute end-3 top-1/2 z-10 -translate-y-1/2 animate-spin text-slate-400" />
+        ) : null}
         {visibleSuggestions.length ? (
-          <div className="admin-section absolute inset-x-0 top-full z-20 mt-2 max-h-60 overflow-y-auto rounded-lg border p-2 shadow-xl">
+          <div className={cls.dropdown}>
             {visibleSuggestions.map((suggestion) => (
-              <button key={suggestion.id} type="button" className="group block w-full rounded-lg border border-transparent px-3 py-2 text-start text-sm transition hover:border-sky-400/40 hover:bg-sky-400/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-400" onClick={() => {
+              <button key={suggestion.id} type="button" className={cls.suggestionBtn} onClick={() => {
                 setAddress(suggestion.label);
                 setQuery(suggestion.label);
                 setSuggestions([]);
                 moveTo(suggestion.latitude, suggestion.longitude, false);
               }}>
-                <strong className="admin-title block transition group-hover:text-sky-300">{suggestion.primaryText}</strong>
-                <span className="admin-muted text-xs">{suggestion.secondaryText}</span>
+                <strong className={cls.suggestionTitle}>{suggestion.primaryText}</strong>
+                <span className={cls.suggestionSub}>{suggestion.secondaryText}</span>
               </button>
             ))}
           </div>
         ) : null}
       </div>
 
-      <label className="admin-muted grid gap-2 text-xs font-bold">
+      <label className={cls.label}>
         {t("coordinates")}
         <span className="flex gap-2" dir="ltr">
           <input
@@ -231,19 +289,19 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
             }}
             inputMode="decimal"
             placeholder="52.4573881,13.3208078"
-            className="admin-input h-10 min-w-0 flex-1 rounded-lg px-3 text-left text-sm outline-none focus:border-sky-400"
+            className={`${cls.input} min-w-0 flex-1 text-left`}
           />
-          <button type="button" onClick={applyCoordinates} className="admin-button inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-black">
+          <button type="button" onClick={applyCoordinates} className={cls.applyBtn}>
             <FiCrosshair /> {t("applyCoordinates")}
           </button>
         </span>
       </label>
 
-      <div className="relative overflow-hidden rounded-lg border border-[var(--admin-border)]">
+      <div className={`relative overflow-hidden rounded-lg border ${cls.mapBorder}`}>
         <div ref={containerRef} className="h-[320px] w-full" />
         <div className={`address-center-pin ${status === "resolving" ? "address-center-pin--loading" : ""}`} aria-hidden="true"><span /></div>
         <div className="address-center-target" aria-hidden="true" />
-        <button type="button" onClick={useCurrentLocation} disabled={status === "locating"} className="admin-icon-button absolute end-3 top-3 z-30 grid h-10 w-10 place-items-center rounded-lg border transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-70" aria-label={t("currentLocation")} aria-busy={status === "locating"}>
+        <button type="button" onClick={useCurrentLocation} disabled={status === "locating"} className={cls.iconBtn} aria-label={t("currentLocation")} aria-busy={status === "locating"}>
           {status === "locating" ? <FiLoader className="animate-spin" /> : <MdMyLocation />}
         </button>
         {status === "loading" ? <div className="absolute inset-0 z-20 grid place-items-center bg-slate-950/20 text-sm font-bold text-white">{t("loading")}</div> : null}

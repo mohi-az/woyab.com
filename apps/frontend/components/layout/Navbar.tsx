@@ -91,11 +91,12 @@ export default function Navbar() {
   const authLinkClassName = isOverlay ? "text-white/80 hover:text-white" : "text-slate-700 hover:text-primary";
   const accountLabels = {
     menu: t("accountMenu.menu"),
+    dashboard: t("auth.dashboard"),
     settings: t("accountMenu.settings"),
     logout: t("auth.logout"),
   };
 
-  if (internalPathname === "/add-business") {
+  if (internalPathname === "/add-business" || internalPathname.startsWith("/business-portal")) {
     return (
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/95 shadow-[0_6px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 lg:h-[4.75rem]">
@@ -222,9 +223,14 @@ export default function Navbar() {
                     <span className="grid h-8 w-8 shrink-0 place-items-center text-xl text-primary"><FiCheckCircle /></span>
                     <span className="text-sm font-black">{t("businessMenu.claimBusinessFree")}</span>
                   </Link>
-                  <Link href={`/login?callbackUrl=${encodeURIComponent("/dashboard")}`} role="menuitem" onClick={() => setBusinessMenuOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2 font-bold transition hover:bg-slate-100 hover:text-primary">
-                    <span className="grid h-8 w-8 shrink-0 place-items-center text-xl text-primary"><FiLogIn /></span>
-                    <span className="text-sm font-black">{t("businessMenu.businessLogin")}</span>
+                  <Link href="/for-businesses" role="menuitem" onClick={() => setBusinessMenuOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2 font-bold transition hover:bg-slate-100 hover:text-primary">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center text-xl text-primary"><FiBriefcase /></span>
+                    <span className="text-sm font-black">{t("businessMenu.learnMore")}</span>
+                  </Link>
+                  <div className="mx-2 my-1 border-t border-slate-100" />
+                  <Link href="/business-portal" role="menuitem" onClick={() => setBusinessMenuOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2 font-bold transition hover:bg-slate-100 hover:text-primary">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center text-xl text-primary"><FiGrid /></span>
+                    <span className="text-sm font-black">{t("businessMenu.manageBusinesses")}</span>
                   </Link>
                 </div>
               </div>
@@ -319,9 +325,13 @@ export default function Navbar() {
                     <FiCheckCircle className="text-lg text-primary" />
                     <span>{t("businessMenu.claimBusinessFree")}</span>
                   </Link>
-                  <Link href={`/login?callbackUrl=${encodeURIComponent("/dashboard")}`} className="flex min-h-11 items-center gap-3 rounded-xl bg-white px-3 py-2 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
-                    <FiLogIn className="text-lg text-primary" />
-                    <span>{t("businessMenu.businessLogin")}</span>
+                  <Link href="/for-businesses" className="flex min-h-11 items-center gap-3 rounded-xl bg-white px-3 py-2 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
+                    <FiBriefcase className="text-lg text-primary" />
+                    <span>{t("businessMenu.learnMore")}</span>
+                  </Link>
+                  <Link href="/business-portal" className="flex min-h-11 items-center gap-3 rounded-xl bg-white px-3 py-2 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
+                    <FiGrid className="text-lg text-primary" />
+                    <span>{t("businessMenu.manageBusinesses")}</span>
                   </Link>
                 </div>
               ) : null}
@@ -377,7 +387,7 @@ type AccountMenuProps = {
   email: string;
   avatarUrl: string;
   locale: string;
-  labels: { menu: string; settings: string; logout: string };
+  labels: { menu: string; dashboard: string; settings: string; logout: string };
   overlay?: boolean;
 };
 
@@ -395,7 +405,10 @@ function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, locale, 
           <p className="truncate text-sm font-black text-slate-950">{name}</p>
           {email ? <p className="mt-1 truncate text-xs text-slate-500" dir="ltr">{email}</p> : null}
         </div>
-        <Link href="/dashboard/profile" role="menuitem" onClick={onClose} className="mt-1 flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition hover:bg-slate-100 hover:text-primary">
+        <Link href="/business-portal" role="menuitem" onClick={onClose} className="mt-1 flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition hover:bg-slate-100 hover:text-primary">
+          <FiGrid className="text-lg" />{labels.dashboard}
+        </Link>
+        <Link href="/dashboard/profile" role="menuitem" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition hover:bg-slate-100 hover:text-primary">
           <FiSettings className="text-lg" />{labels.settings}
         </Link>
         <button type="button" role="menuitem" onClick={() => {
@@ -422,6 +435,7 @@ function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, lo
       </button>
       {open ? (
         <div className="grid gap-1 border-t border-slate-100 p-2">
+          <Link href="/business-portal" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiGrid />{labels.dashboard}</Link>
           <Link href="/dashboard/profile" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiSettings />{labels.settings}</Link>
           <button type="button" onClick={() => {
             onClose();

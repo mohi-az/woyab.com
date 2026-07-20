@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { useState } from "react";
 import {
   businessAttributeFieldName,
   businessAttributeLabel,
@@ -12,6 +13,7 @@ type Props = {
   definitions: BusinessAttributeDefinition[];
   values?: BusinessAttributeValue[];
   variant?: "admin" | "owner";
+  onValuesChange?: (labels: string[]) => void;
 };
 
 const adminInputClassName = "admin-input min-h-10 rounded-lg px-3 text-sm outline-none focus:border-sky-400";
@@ -21,9 +23,12 @@ function isEnabled(value?: string) {
   return value === "true" || value === "on" || value === "1";
 }
 
-export function BusinessAttributeFields({ definitions, values = [], variant = "owner" }: Props) {
+export function BusinessAttributeFields({ definitions, values = [], variant = "owner", onValuesChange }: Props) {
   const locale = useLocale();
   const valueMap = new Map(values.map((item) => [item.attributeId, item.value]));
+  const [draftValues, setDraftValues] = useState<Record<number, string>>(
+    Object.fromEntries(values.map((item) => [item.attributeId, item.value])),
+  );
   const inputClassName = variant === "admin" ? adminInputClassName : ownerInputClassName;
   const checkboxClassName = variant === "admin"
     ? "h-4 w-4 rounded border-white/20 bg-transparent text-sky-400 focus:ring-sky-400"
@@ -33,6 +38,19 @@ export function BusinessAttributeFields({ definitions, values = [], variant = "o
     : "flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-bold text-slate-700";
 
   if (!definitions.length) return null;
+
+  function updateValue(attributeId: number, nextValue: string) {
+    const nextValues = { ...draftValues, [attributeId]: nextValue };
+    setDraftValues(nextValues);
+    onValuesChange?.(
+      definitions.flatMap((definition) => {
+        const currentValue = nextValues[definition.id] ?? "";
+        if (!currentValue || currentValue === "false") return [];
+        const label = businessAttributeLabel(definition, locale);
+        return [definition.dataType === "BOOLEAN" ? label : `${label}: ${currentValue}`];
+      }),
+    );
+  }
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -44,7 +62,13 @@ export function BusinessAttributeFields({ definitions, values = [], variant = "o
         if (definition.dataType === "BOOLEAN") {
           return (
             <label key={definition.id} className={itemClassName}>
-              <input name={fieldName} type="checkbox" defaultChecked={isEnabled(value)} className={checkboxClassName} />
+              <input
+                name={fieldName}
+                type="checkbox"
+                defaultChecked={isEnabled(value)}
+                onChange={(event) => updateValue(definition.id, event.target.checked ? "true" : "")}
+                className={checkboxClassName}
+              />
               <span>{label}</span>
             </label>
           );
@@ -57,6 +81,7 @@ export function BusinessAttributeFields({ definitions, values = [], variant = "o
               name={fieldName}
               type={definition.dataType === "NUMBER" ? "number" : "text"}
               defaultValue={value ?? ""}
+              onChange={(event) => updateValue(definition.id, event.target.value)}
               className={inputClassName}
             />
           </label>

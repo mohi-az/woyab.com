@@ -21,7 +21,9 @@
       "label": "برای کسب‌وکارها",
       "addBusiness": "افزودن کسب‌وکار",
       "claimBusinessFree": "دریافت رایگان مالکیت کسب‌وکار",
-      "businessLogin": "ورود به حساب کسب‌وکار"
+      "businessLogin": "ورود به حساب کسب‌وکار",
+      "manageBusinesses": "مدیریت کسب‌وکارهایم",
+      "learnMore": "برای صاحبان کسب‌وکار"
     },
     "businessHeader": {
       "label": "برای کسب‌وکار"
@@ -894,5 +896,106 @@
       "enabled": "فعال",
       "disabled": "غیرفعال"
     }
+  },
+  "BusinessPortal": {
+    "header": "پنل کسب‌وکار",
+    "sidebar": {
+      "overview": "دید کلی",
+      "analytics": "آمار",
+      "messages": "پیام‌ها",
+      "support": "پشتیبانی",
+      "addBusiness": "افزودن کسب‌وکار",
+      "allBusinesses": "همه کسب‌وکارها",
+      "editBusiness": "ویرایش آگهی",
+      "reviews": "نظرات",
+      "businessPortal": "پنل کسب‌وکار"
+    },
+    "overview": {
+      "title": "دید کلی کسب‌وکار",
+      "description": "همه کسب‌وکارهایتان را از یک جا مدیریت کنید.",
+      "emptyTitle": "حضور کسب‌وکارتان را آغاز کنید",
+      "emptyDescription": "اولین کسب‌وکار خود را اضافه کنید تا آمار بازدید، پیام‌ها و مدیریت نظرات را فعال کنید.",
+      "emptyAction": "افزودن اولین کسب‌وکار",
+      "statsViews": "بازدید (۳۰ روز)",
+      "statsReviews": "نظرات",
+      "statsPending": "تغییرات در صف",
+      "statusActive": "فعال",
+      "statusPending": "در حال بررسی",
+      "statusRejected": "رد شده",
+      "statusDraft": "پیش‌نویس",
+      "statusHidden": "پنهان",
+      "actionEdit": "ویرایش",
+      "actionPublicPage": "صفحه عمومی",
+      "actionAnalytics": "آمار",
+      "addAnother": "افزودن کسب‌وکار دیگر",
+      "totalBusinesses": "{count} کسب‌وکار",
+      "totalViews": "مجموع بازدید",
+      "totalReviews": "مجموع نظرات",
+      "removedWarning": "این کسب‌وکار از دید عموم پنهان شده است.",
+      "removedAction": "بازگردانی"
+    },
+    "edit": {
+      "title": "ویرایش کسب‌وکار",
+      "previewLabel": "پیش‌نمایش زنده",
+      "previewSubtitle": "در حین تایپ به‌روز می‌شود",
+      "submitInfo": "ذخیره یک درخواست تغییر ایجاد می‌کند که بعد از تایید ادمین منتشر می‌شود."
+    },
+    "new": {
+      "title": "افزودن کسب‌وکار جدید"
+    },
+    "accessDenied": {
+      "title": "دسترسی به پنل کسب‌وکار",
+      "description": "پنل کسب‌وکار فقط برای صاحبان بیزینس قابل دسترسی است.",
+      "action": "افزودن کسب‌وکار"
+    },
+    "support": {
+      "title": "تیکت‌های پشتیبانی",
+      "description": "مستقیماً با تیم فارگو صحبت کنید.",
+      "newTicket": "تیکت جدید",
+      "subject": "موضوع",
+      "message": "درخواست خود را توضیح دهید…",
+      "send": "ارسال تیکت",
+      "empty": "هنوز تیکتی درخواست ندادید.",
+      "closeTicket": "بستن تیکت",
+      "reply": "پاسخ",
+      "closedNote": "این تیکت بسته شده است.",
+      "youLabel": "شما",
+      "fargoSupport": "پشتیبانی فارگو",
+      "statusLabels": {
+        "OPEN": "باز",
+        "PENDING": "در انتظار",
+        "RESOLVED": "حل شده",
+        "CLOSED": "بسته"
+      }
+    }
+  },
+  "ForBusinesses": {
+    "metaTitle": "فارگو برای کسب‌وکارها",
+    "metaDescription": "کسب‌وکار ایرانی خود را در فارگو ثبت کنید.",
+    "heroEyebrow": "برای صاحبان کسب‌وکار",
+    "heroTitle": "کسب‌وکارتان را با فارگو رشد دهید",
+    "heroDescription": "به صدها کسب‌وکار ایرانی بپیوندید که در فارگو ثبت شده‌اند.",
+    "heroPrimary": "افزودن کسب‌وکار",
+    "heroSecondary": "مدیریت کسب‌وکارها",
+    "featuresTitle": "همه آنچه برای موفقیت نیاز دارید",
+    "featuresDescription": "ابزاری حرفه‌ای برای کسب‌وکارهای ایرانی در آلمان.",
+    "feature1Title": "ثبت رایگان",
+    "feature1Description": "یک پروفایل جامع با عکس، تماس، ساعات کاری و خدمات بسازید.",
+    "feature2Title": "آمار بازدید",
+    "feature2Description": "ببینید چند نفر کسب‌وکار شما را دیده‌اند.",
+    "feature3Title": "پیام‌های مشتری",
+    "feature3Description": "استعلام‌های مستقیم از مشتریان بالقوه دریافت کنید.",
+    "feature4Title": "مدیریت نظرات",
+    "feature4Description": "به عنوان مالک تایید‌شده پاسخ دهید.",
+    "feature5Title": "پشتیبانی چند کسب‌وکار",
+    "feature5Description": "تمام کسب‌وکارهایتان را از یک داشبورد مدیریت کنید.",
+    "feature6Title": "به‌رسانی‌های مدیریت‌شده",
+    "feature6Description": "تغییرات بعد از بررسی منتشر می‌شوند.",
+    "ctaTitle": "آماده‌اید؟",
+    "ctaDescription": "افزودن کسب‌وکار کمتر از پنج دقیقه طول می‌کشد.",
+    "ctaAction": "ایجاد کسب‌وکار",
+    "claimTitle": "قبلاً در فارگو ثبت شدید؟",
+    "claimDescription": "صفحه خود را رایگان دریافت کنید.",
+    "claimAction": "دریافت صفحه"
   }
 }

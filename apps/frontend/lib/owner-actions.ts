@@ -8,6 +8,7 @@ import { businessAttributeDefinitionSelect, extractBusinessAttributeValues, sync
 import { businessChangeSnapshot, parseChangePayload } from "@/lib/business-change-requests";
 import { selectedTagIds, syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
+import { ownerBusinessWizardSchema } from "@/lib/owner-business-validation";
 
 export async function openOwnerContactMessage(formData: FormData) {
   const userId = await requireUserId();
@@ -194,6 +195,7 @@ export async function closeSupportTicket(formData: FormData) {
 
 export async function createOwnerBusiness(formData: FormData) {
   const userId = await requireUserId();
+  if (value(formData, "submissionIntent") !== "owner-business-final-submit") return;
   const slug = value(formData, "slug");
   const sourceLocale = value(formData, "sourceLocale") as "DE" | "EN" | "FA";
   const categoryId = intValue(formData, "categoryId");
@@ -201,12 +203,27 @@ export async function createOwnerBusiness(formData: FormData) {
   const subCategoryId = intValue(formData, "subCategoryId");
   const specialtyId = intValue(formData, "specialtyId");
 
-  if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
-  if (!locales.includes(sourceLocale) || !categoryId || !cityId) throw new Error("Please check the required business fields.");
+  const validation = ownerBusinessWizardSchema(sourceLocale, "en").safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+  if (!validation.success) throw new Error(validation.error.issues[0]?.message ?? "Business information is invalid.");
+  if (!locales.includes(sourceLocale) || !categoryId || !cityId) throw new Error("Business information is invalid.");
   await validateTaxonomySelection(categoryId, subCategoryId, specialtyId);
 
-  const duplicate = await prisma.business.findUnique({ where: { slug }, select: { id: true } });
-  if (duplicate) throw new Error("This business slug already exists.");
+  // Auto-resolve slug collisions by appending a numeric suffix
+  let finalSlug = slug;
+  const duplicates = await prisma.business.findMany({
+    where: { slug: { startsWith: slug } },
+    select: { slug: true },
+  });
+  if (duplicates.length > 0) {
+    const existingSlugs = new Set(duplicates.map((b) => b.slug));
+    if (existingSlugs.has(slug)) {
+      let counter = 2;
+      while (existingSlugs.has(`${slug}-${counter}`)) counter++;
+      finalSlug = `${slug}-${counter}`;
+    }
+  }
 
   const translations = locales.map((locale) => ({
     locale,
@@ -218,11 +235,24 @@ export async function createOwnerBusiness(formData: FormData) {
   const source = translations.find((translation) => translation.locale === sourceLocale) ?? translations[0];
   if (!source) throw new Error("At least one business name is required.");
 
+  const email = nullableValue(formData, "email");
+  const phone = nullableValue(formData, "phone");
+  const mobile = nullableValue(formData, "mobile");
+  const website = nullableValue(formData, "website");
+  const postalCode = nullableValue(formData, "postalCode");
+  const googlePlaceId = nullableValue(formData, "googlePlaceId");
+  const latitude = numberValue(formData, "latitude");
+  const longitude = numberValue(formData, "longitude");
+
   const business = await prisma.$transaction(async (tx) => {
+    // Collect uploaded image URLs (multiple hidden inputs named "imageUrl")
+    const imageUrls = formData.getAll("imageUrl").filter((v): v is string => typeof v === "string" && v.trim().length > 0).map((v) => v.trim());
+    const coverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
+
     const created = await tx.business.create({
       data: {
         ownerId: userId,
-        slug,
+        slug: finalSlug,
         sourceLocale,
         businessName: source.businessName,
         shortDescription: source.shortDescription,
@@ -233,20 +263,25 @@ export async function createOwnerBusiness(formData: FormData) {
         specialtyId,
         cityId,
         districtId: intValue(formData, "districtId"),
-        latitude: numberValue(formData, "latitude"),
-        longitude: numberValue(formData, "longitude"),
+        latitude,
+        longitude,
         address: nullableValue(formData, "address"),
-        postalCode: nullableValue(formData, "postalCode"),
-        email: nullableValue(formData, "email"),
-        phone: nullableValue(formData, "phone"),
-        mobile: nullableValue(formData, "mobile"),
-        website: nullableValue(formData, "website"),
+        postalCode,
+        email,
+        phone,
+        mobile,
+        website,
+        googlePlaceId,
+        coverImageUrl,
         status: "PENDING",
         verified: false,
         featured: false,
         businessHours: {
           create: businessHoursCreateData(formData),
         },
+        images: imageUrls.length > 0 ? {
+          create: imageUrls.map((url, index) => ({ imageUrl: url, sortOrder: index })),
+        } : undefined,
         translations: {
           create: translations.map((translation) => ({
             locale: translation.locale,

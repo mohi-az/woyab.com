@@ -21,7 +21,9 @@
       "label": "For businesses",
       "addBusiness": "Add a business",
       "claimBusinessFree": "Claim your business for free",
-      "businessLogin": "Log in to Business Account"
+      "businessLogin": "Log in to Business Account",
+      "manageBusinesses": "Manage my businesses",
+      "learnMore": "For business owners"
     },
     "businessHeader": {
       "label": "For business"
@@ -896,5 +898,106 @@
       "enabled": "Enabled",
       "disabled": "Disabled"
     }
+  },
+  "BusinessPortal": {
+    "header": "Business Portal",
+    "sidebar": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "messages": "Messages",
+      "support": "Support",
+      "addBusiness": "Add business",
+      "allBusinesses": "All businesses",
+      "editBusiness": "Edit listing",
+      "reviews": "Reviews",
+      "businessPortal": "Business Portal"
+    },
+    "overview": {
+      "title": "Business Overview",
+      "description": "Manage all your businesses from one place.",
+      "emptyTitle": "Start your business presence",
+      "emptyDescription": "Add your first business listing to unlock visitor analytics, direct messages and review management.",
+      "emptyAction": "Add your first business",
+      "statsViews": "Views (30d)",
+      "statsReviews": "Reviews",
+      "statsPending": "Pending changes",
+      "statusActive": "Active",
+      "statusPending": "Pending",
+      "statusRejected": "Rejected",
+      "statusDraft": "Draft",
+      "statusHidden": "Hidden",
+      "actionEdit": "Edit",
+      "actionPublicPage": "Public page",
+      "actionAnalytics": "Analytics",
+      "addAnother": "Add another business",
+      "totalBusinesses": "{count, plural, one {# business} other {# businesses}}",
+      "totalViews": "Total views",
+      "totalReviews": "Total reviews",
+      "removedWarning": "This business is hidden from public view.",
+      "removedAction": "Restore"
+    },
+    "edit": {
+      "title": "Edit business",
+      "previewLabel": "Live preview",
+      "previewSubtitle": "Updates as you type",
+      "submitInfo": "Saving creates a moderated change request; changes go live after admin approval."
+    },
+    "new": {
+      "title": "Add a new business"
+    },
+    "accessDenied": {
+      "title": "Business portal access",
+      "description": "The business portal is available to business owners. Add or claim a business to get access.",
+      "action": "Add a business"
+    },
+    "support": {
+      "title": "Support tickets",
+      "description": "Talk directly with the Fargo administration and follow your requests.",
+      "newTicket": "New ticket",
+      "subject": "Subject",
+      "message": "Describe your request with enough detail…",
+      "send": "Send ticket",
+      "empty": "You have no support tickets yet.",
+      "closeTicket": "Close ticket",
+      "reply": "Reply",
+      "closedNote": "This ticket is closed. Create a new ticket if you need more help.",
+      "youLabel": "You",
+      "fargoSupport": "Fargo support",
+      "statusLabels": {
+        "OPEN": "Open",
+        "PENDING": "Waiting for you",
+        "RESOLVED": "Resolved",
+        "CLOSED": "Closed"
+      }
+    }
+  },
+  "ForBusinesses": {
+    "metaTitle": "Fargo for Businesses — Grow your local presence",
+    "metaDescription": "List your Iranian-owned business on Fargo and reach thousands of customers across Germany.",
+    "heroEyebrow": "For business owners",
+    "heroTitle": "Grow your business with Fargo",
+    "heroDescription": "Join hundreds of Iranian-owned businesses already listed on Fargo. Reach new customers, manage your presence and track performance — all in one place.",
+    "heroPrimary": "Add your business",
+    "heroSecondary": "Manage existing businesses",
+    "featuresTitle": "Everything you need to succeed",
+    "featuresDescription": "A professional toolkit designed for Iranian-owned businesses in Germany.",
+    "feature1Title": "Free business listing",
+    "feature1Description": "Create a comprehensive profile with photos, contact details, opening hours and service descriptions — completely free.",
+    "feature2Title": "Visitor analytics",
+    "feature2Description": "See how many people view your business, track trends over time and compare performance across all your listings.",
+    "feature3Title": "Customer messages",
+    "feature3Description": "Receive direct inquiries from potential customers through the built-in messaging system and reply by email.",
+    "feature4Title": "Review management",
+    "feature4Description": "Read customer reviews and post verified owner replies to build trust and show your commitment to quality.",
+    "feature5Title": "Multi-business support",
+    "feature5Description": "Own more than one location? Manage all your listings from a single dashboard with aggregated or individual analytics.",
+    "feature6Title": "Moderated updates",
+    "feature6Description": "Submit changes to your listing that go through a quick review, keeping the directory accurate and trustworthy.",
+    "ctaTitle": "Ready to get started?",
+    "ctaDescription": "It takes less than five minutes to add your business and start reaching new customers.",
+    "ctaAction": "Add your business now",
+    "claimTitle": "Already listed on Fargo?",
+    "claimDescription": "Claim your existing listing for free to take control of your business page and unlock owner tools.",
+    "claimAction": "Claim your listing"
   }
 }

@@ -21,7 +21,9 @@
       "label": "Für Unternehmen",
       "addBusiness": "Unternehmen hinzufügen",
       "claimBusinessFree": "Unternehmen kostenlos übernehmen",
-      "businessLogin": "Beim Geschäftskonto anmelden"
+      "businessLogin": "Beim Geschäftskonto anmelden",
+      "manageBusinesses": "Meine Unternehmen verwalten",
+      "learnMore": "Für Unternehmer"
     },
     "businessHeader": {
       "label": "Für Unternehmen"
@@ -896,5 +898,106 @@
       "enabled": "Aktiviert",
       "disabled": "Deaktiviert"
     }
+  },
+  "BusinessPortal": {
+    "header": "Business-Portal",
+    "sidebar": {
+      "overview": "Übersicht",
+      "analytics": "Analyse",
+      "messages": "Nachrichten",
+      "support": "Support",
+      "addBusiness": "Unternehmen hinzufügen",
+      "allBusinesses": "Alle Unternehmen",
+      "editBusiness": "Eintrag bearbeiten",
+      "reviews": "Bewertungen",
+      "businessPortal": "Business-Portal"
+    },
+    "overview": {
+      "title": "Business-Übersicht",
+      "description": "Verwalten Sie alle Ihre Unternehmen an einem Ort.",
+      "emptyTitle": "Starten Sie Ihre Unternehmenspräsenz",
+      "emptyDescription": "Fügen Sie Ihr erstes Unternehmen hinzu, um Besucheranalysen, Nachrichten und Bewertungsverwaltung freizuschalten.",
+      "emptyAction": "Erstes Unternehmen hinzufügen",
+      "statsViews": "Aufrufe (30T)",
+      "statsReviews": "Bewertungen",
+      "statsPending": "Ausstehende Änderungen",
+      "statusActive": "Aktiv",
+      "statusPending": "Ausstehend",
+      "statusRejected": "Abgelehnt",
+      "statusDraft": "Entwurf",
+      "statusHidden": "Ausgeblendet",
+      "actionEdit": "Bearbeiten",
+      "actionPublicPage": "Öffentliche Seite",
+      "actionAnalytics": "Analyse",
+      "addAnother": "Weiteres Unternehmen hinzufügen",
+      "totalBusinesses": "{count, plural, one {# Unternehmen} other {# Unternehmen}}",
+      "totalViews": "Aufrufe gesamt",
+      "totalReviews": "Bewertungen gesamt",
+      "removedWarning": "Dieses Unternehmen ist nicht öffentlich sichtbar.",
+      "removedAction": "Wiederherstellen"
+    },
+    "edit": {
+      "title": "Unternehmen bearbeiten",
+      "previewLabel": "Live-Vorschau",
+      "previewSubtitle": "Wird beim Tippen aktualisiert",
+      "submitInfo": "Speichern erstellt einen moderierten Änderungsantrag; Änderungen werden nach Admin-Freigabe veröffentlicht."
+    },
+    "new": {
+      "title": "Neues Unternehmen hinzufügen"
+    },
+    "accessDenied": {
+      "title": "Business-Portal Zugang",
+      "description": "Das Business-Portal steht Unternehmensinhaber zur Verfügung. Fügen Sie ein Unternehmen hinzu oder übernehmen Sie eines.",
+      "action": "Unternehmen hinzufügen"
+    },
+    "support": {
+      "title": "Support-Tickets",
+      "description": "Sprechen Sie direkt mit der Fargo-Administration und verfolgen Sie Ihre Anfragen.",
+      "newTicket": "Neues Ticket",
+      "subject": "Betreff",
+      "message": "Beschreiben Sie Ihr Anliegen mit ausreichend Details…",
+      "send": "Ticket senden",
+      "empty": "Sie haben noch keine Support-Tickets.",
+      "closeTicket": "Ticket schließen",
+      "reply": "Antworten",
+      "closedNote": "Dieses Ticket ist geschlossen. Erstellen Sie ein neues Ticket, wenn Sie weitere Hilfe benötigen.",
+      "youLabel": "Sie",
+      "fargoSupport": "Fargo-Support",
+      "statusLabels": {
+        "OPEN": "Offen",
+        "PENDING": "Warte auf Sie",
+        "RESOLVED": "Gelöst",
+        "CLOSED": "Geschlossen"
+      }
+    }
+  },
+  "ForBusinesses": {
+    "metaTitle": "Fargo für Unternehmen — Lokale Präsenz ausbauen",
+    "metaDescription": "Registrieren Sie Ihr iranisches Unternehmen auf Fargo und erreichen Sie Tausende von Kunden in ganz Deutschland.",
+    "heroEyebrow": "Für Unternehmer",
+    "heroTitle": "Wachsen Sie mit Fargo",
+    "heroDescription": "Schließen Sie sich Hunderten iranischer Unternehmen an, die bereits bei Fargo gelistet sind. Erreichen Sie neue Kunden, verwalten Sie Ihre Präsenz und verfolgen Sie Ihre Leistung.",
+    "heroPrimary": "Unternehmen hinzufügen",
+    "heroSecondary": "Bestehende Unternehmen verwalten",
+    "featuresTitle": "Alles, was Sie für den Erfolg brauchen",
+    "featuresDescription": "Ein professionelles Toolkit für iranische Unternehmen in Deutschland.",
+    "feature1Title": "Kostenloser Eintrag",
+    "feature1Description": "Erstellen Sie ein umfassendes Profil mit Fotos, Kontaktdaten, Öffnungszeiten und Servicebeschreibungen — völlig kostenlos.",
+    "feature2Title": "Besucheranalyse",
+    "feature2Description": "Verfolgen Sie Aufrufe, Trends und vergleichen Sie alle Ihre Einträge miteinander.",
+    "feature3Title": "Kundennachrichten",
+    "feature3Description": "Erhalten Sie direkte Anfragen über das integrierte Nachrichtensystem.",
+    "feature4Title": "Bewertungsverwaltung",
+    "feature4Description": "Lesen Sie Kundenbewertungen und antworten Sie als verifizierter Inhaber.",
+    "feature5Title": "Mehrere Standorte",
+    "feature5Description": "Verwalten Sie alle Einträge aus einem einzigen Dashboard.",
+    "feature6Title": "Moderierte Updates",
+    "feature6Description": "Reichen Sie Änderungen ein, die nach Prüfung veröffentlicht werden.",
+    "ctaTitle": "Bereit loszulegen?",
+    "ctaDescription": "Es dauert weniger als fünf Minuten, Ihr Unternehmen hinzuzufügen.",
+    "ctaAction": "Jetzt Unternehmen hinzufügen",
+    "claimTitle": "Bereits bei Fargo gelistet?",
+    "claimDescription": "Übernehmen Sie Ihren bestehenden Eintrag kostenlos.",
+    "claimAction": "Eintrag übernehmen"
   }
 }

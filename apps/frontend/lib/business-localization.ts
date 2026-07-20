@@ -24,12 +24,16 @@ const appToDbLocaleMap: Record<AppLocale, ContentLocale> = {
 
 export function localizeBusinessContent<T extends LocalizableBusiness>(business: T, locale: AppLocale) {
   const requestedLocale = appToDbLocaleMap[locale];
-  const requested = business.translations?.find((translation) => translation.locale === requestedLocale);
-  const source = business.translations?.find((translation) => translation.locale === business.sourceLocale);
+  const fallbackOrder = [...new Set<ContentLocale>([requestedLocale, "DE", "EN", "FA", business.sourceLocale])];
+  const orderedTranslations = fallbackOrder
+    .map((fallbackLocale) => business.translations?.find((translation) => translation.locale === fallbackLocale))
+    .filter((translation): translation is TranslationRecord => Boolean(translation));
+  const firstText = (field: "businessName" | "shortDescription" | "description") =>
+    orderedTranslations.map((translation) => translation[field]).find((content) => content !== null && content !== "");
 
   return {
-    businessName: requested?.businessName ?? source?.businessName ?? business.businessName,
-    shortDescription: requested?.shortDescription ?? source?.shortDescription ?? business.shortDescription,
-    description: requested?.description ?? source?.description ?? business.description,
+    businessName: firstText("businessName") ?? business.businessName,
+    shortDescription: firstText("shortDescription") ?? business.shortDescription,
+    description: firstText("description") ?? business.description,
   };
 }

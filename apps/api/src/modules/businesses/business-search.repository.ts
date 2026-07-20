@@ -90,8 +90,8 @@ export async function findNearbyBusinesses(input: BusinessSearchBody) {
       bl."name" AS "locationName",
       city."nameEn" AS "cityNameEn",
       city."nameFa" AS "cityNameFa",
-      COALESCE(bt_requested."businessName", bt_source."businessName", b."businessName") AS "businessName",
-      COALESCE(bt_requested."shortDescription", bt_source."shortDescription", b."shortDescription") AS "shortDescription",
+      COALESCE(bt_requested."businessName", bt_de."businessName", bt_en."businessName", bt_fa."businessName", bt_source."businessName", b."businessName") AS "businessName",
+      COALESCE(bt_requested."shortDescription", bt_de."shortDescription", bt_en."shortDescription", bt_fa."shortDescription", bt_source."shortDescription", b."shortDescription") AS "shortDescription",
       b."featured" AS "featured",
       b."averageRating" AS "averageRating",
       b."createdAt" AS "createdAt",
@@ -105,6 +105,12 @@ export async function findNearbyBusinesses(input: BusinessSearchBody) {
     LEFT JOIN "cities" city ON city."id" = bl."cityId"
     LEFT JOIN "business_translations" bt_requested
       ON bt_requested."businessId" = b."id" AND bt_requested."locale" = ${requestedLocale}::"content_locale"
+    LEFT JOIN "business_translations" bt_de
+      ON bt_de."businessId" = b."id" AND bt_de."locale" = 'DE'::"content_locale"
+    LEFT JOIN "business_translations" bt_en
+      ON bt_en."businessId" = b."id" AND bt_en."locale" = 'EN'::"content_locale"
+    LEFT JOIN "business_translations" bt_fa
+      ON bt_fa."businessId" = b."id" AND bt_fa."locale" = 'FA'::"content_locale"
     LEFT JOIN "business_translations" bt_source
       ON bt_source."businessId" = b."id" AND bt_source."locale" = b."sourceLocale"
     WHERE ${where}
