@@ -6,6 +6,9 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { credentialsSchema } from "@fargo/shared";
 import { prisma } from "@/lib/prisma";
+import { decryptTwoFactorSecret, verifyTotp } from "@/lib/two-factor";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
+import { requestIp } from "@/lib/rate-limit";
 
 const providers: NextAuthConfig["providers"] = [
   Credentials({
@@ -13,14 +16,30 @@ const providers: NextAuthConfig["providers"] = [
     credentials: {
       email: { label: "Email", type: "email" },
       password: { label: "Password", type: "password" },
+      totpCode: { label: "Administrator verification code", type: "text" },
     },
-    authorize: async (credentials) => {
+    authorize: async (credentials, request) => {
       const parsed = credentialsSchema.safeParse(credentials);
       if (!parsed.success) return null;
+      const email = parsed.data.email.trim().toLowerCase();
+      const limited = await Promise.all([
+        isPersistentlyRateLimited("login-ip", requestIp(request), 30, 15 * 60_000),
+        isPersistentlyRateLimited("login-email", email, 15, 15 * 60_000),
+      ]);
+      if (limited.some(Boolean)) return null;
 
-      const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-      if (!user?.passwordHash || !user.active) return null;
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user?.passwordHash || !user.active || !user.emailVerified) return null;
       if (!(await compare(parsed.data.password, user.passwordHash))) return null;
+      const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+      let twoFactorVerified = !isAdmin;
+      if (isAdmin && user.twoFactorEnabledAt) {
+        const code = typeof credentials.totpCode === "string" ? credentials.totpCode.trim() : "";
+        if (!user.twoFactorSecretEncrypted || !verifyTotp(decryptTwoFactorSecret(user.twoFactorSecretEncrypted), code)) {
+          return null;
+        }
+        twoFactorVerified = true;
+      }
 
       return {
         id: user.id,
@@ -29,6 +48,7 @@ const providers: NextAuthConfig["providers"] = [
         image: user.avatarUrl,
         role: user.role,
         authVersion: user.authVersion,
+        twoFactorVerified,
       };
     },
   }),
@@ -54,7 +74,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const email = profile.email?.trim().toLowerCase();
       if (!email || profile.email_verified !== true) return false;
 
-      const existingUser = await prisma.user.findUnique({ where: { email }, select: { avatarUrl: true } });
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+        select: { avatarUrl: true, role: true },
+      });
+      if (existingUser && (existingUser.role === "ADMIN" || existingUser.role === "SUPER_ADMIN")) return false;
       const googleAvatar = typeof profile.picture === "string" ? profile.picture : undefined;
       const avatarUrl = existingUser?.avatarUrl?.startsWith("/uploads/avatars/")
         ? undefined
@@ -101,6 +125,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       token.sub = databaseUser.id;
       token.role = databaseUser.role;
       token.authVersion = databaseUser.authVersion;
+      if (user) token.twoFactorVerified = Boolean(user.twoFactorVerified);
       token.invalid = false;
       token.name = databaseUser.name;
       token.picture = databaseUser.avatarUrl;
@@ -111,6 +136,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub;
         session.user.role = token.role ?? "USER";
         session.user.invalid = token.invalid;
+        session.user.twoFactorVerified = token.twoFactorVerified;
       }
       return session;
     },

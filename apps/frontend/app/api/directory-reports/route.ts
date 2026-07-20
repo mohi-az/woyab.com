@@ -3,6 +3,7 @@ import { z } from "zod";
 import { currentUserId } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { isRateLimited, requestIp } from "@/lib/rate-limit";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 
 const reasonLabels = {
   SPAM: "Spam or advertising",
@@ -46,6 +47,9 @@ export async function POST(request: NextRequest) {
   const targetId = parsed.data.businessId ?? parsed.data.reviewId;
   const rateKey = reporterUserId ? `report:user:${reporterUserId}` : `report:ip:${ip}`;
   if (isRateLimited(rateKey, 6, 15 * 60_000)) {
+    return NextResponse.json({ success: false, errorCode: "RATE_LIMITED", error: "Too many reports. Please try again later." }, { status: 429 });
+  }
+  if (await isPersistentlyRateLimited("directory-report", reporterUserId || ip, 10, 60 * 60_000)) {
     return NextResponse.json({ success: false, errorCode: "RATE_LIMITED", error: "Too many reports. Please try again later." }, { status: 429 });
   }
 

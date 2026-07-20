@@ -508,12 +508,28 @@ export async function setReviewStatus(formData: FormData) {
   if (!reviewId || !reviewStatuses.includes(status)) throw new Error("Invalid review status.");
 
   const review = await prisma.$transaction(async (tx) => {
+    const existing = await tx.review.findUniqueOrThrow({
+      where: { id: reviewId },
+      select: {
+        status: true,
+        user: { select: { email: true, name: true } },
+        business: { select: { businessName: true } },
+      },
+    });
     const updated = await tx.review.update({ where: { id: reviewId }, data: { status } });
     await recalculateBusinessRating(tx, updated.businessId);
-    return updated;
+    return { ...updated, previousStatus: existing.status, user: existing.user, business: existing.business };
   });
 
   await audit(actor.id, "review.status", "Review", reviewId, { status, businessId: review.businessId });
+  if (review.user?.email && review.previousStatus !== status && ["APPROVED", "REJECTED"].includes(status)) {
+    await sendMail({
+      to: review.user.email,
+      subject: `Your Fargo review was ${status.toLowerCase()}`,
+      text: `Your review for ${review.business.businessName} was ${status.toLowerCase()} after moderation.`,
+      html: `<p>Your review for <strong>${escapeHtml(review.business.businessName)}</strong> was ${status.toLowerCase()} after moderation.</p>`,
+    }).catch(() => undefined);
+  }
   refreshAdmin();
 }
 
@@ -763,18 +779,47 @@ export async function updateReportStatus(formData: FormData) {
   const moderatorNote = nullableValue(formData, "moderatorNote");
   const decisionReason = nullableValue(formData, "decisionReason");
   const actionTaken = nullableValue(formData, "actionTaken");
+  const final = ["RESOLVED", "DISMISSED"].includes(status);
+  if (final && !decisionReason) throw new Error("A public decision reason is required before closing a report.");
 
+  const previous = await prisma.directoryReport.findUniqueOrThrow({
+    where: { id },
+    select: {
+      status: true,
+      notifiedAt: true,
+      reporterEmail: true,
+      reporter: { select: { email: true } },
+      business: { select: { businessName: true } },
+      review: { select: { business: { select: { businessName: true } } } },
+    },
+  });
   await prisma.directoryReport.update({
     where: { id },
     data: {
       status,
-      resolvedById: ["RESOLVED", "DISMISSED"].includes(status) ? actor.id : null,
-      resolvedAt: ["RESOLVED", "DISMISSED"].includes(status) ? new Date() : null,
+      resolvedById: final ? actor.id : null,
+      resolvedAt: final ? new Date() : null,
+      notifiedAt: final ? previous.notifiedAt : null,
       moderatorNote,
       decisionReason,
       actionTaken,
     },
   });
+  const recipient = previous.reporter?.email || previous.reporterEmail;
+  if (final && recipient && (!previous.notifiedAt || previous.status !== status)) {
+    const target = previous.business?.businessName || previous.review?.business.businessName || "reported content";
+    try {
+      await sendMail({
+        to: recipient,
+        subject: `Fargo report decision: ${status}`,
+        text: `Your report about ${target} was ${status.toLowerCase()}.\n\nDecision: ${decisionReason}\n${actionTaken ? `Action taken: ${actionTaken}` : ""}`,
+        html: `<p>Your report about <strong>${escapeHtml(target)}</strong> was ${status.toLowerCase()}.</p><p><strong>Decision:</strong> ${escapeHtml(decisionReason || "")}</p>${actionTaken ? `<p><strong>Action taken:</strong> ${escapeHtml(actionTaken)}</p>` : ""}`,
+      });
+      await prisma.directoryReport.update({ where: { id }, data: { notifiedAt: new Date() } });
+    } catch {
+      await audit(actor.id, "report.notification_failed", "DirectoryReport", id);
+    }
+  }
   await audit(actor.id, "report.status", "DirectoryReport", id, { status, decisionReason, actionTaken });
   refreshAdmin();
 }
@@ -844,15 +889,18 @@ export async function updateClaimStatus(formData: FormData) {
     ownerId: status === "APPROVED" ? claim.claimantUserId : null,
     decisionReason,
   });
-  if (status === "APPROVED") {
-    const recipients = [claim.claimant?.email || claim.claimantEmail, claim.business.owner?.email].filter((email, index, items): email is string => Boolean(email) && items.indexOf(email) === index);
+  if (["APPROVED", "REJECTED", "CANCELLED"].includes(status)) {
+    const recipients = [
+      claim.claimant?.email || claim.claimantEmail,
+      status === "APPROVED" ? claim.business.owner?.email : null,
+    ].filter((email, index, items): email is string => Boolean(email) && items.indexOf(email) === index);
     const safeBusinessName = escapeHtml(claim.business.businessName);
     const safeDecisionReason = escapeHtml(decisionReason);
     await Promise.allSettled(recipients.map((to) => sendMail({
       to,
-      subject: `Fargo ownership update for ${claim.business.businessName}`,
-      text: `The ownership claim for ${claim.business.businessName} was approved by Fargo administration. Reason: ${decisionReason}`,
-      html: `<p>The ownership claim for <strong>${safeBusinessName}</strong> was approved by Fargo administration.</p><p>Reason: ${safeDecisionReason}</p>`,
+      subject: `Fargo ownership decision for ${claim.business.businessName}`,
+      text: `The ownership claim for ${claim.business.businessName} is now ${status}. Reason: ${decisionReason || "No additional reason provided."}`,
+      html: `<p>The ownership claim for <strong>${safeBusinessName}</strong> is now <strong>${status}</strong>.</p><p>Reason: ${safeDecisionReason || "No additional reason provided."}</p>`,
     })));
   }
   refreshAdmin();
@@ -864,6 +912,13 @@ export async function reviewBusinessChangeRequest(formData: FormData) {
   const decision = value(formData, "decision");
   const decisionReason = value(formData, "decisionReason");
   if (!id || !["APPROVE", "REJECT"].includes(decision) || decisionReason.length < 3) throw new Error("A decision and reason are required.");
+  const request = await prisma.businessChangeRequest.findUniqueOrThrow({
+    where: { id },
+    select: {
+      submitter: { select: { email: true } },
+      business: { select: { businessName: true } },
+    },
+  });
 
   if (decision === "APPROVE") {
     await applyBusinessChangeRequest(id, actor.id, decisionReason);
@@ -874,6 +929,14 @@ export async function reviewBusinessChangeRequest(formData: FormData) {
     });
     if (!changed.count) throw new Error("Change request is not pending.");
     await audit(actor.id, "business.change_request.reject", "BusinessChangeRequest", id, { decisionReason });
+  }
+  if (request.submitter?.email) {
+    await sendMail({
+      to: request.submitter.email,
+      subject: `Fargo business change request ${decision === "APPROVE" ? "approved" : "rejected"}`,
+      text: `Your change request for ${request.business.businessName} was ${decision === "APPROVE" ? "approved" : "rejected"}. Reason: ${decisionReason}`,
+      html: `<p>Your change request for <strong>${escapeHtml(request.business.businessName)}</strong> was ${decision === "APPROVE" ? "approved" : "rejected"}.</p><p>Reason: ${escapeHtml(decisionReason)}</p>`,
+    }).catch(() => undefined);
   }
   refreshAdmin();
   revalidatePath("/admin/change-requests");

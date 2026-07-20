@@ -3,10 +3,14 @@ import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";
 import { businessChangeSnapshot, parseChangePayload } from "@/lib/business-change-requests";
 import { prisma } from "@/lib/prisma";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 
 export async function POST(request: Request) {
   const userId = await currentUserId();
   if (!userId) return response("AUTH_REQUIRED", "Sign in before suggesting a change.", 401);
+  if (await isPersistentlyRateLimited("business-change-request", userId, 10, 60 * 60_000)) {
+    return response("RATE_LIMITED", "Too many change requests.", 429);
+  }
   const parsed = businessChangeRequestCreateSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return response("INVALID_FIELDS", "Please check the suggested changes.", 400, parsed.error.flatten().fieldErrors);
 

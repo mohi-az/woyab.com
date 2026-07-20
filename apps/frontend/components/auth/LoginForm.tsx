@@ -8,12 +8,13 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 
-export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boolean; callbackUrl: string }) {
+export function LoginForm({ googleEnabled, callbackUrl, verification }: { googleEnabled: boolean; callbackUrl: string; verification?: string }) {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
   const activeLocale = isAppLocale(locale) ? locale : "de";
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -24,6 +25,7 @@ export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boole
     const result = await signIn("credentials", {
       email: form.get("email"),
       password: form.get("password"),
+      totpCode: form.get("totpCode"),
       redirect: false,
     });
 
@@ -34,6 +36,17 @@ export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boole
     }
 
     window.location.assign(localizePathname(callbackUrl, activeLocale));
+  }
+
+  async function resendVerification(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const email = new FormData(event.currentTarget).get("verificationEmail");
+    await fetch("/api/auth/email-verification/resend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    setResendMessage(t("login.resendSent"));
   }
 
   return (
@@ -56,6 +69,8 @@ export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boole
 
       <h1 className="mt-6 text-3xl font-black text-slate-950">{t("login.title")}</h1>
       <p className="mt-2 text-sm text-slate-500">{t("login.description")}</p>
+      {verification === "success" ? <p className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">{t("login.emailVerified")}</p> : null}
+      {verification === "invalid" ? <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">{t("login.verificationInvalid")}</p> : null}
 
       <div className="mt-6 space-y-3">
         <button
@@ -91,6 +106,15 @@ export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boole
             icon: showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />,
           }}
         />
+        <Field
+          name="totpCode"
+          label={t("fields.adminCode")}
+          inputMode="numeric"
+          pattern="[0-9]{6}"
+          maxLength={6}
+          autoComplete="one-time-code"
+          required={false}
+        />
         <button
           disabled={loading}
           className="h-12 w-full rounded-xl bg-primary font-bold text-white disabled:opacity-60"
@@ -102,6 +126,14 @@ export function LoginForm({ googleEnabled, callbackUrl }: { googleEnabled: boole
       <Link href="/forgot-password" className="mt-4 block text-center text-sm font-bold text-primary">
         فراموشی یا تنظیم رمز عبور
       </Link>
+      <details className="mt-4 rounded-xl border border-slate-200 p-3 text-sm">
+        <summary className="cursor-pointer font-bold text-primary">{t("login.resendVerification")}</summary>
+        <form onSubmit={resendVerification} className="mt-3 flex gap-2">
+          <input required name="verificationEmail" type="email" placeholder={t("fields.email")} className="h-10 min-w-0 flex-1 rounded-lg border px-3 text-left" dir="ltr" />
+          <button className="rounded-lg bg-slate-900 px-3 font-bold text-white">{t("login.resend")}</button>
+        </form>
+        {resendMessage ? <p className="mt-2 text-emerald-700">{resendMessage}</p> : null}
+      </details>
 
       <p className="mt-6 text-center text-sm text-slate-600">
         {t("login.noAccount")}{" "}

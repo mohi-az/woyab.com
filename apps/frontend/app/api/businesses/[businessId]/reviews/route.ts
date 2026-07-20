@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { currentUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 
 type RouteContext = {
   params: Promise<{ businessId: string }>;
@@ -16,6 +17,9 @@ const reviewSchema = z.object({
 export async function POST(request: Request, context: RouteContext) {
   const userId = await currentUserId();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (await isPersistentlyRateLimited("create-review", userId, 10, 24 * 60 * 60_000)) {
+    return NextResponse.json({ error: "Too many review requests." }, { status: 429 });
+  }
   const { businessId } = await context.params;
   const parsed = reviewSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Please check the review fields." }, { status: 400 });

@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
+import { requestIp } from "@/lib/rate-limit";
 
 const contactPayloadSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -37,6 +39,9 @@ async function deliverWithResend(to: string, subject: string, html: string, repl
 
 export async function POST(request: NextRequest, context: RouteContext) {
   const { businessId } = await context.params;
+  if (await isPersistentlyRateLimited("business-contact", requestIp(request), 10, 60 * 60_000)) {
+    return NextResponse.json({ success: false, error: "Too many contact requests." }, { status: 429 });
+  }
   try {
     const payload = contactPayloadSchema.parse(await request.json());
     const business = await prisma.business.findFirst({

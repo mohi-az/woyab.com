@@ -15,7 +15,7 @@ model AdminAuditLog {
   entityId   String?
   metadata   Json?
   createdAt  DateTime @default(now())
-  actor      User?    @relation(fields: [actorId], references: [id])
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([actorId])
   @@index([createdAt])
@@ -71,7 +71,7 @@ model BusinessClaim {
   createdAt               DateTime                            @default(now())
   updatedAt               DateTime                            @default(now()) @updatedAt
   business                Business                            @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  claimant                User?                               @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id])
+  claimant                User?                               @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id], onDelete: SetNull)
   reviewedBy              User?                               @relation("BusinessClaimReviewer", fields: [reviewedById], references: [id])
 
   @@index([businessId])
@@ -227,7 +227,7 @@ model DirectoryReport {
   createdAt      DateTime                @default(now())
   updatedAt      DateTime                @default(now()) @updatedAt
   business       Business?               @relation(fields: [businessId], references: [id])
-  reporter       User?                   @relation("DirectoryReportReporter", fields: [reporterUserId], references: [id])
+  reporter       User?                   @relation("DirectoryReportReporter", fields: [reporterUserId], references: [id], onDelete: SetNull)
   resolvedBy     User?                   @relation("DirectoryReportResolver", fields: [resolvedById], references: [id])
   review         Review?                 @relation(fields: [reviewId], references: [id])
 
@@ -259,7 +259,7 @@ model ReviewOwnerReply {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  owner     User?    @relation(fields: [ownerId], references: [id])
+  owner     User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])

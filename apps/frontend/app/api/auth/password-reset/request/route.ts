@@ -6,6 +6,7 @@ import { sendMail } from "@/lib/mail";
 import { createPasswordResetToken, passwordResetExpiry } from "@/lib/password-reset";
 import { prisma } from "@/lib/prisma";
 import { isRateLimited, requestIp } from "@/lib/rate-limit";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 
 function resetBaseUrl(request: Request) {
   return process.env.NEXT_PUBLIC_APP_URL || process.env.AUTH_URL || new URL(request.url).origin;
@@ -14,6 +15,9 @@ function resetBaseUrl(request: Request) {
 export async function POST(request: Request) {
   const ip = requestIp(request);
   if (isRateLimited(`password-reset:${ip}`, 6, 30 * 60_000)) {
+    return NextResponse.json({ success: true });
+  }
+  if (await isPersistentlyRateLimited("password-reset-ip", ip, 8, 60 * 60_000)) {
     return NextResponse.json({ success: true });
   }
 
@@ -30,6 +34,9 @@ export async function POST(request: Request) {
   if (!user?.email) return NextResponse.json({ success: true });
 
   if (isRateLimited(`password-reset:${user.email}`, 3, 30 * 60_000)) {
+    return NextResponse.json({ success: true });
+  }
+  if (await isPersistentlyRateLimited("password-reset-email", user.email, 4, 60 * 60_000)) {
     return NextResponse.json({ success: true });
   }
 

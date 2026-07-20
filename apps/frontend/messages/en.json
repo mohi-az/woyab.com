@@ -406,7 +406,7 @@
     "copyright": "© {year} Fargo. All rights reserved.",
     "madeFor": "Iranian businesses in Germany",
     "legal": "Terms of Use & Legal Notice",
-    "privacy": "Business claim privacy",
+    "privacy": "Privacy Policy",
     "cookieSettings": "Cookie settings"
   },
   "CookieConsent": {
@@ -440,7 +440,8 @@
       "name": "Full name",
       "email": "Email",
       "password": "Password",
-      "confirmPassword": "Confirm password"
+      "confirmPassword": "Confirm password",
+      "adminCode": "Administrator authenticator code (if applicable)"
     },
     "divider": "or continue with email",
     "google": {
@@ -475,7 +476,12 @@
       "description": "Use Google for the fastest sign-in, or continue with your email and password.",
       "submit": "Login",
       "submitting": "Logging in...",
-      "invalidCredentials": "Your email or password is incorrect.",
+      "invalidCredentials": "Your credentials or administrator code are incorrect.",
+      "emailVerified": "Your email address is verified. You can now sign in.",
+      "verificationInvalid": "This verification link is invalid or expired. Register again with the same email to request a new link.",
+      "resendVerification": "Need a new email verification link?",
+      "resend": "Send",
+      "resendSent": "If an unverified account exists, a new link has been sent.",
       "noAccount": "Don't have an account?"
     },
     "register": {
@@ -484,6 +490,8 @@
       "submit": "Create account",
       "submitting": "Creating account...",
       "failed": "Registration could not be completed.",
+      "verificationSent": "Check your inbox to verify your email address.",
+      "verificationHelp": "You must use the verification link before signing in. The link expires after 24 hours.",
       "haveAccount": "Already have an account?"
     }
   },
@@ -495,6 +503,7 @@
       "favorites": "Favorites",
       "addresses": "Addresses",
       "reviews": "Reviews",
+      "reports": "My reports",
       "completionTitle": "Complete your account",
       "completionDescription": "Add your name, phone number and profile photo for a more personal experience.",
       "editProfile": "Edit profile"
@@ -567,6 +576,9 @@
         "sendCreateLink": "Send password setup link",
         "deleteTitle": "Delete account",
         "deleteText": "This is permanent and will delete account-related data.",
+        "deleteMode": "What should happen to your reviews?",
+        "deleteModeErase": "Delete my reviews and account",
+        "deleteModeAnonymize": "Keep reviews anonymously; delete my account",
         "confirmDelete": "Account deletion is permanent. Continue?",
         "deleteFailed": "Account could not be deleted.",
         "passwordConfirm": "Enter your current password to confirm",

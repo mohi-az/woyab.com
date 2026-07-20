@@ -6,12 +6,14 @@ declare module "next-auth" {
       id: string;
       role: "USER" | "OWNER" | "ADMIN" | "SUPER_ADMIN";
       invalid?: boolean;
+      twoFactorVerified?: boolean;
     } & DefaultSession["user"];
   }
 
   interface User {
     role?: "USER" | "OWNER" | "ADMIN" | "SUPER_ADMIN";
     authVersion?: number;
+    twoFactorVerified?: boolean;
   }
 }
 
@@ -20,5 +22,6 @@ declare module "next-auth/jwt" {
     role?: "USER" | "OWNER" | "ADMIN" | "SUPER_ADMIN";
     authVersion?: number;
     invalid?: boolean;
+    twoFactorVerified?: boolean;
   }
 }

@@ -1,7 +1,7 @@
 model Review {
   id               String            @id @default(cuid())
   businessId       String
-  userId           String
+  userId           String?
   rating           Int
   title            String?
   comment          String?
@@ -15,7 +15,7 @@ model Review {
   images           ReviewImage[]
   ownerReply       ReviewOwnerReply?
   business         Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  user             User              @relation(fields: [userId], references: [id])
+  user             User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([businessId, userId])
   @@index([businessId])

@@ -12,7 +12,7 @@ export async function currentUser() {
   const session = await auth();
   if (!session?.user?.id || session.user.invalid) return null;
 
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
       id: true,
@@ -21,8 +21,10 @@ export async function currentUser() {
       avatarUrl: true,
       role: true,
       active: true,
+      twoFactorEnabledAt: true,
     },
   });
+  return user ? { ...user, twoFactorVerified: Boolean(session.user.twoFactorVerified) } : null;
 }
 
 export async function requireRole(roles: UserRole[]) {
@@ -34,6 +36,16 @@ export async function requireRole(roles: UserRole[]) {
   if (!user.active || !roles.includes(user.role)) {
     await redirectWithLocale("/dashboard");
     throw new Error("Redirecting to dashboard.");
+  }
+  if (adminRoles.includes(user.role)) {
+    if (!user.twoFactorEnabledAt) {
+      await redirectWithLocale("/dashboard/security/admin-2fa");
+      throw new Error("Administrator two-factor enrollment is required.");
+    }
+    if (!user.twoFactorVerified) {
+      await redirectWithLocale("/login?callbackUrl=/admin&twoFactor=required");
+      throw new Error("Administrator two-factor verification is required.");
+    }
   }
   return user;
 }

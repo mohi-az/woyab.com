@@ -406,7 +406,7 @@
     "copyright": "© {year} Fargo. Alle Rechte vorbehalten.",
     "madeFor": "Iranische Unternehmen in Deutschland",
     "legal": "Nutzungsbedingungen & Impressum",
-    "privacy": "Datenschutz bei Unternehmensansprüchen",
+    "privacy": "Datenschutzerklärung",
     "cookieSettings": "Cookie-Einstellungen"
   },
   "CookieConsent": {
@@ -440,7 +440,8 @@
       "name": "Vollstandiger Name",
       "email": "E-Mail",
       "password": "Passwort",
-      "confirmPassword": "Passwort bestatigen"
+      "confirmPassword": "Passwort bestatigen",
+      "adminCode": "Administrator-Authenticator-Code (falls erforderlich)"
     },
     "divider": "oder mit E-Mail fortfahren",
     "google": {
@@ -475,7 +476,12 @@
       "description": "Google ist der schnellste Weg. Alternativ konnen Sie sich mit E-Mail und Passwort anmelden.",
       "submit": "Anmelden",
       "submitting": "Anmeldung lauft...",
-      "invalidCredentials": "E-Mail oder Passwort ist nicht korrekt.",
+      "invalidCredentials": "Anmeldedaten oder Administrator-Code sind nicht korrekt.",
+      "emailVerified": "Ihre E-Mail-Adresse wurde bestätigt. Sie können sich jetzt anmelden.",
+      "verificationInvalid": "Dieser Bestätigungslink ist ungültig oder abgelaufen. Registrieren Sie sich erneut mit derselben E-Mail-Adresse.",
+      "resendVerification": "Benötigen Sie einen neuen Bestätigungslink?",
+      "resend": "Senden",
+      "resendSent": "Falls ein unbestätigtes Konto existiert, wurde ein neuer Link gesendet.",
       "noAccount": "Noch kein Konto?"
     },
     "register": {
@@ -484,6 +490,8 @@
       "submit": "Konto erstellen",
       "submitting": "Konto wird erstellt...",
       "failed": "Die Registrierung konnte nicht abgeschlossen werden.",
+      "verificationSent": "Prüfen Sie Ihren Posteingang und bestätigen Sie Ihre E-Mail-Adresse.",
+      "verificationHelp": "Vor der Anmeldung müssen Sie den Bestätigungslink verwenden. Er läuft nach 24 Stunden ab.",
       "haveAccount": "Sie haben bereits ein Konto?"
     }
   },
@@ -495,6 +503,7 @@
       "favorites": "Favoriten",
       "addresses": "Adressen",
       "reviews": "Bewertungen",
+      "reports": "Meine Meldungen",
       "completionTitle": "Konto vervollst?ndigen",
       "completionDescription": "Erg?nzen Sie Name, Telefonnummer und Profilbild f?r eine pers?nlichere Erfahrung.",
       "editProfile": "Profil bearbeiten"
@@ -566,7 +575,10 @@
         "sendChangeLink": "Link zum ?ndern senden",
         "sendCreateLink": "Link zum Erstellen senden",
         "deleteTitle": "Konto l?schen",
-        "deleteText": "Dies ist dauerhaft und l?scht die mit dem Konto verbundenen Daten.",
+        "deleteText": "Dies ist dauerhaft und löscht die mit dem Konto verbundenen Daten.",
+        "deleteMode": "Was soll mit Ihren Bewertungen geschehen?",
+        "deleteModeErase": "Bewertungen und Konto löschen",
+        "deleteModeAnonymize": "Bewertungen anonym behalten; Konto löschen",
         "confirmDelete": "Das L?schen des Kontos ist dauerhaft. Fortfahren?",
         "deleteFailed": "Konto konnte nicht gel?scht werden.",
         "passwordConfirm": "Geben Sie zur Best?tigung Ihr aktuelles Passwort ein",

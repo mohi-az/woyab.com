@@ -65,7 +65,7 @@ export default async function Footer() {
           <p>{t("copyright", { year: new Date().getFullYear() })}</p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
             <Link href={href("/legal/terms")} className="transition hover:text-white">{t("legal")}</Link>
-            <Link href={href("/privacy/business-claims")} className="transition hover:text-white">{t("privacy")}</Link>
+            <Link href={href("/privacy")} className="transition hover:text-white">{t("privacy")}</Link>
             <CookiePreferencesButton label={t("cookieSettings")} />
             <p>{t("madeFor")}</p>
           </div>

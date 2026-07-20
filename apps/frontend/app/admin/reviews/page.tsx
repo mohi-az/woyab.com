@@ -77,7 +77,7 @@ export default async function AdminReviewsPage({ searchParams }: PageProps) {
     createdAt: review.createdAt.toISOString(),
     businessName: review.business.businessName,
     businessSlug: review.business.slug,
-    author: review.user.name || review.user.email || "-",
+    author: review.user?.name || review.user?.email || "Anonymous",
   }));
 
   return (

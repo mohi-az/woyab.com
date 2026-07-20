@@ -164,7 +164,7 @@ export default async function AdminOverviewPage() {
                   <span className="font-bold text-white">{review.business.businessName}</span>
                   <StatusBadge status={review.status} />
                 </div>
-                <p className="mt-2 line-clamp-2 text-sm text-slate-400">{review.comment || review.title || review.user.name || review.user.email}</p>
+                <p className="mt-2 line-clamp-2 text-sm text-slate-400">{review.comment || review.title || review.user?.name || review.user?.email || "Anonymous"}</p>
               </Link>
             ))}
             {!pendingReviews.length ? <p className="rounded-lg border border-dashed border-white/10 p-6 text-center text-slate-400">{t("empty.noPendingReviews")}</p> : null}

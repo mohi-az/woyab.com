@@ -59,7 +59,7 @@ export default async function BusinessReviewsPage({ params }: Props) {
               <div>
                 <h3 className="font-black text-slate-950">{review.title || "Customer review"}</h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  {review.user.name || review.user.email || "Fargo user"} · {formatDate(review.createdAt)} · <Stars rating={review.rating} />
+                  {review.user?.name || review.user?.email || "Anonymous"} · {formatDate(review.createdAt)} · <Stars rating={review.rating} />
                 </p>
               </div>
               <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500 ring-1 ring-slate-200">

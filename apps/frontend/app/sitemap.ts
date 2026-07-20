@@ -6,7 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de";
 
   // Static pages with alternates for each locale
-  const staticPaths = ["/", "/businesses", "/legal/terms", "/privacy/business-claims"];
+  const staticPaths = ["/", "/businesses", "/legal/terms", "/privacy", "/privacy/business-claims"];
 
   const staticEntries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
     url: `${baseUrl}${path === "/" ? "" : path}`,

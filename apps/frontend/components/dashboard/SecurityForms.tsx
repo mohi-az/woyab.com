@@ -56,7 +56,14 @@ export function SecurityForms({ hasPassword }: { hasPassword: boolean }) {
     <form onSubmit={deleteAccount} className="space-y-4 rounded-2xl border border-red-200 bg-red-50 p-6">
       <h2 className="text-lg font-black text-red-800">{t("deleteTitle")}</h2>
       <p className="text-sm text-red-700">{t("deleteText")}</p>
-      {hasPassword ? <Password name="password" label={t("passwordConfirm")} /> : <label className="block text-sm font-bold text-red-800">{t("deleteConfirm")}<input required name="confirmation" className="mt-2 h-11 w-full rounded-xl border border-red-300 px-3" /></label>}
+      <label className="block text-sm font-bold text-red-800">{t("deleteMode")}
+        <select name="mode" className="mt-2 h-11 w-full rounded-xl border border-red-300 bg-white px-3">
+          <option value="ERASE">{t("deleteModeErase")}</option>
+          <option value="ANONYMIZE">{t("deleteModeAnonymize")}</option>
+        </select>
+      </label>
+      {hasPassword ? <Password name="password" label={t("passwordConfirm")} /> : null}
+      <label className="block text-sm font-bold text-red-800">{t("deleteConfirm")}<input required name="confirmation" pattern="DELETE" className="mt-2 h-11 w-full rounded-xl border border-red-300 px-3" /></label>
       {deleteMessage ? <p className="text-sm text-red-700">{deleteMessage}</p> : null}
       <button className="rounded-xl bg-red-700 px-5 py-3 font-bold text-white">{t("deleteButton")}</button>
     </form>

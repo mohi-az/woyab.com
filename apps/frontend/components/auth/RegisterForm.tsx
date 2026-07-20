@@ -28,6 +28,8 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [devLink, setDevLink] = useState("");
   const [values, setValues] = useState<RegisterValues>({
     name: "",
     email: "",
@@ -103,18 +105,9 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
       return;
     }
 
-    const login = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-
-    if (login?.error) {
-      window.location.assign(localizePathname(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`, activeLocale));
-      return;
-    }
-
-    window.location.assign(localizePathname(callbackUrl, activeLocale));
+    setDevLink(result.devLink || "");
+    setVerificationSent(true);
+    setLoading(false);
   }
 
   return (
@@ -159,7 +152,14 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
 
       {error ? <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
 
-      <form onSubmit={submit} className="space-y-4" noValidate>
+      {verificationSent ? (
+        <div className="mt-6 space-y-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
+          <p className="font-bold">{t("register.verificationSent")}</p>
+          <p>{t("register.verificationHelp")}</p>
+          {devLink ? <a href={devLink} className="block break-all font-bold underline">{devLink}</a> : null}
+          <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="inline-flex rounded-xl bg-primary px-4 py-2 font-bold text-white">{t("tabs.login")}</Link>
+        </div>
+      ) : <form onSubmit={submit} className="space-y-4" noValidate>
         <TextField
           name="name"
           label={t("fields.name")}
@@ -239,7 +239,7 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
         >
           {loading ? t("register.submitting") : t("register.submit")}
         </button>
-      </form>
+      </form>}
 
       <p className="mt-6 text-center text-sm text-slate-600">
         {t("register.haveAccount")}{" "}

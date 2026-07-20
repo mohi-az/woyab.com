@@ -12,6 +12,8 @@ const requiredProductionValues = [
   "SMTP_FROM",
   "CRON_SECRET",
   "INTERNAL_API_SECRET",
+  "ABUSE_RATE_LIMIT_SECRET",
+  "TWO_FACTOR_ENCRYPTION_KEY",
 ] as const;
 
 export function assertProductionConfiguration() {
@@ -27,6 +29,8 @@ export function assertProductionConfiguration() {
   if (process.env.PRIVACY_SUPERVISORY_AUTHORITY_URL && !process.env.PRIVACY_SUPERVISORY_AUTHORITY_URL.startsWith("https://")) throw new Error("PRIVACY_SUPERVISORY_AUTHORITY_URL must use HTTPS.");
   if (process.env.CRON_SECRET!.length < 24) throw new Error("CRON_SECRET must contain at least 24 characters.");
   if (process.env.INTERNAL_API_SECRET!.length < 32) throw new Error("INTERNAL_API_SECRET must contain at least 32 characters.");
+  if (process.env.ABUSE_RATE_LIMIT_SECRET!.length < 32) throw new Error("ABUSE_RATE_LIMIT_SECRET must contain at least 32 characters.");
+  if (process.env.TWO_FACTOR_ENCRYPTION_KEY!.length < 32) throw new Error("TWO_FACTOR_ENCRYPTION_KEY must contain at least 32 characters.");
 }
 
 export function getPublicLegalConfig() {

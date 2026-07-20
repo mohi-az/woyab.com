@@ -65,3 +65,80 @@ test("public Next.js surfaces use ACTIVE businesses and APPROVED reviews", async
   assert.match(reports, /status: "APPROVED"/);
   assert.match(reports, /status: "ACTIVE"/);
 });
+
+test("password registration requires a single-use email verification", async () => {
+  const [registration, auth, verification, migration] = await Promise.all([
+    frontendSource("app/api/auth/register/route.ts"),
+    frontendSource("auth.ts"),
+    frontendSource("lib/email-verification.ts"),
+    readFile(new URL("../../../packages/database/prisma/migrations/20260720190000_account_security_privacy/migration.sql", import.meta.url), "utf8"),
+  ]);
+  assert.match(registration, /sendAccountVerification/);
+  assert.match(auth, /!user\.emailVerified/);
+  assert.match(verification, /tokenHash/);
+  assert.match(verification, /usedAt/);
+  assert.match(migration, /email_verification_tokens/);
+});
+
+test("high-impact request routes use persistent anti-abuse limits", async () => {
+  const paths = [
+    "app/api/auth/register/route.ts",
+    "app/api/auth/password-reset/request/route.ts",
+    "app/api/directory-reports/route.ts",
+    "app/api/support-tickets/route.ts",
+    "app/api/business-claims/route.ts",
+    "app/api/business-change-requests/route.ts",
+  ];
+  const routes = await Promise.all(paths.map(frontendSource));
+  for (const route of routes) assert.match(route, /isPersistentlyRateLimited/);
+});
+
+test("account deletion supports true erasure or authorless anonymization", async () => {
+  const [accountRoute, reviewSchema] = await Promise.all([
+    frontendSource("app/api/account/route.ts"),
+    readFile(new URL("../../../packages/database/prisma/schema/review.prisma", import.meta.url), "utf8"),
+  ]);
+  assert.match(accountRoute, /z\.enum\(\["ERASE", "ANONYMIZE"\]\)/);
+  assert.match(accountRoute, /review\.deleteMany/);
+  assert.match(accountRoute, /userId: null/);
+  assert.match(accountRoute, /claimantName: "Anonymized"/);
+  assert.match(accountRoute, /user\.delete/);
+  assert.match(reviewSchema, /userId\s+String\?/);
+});
+
+test("the platform privacy policy is public and linked from the footer", async () => {
+  const [policy, footer, sitemap] = await Promise.all([
+    frontendSource("app/privacy/page.tsx"),
+    frontendSource("components/layout/Footer.tsx"),
+    frontendSource("app/sitemap.ts"),
+  ]);
+  assert.match(policy, /Fargo Privacy Policy/);
+  assert.match(policy, /سیاست حریم خصوصی فارگو/);
+  assert.match(policy, /Datenschutzerklärung von Fargo/);
+  assert.match(footer, /href\("\/privacy"\)/);
+  assert.match(sitemap, /"\/privacy"/);
+});
+
+test("final moderation decisions notify reporters and contributors", async () => {
+  const actions = await frontendSource("lib/admin-actions.ts");
+  assert.match(actions, /report\.notification_failed/);
+  assert.match(actions, /Your report about/);
+  assert.match(actions, /Fargo ownership decision/);
+  assert.match(actions, /Fargo business change request/);
+  assert.match(actions, /Your Fargo review was/);
+});
+
+test("administrator access requires encrypted TOTP enrollment and verification", async () => {
+  const [auth, adminAuth, twoFactor, route] = await Promise.all([
+    frontendSource("auth.ts"),
+    frontendSource("lib/admin-auth.ts"),
+    frontendSource("lib/two-factor.ts"),
+    frontendSource("app/api/admin/two-factor/route.ts"),
+  ]);
+  assert.match(auth, /verifyTotp/);
+  assert.match(auth, /twoFactorVerified/);
+  assert.match(adminAuth, /twoFactorEnabledAt/);
+  assert.match(adminAuth, /twoFactorVerified/);
+  assert.match(twoFactor, /aes-256-gcm/);
+  assert.match(route, /admin\.two_factor\.enabled/);
+});

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { currentUserId } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 
 const ticketSchema = z.object({
   subject: z.string().trim().min(3).max(160),
@@ -14,6 +15,9 @@ export async function POST(request: NextRequest) {
 
   const userId = await currentUserId();
   if (!userId) return NextResponse.json({ success: false, error: "Authentication required." }, { status: 401 });
+  if (await isPersistentlyRateLimited("support-ticket", userId, 5, 60 * 60_000)) {
+    return NextResponse.json({ success: false, error: "Too many support requests." }, { status: 429 });
+  }
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, _count: { select: { businesses: true } } } });
   if (!user || (user.role === "USER" && user._count.businesses === 0)) {
     return NextResponse.json({ success: false, error: "Support tickets are available to business owners." }, { status: 403 });

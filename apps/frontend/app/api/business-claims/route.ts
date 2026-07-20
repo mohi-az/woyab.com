@@ -9,12 +9,16 @@ import {
 } from "@/lib/business-claims";
 import { currentUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
+import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 
 const activeStatuses = ["PENDING_VERIFICATION", "UNDER_REVIEW"] as const;
 
 export async function POST(request: Request) {
   const userId = await currentUserId();
   if (!userId) return error("AUTH_REQUIRED", "Sign in before claiming a business.", 401);
+  if (await isPersistentlyRateLimited("business-claim", userId, 5, 24 * 60 * 60_000)) {
+    return error("RATE_LIMITED", "Too many ownership requests.", 429);
+  }
 
   const parsed = businessClaimCreateSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return error("INVALID_FIELDS", "Please check the claim fields.", 400, parsed.error.flatten().fieldErrors);
