@@ -19,12 +19,17 @@ export async function POST(_request: Request, context: Context) {
   const { id } = await context.params;
   const claim = await prisma.businessClaim.findFirst({
     where: { id, claimantUserId: userId },
-    include: { business: { select: { businessName: true, ownerId: true, removedAt: true } } },
+    include: {
+      business: {
+        select: { businessName: true, ownerId: true, removedAt: true, status: true },
+      },
+    },
   });
   if (!claim) return respond("CLAIM_NOT_FOUND", "Claim not found.", 404);
   if (!claim.officialBusinessEmail) return respond("EMAIL_DELIVERY_FAILED", "No business email is attached to this claim.", 409);
   if (!['PENDING_VERIFICATION', 'EXPIRED'].includes(claim.status)) return respond("CLAIM_NOT_PENDING", "This claim cannot receive another code.", 409);
   if (claim.business.removedAt) return respond("BUSINESS_REMOVED", "This business is not publicly available.", 409);
+  if (claim.business.status !== "ACTIVE") return respond("BUSINESS_REMOVED", "This business is not publicly available.", 409);
   if (claim.business.ownerId) return respond("BUSINESS_ALREADY_OWNED", "This business already has a verified owner.", 409);
 
   const now = new Date();

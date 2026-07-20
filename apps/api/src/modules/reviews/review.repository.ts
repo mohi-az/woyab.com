@@ -2,9 +2,13 @@ import { prisma } from "../../lib/prisma.js";
 import type { CreateReviewBody, UpdateReviewBody } from "./review.schema.js";
 
 export const reviewRepository = {
-  findMany: (businessId: string, skip: number, take: number, where: { status?: "PENDING" | "APPROVED" | "REJECTED" } = {}) =>
+  findMany: (businessId: string, skip: number, take: number) =>
     prisma.review.findMany({
-      where: { businessId, ...where, business: { removedAt: null } },
+      where: {
+        businessId,
+        status: "APPROVED",
+        business: { removedAt: null, status: "ACTIVE" },
+      },
       skip,
       take,
       orderBy: { createdAt: "desc" },
@@ -12,27 +16,33 @@ export const reviewRepository = {
         user: { select: { id: true, name: true, avatarUrl: true } },
         images: true,
         ownerReply: {
-          include: {
-            owner: { select: { id: true, name: true, avatarUrl: true } },
-          },
+          select: { id: true, content: true, createdAt: true, updatedAt: true },
         },
       },
     }),
 
-  count: (businessId: string, where: { status?: "PENDING" | "APPROVED" | "REJECTED" } = {}) =>
-    prisma.review.count({ where: { businessId, ...where, business: { removedAt: null } } }),
+  count: (businessId: string) =>
+    prisma.review.count({
+      where: {
+        businessId,
+        status: "APPROVED",
+        business: { removedAt: null, status: "ACTIVE" },
+      },
+    }),
 
   findById: (id: string) =>
     prisma.review.findFirst({
-      where: { id, business: { removedAt: null } },
+      where: {
+        id,
+        status: "APPROVED",
+        business: { removedAt: null, status: "ACTIVE" },
+      },
       include: {
         user: { select: { id: true, name: true, avatarUrl: true } },
         business: { select: { id: true, slug: true, businessName: true } },
         images: true,
         ownerReply: {
-          include: {
-            owner: { select: { id: true, name: true, avatarUrl: true } },
-          },
+          select: { id: true, content: true, createdAt: true, updatedAt: true },
         },
       },
     }),

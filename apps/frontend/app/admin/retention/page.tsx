@@ -1,8 +1,10 @@
 import { AdminButton, AdminSection, StatusBadge } from "@/components/admin/AdminPrimitives";
 import { reviewRetentionItem } from "@/lib/admin-actions";
+import { requireSuperAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminRetentionPage() {
+  await requireSuperAdmin();
   const now = new Date();
   const [claims, changeRequests] = await Promise.all([
     prisma.businessClaim.findMany({

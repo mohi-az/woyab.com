@@ -4,7 +4,7 @@ import type { AttributeDataType, BusinessStatus, DayOfWeek, Prisma, ReviewStatus
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { appLocales } from "@/i18n/config";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdmin, requireSuperAdmin } from "@/lib/admin-auth";
 import { applyBusinessChangeRequest } from "@/lib/business-change-requests";
 import { ownershipRetentionDate } from "@/lib/business-claims";
 import { sendMail } from "@/lib/mail";
@@ -545,7 +545,7 @@ export async function deleteReview(formData: FormData) {
 }
 
 export async function updateUserAccess(formData: FormData) {
-  const actor = await requireAdmin();
+  const actor = await requireSuperAdmin();
   const userId = value(formData, "userId");
   const role = value(formData, "role") as UserRole;
   const active = booleanValue(formData, "active");
@@ -800,6 +800,13 @@ export async function updateClaimStatus(formData: FormData) {
     if (status === "APPROVED") {
       if (!existing.claimantUserId) throw new Error("Approved claims must belong to a registered user.");
       if (!existing.verifiedAt || existing.verificationMethod !== "EMAIL_OTP") throw new Error("The business email must be verified before approval.");
+      if (
+        existing.business.ownerId
+        && existing.business.ownerId !== existing.claimantUserId
+        && actor.role !== "SUPER_ADMIN"
+      ) {
+        throw new Error("Only a super admin may transfer an already-owned business.");
+      }
       if (existing.business.ownerId && existing.business.ownerId !== existing.claimantUserId) {
         const endedAt = new Date();
         await tx.businessClaim.updateMany({
@@ -873,7 +880,7 @@ export async function reviewBusinessChangeRequest(formData: FormData) {
 }
 
 export async function reviewRetentionItem(formData: FormData) {
-  const actor = await requireAdmin();
+  const actor = await requireSuperAdmin();
   const type = value(formData, "type");
   const id = value(formData, "id");
   const action = value(formData, "action");
@@ -953,7 +960,7 @@ export async function replyToTicket(formData: FormData) {
 }
 
 export async function updateAdminSetting(formData: FormData) {
-  const actor = await requireAdmin();
+  const actor = await requireSuperAdmin();
   const key = value(formData, "key");
   const type = value(formData, "type");
   if (!key) throw new Error("Setting key is required.");

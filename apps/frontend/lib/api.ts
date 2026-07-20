@@ -88,7 +88,7 @@ type BusinessDetailApiResponse = {
     reviewCount?: number | null;
     verified?: boolean;
     featured?: boolean;
-    owner?: { id: string } | null;
+    hasOwner?: boolean;
     category?: {
       id: number;
       nameFa: string;
@@ -191,11 +191,6 @@ type ReviewApiItem = {
     content: string;
     createdAt: string;
     updatedAt: string;
-    owner?: {
-      id: string;
-      name?: string | null;
-      avatarUrl?: string | null;
-    } | null;
   } | null;
 };
 
@@ -738,7 +733,7 @@ export async function fetchBusinessBySlug(
       reviewCount: business.reviewCount ?? 0,
       verified: Boolean(business.verified),
       featured: booleanFlag(business.featured),
-      hasOwner: Boolean(business.owner),
+      hasOwner: Boolean(business.hasOwner),
       hours: (business.businessHours ?? []).map((hour) => ({
         dayOfWeek: hour.dayOfWeek,
         openTime: hour.openTime,
@@ -779,7 +774,7 @@ export async function fetchBusinessBySlug(
 
 export async function fetchBusinessReviews(businessId: string): Promise<BusinessReviewItem[]> {
   try {
-    const res = await fetch(`${API_BASE}/v1/businesses/${businessId}/reviews?limit=50&status=APPROVED`, {
+    const res = await fetch(`${API_BASE}/v1/businesses/${businessId}/reviews?limit=50`, {
       cache: "no-store",
     });
     if (!res.ok) return [];
@@ -804,8 +799,8 @@ export async function fetchBusinessReviews(businessId: string): Promise<Business
             id: review.ownerReply.id,
             content: review.ownerReply.content,
             createdAt: review.ownerReply.createdAt,
-            ownerName: review.ownerReply.owner?.name?.trim() || "Business owner",
-            ownerAvatarUrl: review.ownerReply.owner?.avatarUrl,
+            ownerName: "Business owner",
+            ownerAvatarUrl: null,
           }
         : null,
     }));

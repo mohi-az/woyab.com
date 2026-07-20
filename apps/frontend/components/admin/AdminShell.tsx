@@ -52,6 +52,12 @@ const navItems = [
   { href: "/admin/audit", key: "audit", icon: FiActivity },
 ] as const;
 
+const superAdminOnlyPaths = new Set([
+  "/admin/audit",
+  "/admin/retention",
+  "/admin/settings",
+]);
+
 function normalizePath(pathname: string) {
   return pathname.replace(/^\/(de|en|fa)(?=\/|$)/, "") || "/";
 }
@@ -129,7 +135,7 @@ export function AdminShell({ user, children, initialTheme }: {
 
         <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-5">
           <div className="grid gap-1">
-            {navItems.map((item) => {
+            {navItems.filter((item) => user.role === "SUPER_ADMIN" || !superAdminOnlyPaths.has(item.href)).map((item) => {
               const Icon = item.icon;
               const active = item.href === "/admin"
                 ? normalizedPath === "/admin"

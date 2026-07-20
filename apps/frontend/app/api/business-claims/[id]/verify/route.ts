@@ -15,11 +15,16 @@ export async function POST(request: Request, context: Context) {
   const now = new Date();
   const claim = await prisma.businessClaim.findFirst({
     where: { id, claimantUserId: userId },
-    include: { business: { select: { id: true, ownerId: true, email: true, removedAt: true } } },
+    include: {
+      business: {
+        select: { id: true, ownerId: true, email: true, removedAt: true, status: true },
+      },
+    },
   });
   if (!claim) return reply("CLAIM_NOT_FOUND", "Claim not found.", 404);
   if (claim.status !== "PENDING_VERIFICATION") return reply("CLAIM_NOT_PENDING", "This claim is no longer awaiting a code.", 409, { status: claim.status });
   if (claim.business.removedAt) return reply("BUSINESS_REMOVED", "This business is not publicly available.", 409);
+  if (claim.business.status !== "ACTIVE") return reply("BUSINESS_REMOVED", "This business is not publicly available.", 409);
   if (claim.business.ownerId) {
     await prisma.businessClaim.updateMany({
       where: { id, claimantUserId: userId, status: "PENDING_VERIFICATION" },
@@ -65,7 +70,10 @@ export async function POST(request: Request, context: Context) {
     await tx.adminAuditLog.create({ data: { actorId: userId, action: "claim.email_verified", entityType: "BusinessClaim", entityId: id, metadata: { businessId: claim.businessId, decision } } });
 
     if (decision === "APPROVED") {
-      const attached = await tx.business.updateMany({ where: { id: claim.businessId, ownerId: null, removedAt: null }, data: { ownerId: userId, verified: true } });
+      const attached = await tx.business.updateMany({
+        where: { id: claim.businessId, ownerId: null, removedAt: null, status: "ACTIVE" },
+        data: { ownerId: userId, verified: true },
+      });
       if (attached.count) {
         await tx.user.update({ where: { id: userId }, data: { role: "OWNER", authVersion: { increment: 1 } } });
         await tx.businessClaim.update({ where: { id }, data: { status: "APPROVED", reviewedAt: now } });

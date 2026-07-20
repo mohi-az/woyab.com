@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   const target = parsed.data.businessId
     ? await prisma.business.findFirst({
-        where: { id: parsed.data.businessId, removedAt: null },
+        where: { id: parsed.data.businessId, removedAt: null, status: "ACTIVE" },
         select: {
           id: true,
           slug: true,
@@ -65,7 +65,11 @@ export async function POST(request: NextRequest) {
         },
       })
     : await prisma.review.findFirst({
-        where: { id: parsed.data.reviewId, business: { removedAt: null } },
+        where: {
+          id: parsed.data.reviewId,
+          status: "APPROVED",
+          business: { removedAt: null, status: "ACTIVE" },
+        },
         select: {
           id: true,
           rating: true,

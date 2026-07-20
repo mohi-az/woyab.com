@@ -17,7 +17,18 @@ test("the public Express business and service routers expose no write handlers",
   assert.doesNotMatch(serviceRoute, /serviceRouter\.(post|patch|delete)\(/);
 });
 
-test("all public business discovery paths exclude soft-removed records", async () => {
+test("the public taxonomy and location routers expose no mutation handlers", async () => {
+  const routes = await Promise.all([
+    source("src/modules/categories/category.route.ts"),
+    source("src/modules/locations/location.route.ts"),
+    source("src/modules/tags/tag.route.ts"),
+  ]);
+  for (const route of routes) {
+    assert.doesNotMatch(route, /\.(post|put|patch|delete)\(/);
+  }
+});
+
+test("all public business discovery paths require ACTIVE, non-removed records", async () => {
   const [repository, mapRepository, searchRepository, googlePhotos] = await Promise.all([
     source("src/modules/businesses/business.repository.ts"),
     source("src/modules/businesses/business-map.repository.ts"),
@@ -26,7 +37,41 @@ test("all public business discovery paths exclude soft-removed records", async (
   ]);
   assert.match(repository, /removedAt: null/);
   assert.match(mapRepository, /b\."removedAt" IS NULL/);
+  assert.match(mapRepository, /b\."status" = 'ACTIVE'/);
   assert.match(searchRepository, /b\."removedAt" IS NULL/);
+  assert.match(searchRepository, /b\."status" = 'ACTIVE'/);
   assert.doesNotMatch(googlePhotos, /googlePlacesRouter\.get\("\/google-photos/);
-  assert.match(googlePhotos, /where: \{ id, removedAt: null \}/);
+  assert.match(repository, /removedAt: null, status: "ACTIVE"/);
+  assert.match(googlePhotos, /removedAt: null, status: "ACTIVE"/);
+});
+
+test("public review reads expose only approved reviews on active businesses", async () => {
+  const [repository, schema] = await Promise.all([
+    source("src/modules/reviews/review.repository.ts"),
+    source("src/modules/reviews/review.schema.ts"),
+  ]);
+  assert.match(repository, /status: "APPROVED"/);
+  assert.match(repository, /business: \{ removedAt: null, status: "ACTIVE" \}/);
+  assert.doesNotMatch(schema, /listReviewsQuerySchema[\s\S]*PENDING/);
+});
+
+test("public business and owner-reply payloads do not select owner identity", async () => {
+  const [businessRepository, businessService, reviewRepository] = await Promise.all([
+    source("src/modules/businesses/business.repository.ts"),
+    source("src/modules/businesses/business.service.ts"),
+    source("src/modules/reviews/review.repository.ts"),
+  ]);
+  assert.doesNotMatch(businessRepository, /owner:\s*\{\s*select:/);
+  assert.match(businessService, /ownerId,[\s\S]*hasOwner: Boolean\(ownerId\)/);
+  assert.doesNotMatch(reviewRepository, /owner:\s*\{\s*select:/);
+});
+
+test("costly unbound Google endpoints require an internal secret and rate limiting", async () => {
+  const [geoRoute, googleRoute] = await Promise.all([
+    source("src/modules/geo/geo.route.ts"),
+    source("src/modules/businesses/google-places.route.ts"),
+  ]);
+  assert.match(geoRoute, /place-photos\/:placeId", requireInternalApi, internalGoogleRateLimit/);
+  assert.match(geoRoute, /place-photo", requireInternalApi, internalGoogleRateLimit/);
+  assert.match(googleRoute, /googlePlacesRateLimit/);
 });

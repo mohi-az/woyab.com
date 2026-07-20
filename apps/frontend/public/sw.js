@@ -6,10 +6,22 @@
  *  - آیکون‌ها/static:   stale-while-revalidate
  */
 
-const CACHE_NAME = "fargo-cache-v1";
+const CACHE_NAME = "fargo-cache-v2";
 
 // منابع حیاتی که در install کش می‌شوند
 const PRECACHE_URLS = ["/", "/offline", "/manifest.webmanifest"];
+const PRIVATE_PATH_PREFIXES = ["/admin", "/dashboard", "/business-portal"];
+
+function normalizedPathname(pathname) {
+  return pathname.replace(/^\/(de|en|fa)(?=\/|$)/, "") || "/";
+}
+
+function isPrivatePath(pathname) {
+  const normalized = normalizedPathname(pathname);
+  return PRIVATE_PATH_PREFIXES.some(
+    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
+  );
+}
 
 // ========================
 // Install
@@ -57,6 +69,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Never store authenticated panel documents or RSC payloads.
+  if (isPrivatePath(url.pathname)) {
+    event.respondWith(privateNetworkOnly(request));
+    return;
+  }
+
   // درخواست‌های ناوبری (صفحات HTML): شبکه اول + offline fallback
   if (request.mode === "navigate") {
     event.respondWith(navigationStrategy(request));
@@ -80,6 +98,23 @@ async function networkOnly(request) {
       status: 503,
       headers: { "Content-Type": "application/json" },
     });
+  }
+}
+
+async function privateNetworkOnly(request) {
+  try {
+    return await fetch(request, { cache: "no-store" });
+  } catch {
+    if (request.mode === "navigate") {
+      return (
+        (await caches.match("/offline")) ??
+        new Response("<h1>Offline</h1>", {
+          status: 503,
+          headers: { "Content-Type": "text/html" },
+        })
+      );
+    }
+    return new Response("", { status: 503 });
   }
 }
 

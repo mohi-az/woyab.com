@@ -5,15 +5,12 @@ import { reviewRepository } from "./review.repository.js";
 
 export const reviewService = {
   list: async (businessId: string, query: ListReviewsQuery) => {
-    const { page, limit, status } = query;
+    const { page, limit } = query;
     const skip = (page - 1) * limit;
-    const where = {
-      ...(status && { status }),
-    };
 
     const [items, total] = await Promise.all([
-      reviewRepository.findMany(businessId, skip, limit, where),
-      reviewRepository.count(businessId, where),
+      reviewRepository.findMany(businessId, skip, limit),
+      reviewRepository.count(businessId),
     ]);
 
     return { items, total, page, limit, totalPages: Math.ceil(total / limit) };

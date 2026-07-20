@@ -17,6 +17,7 @@ type ImageMode = "google" | "manual";
 
 type Props = {
   locale: string;
+  googlePlaceId: string;
   googlePhotos: GooglePlacePhoto[];
   googlePhotosStatus: "idle" | "loading" | "ready" | "empty" | "error";
   imageMode: ImageMode;
@@ -78,12 +79,13 @@ function copy(locale: string) {
   };
 }
 
-function googlePhotoUrl(photoReference: string, maxWidth = 1000) {
-  return `/api/place-photo?ref=${encodeURIComponent(photoReference)}&maxWidth=${maxWidth}`;
+function googlePhotoUrl(photoReference: string, placeId: string, maxWidth = 1000) {
+  return `/api/place-photo?ref=${encodeURIComponent(photoReference)}&placeId=${encodeURIComponent(placeId)}&maxWidth=${maxWidth}`;
 }
 
 export function BusinessImageManager({
   locale,
+  googlePlaceId,
   googlePhotos,
   googlePhotosStatus,
   imageMode,
@@ -179,7 +181,7 @@ export function BusinessImageManager({
                   }`}
                 >
                   <img
-                    src={googlePhotoUrl(photo.photoReference, 640)}
+                    src={googlePhotoUrl(photo.photoReference, googlePlaceId, 640)}
                     alt=""
                     draggable={false}
                     className="aspect-square h-full w-full object-cover"

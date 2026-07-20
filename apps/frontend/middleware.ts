@@ -10,12 +10,28 @@ import {
 } from "@/i18n/config";
 
 const bypassPrefixes = ["/api", "/_next", "/pwa-icons", "/monitoring"];
+const privatePrefixes = ["/admin", "/dashboard", "/business-portal"];
 
 function shouldBypass(pathname: string) {
   return bypassPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
     || pathname === "/sw.js"
     || pathname === "/manifest.webmanifest"
     || /\.[^/]+$/.test(pathname);
+}
+
+function isPrivatePath(pathname: string) {
+  const normalized = stripLocalePrefix(pathname);
+  return privatePrefixes.some(
+    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
+  );
+}
+
+function preventPrivateCaching(response: NextResponse, pathname: string) {
+  if (!isPrivatePath(pathname)) return response;
+  response.headers.set("Cache-Control", "private, no-store, no-cache, max-age=0, must-revalidate");
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Expires", "0");
+  return response;
 }
 
 export function middleware(request: NextRequest) {
@@ -36,7 +52,7 @@ export function middleware(request: NextRequest) {
       sameSite: "lax",
       path: "/",
     });
-    return response;
+    return preventPrivateCaching(response, pathname);
   }
 
   const rewrittenUrl = request.nextUrl.clone();
@@ -57,7 +73,7 @@ export function middleware(request: NextRequest) {
     path: "/",
   });
 
-  return response;
+  return preventPrivateCaching(response, pathname);
 }
 
 export const config = {

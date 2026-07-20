@@ -16,9 +16,6 @@ export const reviewStandaloneRouter = Router();
  *         name: businessId
  *         required: true
  *         schema: { type: string }
- *       - in: query
- *         name: status
- *         schema: { type: string, enum: [PENDING, APPROVED, REJECTED] }
  *     responses:
  *       200:
  *         description: Paginated list of reviews

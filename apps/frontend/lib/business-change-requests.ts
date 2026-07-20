@@ -73,7 +73,7 @@ export async function businessChangeSnapshot(businessId: string) {
   const business = await prisma.business.findUnique({
     where: { id: businessId },
     select: {
-      id: true, updatedAt: true, ownerId: true, removedAt: true, sourceLocale: true,
+      id: true, updatedAt: true, ownerId: true, removedAt: true, status: true, sourceLocale: true,
       businessName: true, shortDescription: true, description: true, legalName: true,
       email: true, phone: true, mobile: true, whatsapp: true, website: true,
       instagram: true, telegram: true, facebook: true, youtube: true, linkedin: true,

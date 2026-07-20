@@ -68,7 +68,7 @@ export async function getPlacePhotos(placeId: string): Promise<GooglePhotoItem[]
 
   // Fetch from Google Places API (New)
   try {
-    const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?fields=photos&key=${env.GOOGLE_PLACES_API_KEY}`;
+    const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?fields=photos`;
     const response = await fetch(url, {
       headers: {
         "X-Goog-Api-Key": env.GOOGLE_PLACES_API_KEY,
@@ -144,8 +144,12 @@ export async function getPhotoBuffer(
 
   // Fetch from Google Places Photo API (New)
   try {
-    const url = `https://places.googleapis.com/v1/${photoReference}/media?maxWidthPx=${maxWidth}&key=${env.GOOGLE_PLACES_API_KEY}`;
-    const response = await fetch(url);
+    const url = `https://places.googleapis.com/v1/${photoReference}/media?maxWidthPx=${maxWidth}`;
+    const response = await fetch(url, {
+      headers: {
+        "X-Goog-Api-Key": env.GOOGLE_PLACES_API_KEY,
+      },
+    });
 
     if (!response.ok) {
       logger.warn({ status: response.status, photoReference }, "Google Places Photo API error");

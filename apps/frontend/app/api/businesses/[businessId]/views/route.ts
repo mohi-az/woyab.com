@@ -19,7 +19,10 @@ export async function POST(request: Request, context: RouteContext) {
   const { businessId } = await context.params;
   const payload = payloadSchema.safeParse(await request.json().catch(() => null));
   if (!payload.success) return NextResponse.json({ error: "Invalid analytics payload" }, { status: 400 });
-  const business = await prisma.business.findFirst({ where: { id: businessId, removedAt: null }, select: { id: true } });
+  const business = await prisma.business.findFirst({
+    where: { id: businessId, removedAt: null, status: "ACTIVE" },
+    select: { id: true },
+  });
   if (!business) return NextResponse.json({ error: "Business not found" }, { status: 404 });
 
   await prisma.$transaction([

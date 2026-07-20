@@ -6,6 +6,7 @@ import { redirectWithLocale } from "@/i18n/server";
 import { prisma } from "@/lib/prisma";
 
 const adminRoles: UserRole[] = ["ADMIN", "SUPER_ADMIN"];
+const superAdminRoles: UserRole[] = ["SUPER_ADMIN"];
 
 export async function currentUser() {
   const session = await auth();
@@ -39,6 +40,10 @@ export async function requireRole(roles: UserRole[]) {
 
 export async function requireAdmin() {
   return requireRole(adminRoles);
+}
+
+export async function requireSuperAdmin() {
+  return requireRole(superAdminRoles);
 }
 
 export function isAdminRole(role: UserRole) {

@@ -1,9 +1,11 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { AdminSection, AdminTable, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { isAppLocale } from "@/i18n/config";
+import { requireSuperAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminAuditPage() {
+  await requireSuperAdmin();
   const [t, requestedLocale, logs] = await Promise.all([
     getTranslations("Admin"),
     getLocale(),

@@ -11,6 +11,7 @@ const requiredProductionValues = [
   "SMTP_PORT",
   "SMTP_FROM",
   "CRON_SECRET",
+  "INTERNAL_API_SECRET",
 ] as const;
 
 export function assertProductionConfiguration() {
@@ -25,6 +26,7 @@ export function assertProductionConfiguration() {
   if (Boolean(process.env.SMTP_USER) !== Boolean(process.env.SMTP_PASSWORD)) throw new Error("SMTP_USER and SMTP_PASSWORD must either both be set or both be empty.");
   if (process.env.PRIVACY_SUPERVISORY_AUTHORITY_URL && !process.env.PRIVACY_SUPERVISORY_AUTHORITY_URL.startsWith("https://")) throw new Error("PRIVACY_SUPERVISORY_AUTHORITY_URL must use HTTPS.");
   if (process.env.CRON_SECRET!.length < 24) throw new Error("CRON_SECRET must contain at least 24 characters.");
+  if (process.env.INTERNAL_API_SECRET!.length < 32) throw new Error("INTERNAL_API_SECRET must contain at least 32 characters.");
 }
 
 export function getPublicLegalConfig() {

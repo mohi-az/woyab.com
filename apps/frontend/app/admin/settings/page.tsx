@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { AdminButton, AdminSection } from "@/components/admin/AdminPrimitives";
 import { updateAdminSetting } from "@/lib/admin-actions";
+import { requireSuperAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 const defaultSettings = [
@@ -12,6 +13,7 @@ const defaultSettings = [
 const inputClassName = "admin-input h-11 min-w-0 rounded-lg px-3 text-sm outline-none focus:border-sky-400";
 
 export default async function AdminSettingsPage() {
+  await requireSuperAdmin();
   const [t, settings] = await Promise.all([
     getTranslations("Admin"),
     prisma.adminSetting.findMany(),

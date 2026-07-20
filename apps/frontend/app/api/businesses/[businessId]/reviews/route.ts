@@ -20,7 +20,10 @@ export async function POST(request: Request, context: RouteContext) {
   const parsed = reviewSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Please check the review fields." }, { status: 400 });
 
-  const business = await prisma.business.findFirst({ where: { id: businessId, removedAt: null }, select: { id: true } });
+  const business = await prisma.business.findFirst({
+    where: { id: businessId, removedAt: null, status: "ACTIVE" },
+    select: { id: true },
+  });
   if (!business) return NextResponse.json({ error: "Business not found" }, { status: 404 });
   const existing = await prisma.review.findUnique({ where: { businessId_userId: { businessId, userId } } });
   if (existing) return NextResponse.json({ error: "You have already reviewed this business." }, { status: 409 });

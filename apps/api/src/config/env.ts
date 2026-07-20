@@ -14,6 +14,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
   GOOGLE_PLACES_API_KEY: z.string().min(1).optional(),
+  INTERNAL_API_SECRET: z.string().min(32).optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -35,6 +36,13 @@ export const env = {
 if (!env.DATABASE_URL) {
   console.error("Invalid environment configuration", {
     DATABASE_URL: "DATABASE_URL is required outside development",
+  });
+  process.exit(1);
+}
+
+if (env.NODE_ENV === "production" && env.GOOGLE_PLACES_API_KEY && !env.INTERNAL_API_SECRET) {
+  console.error("Invalid environment configuration", {
+    INTERNAL_API_SECRET: "A secret of at least 32 characters is required when Google Places is enabled",
   });
   process.exit(1);
 }

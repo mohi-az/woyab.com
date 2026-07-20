@@ -20,6 +20,7 @@ export async function POST(request: Request) {
   const snapshot = await businessChangeSnapshot(parsed.data.businessId);
   if (!snapshot) return response("BUSINESS_NOT_FOUND", "Business not found.", 404);
   if (snapshot.removedAt) return response("BUSINESS_REMOVED", "This business is not publicly available.", 409);
+  if (snapshot.status !== "ACTIVE") return response("BUSINESS_NOT_FOUND", "Business not found.", 404);
   if (parsed.data.submitterRelation === "OWNER" && snapshot.ownerId !== userId) return response("FORBIDDEN", "Only the verified owner can submit owner changes.", 403);
 
   const active = await prisma.businessChangeRequest.findFirst({

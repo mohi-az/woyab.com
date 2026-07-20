@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const payload = contactPayloadSchema.parse(await request.json());
     const business = await prisma.business.findFirst({
-      where: { id: businessId, removedAt: null },
+      where: { id: businessId, removedAt: null, status: "ACTIVE" },
       select: { id: true, businessName: true, email: true, ownerId: true },
     });
     if (!business) return NextResponse.json({ success: false, error: "Business not found." }, { status: 404 });

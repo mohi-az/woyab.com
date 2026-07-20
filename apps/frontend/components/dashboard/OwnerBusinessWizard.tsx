@@ -475,7 +475,9 @@ export function OwnerBusinessWizard({
   const selectedCategory = categories.find((item) => String(item.id) === categoryId);
   const selectedCity = cities.find((item) => String(item.id) === cityId);
   const localizedDraft = translations[previewLocale];
-  const googleCoverUrl = googlePhotos[0] ? googlePhotoUrl(googlePhotos[0].photoReference, 1200) : undefined;
+  const googleCoverUrl = googlePhotos[0]
+    ? googlePhotoUrl(googlePhotos[0].photoReference, googlePlaceId, 1200)
+    : undefined;
   const draft: BusinessDraft = {
     locale,
     businessName: localizedDraft.businessName || undefined,
@@ -741,6 +743,7 @@ export function OwnerBusinessWizard({
             <p className="text-xs font-bold text-slate-500">{text.optionalStep}</p>
             <BusinessImageManager
               locale={locale}
+              googlePlaceId={googlePlaceId}
               googlePhotos={googlePhotos}
               googlePhotosStatus={googlePhotosStatus}
               imageMode={imageMode}

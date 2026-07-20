@@ -49,6 +49,24 @@ function stripTranslations<T extends { translations?: unknown }>(item: T) {
   return rest;
 }
 
+function publicBusinessDetail<T extends {
+  translations?: unknown;
+  ownerId?: string | null;
+  removedById?: string | null;
+  removedAt?: Date | null;
+  restoredAt?: Date | null;
+}>(item: T) {
+  const {
+    translations: _translations,
+    ownerId,
+    removedById: _removedById,
+    removedAt: _removedAt,
+    restoredAt: _restoredAt,
+    ...rest
+  } = item;
+  return { ...rest, hasOwner: Boolean(ownerId) };
+}
+
 function localizeItems<T extends {
   id: string;
   sourceLocale: "DE" | "EN" | "FA";
@@ -344,13 +362,13 @@ export const businessService = {
   getById: async (id: string, locale: AppLocale) => {
     const business = await businessRepository.findById(id);
     if (!business) throw ApiError.notFound("Business not found");
-    return stripTranslations(localizeBusiness(business, locale));
+    return publicBusinessDetail(localizeBusiness(business, locale));
   },
 
   getBySlug: async (slug: string, locale: AppLocale) => {
     const business = await businessRepository.findDetailBySlug(slug);
     if (!business) throw ApiError.notFound("Business not found");
-    return stripTranslations(localizeBusiness(business, locale));
+    return publicBusinessDetail(localizeBusiness(business, locale));
   },
 
   create: async (data: CreateBusinessBody) => {

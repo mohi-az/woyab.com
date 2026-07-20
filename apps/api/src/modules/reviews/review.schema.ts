@@ -32,9 +32,7 @@ export const reviewBusinessParamsSchema = z.object({
   businessId: z.string().min(1),
 });
 
-export const listReviewsQuerySchema = paginationQuerySchema.extend({
-  status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-});
+export const listReviewsQuerySchema = paginationQuerySchema;
 
 export type CreateReviewBody = z.infer<typeof createReviewBodySchema>;
 export type UpdateReviewBody = z.infer<typeof updateReviewBodySchema>;
