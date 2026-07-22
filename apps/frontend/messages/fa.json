@@ -171,7 +171,8 @@
       "allCities": "همه شهرها",
       "location": "لوکیشن",
         "reset": "پاک کردن",
-        "favoritesOnly": "فقط علاقه‌مندی‌های من"
+        "favoritesOnly": "فقط علاقه‌مندی‌های من",
+        "openNow": "الان باز است"
     },
     "sort": {
       "label": "مرتب‌سازی:",
@@ -185,7 +186,11 @@
       "reviewsTemplate": "{count} نظر",
       "featured": "ویژه",
       "unknownLocation": "موقعیت ثبت نشده",
-      "distance": "{distance} کیلومتر فاصله"
+      "distance": "{distance} کیلومتر فاصله",
+      "openNow": "الان باز است",
+      "closed": "بسته است",
+      "openSoon": "به‌زودی باز می‌شود · {time}",
+      "closeSoon": "به‌زودی بسته می‌شود · {time}"
     },
     "location": {
       "inputLabel": "جست‌وجوی محدوده",
@@ -246,7 +251,10 @@
       "title": "دیدگاه مشتریان",
       "verified": "تاییدشده",
       "empty": "هنوز نظری برای این کسب‌وکار ثبت نشده است.",
-      "ownerReply": "پاسخ صاحب کسب‌وکار"
+      "ownerReply": "پاسخ صاحب کسب‌وکار",
+      "helpful": "این نظر مفید بود ({count})",
+      "helpfulLogin": "برای ثبت رأی مفید بودن وارد حساب شوید",
+      "helpfulOwn": "نمی‌توانید به نظر خودتان رأی بدهید"
     },
     "reviewsForm": {
       "title": "ثبت نظر",
@@ -335,6 +343,12 @@
     "hoursTitle": "ساعات کاری",
     "hoursUnavailable": "ساعات کاری هنوز ثبت نشده است.",
     "closed": "بسته",
+    "openStatus": {
+      "OPEN": "الان باز است",
+      "CLOSED": "بسته است",
+      "OPEN_SOON": "به‌زودی باز می‌شود · {time}",
+      "CLOSE_SOON": "به‌زودی بسته می‌شود · {time}"
+    },
     "days": {
       "MONDAY": "دوشنبه",
       "TUESDAY": "سه‌شنبه",
@@ -556,6 +570,21 @@
     "reviews": {
       "title": "نظرهای من",
       "empty": "هنوز نظری ثبت نکرده‌اید.",
+      "edit": "ویرایش",
+      "delete": "حذف",
+      "save": "ذخیره تغییرات",
+      "saving": "در حال ذخیره...",
+      "cancel": "انصراف",
+      "rating": "امتیاز",
+      "ratingValue": "{count} ستاره",
+      "titlePlaceholder": "عنوان نظر (اختیاری)",
+      "commentPlaceholder": "تجربه خود را بنویسید",
+      "moderationNotice": "نظر ویرایش‌شده پیش از انتشار دوباره برای بررسی ارسال می‌شود.",
+      "updateSuccess": "تغییرات ذخیره و برای بررسی ارسال شد.",
+      "updateError": "ویرایش نظر انجام نشد.",
+      "deleteConfirm": "این نظر برای همیشه حذف شود؟",
+      "deleteSuccess": "نظر حذف شد.",
+      "deleteError": "حذف نظر انجام نشد.",
       "status": {
         "PENDING": "در انتظار بررسی",
         "APPROVED": "تأیید شده",

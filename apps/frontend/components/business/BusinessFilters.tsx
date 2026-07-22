@@ -25,6 +25,7 @@ export type BusinessFilterLabels = {
   location: string;
   reset: string;
   favoritesOnly: string;
+  openNow: string;
   locationPicker: LocationPickerLabels;
 };
 
@@ -158,6 +159,15 @@ export function BusinessFilters({
                 className="h-4 w-4 accent-primary"
               />
               {labels.favoritesOnly}
+            </label>
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-sm font-bold text-emerald-800">
+              <input
+                type="checkbox"
+                checked={Boolean(filters.openNow)}
+                onChange={(event) => onFiltersChange({ openNow: event.target.checked || undefined })}
+                className="h-4 w-4 accent-emerald-600"
+              />
+              {labels.openNow}
             </label>
             <div>
               <label htmlFor="business-search" className="mb-2 block text-sm font-bold text-gray-800">{labels.search}</label>

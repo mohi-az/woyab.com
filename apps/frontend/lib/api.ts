@@ -34,6 +34,7 @@ type BusinessApiItem = {
   averageRating?: number | null;
   reviewCount?: number | null;
   featured?: boolean;
+  businessHours?: BusinessHourItem[];
   category?: {
     nameFa: string;
     nameEn: string;
@@ -52,6 +53,13 @@ type BusinessApiItem = {
     name?: string | null;
     city?: { nameFa?: string | null; nameEn?: string | null } | null;
   } | null;
+};
+
+type BusinessHourItem = {
+  dayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
+  openTime?: string | null;
+  closeTime?: string | null;
+  isClosed: boolean;
 };
 
 type BusinessDetailApiResponse = {
@@ -234,6 +242,7 @@ export type BusinessDirectoryFilters = {
   cityId?: number;
   sortBy?: "latest" | "distance";
   favoritesOnly?: boolean;
+  openNow?: boolean;
 };
 
 export type DirectoryFilterOption = {
@@ -274,6 +283,7 @@ export type LatestBusinessCardItem = {
   matchedLocationName?: string | null;
   featured?: boolean;
   googlePlaceId?: string | null;
+  hours: BusinessHourItem[];
 };
 
 export type BusinessDetailData = {
@@ -353,6 +363,7 @@ export type BusinessReviewItem = {
   comment?: string | null;
   createdAt: string;
   visitDate?: string | null;
+  helpfulCount: number;
   verified: boolean;
   status?: "PENDING" | "APPROVED" | "REJECTED";
   user: {
@@ -451,6 +462,7 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       location: getLocalizedName(locale, business.city),
       featured: booleanFlag(business.featured),
       googlePlaceId: business.googlePlaceId,
+      hours: business.businessHours ?? [],
     }));
   } catch {
     return [];
@@ -469,6 +481,7 @@ function directoryParams(filters: BusinessDirectoryFilters) {
   if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
   if (filters.cityId) params.set("cityId", String(filters.cityId));
   if (filters.sortBy) params.set("sortBy", filters.sortBy);
+  if (filters.openNow) params.set("openNow", "true");
 
   return params;
 }
@@ -514,6 +527,7 @@ export async function fetchBusinessDirectory(
         matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
         featured: booleanFlag(business.featured),
         googlePlaceId: business.googlePlaceId,
+        hours: business.businessHours ?? [],
       })),
     };
   } catch {
@@ -545,6 +559,7 @@ export async function searchBusinessDirectory(
     search: filters.search,
     sortBy: filters.sortBy ?? "recommended",
     favoritesOnly: filters.favoritesOnly,
+    openNow: filters.openNow,
     origin,
     locale: locale as AppLocale,
   };
@@ -585,6 +600,7 @@ export async function searchBusinessDirectory(
       matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
       featured: booleanFlag(business.featured),
       googlePlaceId: business.googlePlaceId,
+      hours: business.businessHours ?? [],
     })),
   };
 }
@@ -787,6 +803,7 @@ export async function fetchBusinessReviews(businessId: string): Promise<Business
       comment: review.comment,
       createdAt: review.createdAt,
       visitDate: review.visitDate,
+      helpfulCount: review.helpfulCount ?? 0,
       verified: Boolean(review.verified),
       status: review.status,
       user: {

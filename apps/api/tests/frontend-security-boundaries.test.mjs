@@ -142,3 +142,46 @@ test("administrator access requires encrypted TOTP enrollment and verification",
   assert.match(twoFactor, /aes-256-gcm/);
   assert.match(route, /admin\.two_factor\.enabled/);
 });
+
+test("review authors can edit or delete only their own reviews", async () => {
+  const [route, dashboard] = await Promise.all([
+    frontendSource("app/api/reviews/[reviewId]/route.ts"),
+    frontendSource("components/dashboard/ReviewManagementCard.tsx"),
+  ]);
+  assert.match(route, /currentUserId\(\)/);
+  assert.match(route, /where: \{ id: reviewId, userId \}/);
+  assert.match(route, /status: "PENDING"/);
+  assert.match(route, /recalculatePublicBusinessRating/);
+  assert.match(route, /tx\.review\.delete/);
+  assert.match(dashboard, /method: "PATCH"/);
+  assert.match(dashboard, /method: "DELETE"/);
+});
+
+test("helpful review votes are authenticated, unique, and cannot target the author", async () => {
+  const [schema, route] = await Promise.all([
+    readFile(new URL("../../../packages/database/prisma/schema/review.prisma", import.meta.url), "utf8"),
+    frontendSource("app/api/reviews/[reviewId]/helpful/route.ts"),
+  ]);
+  assert.match(schema, /model ReviewHelpfulVote/);
+  assert.match(schema, /@@unique\(\[reviewId, userId\]\)/);
+  assert.match(route, /review\.userId === userId/);
+  assert.match(route, /createMany/);
+  assert.match(route, /skipDuplicates: true/);
+  assert.match(route, /helpfulCount: \{ increment: 1 \}/);
+});
+
+test("open-now filtering and labels use registered hours in the Berlin time zone", async () => {
+  const [hours, filters, searchSchema, searchRepository] = await Promise.all([
+    frontendSource("lib/business-hours.ts"),
+    frontendSource("components/business/BusinessFilters.tsx"),
+    readFile(new URL("../../../packages/shared/src/validators/location.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/modules/businesses/business-hours.repository.ts", import.meta.url), "utf8"),
+  ]);
+  assert.match(hours, /Europe\/Berlin/);
+  assert.match(hours, /OPEN_SOON/);
+  assert.match(hours, /CLOSE_SOON/);
+  assert.match(filters, /filters\.openNow/);
+  assert.match(searchSchema, /openNow: z\.boolean\(\)\.optional\(\)/);
+  assert.match(searchRepository, /business_hours/);
+  assert.match(searchRepository, /openTime.*closeTime/s);
+});

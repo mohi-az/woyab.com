@@ -18,6 +18,7 @@ import {
   FiSend,
   FiSliders,
   FiStar,
+  FiThumbsUp,
 } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTelegramPlane, FaYoutube } from "react-icons/fa";
 import { MdStar, MdStarBorder } from "react-icons/md";
@@ -28,6 +29,7 @@ import { buildDirectionsUrl } from "@/lib/directions";
 import { DirectoryReportButton } from "@/features/businesses/DirectoryReportButton";
 import { BusinessEditButton } from "@/features/businesses/BusinessEditButton";
 import { getCookieConsent, onCookieConsentChange } from "@/lib/cookie-consent";
+import { getBusinessOpenStatus } from "@/lib/business-hours";
 
 type Props = {
   business: BusinessDetailData;
@@ -116,7 +118,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   const cityHref = business.cityId ? `/businesses?cityId=${business.cityId}` : null;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const reviews = initialReviews.filter((review) => review.status === "APPROVED");
+  const [reviews, setReviews] = useState(() => initialReviews.filter((review) => review.status === "APPROVED"));
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({ rating: 0, title: "", comment: "" });
   const [contactForm, setContactForm] = useState<ContactFormState>({
     name: "",
@@ -128,6 +130,19 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   const [contactFeedback, setContactFeedback] = useState<string | null>(null);
   const [reviewPending, setReviewPending] = useState(false);
   const [contactPending, setContactPending] = useState(false);
+  const [helpfulReviewIds, setHelpfulReviewIds] = useState<Set<string>>(new Set());
+  const [helpfulPendingIds, setHelpfulPendingIds] = useState<Set<string>>(new Set());
+  const [now, setNow] = useState(() => new Date());
+  const openStatus = getBusinessOpenStatus(business.hours, now);
+  const openStatusLabel = openStatus.kind === "UNKNOWN"
+    ? null
+    : t(`openStatus.${openStatus.kind}`, { time: openStatus.transitionTime ?? "" });
+  const reviewIdsKey = reviews.map((review) => review.id).join(",");
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,6 +182,18 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!currentUser || !reviewIdsKey) return;
+    const controller = new AbortController();
+    const params = new URLSearchParams();
+    for (const reviewId of reviewIdsKey.split(",")) params.append("id", reviewId);
+    void fetch(`/api/reviews/helpful?${params}`, { cache: "no-store", signal: controller.signal })
+      .then((response) => response.json())
+      .then((json) => setHelpfulReviewIds(new Set<string>(json.data?.reviewIds ?? [])))
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [currentUser, reviewIdsKey]);
 
   useEffect(() => {
     let recorded = false;
@@ -275,6 +302,34 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     }
   }
 
+  async function toggleHelpful(review: BusinessReviewItem) {
+    if (!currentUser || currentUser.id === review.user.id || helpfulPendingIds.has(review.id)) return;
+    const voted = helpfulReviewIds.has(review.id);
+    setHelpfulPendingIds((current) => new Set(current).add(review.id));
+    try {
+      const response = await fetch(`/api/reviews/${review.id}/helpful`, {
+        method: voted ? "DELETE" : "POST",
+      });
+      const json = await response.json().catch(() => null);
+      if (!response.ok) return;
+      setHelpfulReviewIds((current) => {
+        const next = new Set(current);
+        if (json.data.voted) next.add(review.id);
+        else next.delete(review.id);
+        return next;
+      });
+      setReviews((current) => current.map((item) => item.id === review.id
+        ? { ...item, helpfulCount: json.data.helpfulCount }
+        : item));
+    } finally {
+      setHelpfulPendingIds((current) => {
+        const next = new Set(current);
+        next.delete(review.id);
+        return next;
+      });
+    }
+  }
+
   return (
     <div className="bg-[#f8f5f1] pb-16 [&_button:not(:disabled)]:cursor-pointer">
       <section className="hero-theme relative isolate -mt-16 overflow-hidden bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 lg:-mt-[4.75rem] lg:pt-36">
@@ -331,6 +386,19 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/12 px-3 py-1 text-amber-200">
                     <FiStar />
                     {t("featured")}
+                  </span>
+                ) : null}
+                {openStatusLabel ? (
+                  <span className={`inline-flex rounded-full border px-3 py-1.5 font-black ${
+                    openStatus.kind === "OPEN"
+                      ? "border-emerald-300/30 bg-emerald-300/15 text-emerald-200"
+                      : openStatus.kind === "CLOSE_SOON"
+                        ? "border-amber-300/30 bg-amber-300/15 text-amber-200"
+                        : openStatus.kind === "OPEN_SOON"
+                          ? "border-sky-300/30 bg-sky-300/15 text-sky-200"
+                          : "border-slate-300/20 bg-slate-300/10 text-slate-300"
+                  }`}>
+                    {openStatusLabel}
                   </span>
                 ) : null}
               </div>
@@ -496,6 +564,25 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
                       {review.title ? <p className="mt-4 text-sm font-black text-slate-900">{review.title}</p> : null}
                       {review.comment ? <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{review.comment}</p> : null}
+                      <button
+                        type="button"
+                        disabled={!currentUser || currentUser.id === review.user.id || helpfulPendingIds.has(review.id)}
+                        onClick={() => void toggleHelpful(review)}
+                        aria-pressed={helpfulReviewIds.has(review.id)}
+                        title={!currentUser
+                          ? t("reviewsSection.helpfulLogin")
+                          : currentUser.id === review.user.id
+                            ? t("reviewsSection.helpfulOwn")
+                            : undefined}
+                        className={`mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                          helpfulReviewIds.has(review.id)
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-primary hover:text-primary"
+                        }`}
+                      >
+                        <FiThumbsUp />
+                        {t("reviewsSection.helpful", { count: review.helpfulCount })}
+                      </button>
                       {review.ownerReply ? (
                         <div className="mt-4 rounded-2xl border border-primary/10 bg-white px-4 py-3">
                           <div className="flex items-center gap-2 text-xs font-black text-primary">

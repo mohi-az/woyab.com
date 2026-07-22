@@ -9,17 +9,21 @@ import {
   localizeBusiness,
 } from "./business-localization.js";
 import { findBusinessMapPoints } from "./business-map.repository.js";
+import { findCurrentlyOpenBusinessIds } from "./business-hours.repository.js";
 import { findNearbyBusinesses } from "./business-search.repository.js";
 import { businessRepository } from "./business.repository.js";
 
-function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: string[] }) {
+function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: string[]; openBusinessIds?: string[] }) {
   const { categoryId, subCategoryId, cityId, status, featured, verified, search } = query;
 
   return {
+    AND: [
+      ...(query.favoriteBusinessIds ? [{ id: { in: query.favoriteBusinessIds } }] : []),
+      ...(query.openBusinessIds ? [{ id: { in: query.openBusinessIds } }] : []),
+    ],
     ...(categoryId !== undefined && { categoryId }),
     ...(subCategoryId !== undefined && { subCategoryId }),
     ...(cityId !== undefined && { cityId }),
-    ...(query.favoriteBusinessIds && { id: { in: query.favoriteBusinessIds } }),
     ...(status && { status }),
     ...(featured !== undefined && { featured: featured === "true" }),
     ...(verified !== undefined && { verified: verified === "true" }),
@@ -295,6 +299,7 @@ export const businessService = {
 
   search: async (input: BusinessSearchBody) => {
     if (!input.origin) {
+      const openBusinessIds = input.openNow ? await findCurrentlyOpenBusinessIds() : undefined;
       return businessService.list({
         page: input.page,
         limit: input.limit,
@@ -305,6 +310,7 @@ export const businessService = {
         search: input.search,
         sortBy: input.sortBy === "latest" ? "latest" : undefined,
         favoriteBusinessIds: input.favoriteBusinessIds,
+        openBusinessIds,
       });
     }
 
@@ -340,10 +346,12 @@ export const businessService = {
     };
   },
 
-  list: async (query: ListBusinessesQuery & { favoriteBusinessIds?: string[] }) => {
+  list: async (query: ListBusinessesQuery & { favoriteBusinessIds?: string[]; openBusinessIds?: string[] }) => {
     const { page, limit, locale, sortBy } = query;
     const skip = (page - 1) * limit;
-    const where = businessListWhere(query);
+    const openBusinessIds = query.openBusinessIds
+      ?? (query.openNow === "true" ? await findCurrentlyOpenBusinessIds() : undefined);
+    const where = businessListWhere({ ...query, openBusinessIds });
 
     const [items, total] = await Promise.all([
       businessRepository.findMany(skip, limit, where, sortBy),

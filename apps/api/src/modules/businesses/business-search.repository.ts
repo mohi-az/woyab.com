@@ -3,6 +3,7 @@ import type { BusinessSearchBody } from "@fargo/shared";
 
 import { prisma } from "../../lib/prisma.js";
 import { appLocaleToContentLocale } from "./business-localization.js";
+import { currentlyOpenBusinessCondition } from "./business-hours.repository.js";
 
 export type SpatialBusinessMatch = {
   businessId: string;
@@ -17,7 +18,9 @@ export type SpatialBusinessMatch = {
   featured: boolean;
 };
 
-function spatialConditions(input: BusinessSearchBody) {
+type InternalBusinessSearchBody = BusinessSearchBody & { openBusinessIds?: string[] };
+
+function spatialConditions(input: InternalBusinessSearchBody) {
   const { origin } = input;
   if (!origin) throw new Error("Spatial search requires an origin");
 
@@ -52,6 +55,13 @@ function spatialConditions(input: BusinessSearchBody) {
       ? Prisma.sql`b."id" IN (${Prisma.join(input.favoriteBusinessIds)})`
       : Prisma.sql`FALSE`);
   }
+  if (input.openBusinessIds) {
+    conditions.push(input.openBusinessIds.length
+      ? Prisma.sql`b."id" IN (${Prisma.join(input.openBusinessIds)})`
+      : Prisma.sql`FALSE`);
+  } else if (input.openNow) {
+    conditions.push(currentlyOpenBusinessCondition());
+  }
   if (input.search) {
     const term = `%${input.search}%`;
     conditions.push(Prisma.sql`(
@@ -73,7 +83,7 @@ function spatialConditions(input: BusinessSearchBody) {
   return { point, where: Prisma.join(conditions, " AND "), requestedLocale };
 }
 
-export async function findNearbyBusinesses(input: BusinessSearchBody) {
+export async function findNearbyBusinesses(input: InternalBusinessSearchBody) {
   const { point, where, requestedLocale } = spatialConditions(input);
   const skip = (input.page - 1) * input.limit;
   const orderBy = input.sortBy === "latest"

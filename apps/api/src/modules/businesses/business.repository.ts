@@ -57,6 +57,9 @@ const businessCardSelect = {
   logoUrl: true,
   coverImageUrl: true,
   googlePlaceId: true,
+  businessHours: {
+    select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true },
+  },
   categoryId: true,
   category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
   subCategoryId: true,

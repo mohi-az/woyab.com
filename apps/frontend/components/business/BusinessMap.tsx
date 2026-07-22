@@ -50,6 +50,7 @@ type Props = {
   labels: BusinessMapLabels;
   favoriteBusinessIds: Set<string>;
   savedLocations: Array<SavedLocationOption & { isDefault?: boolean }>;
+  refreshKey?: number;
 };
 
 type MapData = FeatureCollection<Point, MapProperties> & { truncated?: boolean };
@@ -125,7 +126,7 @@ function savedLocationIcon(icon: SavedLocationOption["icon"]) {
   return '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
 }
 
-export function BusinessMap({ filters, location, radiusKm, locale, labels, favoriteBusinessIds, savedLocations }: Props) {
+export function BusinessMap({ filters, location, radiusKm, locale, labels, favoriteBusinessIds, savedLocations, refreshKey = 0 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapboxRef = useRef<typeof mapboxgl | null>(null);
@@ -492,6 +493,7 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
         origin,
         locale,
         favoritesOnly: filters.favoritesOnly,
+        openNow: filters.openNow,
       }),
       signal: controller.signal,
     }).then(async (response) => {
@@ -530,11 +532,13 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
     filters.search,
     filters.subCategoryId,
     filters.favoritesOnly,
+    filters.openNow,
     labels.error,
     location,
     locale,
     radiusKm,
     ready,
+    refreshKey,
     savedLocations,
   ]);
 

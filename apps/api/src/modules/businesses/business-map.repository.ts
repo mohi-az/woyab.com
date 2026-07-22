@@ -3,6 +3,7 @@ import type { BusinessMapBody } from "@fargo/shared";
 
 import { prisma } from "../../lib/prisma.js";
 import { appLocaleToContentLocale } from "./business-localization.js";
+import { currentlyOpenBusinessCondition } from "./business-hours.repository.js";
 
 type BusinessMapRow = {
   locationId: string;
@@ -77,6 +78,7 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
       ? Prisma.sql`b."id" IN (${Prisma.join(input.favoriteBusinessIds)})`
       : Prisma.sql`FALSE`);
   }
+  if (input.openNow) conditions.push(currentlyOpenBusinessCondition());
   if (input.search) {
     const term = `%${input.search}%`;
     conditions.push(Prisma.sql`(

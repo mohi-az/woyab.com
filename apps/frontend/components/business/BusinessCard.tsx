@@ -7,6 +7,7 @@ import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
 import { FavoriteButton } from "@/components/business/FavoriteButton";
 import { Link } from "@/i18n/navigation";
+import { getBusinessOpenStatus, type BusinessHour } from "@/lib/business-hours";
 
 export type BusinessCardProps = {
   businessId: string;
@@ -30,6 +31,9 @@ export type BusinessCardProps = {
   featuredLabel?: string;
   isFavorite?: boolean;
   onFavoriteChange?: (saved: boolean) => void;
+  hours?: BusinessHour[];
+  now?: Date;
+  openStatusLabels?: Record<"OPEN" | "CLOSED" | "OPEN_SOON" | "CLOSE_SOON", string>;
 };
 
 function RatingStars({ rating = 0 }: { rating?: number | null }) {
@@ -67,6 +71,9 @@ export function BusinessCard({
   featuredLabel = "Featured",
   isFavorite,
   onFavoriteChange,
+  hours = [],
+  now = new Date(),
+  openStatusLabels,
 }: BusinessCardProps) {
   const [failedImageUrls, setFailedImageUrls] = useState<string[]>([]);
   const displayImageUrl = imageUrl && !failedImageUrls.includes(imageUrl)
@@ -74,6 +81,17 @@ export function BusinessCard({
     : fallbackImageUrl && !failedImageUrls.includes(fallbackImageUrl)
       ? fallbackImageUrl
       : null;
+  const openStatus = getBusinessOpenStatus(hours, now);
+  const openStatusLabel = openStatus.kind === "UNKNOWN" || !openStatusLabels
+    ? null
+    : openStatusLabels[openStatus.kind].replace("{time}", openStatus.transitionTime ?? "");
+  const openStatusStyle = openStatus.kind === "OPEN"
+    ? "bg-emerald-500 text-white"
+    : openStatus.kind === "CLOSE_SOON"
+      ? "bg-amber-400 text-slate-950"
+      : openStatus.kind === "OPEN_SOON"
+        ? "bg-sky-500 text-white"
+        : "bg-slate-800/85 text-white";
 
   const content = (
     <>
@@ -104,6 +122,11 @@ export function BusinessCard({
           <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-black text-slate-950 shadow-lg">
             <FiStar className="shrink-0" />
             {featuredLabel}
+          </span>
+        ) : null}
+        {openStatusLabel ? (
+          <span className={`absolute end-3 top-3 rounded-full px-3 py-1.5 text-xs font-black shadow-lg ${openStatusStyle}`}>
+            {openStatusLabel}
           </span>
         ) : null}
       </div>

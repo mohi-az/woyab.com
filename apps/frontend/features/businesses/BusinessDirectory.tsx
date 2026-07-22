@@ -34,6 +34,10 @@ type Labels = {
     unknownLocation: string;
     distance: string;
     featured: string;
+    openNow: string;
+    closed: string;
+    openSoon: string;
+    closeSoon: string;
   };
   empty: { title: string; description: string };
   pagination: { label: string; previous: string; next: string };
@@ -75,6 +79,13 @@ export function BusinessDirectory({
   const [mapOpen, setMapOpen] = useState(false);
   const [favoriteBusinessIds, setFavoriteBusinessIds] = useState<Set<string>>(new Set());
   const [savedLocations, setSavedLocations] = useState<Array<SavedLocationOption & { isDefault?: boolean }>>([]);
+  const [now, setNow] = useState(() => new Date());
+  const openNowRefreshKey = filters.openNow ? Math.floor(now.getTime() / 60_000) : 0;
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -131,6 +142,7 @@ export function BusinessDirectory({
     if (filters.cityId) params.set("cityId", String(filters.cityId));
     if (filters.sortBy === "latest") params.set("sortBy", "latest");
     if (filters.favoritesOnly) params.set("favoritesOnly", "true");
+    if (filters.openNow) params.set("openNow", "true");
     if (filters.page > 1) params.set("page", String(filters.page));
     const query = params.toString();
     const path = `/${locale}/businesses`;
@@ -163,7 +175,7 @@ export function BusinessDirectory({
       });
 
     return () => controller.abort();
-  }, [filters, labels.error, locale, location, radiusKm]);
+  }, [filters, labels.error, locale, location, openNowRefreshKey, radiusKm]);
 
   const currentPage = directory.totalPages > 0 ? Math.min(directory.page, directory.totalPages) : 1;
   const pages = visiblePages(currentPage, directory.totalPages);
@@ -181,6 +193,7 @@ export function BusinessDirectory({
             labels={labels.map}
             favoriteBusinessIds={favoriteBusinessIds}
             savedLocations={savedLocations}
+            refreshKey={openNowRefreshKey}
           />
         </div>
       ) : null}
@@ -260,6 +273,13 @@ export function BusinessDirectory({
                         locationFallback={labels.card.unknownLocation}
                         distanceLabel={distanceLabel}
                         featuredLabel={labels.card.featured}
+                        openStatusLabels={{
+                          OPEN: labels.card.openNow,
+                          CLOSED: labels.card.closed,
+                          OPEN_SOON: labels.card.openSoon,
+                          CLOSE_SOON: labels.card.closeSoon,
+                        }}
+                        now={now}
                         isFavorite={favoriteBusinessIds.has(business.businessId)}
                         onFavoriteChange={(saved) => setFavoriteBusinessIds((current) => {
                           const next = new Set(current);

@@ -27,6 +27,7 @@ model User {
   resolvedDirectoryReports DirectoryReport[]       @relation("DirectoryReportResolver")
   favorites                Favorite[]
   reviewOwnerReplies       ReviewOwnerReply[]
+  reviewHelpfulVotes       ReviewHelpfulVote[]
   reviews                  Review[]
   assignedSupportTickets   SupportTicket[]         @relation("SupportTicketAssignee")
   supportTickets           SupportTicket[]         @relation("SupportTicketUser")

@@ -52,6 +52,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
     cityId: positiveInt(first(params.cityId)),
     sortBy: first(params.sortBy) === "latest" ? "latest" : undefined,
     favoritesOnly: first(params.favoritesOnly) === "true" || undefined,
+    openNow: first(params.openNow) === "true" || undefined,
   };
 
   const [directory, categories, subCategories, cities] = await Promise.all([
@@ -99,6 +100,10 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             unknownLocation: t("card.unknownLocation"),
             distance: t("card.distance", { distance: "{distance}" }),
             featured: t("card.featured"),
+            openNow: t("card.openNow"),
+            closed: t("card.closed"),
+            openSoon: t("card.openSoon", { time: "{time}" }),
+            closeSoon: t("card.closeSoon", { time: "{time}" }),
           },
           empty: { title: t("empty.title"), description: t("empty.description") },
           pagination: {
@@ -130,6 +135,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             allCities: t("filters.allCities"),
             location: t("filters.location"),
             favoritesOnly: t("filters.favoritesOnly"),
+            openNow: t("filters.openNow"),
             reset: t("filters.reset"),
             locationPicker: {
               inputLabel: t("location.inputLabel"),

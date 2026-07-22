@@ -26,6 +26,7 @@ export const businessSearchBodySchema = paginationQuerySchema.extend({
   origin: locationOriginSchema.optional(),
   locale: appLocaleSchema,
   favoriteBusinessIds: z.array(z.string().min(1)).max(500).optional(),
+  openNow: z.boolean().optional(),
 }).superRefine((value, context) => {
   if (value.sortBy === "distance" && !value.origin) {
     context.addIssue({
@@ -75,6 +76,7 @@ export const businessMapBodySchema = z.object({
   bounds: mapBoundsSchema.optional(),
   locale: appLocaleSchema,
   favoriteBusinessIds: z.array(z.string().min(1)).max(500).optional(),
+  openNow: z.boolean().optional(),
 });
 
 export type BusinessSearchBody = z.infer<typeof businessSearchBodySchema>;

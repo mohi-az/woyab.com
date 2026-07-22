@@ -229,7 +229,7 @@ model DirectoryReport {
   business       Business?               @relation(fields: [businessId], references: [id])
   reporter       User?                   @relation("DirectoryReportReporter", fields: [reporterUserId], references: [id], onDelete: SetNull)
   resolvedBy     User?                   @relation("DirectoryReportResolver", fields: [resolvedById], references: [id])
-  review         Review?                 @relation(fields: [reviewId], references: [id])
+  review         Review?                 @relation(fields: [reviewId], references: [id], onDelete: SetNull)
 
   @@index([businessId])
   @@index([createdAt])

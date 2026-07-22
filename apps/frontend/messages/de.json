@@ -173,7 +173,8 @@
       "allCities": "Alle Städte",
       "location": "Standort",
         "reset": "Zurücksetzen",
-        "favoritesOnly": "Nur meine Favoriten anzeigen"
+        "favoritesOnly": "Nur meine Favoriten anzeigen",
+        "openNow": "Jetzt geöffnet"
     },
     "sort": {
       "label": "Sortieren nach:",
@@ -187,7 +188,11 @@
       "reviewsTemplate": "{count} Bewertungen",
       "featured": "Empfohlen",
       "unknownLocation": "Standort nicht verfügbar",
-      "distance": "{distance} km entfernt"
+      "distance": "{distance} km entfernt",
+      "openNow": "Jetzt geöffnet",
+      "closed": "Geschlossen",
+      "openSoon": "Öffnet bald · {time}",
+      "closeSoon": "Schließt bald · {time}"
     },
     "location": {
       "inputLabel": "Ort suchen",
@@ -248,7 +253,10 @@
       "title": "Kundenbewertungen",
       "verified": "Verifiziert",
       "empty": "Bisher wurden noch keine Bewertungen veroffentlicht.",
-      "ownerReply": "Antwort des Inhabers"
+      "ownerReply": "Antwort des Inhabers",
+      "helpful": "Hilfreich ({count})",
+      "helpfulLogin": "Melden Sie sich an, um Bewertungen als hilfreich zu markieren",
+      "helpfulOwn": "Sie können nicht für Ihre eigene Bewertung stimmen"
     },
     "reviewsForm": {
       "title": "Bewertung schreiben",
@@ -337,6 +345,12 @@
     "hoursTitle": "Offnungszeiten",
     "hoursUnavailable": "Offnungszeiten sind noch nicht verfugbar.",
     "closed": "Geschlossen",
+    "openStatus": {
+      "OPEN": "Jetzt geöffnet",
+      "CLOSED": "Geschlossen",
+      "OPEN_SOON": "Öffnet bald · {time}",
+      "CLOSE_SOON": "Schließt bald · {time}"
+    },
     "days": {
       "MONDAY": "Montag",
       "TUESDAY": "Dienstag",
@@ -558,6 +572,21 @@
     "reviews": {
       "title": "Meine Bewertungen",
       "empty": "Sie haben noch keine Bewertung abgegeben.",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "save": "Änderungen speichern",
+      "saving": "Wird gespeichert...",
+      "cancel": "Abbrechen",
+      "rating": "Bewertung",
+      "ratingValue": "{count} Sterne",
+      "titlePlaceholder": "Titel der Bewertung (optional)",
+      "commentPlaceholder": "Beschreiben Sie Ihre Erfahrung",
+      "moderationNotice": "Bearbeitete Bewertungen werden vor der erneuten Veröffentlichung geprüft.",
+      "updateSuccess": "Ihre Änderungen wurden gespeichert und zur Prüfung gesendet.",
+      "updateError": "Die Bewertung konnte nicht aktualisiert werden.",
+      "deleteConfirm": "Diese Bewertung dauerhaft löschen?",
+      "deleteSuccess": "Die Bewertung wurde gelöscht.",
+      "deleteError": "Die Bewertung konnte nicht gelöscht werden.",
       "status": {
         "PENDING": "Wird gepr?ft",
         "APPROVED": "Genehmigt",

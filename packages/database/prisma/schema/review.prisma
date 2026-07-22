@@ -12,6 +12,7 @@ model Review {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   directoryReports DirectoryReport[]
+  helpfulVotes     ReviewHelpfulVote[]
   images           ReviewImage[]
   ownerReply       ReviewOwnerReply?
   business         Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -21,6 +22,19 @@ model Review {
   @@index([businessId])
   @@index([status])
   @@map("reviews")
+}
+
+model ReviewHelpfulVote {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId])
+  @@index([userId])
+  @@map("review_helpful_votes")
 }
 
 model ReviewImage {

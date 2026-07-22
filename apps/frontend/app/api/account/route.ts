@@ -35,6 +35,18 @@ export async function DELETE(request: Request) {
   }
 
   await prisma.$transaction(async (tx) => {
+    const votedReviewIds = await tx.reviewHelpfulVote.findMany({
+      where: { userId },
+      select: { reviewId: true },
+    });
+    await tx.reviewHelpfulVote.deleteMany({ where: { userId } });
+    for (const { reviewId } of votedReviewIds) {
+      await tx.review.updateMany({
+        where: { id: reviewId, helpfulCount: { gt: 0 } },
+        data: { helpfulCount: { decrement: 1 } },
+      });
+    }
+
     if (parsed.data.mode === "ERASE") {
       await tx.review.deleteMany({ where: { userId } });
     } else {

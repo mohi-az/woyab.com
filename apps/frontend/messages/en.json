@@ -173,7 +173,8 @@
       "allCities": "All cities",
       "location": "Location",
         "reset": "Reset",
-        "favoritesOnly": "Show only my favorites"
+        "favoritesOnly": "Show only my favorites",
+        "openNow": "Open now"
     },
     "sort": {
       "label": "Sort by:",
@@ -187,7 +188,11 @@
       "reviewsTemplate": "{count} reviews",
       "featured": "Featured",
       "unknownLocation": "Location not available",
-      "distance": "{distance} km away"
+      "distance": "{distance} km away",
+      "openNow": "Open now",
+      "closed": "Closed",
+      "openSoon": "Opens soon · {time}",
+      "closeSoon": "Closes soon · {time}"
     },
     "location": {
       "inputLabel": "Search an area",
@@ -248,7 +253,10 @@
       "title": "Customer reviews",
       "verified": "Verified",
       "empty": "No reviews have been posted yet.",
-      "ownerReply": "Owner reply"
+      "ownerReply": "Owner reply",
+      "helpful": "Helpful ({count})",
+      "helpfulLogin": "Log in to mark reviews as helpful",
+      "helpfulOwn": "You cannot vote for your own review"
     },
     "reviewsForm": {
       "title": "Write a review",
@@ -337,6 +345,12 @@
     "hoursTitle": "Business hours",
     "hoursUnavailable": "Business hours are not available yet.",
     "closed": "Closed",
+    "openStatus": {
+      "OPEN": "Open now",
+      "CLOSED": "Closed",
+      "OPEN_SOON": "Opens soon · {time}",
+      "CLOSE_SOON": "Closes soon · {time}"
+    },
     "days": {
       "MONDAY": "Monday",
       "TUESDAY": "Tuesday",
@@ -558,6 +572,21 @@
     "reviews": {
       "title": "My reviews",
       "empty": "You have not posted a review yet.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "rating": "Rating",
+      "ratingValue": "{count} stars",
+      "titlePlaceholder": "Review title (optional)",
+      "commentPlaceholder": "Write about your experience",
+      "moderationNotice": "Edited reviews return to moderation before being published again.",
+      "updateSuccess": "Your changes were saved and sent for moderation.",
+      "updateError": "The review could not be updated.",
+      "deleteConfirm": "Permanently delete this review?",
+      "deleteSuccess": "The review was deleted.",
+      "deleteError": "The review could not be deleted.",
       "status": {
         "PENDING": "Pending review",
         "APPROVED": "Approved",
