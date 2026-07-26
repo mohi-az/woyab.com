@@ -31,7 +31,9 @@
     "accountMenu": {
       "menu": "Kontomenü",
       "settings": "Kontoeinstellungen",
-      "fallbackName": "Mein Konto"
+      "fallbackName": "Mein Konto",
+      "adminPanel": "Admin-Bereich",
+      "ownerPortal": "Business-Portal"
     },
     "actions": {
       "user": "Nutzer",
@@ -542,6 +544,7 @@
       "addresses": "Meine Adressen",
       "reviews": "Meine Bewertungen",
       "owner": "Inhaber-Dashboard",
+      "adminPanel": "Admin-Bereich",
       "ownerMessages": "Unternehmensnachrichten",
       "supportTickets": "Support-Tickets",
       "addBusiness": "Eintrag hinzufugen",

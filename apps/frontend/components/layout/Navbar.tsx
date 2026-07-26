@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { FiBriefcase, FiCheckCircle, FiChevronDown, FiGrid, FiLogIn, FiLogOut, FiMenu, FiPlusSquare, FiSettings, FiUserPlus, FiX } from "react-icons/fi";
+import { FiBriefcase, FiCheckCircle, FiChevronDown, FiGrid, FiLogIn, FiLogOut, FiMenu, FiPlusSquare, FiSettings, FiShield, FiUserPlus, FiX } from "react-icons/fi";
 import { FaClipboardList } from "react-icons/fa";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import { stripLocalePrefix } from "@/i18n/config";
@@ -94,6 +94,8 @@ export default function Navbar() {
     dashboard: t("auth.dashboard"),
     settings: t("accountMenu.settings"),
     logout: t("auth.logout"),
+    adminPanel: t("accountMenu.adminPanel"),
+    ownerPortal: t("accountMenu.ownerPortal"),
   };
 
   if (internalPathname === "/add-business" || internalPathname.startsWith("/business-portal")) {
@@ -119,6 +121,7 @@ export default function Navbar() {
                 name={userName}
                 email={userEmail}
                 avatarUrl={userAvatar}
+                role={session.user.role}
                 locale={locale}
                 labels={accountLabels}
               />
@@ -252,6 +255,7 @@ export default function Navbar() {
                   name={userName}
                   email={userEmail}
                   avatarUrl={userAvatar}
+                  role={session.user.role}
                   locale={locale}
                   labels={accountLabels}
                   overlay={isOverlay}
@@ -354,6 +358,7 @@ export default function Navbar() {
                     name={userName}
                     email={userEmail}
                     avatarUrl={userAvatar}
+                    role={session.user.role}
                     locale={locale}
                     labels={accountLabels}
                   />
@@ -386,12 +391,13 @@ type AccountMenuProps = {
   name: string;
   email: string;
   avatarUrl: string;
+  role?: "USER" | "OWNER" | "ADMIN" | "SUPER_ADMIN";
   locale: string;
-  labels: { menu: string; dashboard: string; settings: string; logout: string };
+  labels: { menu: string; dashboard: string; settings: string; logout: string; adminPanel: string; ownerPortal: string };
   overlay?: boolean;
 };
 
-function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, locale, labels, overlay = false }: AccountMenuProps) {
+function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, role, locale, labels, overlay = false }: AccountMenuProps) {
   return (
     <div className="relative" onBlur={(event) => {
       if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) onClose();
@@ -405,9 +411,19 @@ function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, locale, 
           <p className="truncate text-sm font-black text-slate-950">{name}</p>
           {email ? <p className="mt-1 truncate text-xs text-slate-500" dir="ltr">{email}</p> : null}
         </div>
-        <Link href="/business-portal" role="menuitem" onClick={onClose} className="mt-1 flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition hover:bg-slate-100 hover:text-primary">
+        <Link href="/dashboard" role="menuitem" onClick={onClose} className="mt-1 flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition hover:bg-slate-100 hover:text-primary">
           <FiGrid className="text-lg" />{labels.dashboard}
         </Link>
+        {(role === "ADMIN" || role === "SUPER_ADMIN") ? (
+          <Link href="/admin" role="menuitem" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-sky-700 transition hover:bg-sky-50">
+            <FiShield className="text-lg text-sky-600" />{labels.adminPanel}
+          </Link>
+        ) : null}
+        {(role === "OWNER" || role === "ADMIN" || role === "SUPER_ADMIN") ? (
+          <Link href="/business-portal" role="menuitem" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100 hover:text-primary">
+            <FiBriefcase className="text-lg text-amber-600" />{labels.ownerPortal}
+          </Link>
+        ) : null}
         <Link href="/dashboard/profile" role="menuitem" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition hover:bg-slate-100 hover:text-primary">
           <FiSettings className="text-lg" />{labels.settings}
         </Link>
@@ -422,7 +438,7 @@ function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, locale, 
   );
 }
 
-function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, locale, labels }: AccountMenuProps) {
+function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, role, locale, labels }: AccountMenuProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <button type="button" aria-expanded={open} onClick={onToggle} className="flex min-h-14 w-full items-center gap-3 px-3 text-start">
@@ -435,7 +451,13 @@ function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, lo
       </button>
       {open ? (
         <div className="grid gap-1 border-t border-slate-100 p-2">
-          <Link href="/business-portal" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiGrid />{labels.dashboard}</Link>
+          <Link href="/dashboard" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiGrid />{labels.dashboard}</Link>
+          {(role === "ADMIN" || role === "SUPER_ADMIN") ? (
+            <Link href="/admin" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-sky-700 hover:bg-sky-50"><FiShield className="text-sky-600" />{labels.adminPanel}</Link>
+          ) : null}
+          {(role === "OWNER" || role === "ADMIN" || role === "SUPER_ADMIN") ? (
+            <Link href="/business-portal" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiBriefcase className="text-amber-600" />{labels.ownerPortal}</Link>
+          ) : null}
           <Link href="/dashboard/profile" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiSettings />{labels.settings}</Link>
           <button type="button" onClick={() => {
             onClose();

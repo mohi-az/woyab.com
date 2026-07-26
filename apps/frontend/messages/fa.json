@@ -31,7 +31,9 @@
     "accountMenu": {
       "menu": "منوی حساب کاربری",
       "settings": "تنظیمات حساب کاربری",
-      "fallbackName": "حساب من"
+      "fallbackName": "حساب من",
+      "adminPanel": "پنل مدیریت",
+      "ownerPortal": "داشبورد کسب‌وکارها"
     },
     "actions": {
       "user": "کاربر",
@@ -540,6 +542,7 @@
       "reviews": "نظرهای من",
       "reports": "گزارش‌های من",
       "owner": "داشبورد صاحب کسب‌وکار",
+      "adminPanel": "پنل مدیریت",
       "ownerMessages": "پیام‌های کسب‌وکار",
       "supportTickets": "تیکت‌های پشتیبانی",
       "addBusiness": "افزودن کسب‌وکار",

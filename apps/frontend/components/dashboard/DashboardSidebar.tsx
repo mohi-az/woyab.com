@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { FiAlertCircle, FiBriefcase, FiGrid, FiHeart, FiLock, FiMapPin, FiStar, FiUser } from "react-icons/fi";
+import { FiAlertCircle, FiBriefcase, FiGrid, FiHeart, FiLock, FiMapPin, FiShield, FiStar, FiUser } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 import { stripLocalePrefix } from "@/i18n/config";
 import { cn } from "@/lib/utils";
@@ -33,10 +33,10 @@ export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }
   const [user, setUser] = useState(initialUser);
   const displayName = user.name || t("fallbackName");
   const initials = displayName.trim().slice(0, 1).toUpperCase();
+  const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
   const hasOwnerAccess =
     user.role === "OWNER" ||
-    user.role === "ADMIN" ||
-    user.role === "SUPER_ADMIN" ||
+    isAdmin ||
     user.hasBusinesses;
 
   useEffect(() => {
@@ -89,8 +89,19 @@ export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }
             </Link>
           );
         })}
-        {hasOwnerAccess ? (
+        {isAdmin ? (
           <div className="mt-3 border-t border-slate-100 pt-3">
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-sky-700 transition-colors hover:bg-sky-50"
+            >
+              <FiShield className="shrink-0 text-base text-sky-600" />
+              {t("adminPanel")}
+            </Link>
+          </div>
+        ) : null}
+        {hasOwnerAccess ? (
+          <div className="mt-1 border-t border-slate-100 pt-1">
             <Link
               href="/business-portal"
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-colors hover:bg-primary/5 hover:text-primary"
