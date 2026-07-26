@@ -1,4 +1,4 @@
-﻿import { getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { FiBriefcase, FiHeart, FiMapPin, FiStar } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 import { requireUserId } from "@/lib/auth-user";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export default async function DashboardPage() {
   const [userId, t] = await Promise.all([requireUserId(), getTranslations("Dashboard.overview")]);
   const [user, favorites, addresses, reviews, businesses] = await Promise.all([
-    prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true, role: true, avatarUrl: true } }),
+    prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true, role: true, avatarUrl: true, phone: true } }),
     prisma.favorite.count({ where: { userId } }),
     prisma.userSavedLocation.count({ where: { userId } }),
     prisma.review.count({ where: { userId } }),
@@ -26,6 +26,8 @@ export default async function DashboardPage() {
     { label: t("addresses"), count: addresses, href: "/dashboard/addresses", icon: FiMapPin, accent: "bg-sky-50 text-sky-600" },
     { label: t("reviews"), count: reviews, href: "/dashboard/reviews", icon: FiStar, accent: "bg-amber-50 text-amber-600" },
   ] as const;
+
+  const isProfileComplete = Boolean(user.name && user.phone && user.avatarUrl);
 
   return (
     <div className="space-y-6">
@@ -66,35 +68,17 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Business portal CTA (only for owners) */}
-      {hasOwnerAccess ? (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-slate-950 p-6 text-white">
-          <div className="flex items-center gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/20 text-lg text-primary-light">
-              <FiBriefcase />
-            </span>
-            <div>
-              <h2 className="font-black">Business owner tools</h2>
-              <p className="mt-0.5 text-sm text-slate-300">Manage listings, analytics and reviews</p>
-            </div>
-          </div>
-          <Link
-            href="/business-portal"
-            className="inline-flex min-h-10 items-center rounded-xl bg-primary px-5 text-sm font-black text-white"
-          >
-            Open Business Portal â†’
-          </Link>
-        </div>
-      ) : null}
 
       {/* Profile completion */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-black text-slate-950">{t("completionTitle")}</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500">{t("completionDescription")}</p>
-        <Link href="/dashboard/profile" className="mt-4 inline-flex rounded-xl bg-primary px-5 py-3 font-bold text-white">
-          {t("editProfile")}
-        </Link>
-      </div>
+      {!isProfileComplete && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-lg font-black text-slate-950">{t("completionTitle")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-500">{t("completionDescription")}</p>
+          <Link href="/dashboard/profile" className="mt-4 inline-flex rounded-xl bg-primary px-5 py-3 font-bold text-white">
+            {t("editProfile")}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

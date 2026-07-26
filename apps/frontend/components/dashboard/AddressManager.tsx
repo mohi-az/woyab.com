@@ -76,6 +76,8 @@ function normalizeAddress(item: Address): Address {
 export function AddressManager({ initial }: { initial: Address[] }) {
   const locale = useLocale();
   const t = useTranslations("Dashboard.addresses.manager");
+  const mapUnavailableText = t("errors.mapUnavailable");
+  const searchUnavailableText = t("errors.searchUnavailable");
   const [items, setItems] = useState(() => initial.map(normalizeAddress));
   const [editing, setEditing] = useState<Address | null>(null);
   const [draft, setDraft] = useState<DraftAddress>(empty);
@@ -94,6 +96,11 @@ export function AddressManager({ initial }: { initial: Address[] }) {
   const abortRef = useRef<AbortController | null>(null);
   const reverseTimeoutRef = useRef<number | null>(null);
   const skipNextMoveReverseRef = useRef(false);
+  const draftCoordsRef = useRef({ latitude: draft.latitude, longitude: draft.longitude });
+
+  useEffect(() => {
+    draftCoordsRef.current = { latitude: draft.latitude, longitude: draft.longitude };
+  }, [draft.latitude, draft.longitude]);
 
   const reverseGeocode = useCallback(async (latitude: number, longitude: number) => {
     setStatus("resolving");
@@ -150,7 +157,8 @@ export function AddressManager({ initial }: { initial: Address[] }) {
         zoom: 12,
       });
 
-      map.on("movestart", () => {
+      map.on("movestart", (event) => {
+        if (!event.originalEvent) return;
         if (reverseTimeoutRef.current) {
           window.clearTimeout(reverseTimeoutRef.current);
           reverseTimeoutRef.current = null;
@@ -158,9 +166,18 @@ export function AddressManager({ initial }: { initial: Address[] }) {
         setAddressSyncPending(false);
       });
 
-      map.on("moveend", () => {
+      map.on("moveend", (event) => {
+        if (!event.originalEvent) return;
         const center = map.getCenter();
-        setDraft((current) => ({ ...current, latitude: center.lat, longitude: center.lng }));
+        setDraft((current) => {
+          if (
+            Math.abs(current.latitude - center.lat) < 0.000001 &&
+            Math.abs(current.longitude - center.lng) < 0.000001
+          ) {
+            return current;
+          }
+          return { ...current, latitude: center.lat, longitude: center.lng };
+        });
         if (skipNextMoveReverseRef.current) {
           skipNextMoveReverseRef.current = false;
           return;
@@ -184,7 +201,7 @@ export function AddressManager({ initial }: { initial: Address[] }) {
       });
       map.once("remove", () => resizeObserver.disconnect());
     }).catch(() => {
-      if (!cancelled) setError(t("errors.mapUnavailable"));
+      if (!cancelled) setError(mapUnavailableText);
     });
 
     return () => {
@@ -202,7 +219,7 @@ export function AddressManager({ initial }: { initial: Address[] }) {
       skipNextMoveReverseRef.current = false;
       mapRef.current = null;
     };
-  }, [reverseGeocode, setPickedLocation, t]);
+  }, [reverseGeocode, setPickedLocation, mapUnavailableText]);
 
   useEffect(() => {
     if (!mapReady || !mapRef.current || !mapboxRef.current) return;
@@ -277,8 +294,8 @@ export function AddressManager({ initial }: { initial: Address[] }) {
           body: JSON.stringify({
             q: trimmed,
             language: locale,
-            proximityLatitude: draft.latitude,
-            proximityLongitude: draft.longitude,
+            proximityLatitude: draftCoordsRef.current.latitude,
+            proximityLongitude: draftCoordsRef.current.longitude,
           }),
           signal: controller.signal,
         });
@@ -286,14 +303,14 @@ export function AddressManager({ initial }: { initial: Address[] }) {
         const json = (await response.json()) as { data?: Suggestion[] };
         setSuggestions(json.data ?? []);
       } catch (requestError) {
-        if ((requestError as Error).name !== "AbortError") setError(t("errors.searchUnavailable"));
+        if ((requestError as Error).name !== "AbortError") setError(searchUnavailableText);
       } finally {
         if (!controller.signal.aborted) setStatus("idle");
       }
     }, 280);
 
     return () => window.clearTimeout(timer);
-  }, [draft.latitude, draft.longitude, locale, query, t]);
+  }, [locale, query, searchUnavailableText]);
 
   function selectSuggestion(suggestion: Suggestion) {
     setDraft((current) => ({
