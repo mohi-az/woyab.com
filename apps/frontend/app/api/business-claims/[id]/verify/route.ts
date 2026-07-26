@@ -1,7 +1,7 @@
 import { businessClaimVerifySchema, claimVerificationDecision, otpFailureState } from "@fargo/shared";
 import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";
-import { claimOtpBlockMs, claimOtpMatches, claimRetentionDate } from "@/lib/business-claims";
+import { claimOtpBlockMs, claimOtpMatches, claimRetentionDate, sendBusinessClaimApprovedEmail, sendBusinessClaimUnderReviewEmail } from "@/lib/business-claims";
 import { prisma } from "@/lib/prisma";
 
 type Context = { params: Promise<{ id: string }> };
@@ -17,7 +17,7 @@ export async function POST(request: Request, context: Context) {
     where: { id, claimantUserId: userId },
     include: {
       business: {
-        select: { id: true, ownerId: true, email: true, removedAt: true, status: true },
+        select: { id: true, businessName: true, ownerId: true, email: true, removedAt: true, status: true },
       },
     },
   });
@@ -83,6 +83,29 @@ export async function POST(request: Request, context: Context) {
     }
     return { status: "UNDER_REVIEW" as const };
   });
+
+  if (result.status === "APPROVED") {
+    try {
+      await sendBusinessClaimApprovedEmail({
+        to: claim.claimantEmail,
+        businessName: claim.business.businessName,
+        claimantName: claim.claimantName,
+      });
+    } catch {
+      // Email delivery error should not block successful DB transaction
+    }
+  } else if (result.status === "UNDER_REVIEW") {
+    try {
+      await sendBusinessClaimUnderReviewEmail({
+        to: claim.claimantEmail,
+        businessName: claim.business.businessName,
+        claimantName: claim.claimantName,
+        officialBusinessEmail: claim.officialBusinessEmail || claim.claimantEmail,
+      });
+    } catch {
+      // Email delivery error should not block successful DB transaction
+    }
+  }
 
   return NextResponse.json({ success: true, code: result.status === "UNDER_REVIEW" ? "OWNER_REVIEW_REQUIRED" : undefined, data: result });
 }

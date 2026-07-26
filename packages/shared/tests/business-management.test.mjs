@@ -21,10 +21,12 @@ test("claim input normalizes the business email and requires HTTPS evidence", ()
   assert.equal(businessClaimCreateSchema.safeParse({ ...parsed, termsAccepted: false }).success, false);
 });
 
-test("claim matrix only auto-approves an exact non-Gmail email for an unowned business", () => {
+test("claim matrix only auto-approves an exact non-public email for an unowned business", () => {
   assert.equal(claimVerificationDecision({ emailMatchesListing: true, officialBusinessEmail: "owner@example.com", hasOwner: false }), "APPROVED");
   assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "owner@example.com", hasOwner: false }), "UNDER_REVIEW");
   assert.equal(claimVerificationDecision({ emailMatchesListing: true, officialBusinessEmail: "owner@gmail.com", hasOwner: false }), "UNDER_REVIEW");
+  assert.equal(claimVerificationDecision({ emailMatchesListing: true, officialBusinessEmail: "owner@gmx.de", hasOwner: false }), "UNDER_REVIEW");
+  assert.equal(claimVerificationDecision({ emailMatchesListing: true, officialBusinessEmail: "owner@web.de", hasOwner: false }), "UNDER_REVIEW");
   assert.equal(claimVerificationDecision({ emailMatchesListing: true, officialBusinessEmail: "owner@example.com", hasOwner: true }), "UNDER_REVIEW");
 });
 

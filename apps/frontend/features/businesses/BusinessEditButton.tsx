@@ -27,6 +27,8 @@ export function BusinessEditButton({ business, currentUser }: Props) {
   const [pending, setPending] = useState(false);
   const [feedback, setFeedback] = useState("");
 
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   const [selectedField, setSelectedField] = useState<typeof editableFields[number]>("businessName");
 
   useEffect(() => {
@@ -37,12 +39,21 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     return () => window.clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const interval = window.setInterval(() => {
+      setResendCooldown((prev) => (prev > 1 ? prev - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(interval);
+  }, [resendCooldown]);
+
   function close() {
     setOpen(false);
     setRelation(null);
     setClaimId(null);
     setSelectedField("businessName");
     setFeedback("");
+    setResendCooldown(0);
   }
 
   function openOwnershipReport() {
@@ -72,7 +83,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     const result = await response.json().catch(() => null);
     setPending(false);
     if (!response.ok) { setFeedback(result?.code === "BUSINESS_ALREADY_OWNED" ? t("ownerUnavailable") : result?.error || t("errors.submit")); return; }
-    setClaimId(result.data.id); setFeedback(t("claim.codeSent"));
+    setClaimId(result.data.id); setFeedback(t("claim.codeSent")); setResendCooldown(60);
   }
 
   async function verifyClaim(event: React.FormEvent<HTMLFormElement>) {
@@ -89,11 +100,18 @@ export function BusinessEditButton({ business, currentUser }: Props) {
   }
 
   async function resendClaim() {
-    if (!claimId || pending) return;
+    if (!claimId || pending || resendCooldown > 0) return;
     setPending(true); setFeedback("");
     const response = await fetch(`/api/business-claims/${claimId}/resend`, { method: "POST" });
     const result = await response.json().catch(() => null);
-    setPending(false); setFeedback(response.ok ? t("claim.codeSent") : result?.error || t("errors.submit"));
+    setPending(false);
+    if (response.ok) {
+      setFeedback(t("claim.codeSent"));
+      setResendCooldown(60);
+    } else {
+      setFeedback(result?.error || t("errors.submit"));
+      if (result?.code === "OTP_BLOCKED") setResendCooldown(60);
+    }
   }
 
   async function submitSuggestion(event: React.FormEvent<HTMLFormElement>) {
@@ -188,7 +206,9 @@ export function BusinessEditButton({ business, currentUser }: Props) {
           {relation === "OWNER" && currentUser && claimId ? <form onSubmit={verifyClaim} className="mt-6 grid gap-4">
             <Field label={t("claim.code")}><input name="code" required inputMode="numeric" pattern="[0-9]{6}" maxLength={6} className={`${inputClass} text-center text-2xl tracking-[.4em]`} dir="ltr" /></Field>
             <button disabled={pending} className={primaryButton}>{pending ? t("submitting") : t("claim.verify")}</button>
-            <button type="button" disabled={pending} onClick={resendClaim} className="cursor-pointer text-sm font-black text-primary transition hover:text-primary-dark disabled:cursor-not-allowed">{t("claim.resend")}</button>
+            <button type="button" disabled={pending || resendCooldown > 0} onClick={resendClaim} className="cursor-pointer text-sm font-black text-primary transition hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-60">
+              {resendCooldown > 0 ? `${t("claim.resend")} (${resendCooldown}s)` : t("claim.resend")}
+            </button>
           </form> : null}
 
           {relation && relation !== "OWNER" && currentUser ? <form onSubmit={submitSuggestion} className="mt-6 grid gap-4">

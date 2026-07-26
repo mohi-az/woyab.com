@@ -7,6 +7,7 @@ import { appLocales } from "@/i18n/config";
 import { requireAdmin, requireSuperAdmin } from "@/lib/admin-auth";
 import { applyBusinessChangeRequest } from "@/lib/business-change-requests";
 import { ownershipRetentionDate } from "@/lib/business-claims";
+import { renderEmailCard } from "@/lib/email-templates";
 import { sendMail } from "@/lib/mail";
 import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
 import { syncBusinessTags } from "@/lib/business-tags";
@@ -530,11 +531,26 @@ export async function setReviewStatus(formData: FormData) {
 
   await audit(actor.id, "review.status", "Review", reviewId, { status, businessId: review.businessId });
   if (review.user?.email && review.previousStatus !== status && ["APPROVED", "REJECTED"].includes(status)) {
+    const isApproved = status === "APPROVED";
+    const html = renderEmailCard({
+      badgeText: isApproved ? "منتشر شد" : "تایید نشد",
+      badgeBg: isApproved ? "#10b981" : "#ef4444",
+      title: isApproved ? "نظر شما منتشر گردید" : "نتیجه بررسی نظر شما",
+      subtitle: isApproved
+        ? `سلام ${review.user?.name ? `${review.user.name} عزیز` : ""}،<br/>با تشکر از ثبت دیدگاه شما، نظر ارسالی شما برای کسب‌وکار <strong>${review.business.businessName}</strong> پس از بررسی و پایش محتوا تایید و منتشر گردید.`
+        : `سلام ${review.user?.name ? `${review.user.name} عزیز` : ""}،<br/>به اطلاع می‌رسانیم نظر ارسالی شما برای کسب‌وکار <strong>${review.business.businessName}</strong> پس از بررسی، با قوانین و ضوابط انتشار نظرات در فارگو مطابقت نداشت و تایید نگردید.`,
+      details: [
+        { label: "نام کسب‌وکار", value: review.business.businessName },
+        { label: "وضعیت نظر", value: isApproved ? "تایید و منتشر شد" : "تایید نشد" },
+      ],
+      footerNote: "با تشکر از همراهی شما در فارگو،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+    });
+
     await sendMail({
       to: review.user.email,
-      subject: `Your Fargo review was ${status.toLowerCase()}`,
+      subject: `نتیجه بررسی نظر شما برای ${review.business.businessName} | Fargo`,
       text: `Your review for ${review.business.businessName} was ${status.toLowerCase()} after moderation.`,
-      html: `<p>Your review for <strong>${escapeHtml(review.business.businessName)}</strong> was ${status.toLowerCase()} after moderation.</p>`,
+      html,
     }).catch(() => undefined);
   }
   refreshAdmin();
@@ -890,13 +906,28 @@ export async function updateClaimStatus(formData: FormData) {
       claim.claimant?.email || claim.claimantEmail,
       status === "APPROVED" ? claim.business.owner?.email : null,
     ].filter((email, index, items): email is string => Boolean(email) && items.indexOf(email) === index);
-    const safeBusinessName = escapeHtml(claim.business.businessName);
-    const safeDecisionReason = escapeHtml(decisionReason);
+    const isApproved = status === "APPROVED";
+    const claimantName = claim.claimant?.name || claim.claimantName || "";
+    const html = renderEmailCard({
+      badgeText: isApproved ? "تایید شد" : "تایید نشد",
+      badgeBg: isApproved ? "#10b981" : "#ef4444",
+      title: isApproved ? "تایید درخواست مالکیت کسب‌وکار" : "نتیجه بررسی درخواست مالکیت کسب‌وکار",
+      subtitle: isApproved
+        ? `سلام ${claimantName ? `${claimantName} عزیز` : "گرامی"}،<br/>با خوشحالی به اطلاع می‌رسانیم که درخواست مالکیت شما برای کسب‌وکار <strong>${claim.business.businessName}</strong> با موفقیت تایید شد.<br/><br/>اکنون دسترسی کامل پنل مدیریت این کسب‌وکار برای حساب شما فعال شده است.`
+        : `سلام ${claimantName ? `${claimantName} عزیز` : "گرامی"}،<br/>با تشکر از صبر شما، به اطلاع می‌رسانیم که درخواست مالکیت شما برای کسب‌وکار <strong>${claim.business.businessName}</strong> پس از بررسی مورد تایید قرار نگرفت.`,
+      details: [
+        { label: "نام کسب‌وکار", value: claim.business.businessName },
+        { label: "وضعیت درخواست", value: isApproved ? "تایید شده (Approved)" : "تایید نشد (Rejected)" },
+        { label: "توضیح مدیریت", value: decisionReason || (isApproved ? "تایید مدارک و هویت" : "عدم احراز شرایط لازم") },
+      ],
+      footerNote: "با تشکر از همراهی شما،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+    });
+
     await Promise.allSettled(recipients.map((to) => sendMail({
       to,
-      subject: `Fargo ownership decision for ${claim.business.businessName}`,
+      subject: `نتیجه بررسی درخواست مالکیت کسب‌وکار ${claim.business.businessName} | Fargo`,
       text: `The ownership claim for ${claim.business.businessName} is now ${status}. Reason: ${decisionReason || "No additional reason provided."}`,
-      html: `<p>The ownership claim for <strong>${safeBusinessName}</strong> is now <strong>${status}</strong>.</p><p>Reason: ${safeDecisionReason || "No additional reason provided."}</p>`,
+      html,
     })));
   }
   refreshAdmin();
@@ -927,11 +958,27 @@ export async function reviewBusinessChangeRequest(formData: FormData) {
     await audit(actor.id, "business.change_request.reject", "BusinessChangeRequest", id, { decisionReason });
   }
   if (request.submitter?.email) {
+    const isApproved = decision === "APPROVE";
+    const html = renderEmailCard({
+      badgeText: isApproved ? "تایید و اعمال شد" : "تایید نشد",
+      badgeBg: isApproved ? "#10b981" : "#ef4444",
+      title: isApproved ? "پیشنهاد تغییرات شما تایید شد" : "نتیجه بررسی پیشنهاد تغییرات کسب‌وکار",
+      subtitle: isApproved
+        ? `سلام،<br/>با تشکر از مشارکت و همکاری شما در فارگو، پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی توسط تیم فارگو تایید و روی صفحه کسب‌وکار اعمال گردید.`
+        : `سلام،<br/>با تشکر از مشارکت شما، به اطلاع می‌رسانیم که پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی تایید نگردید.`,
+      details: [
+        { label: "نام کسب‌وکار", value: request.business.businessName },
+        { label: "نتیجه بررسی", value: isApproved ? "تایید و اعمال شد" : "تایید نشد" },
+        { label: "توضیح مدیریت", value: decisionReason || (isApproved ? "مطابق اطلاعات معتبر" : "اطلاعات پیشنهادی تایید نشد") },
+      ],
+      footerNote: "با تشکر از همراهی شما در بهبود اطلاعات فارگو،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+    });
+
     await sendMail({
       to: request.submitter.email,
-      subject: `Fargo business change request ${decision === "APPROVE" ? "approved" : "rejected"}`,
-      text: `Your change request for ${request.business.businessName} was ${decision === "APPROVE" ? "approved" : "rejected"}. Reason: ${decisionReason}`,
-      html: `<p>Your change request for <strong>${escapeHtml(request.business.businessName)}</strong> was ${decision === "APPROVE" ? "approved" : "rejected"}.</p><p>Reason: ${escapeHtml(decisionReason)}</p>`,
+      subject: `نتیجه بررسی پیشنهاد تغییرات کسب‌وکار ${request.business.businessName} | Fargo`,
+      text: `Your change request for ${request.business.businessName} was ${isApproved ? "approved" : "rejected"}. Reason: ${decisionReason}`,
+      html,
     }).catch(() => undefined);
   }
   refreshAdmin();

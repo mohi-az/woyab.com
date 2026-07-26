@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHmac, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import { resolve4, resolve6, resolveMx } from "node:dns/promises";
+import { renderEmailCard } from "@/lib/email-templates";
 import { sendMail } from "@/lib/mail";
 
 export const claimOtpMaxAgeMs = 10 * 60_000;
@@ -77,22 +78,92 @@ export async function sendBusinessClaimOtp(input: {
   claimantName: string;
   code: string;
 }) {
-  const warning = "If you are not the owner of this business, ignore this email.";
-  const escapedBusiness = escapeHtml(input.businessName);
-  const escapedClaimant = escapeHtml(input.claimantName);
-  const escapedCode = escapeHtml(input.code);
+  const html = renderEmailCard({
+    badgeText: "کد تایید مالکیت",
+    badgeBg: "#0f172a",
+    title: `کد تایید احراز مالکیت`,
+    subtitle: `سلام ${input.claimantName} عزیز،<br/>جهت ادامه فرآیند احراز مالکیت برای کسب‌وکار <strong>${input.businessName}</strong>، لطفاً کد ۶ رقمی زیر را در سیستم وارد نمایید:`,
+    details: [
+      { label: "کد ۶ رقمی تایید", value: input.code },
+      { label: "مدت اعتبار", value: "۱۰ دقیقه" },
+    ],
+    footerNote: "اگر شما این درخواست را ثبت نکرده‌اید، می‌توانید این ایمیل را نادیده بگیرید.<br/><strong>تیم فارگو (Fargo Team)</strong>",
+  });
 
   await sendMail({
     to: input.to,
-    subject: `Fargo ownership verification for ${input.businessName}`,
+    subject: `کد تایید احراز مالکیت کسب‌وکار ${input.businessName} | Fargo`,
     text: [
-      `Business: ${input.businessName}`,
-      `Requested by: ${input.claimantName}`,
-      `Verification code: ${input.code}`,
-      "This one-time code expires in 10 minutes.",
-      warning,
+      `کسب‌وکار: ${input.businessName}`,
+      `متقاضی: ${input.claimantName}`,
+      `کد تایید ۶ رقمی: ${input.code}`,
+      "این کد تا ۱۰ دقیقه معتبر است.",
     ].join("\n\n"),
-    html: `<h1>Verify business ownership</h1><p><strong>Business:</strong> ${escapedBusiness}</p><p><strong>Requested by:</strong> ${escapedClaimant}</p><p style="font-size:28px;font-weight:800;letter-spacing:6px">${escapedCode}</p><p>This one-time code expires in 10 minutes.</p><p><strong>${warning}</strong></p>`,
+    html,
+  });
+}
+
+export async function sendBusinessClaimUnderReviewEmail(input: {
+  to: string;
+  businessName: string;
+  claimantName: string;
+  officialBusinessEmail: string;
+}) {
+  const html = renderEmailCard({
+    badgeText: "در حال بررسی",
+    badgeBg: "#f59e0b",
+    title: `درخواست مالکیت شما دریافت شد`,
+    subtitle: `سلام ${input.claimantName} عزیز،<br/>از ثبت درخواست شما برای مدیریت کسب‌وکار <strong>${input.businessName}</strong> سپاسگزاریم. ایمیل شما با موفقیت تایید شد و درخواست شما جهت بررسی نهایی به تیم پشتیبانی فارگو ارسال گردید.<br/><br/>اطلاعات ارسالی شما توسط کارشناسان بررسی خواهد شد و نتیجه آن به زودی از طریق همین ایمیل اطلاع‌رسانی می‌گردد.`,
+    details: [
+      { label: "نام کسب‌وکار", value: input.businessName },
+      { label: "نام متقاضی", value: input.claimantName },
+      { label: "ایمیل رسمی ثبت‌شده", value: input.officialBusinessEmail },
+      { label: "وضعیت درخواست", value: "در انتظار بررسی توسط مدیران (Under Review)" },
+    ],
+    footerNote: "با تشکر از صبر و همکاری شما،<br/><strong>تیم پشتیبانی فارگو (Fargo Team)</strong>",
+  });
+
+  await sendMail({
+    to: input.to,
+    subject: `درخواست مالکیت کسب‌وکار ${input.businessName} ثبت شد | Fargo`,
+    text: [
+      `سلام ${input.claimantName} عزیز،`,
+      `از ثبت درخواست شما برای مدیریت کسب‌وکار "${input.businessName}" سپاسگزاریم.`,
+      `ایمیل شما تایید شد و درخواست جهت بررسی نهایی به تیم پشتیبانی فارگو ارسال گردید.`,
+      `نتیجه بررسی به زودی به اطلاع شما خواهد رسید.`,
+      `با تشکر، تیم فارگو`,
+    ].join("\n\n"),
+    html,
+  });
+}
+
+export async function sendBusinessClaimApprovedEmail(input: {
+  to: string;
+  businessName: string;
+  claimantName: string;
+}) {
+  const html = renderEmailCard({
+    badgeText: "تایید شد",
+    badgeBg: "#10b981",
+    title: `تایید درخواست مالکیت کسب‌وکار`,
+    subtitle: `سلام ${input.claimantName} عزیز،<br/>با خوشحالی به اطلاع می‌رسانیم که درخواست مالکیت شما برای کسب‌وکار <strong>${input.businessName}</strong> با موفقیت تایید شد.<br/><br/>اکنون دسترسی کامل پنل مدیریت این کسب‌وکار برای حساب شما فعال شده است.`,
+    details: [
+      { label: "نام کسب‌وکار", value: input.businessName },
+      { label: "نام متقاضی", value: input.claimantName },
+      { label: "وضعیت دسترسی", value: "فعال (Owner Access)" },
+    ],
+    footerNote: "با تشکر از همراهی شما،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+  });
+
+  await sendMail({
+    to: input.to,
+    subject: `مالکیت کسب‌وکار ${input.businessName} تایید شد | Fargo`,
+    text: [
+      `سلام ${input.claimantName} عزیز،`,
+      `درخواست مالکیت شما برای کسب‌وکار "${input.businessName}" تایید شد!`,
+      "اکنون دسترسی مدیریت این صفحه برای شما فعال است.",
+    ].join("\n\n"),
+    html,
   });
 }
 

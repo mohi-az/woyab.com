@@ -1,10 +1,37 @@
+const PUBLIC_EMAIL_DOMAINS = new Set([
+  "gmail.com",
+  "googlemail.com",
+  "yahoo.com",
+  "yahoo.de",
+  "gmx.de",
+  "gmx.net",
+  "gmx.at",
+  "gmx.ch",
+  "web.de",
+  "t-online.de",
+  "freenet.de",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "icloud.com",
+  "me.com",
+  "mac.com",
+  "proton.me",
+  "protonmail.com",
+  "aol.com",
+  "mail.ru",
+  "yandex.ru",
+  "yandex.com",
+  "zoho.com",
+]);
+
 export function claimVerificationDecision(input: {
   emailMatchesListing: boolean;
   officialBusinessEmail: string;
   hasOwner: boolean;
 }) {
   const domain = input.officialBusinessEmail.slice(input.officialBusinessEmail.lastIndexOf("@") + 1).toLowerCase();
-  const publicMailbox = domain === "gmail.com" || domain === "googlemail.com";
+  const publicMailbox = PUBLIC_EMAIL_DOMAINS.has(domain);
   return input.emailMatchesListing && !input.hasOwner && !publicMailbox ? "APPROVED" as const : "UNDER_REVIEW" as const;
 }
 

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AdminSection } from "@/components/admin/AdminPrimitives";
-import { AdminChangeRequestCard } from "@/components/admin/AdminChangeRequestCard";
+import { AdminChangeRequestsGrid } from "@/components/admin/AdminChangeRequestsGrid";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminChangeRequestsPage() {
@@ -24,16 +24,7 @@ export default async function AdminChangeRequestsPage() {
         <p className="admin-muted mt-2 text-[15px] font-medium text-slate-600 dark:text-slate-400">{t("description")}</p>
       </div>
       <AdminSection title={t("list")}>
-        <div className="grid gap-6">
-          {requests.map((request) => (
-            <AdminChangeRequestCard key={request.id} request={request} />
-          ))}
-          {!requests.length ? (
-            <p className="admin-muted rounded-2xl border border-dashed border-slate-300 dark:border-white/10 p-12 text-center text-sm font-semibold text-slate-500 dark:text-slate-400">
-              {t("empty")}
-            </p>
-          ) : null}
-        </div>
+        <AdminChangeRequestsGrid requests={requests} />
       </AdminSection>
     </div>
   );
