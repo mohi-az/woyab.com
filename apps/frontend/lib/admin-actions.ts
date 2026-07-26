@@ -7,7 +7,7 @@ import { appLocales } from "@/i18n/config";
 import { requireAdmin, requireSuperAdmin } from "@/lib/admin-auth";
 import { applyBusinessChangeRequest } from "@/lib/business-change-requests";
 import { ownershipRetentionDate } from "@/lib/business-claims";
-import { renderEmailCard } from "@/lib/email-templates";
+import { buildReviewModerationEmail, renderEmailCard } from "@/lib/email-templates";
 import { sendMail } from "@/lib/mail";
 import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
 import { syncBusinessTags } from "@/lib/business-tags";
@@ -520,37 +520,33 @@ export async function setReviewStatus(formData: FormData) {
       where: { id: reviewId },
       select: {
         status: true,
+        rating: true,
+        title: true,
         user: { select: { email: true, name: true } },
-        business: { select: { businessName: true } },
+        business: { select: { businessName: true, sourceLocale: true } },
       },
     });
     const updated = await tx.review.update({ where: { id: reviewId }, data: { status } });
     await recalculateBusinessRating(tx, updated.businessId);
-    return { ...updated, previousStatus: existing.status, user: existing.user, business: existing.business };
+    return { ...updated, previousStatus: existing.status, user: existing.user, business: existing.business, rating: existing.rating, title: existing.title };
   });
 
   await audit(actor.id, "review.status", "Review", reviewId, { status, businessId: review.businessId });
   if (review.user?.email && review.previousStatus !== status && ["APPROVED", "REJECTED"].includes(status)) {
-    const isApproved = status === "APPROVED";
-    const html = renderEmailCard({
-      badgeText: isApproved ? "منتشر شد" : "تایید نشد",
-      badgeBg: isApproved ? "#10b981" : "#ef4444",
-      title: isApproved ? "نظر شما منتشر گردید" : "نتیجه بررسی نظر شما",
-      subtitle: isApproved
-        ? `سلام ${review.user?.name ? `${review.user.name} عزیز` : ""}،<br/>با تشکر از ثبت دیدگاه شما، نظر ارسالی شما برای کسب‌وکار <strong>${review.business.businessName}</strong> پس از بررسی و پایش محتوا تایید و منتشر گردید.`
-        : `سلام ${review.user?.name ? `${review.user.name} عزیز` : ""}،<br/>به اطلاع می‌رسانیم نظر ارسالی شما برای کسب‌وکار <strong>${review.business.businessName}</strong> پس از بررسی، با قوانین و ضوابط انتشار نظرات در فارگو مطابقت نداشت و تایید نگردید.`,
-      details: [
-        { label: "نام کسب‌وکار", value: review.business.businessName },
-        { label: "وضعیت نظر", value: isApproved ? "تایید و منتشر شد" : "تایید نشد" },
-      ],
-      footerNote: "با تشکر از همراهی شما در فارگو،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+    const emailData = buildReviewModerationEmail({
+      userName: review.user.name,
+      businessName: review.business.businessName,
+      rating: review.rating,
+      reviewTitle: review.title,
+      status: status as "APPROVED" | "REJECTED",
+      locale: review.business.sourceLocale?.toLowerCase() || "fa",
     });
 
     await sendMail({
       to: review.user.email,
-      subject: `نتیجه بررسی نظر شما برای ${review.business.businessName} | Fargo`,
-      text: `Your review for ${review.business.businessName} was ${status.toLowerCase()} after moderation.`,
-      html,
+      subject: emailData.subject,
+      text: emailData.text,
+      html: emailData.html,
     }).catch(() => undefined);
   }
   refreshAdmin();
