@@ -636,6 +636,7 @@ export function AdminBusinessGrid({
                         <input type="hidden" name="featured" value={String(editing?.featured ?? false)} />
                         <FieldShell label={t("fields.owner")}>
                           <AdminSearchSelect
+                            key={`owner-${editing?.id ?? (creating ? "new" : "none")}-${editing?.ownerId ?? "none"}`}
                             name="ownerId"
                             defaultValue={editing?.ownerId ?? ""}
                             allowClear
@@ -650,20 +651,20 @@ export function AdminBusinessGrid({
                       <h3 className="admin-wizard-card-title">{cardTaxonomy}</h3>
                       <div className="grid content-start gap-4">
                         <FieldShell label={t("fields.category")} required error={errors.categoryId}>
-                          <AdminSearchSelect name="categoryId" defaultValue={categoryIdDraft} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {
+                          <AdminSearchSelect key={`category-${editing?.id ?? (creating ? "new" : "none")}-${categoryIdDraft}`} name="categoryId" defaultValue={categoryIdDraft} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {
                             clearError(name);
                             setCategoryIdDraft(value);
                             setSubCategoryIdDraft("");
                           }} />
                         </FieldShell>
                         <FieldShell label={t("fields.subCategory")}>
-                          <AdminSearchSelect key={`subcategory-${categoryIdDraft}`} name="subCategoryId" defaultValue={subCategoryIdDraft} allowClear options={visibleSubCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(_, value) => setSubCategoryIdDraft(value)} />
+                          <AdminSearchSelect key={`subcategory-${editing?.id ?? (creating ? "new" : "none")}-${categoryIdDraft}-${subCategoryIdDraft}`} name="subCategoryId" defaultValue={subCategoryIdDraft} allowClear options={visibleSubCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(_, value) => setSubCategoryIdDraft(value)} />
                         </FieldShell>
                         <FieldShell label={t("fields.specialty")}>
-                          <AdminMultiSelect key={`specialty-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={subCategoryIdDraft && String(editing?.subCategoryId ?? "") === subCategoryIdDraft ? (editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])) : []} options={visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                          <AdminMultiSelect key={`specialty-${editing?.id ?? (creating ? "new" : "none")}-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={subCategoryIdDraft && String(editing?.subCategoryId ?? "") === subCategoryIdDraft ? (editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])) : []} options={visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
                         </FieldShell>
                         <FieldShell label={t("fields.city")} required error={errors.cityId}>
-                          <AdminSearchSelect name="cityId" defaultValue={editing?.cityId ?? editing?.city?.id ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
+                          <AdminSearchSelect key={`city-${editing?.id ?? (creating ? "new" : "none")}-${editing?.cityId ?? defaultCityId}`} name="cityId" defaultValue={editing?.cityId ?? editing?.city?.id ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
                         </FieldShell>
                       </div>
                     </div>

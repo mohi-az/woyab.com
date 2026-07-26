@@ -64,23 +64,29 @@ function numberValue(formData: FormData, key: string) {
 
 async function validateTaxonomySelection(categoryId: number, subCategoryId: number | null, specialtyId: number | null) {
   if (!subCategoryId) {
-    if (specialtyId) throw new Error("Select a subcategory before selecting a specialty.");
-    return;
+    if (specialtyId) throw new Error("لطفاً قبل از انتخاب تخصص، زیردسته‌بندی را انتخاب کنید.");
+    return { subCategoryId: null, specialtyId: null };
   }
 
   const subCategory = await prisma.subCategory.findFirst({
     where: { id: subCategoryId, categoryId, active: true },
     select: { id: true },
   });
-  if (!subCategory) throw new Error("The selected subcategory does not belong to this category.");
+
+  if (!subCategory) {
+    if (!specialtyId) return { subCategoryId: null, specialtyId: null };
+    throw new Error("زیردسته‌بندی انتخاب‌شده با دسته‌بندی اصلی مطابقت ندارد.");
+  }
 
   if (specialtyId) {
     const specialty = await prisma.specialty.findFirst({
       where: { id: specialtyId, subCategoryId, active: true },
       select: { id: true },
     });
-    if (!specialty) throw new Error("The selected specialty does not belong to this subcategory.");
+    if (!specialty) throw new Error("تخصص انتخاب‌شده با این زیردسته‌بندی مطابقت ندارد.");
   }
+
+  return { subCategoryId, specialtyId };
 }
 
 function businessHoursCreateData(formData: FormData) {

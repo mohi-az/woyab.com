@@ -27,11 +27,29 @@ export async function POST(request: Request) {
   if (snapshot.status !== "ACTIVE") return response("BUSINESS_NOT_FOUND", "Business not found.", 404);
   if (parsed.data.submitterRelation === "OWNER" && snapshot.ownerId !== userId) return response("FORBIDDEN", "Only the verified owner can submit owner changes.", 403);
 
-  const active = await prisma.businessChangeRequest.findFirst({
-    where: { businessId: parsed.data.businessId, submitterUserId: userId, kind: parsed.data.kind, status: "PENDING" },
-    select: { id: true },
-  });
-  if (active) return response("CHANGE_REQUEST_ALREADY_ACTIVE", "A pending request of this type already exists.", 409, { id: active.id });
+  if (parsed.data.kind === "DETAILS" && payload && "changes" in payload && Array.isArray((payload as { changes: Array<{ field: string }> }).changes)) {
+    const requestedFields = new Set((payload as { changes: Array<{ field: string }> }).changes.map((c) => c.field));
+    const activeRequests = await prisma.businessChangeRequest.findMany({
+      where: { businessId: parsed.data.businessId, submitterUserId: userId, kind: "DETAILS", status: "PENDING" },
+      select: { id: true, payload: true },
+    });
+    const hasDuplicateField = activeRequests.some((req) => {
+      const p = req.payload as { changes?: Array<{ field: string }> } | null;
+      if (p && Array.isArray(p.changes)) {
+        return p.changes.some((c) => requestedFields.has(c.field));
+      }
+      return false;
+    });
+    if (hasDuplicateField) {
+      return response("CHANGE_REQUEST_ALREADY_ACTIVE", "A pending request for this specific field already exists.", 409);
+    }
+  } else {
+    const active = await prisma.businessChangeRequest.findFirst({
+      where: { businessId: parsed.data.businessId, submitterUserId: userId, kind: parsed.data.kind, status: "PENDING" },
+      select: { id: true },
+    });
+    if (active) return response("CHANGE_REQUEST_ALREADY_ACTIVE", "A pending request of this type already exists.", 409, { id: active.id });
+  }
 
   const created = await prisma.businessChangeRequest.create({
     data: {

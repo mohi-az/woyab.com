@@ -35,8 +35,12 @@ const serviceUpdatePayloadSchema = serviceCreatePayloadSchema.partial().extend({
 const serviceDeactivatePayloadSchema = z.object({ serviceId: z.string().min(1) });
 
 const contactEmailFields = new Set(["email"]);
+const phoneFields = new Set(["phone", "mobile", "whatsapp"]);
 const urlFields = new Set(["website", "instagram", "telegram", "facebook", "youtube", "linkedin"]);
 const integerFields = new Set(["categoryId", "subCategoryId", "specialtyId", "cityId", "districtId", "establishedYear"]);
+
+const phoneRegex = /^\+?[0-9\s\-()]{3,30}$/;
+const postalCodeRegex = /^[a-zA-Z0-9\s\-]{3,15}$/;
 
 export function parseChangePayload(kind: string, payload: unknown) {
   switch (kind) {
@@ -46,8 +50,10 @@ export function parseChangePayload(kind: string, payload: unknown) {
       for (const change of parsed.changes) {
         if (unique.has(change.field)) throw new Error(`Duplicate change field: ${change.field}`);
         unique.add(change.field);
-        if (contactEmailFields.has(change.field) && change.value && !z.email().safeParse(change.value).success) throw new Error("Enter a valid business email.");
-        if (urlFields.has(change.field) && change.value && !z.url().safeParse(change.value).success) throw new Error(`Enter a valid URL for ${change.field}.`);
+        if (contactEmailFields.has(change.field) && change.value && !z.string().email().safeParse(change.value).success) throw new Error("Enter a valid business email.");
+        if (phoneFields.has(change.field) && change.value && !phoneRegex.test(change.value.trim())) throw new Error("Enter a valid phone number.");
+        if (change.field === "postalCode" && change.value && !postalCodeRegex.test(change.value.trim())) throw new Error("Enter a valid postal code.");
+        if (urlFields.has(change.field) && change.value && !z.string().url().safeParse(change.value.startsWith("http") ? change.value : `https://${change.value}`).success) throw new Error(`Enter a valid URL for ${change.field}.`);
         if (integerFields.has(change.field) && change.value && (!Number.isInteger(Number(change.value)) || Number(change.value) <= 0)) throw new Error(`Enter a valid integer for ${change.field}.`);
         if (["categoryId", "cityId"].includes(change.field) && !change.value) throw new Error(`${change.field} is required.`);
         if (change.field === "establishedYear" && change.value && (Number(change.value) < 1800 || Number(change.value) > 2100)) throw new Error("Enter a valid established year.");
@@ -98,7 +104,6 @@ export async function applyBusinessChangeRequest(requestId: string, reviewerId: 
     const business = await tx.business.findUnique({ where: { id: request.businessId }, select: { id: true, updatedAt: true, sourceLocale: true, removedAt: true, categoryId: true, subCategoryId: true, specialtyId: true, cityId: true, districtId: true } });
     if (!business) throw new Error("Business not found.");
     if (business.removedAt) throw new Error("BUSINESS_REMOVED");
-    if (business.updatedAt.getTime() !== request.businessUpdatedAt.getTime()) throw new Error("STALE_CHANGE_REQUEST");
 
     const payload = parseChangePayload(request.kind, request.payload);
     if (request.kind === "DETAILS") {
@@ -183,5 +188,5 @@ export async function applyBusinessChangeRequest(requestId: string, reviewerId: 
     });
     await tx.adminAuditLog.create({ data: { actorId: reviewerId, action: "business.change_request.approve", entityType: "BusinessChangeRequest", entityId: request.id, metadata: { businessId: request.businessId, kind: request.kind } } });
     return request;
-  }, { isolationLevel: "Serializable" });
+  });
 }

@@ -164,6 +164,16 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     googlePlaceId: business.googlePlaceId,
   }));
 
+  const ownerMap = new Map<string, { id: string; name: string | null; email: string | null; role: string }>();
+  for (const user of ownerOptions) {
+    ownerMap.set(user.id, user);
+  }
+  for (const b of businessesRaw) {
+    if (b.ownerId && b.owner && !ownerMap.has(b.ownerId)) {
+      ownerMap.set(b.ownerId, { id: b.ownerId, name: b.owner.name, email: b.owner.email, role: "OWNER" });
+    }
+  }
+
   return (
     <div className="space-y-6">
       <AdminSection title={t("filters.title")}>
@@ -187,7 +197,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
         subCategories={subCategories}
         specialties={specialties}
         cities={cities}
-        ownerOptions={ownerOptions.map((owner) => ({
+        ownerOptions={[...ownerMap.values()].map((owner) => ({
           value: owner.id,
           label: [owner.name, owner.email, owner.role].filter(Boolean).join(" / "),
         }))}

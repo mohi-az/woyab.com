@@ -13,7 +13,7 @@ type Props = { business: BusinessDetailData; currentUser: CurrentUser | null };
 const editableFields = [
   "businessName", "legalName", "shortDescription", "description", "email", "phone", "mobile", "whatsapp", "website",
   "instagram", "telegram", "facebook", "youtube", "linkedin", "address", "postalCode", "categoryId", "subCategoryId",
-  "specialtyId", "cityId", "districtId", "latitude", "longitude", "establishedYear", "priceRange",
+  "specialtyId", "cityId", "districtId", "establishedYear", "priceRange",
 ] as const;
 
 export function BusinessEditButton({ business, currentUser }: Props) {
@@ -27,6 +27,8 @@ export function BusinessEditButton({ business, currentUser }: Props) {
   const [pending, setPending] = useState(false);
   const [feedback, setFeedback] = useState("");
 
+  const [selectedField, setSelectedField] = useState<typeof editableFields[number]>("businessName");
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setMounted(true);
@@ -39,6 +41,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     setOpen(false);
     setRelation(null);
     setClaimId(null);
+    setSelectedField("businessName");
     setFeedback("");
   }
 
@@ -104,28 +107,55 @@ export function BusinessEditButton({ business, currentUser }: Props) {
         businessId: business.id, submitterRelation: relation, kind: "DETAILS",
         payload: { changes: [{ field: form.get("field"), value: form.get("value") }] },
         additionalContext: String(form.get("additionalContext") || "") || undefined,
-        evidenceUrl: normalizeOptionalUrl(form.get("evidenceUrl")),
       }),
     });
     const result = await response.json().catch(() => null);
     setPending(false);
-    setFeedback(response.ok ? t("suggestion.submitted") : result?.error || t("errors.submit"));
-    if (response.ok) event.currentTarget.reset();
+    if (!response.ok) {
+      if (result?.code === "CHANGE_REQUEST_ALREADY_ACTIVE") {
+        setFeedback(t("errors.alreadyActive"));
+      } else if (result?.code === "RATE_LIMITED") {
+        setFeedback(t("errors.rateLimited"));
+      } else if (result?.code === "AUTH_REQUIRED") {
+        setFeedback(t("authRequired"));
+      } else if (typeof result?.error === "string" && result.error.toLowerCase().includes("email")) {
+        setFeedback(t("errors.invalidEmail"));
+      } else if (typeof result?.error === "string" && result.error.toLowerCase().includes("phone")) {
+        setFeedback(t("errors.invalidPhone"));
+      } else if (typeof result?.error === "string" && (result.error.toLowerCase().includes("url") || result.error.toLowerCase().includes("http"))) {
+        setFeedback(t("errors.invalidUrl"));
+      } else if (typeof result?.error === "string" && result.error.toLowerCase().includes("postal")) {
+        setFeedback(t("errors.invalidPostalCode"));
+      } else {
+        setFeedback(t("errors.submit"));
+      }
+      return;
+    }
+    setFeedback(t("suggestion.submitted"));
+    event.currentTarget.reset();
   }
 
   const loginHref = localizePathname(`/login?callbackUrl=${encodeURIComponent(`/businesses/${business.slug}?edit=1`)}`, activeLocale);
   const claimPrivacyHref = localizePathname("/privacy/business-claims", activeLocale);
 
   return <>
-    <button type="button" onClick={() => setOpen(true)} className="mt-6 inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-5 text-sm font-black text-primary transition hover:border-primary/30 hover:bg-primary/10">
-      <FiEdit3 /> {t("button")}
-    </button>
+    <div className="mt-8 border-t border-slate-100 pt-6">
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-5 text-sm font-black text-primary transition hover:border-primary/30 hover:bg-primary/10">
+        <FiEdit3 /> {t("button")}
+      </button>
+    </div>
     {mounted && open ? createPortal(
       <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={t("title")}>
         <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[28px] bg-white p-6 text-slate-900 shadow-2xl sm:p-8">
           <div className="flex items-start justify-between gap-4"><div><h2 className="text-2xl font-black">{t("title")}</h2><p className="mt-2 text-sm leading-6 text-slate-500">{business.title}</p></div><button type="button" onClick={close} className="grid h-10 w-10 cursor-pointer place-items-center rounded-full bg-slate-100 transition hover:bg-slate-200" aria-label={t("close")}><FiX /></button></div>
 
-          {business.hasOwner && !relation ? (
+          {!relation ? <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <RoleButton icon={FiBriefcase} label={t("roles.owner")} onClick={() => setRelation("OWNER")} />
+            <RoleButton icon={FiUsers} label={t("roles.employee")} onClick={() => setRelation("EMPLOYEE")} />
+            <RoleButton icon={FiUser} label={t("roles.customer")} onClick={() => setRelation("CUSTOMER")} />
+          </div> : null}
+
+          {relation === "OWNER" && business.hasOwner ? (
             <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
               <div className="flex items-start gap-3">
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-100 text-xl text-amber-800"><FiAlertCircle /></span>
@@ -140,15 +170,9 @@ export function BusinessEditButton({ business, currentUser }: Props) {
             </div>
           ) : null}
 
-          {!relation ? <div className={`mt-6 grid gap-3 ${business.hasOwner ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
-            {!business.hasOwner ? <RoleButton icon={FiBriefcase} label={t("roles.owner")} onClick={() => setRelation("OWNER")} /> : null}
-            <RoleButton icon={FiUsers} label={t("roles.employee")} onClick={() => setRelation("EMPLOYEE")} />
-            <RoleButton icon={FiUser} label={t("roles.customer")} onClick={() => setRelation("CUSTOMER")} />
-          </div> : null}
-
           {relation && !currentUser ? <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"><p>{t("authRequired")}</p><a href={loginHref} className="mt-4 inline-flex rounded-xl bg-primary px-5 py-3 font-black text-white">{t("signIn")}</a></div> : null}
 
-          {relation === "OWNER" && currentUser && !claimId ? <form onSubmit={submitClaim} className="mt-6 grid gap-4">
+          {relation === "OWNER" && !business.hasOwner && currentUser && !claimId ? <form onSubmit={submitClaim} className="mt-6 grid gap-4">
             <Field label={t("claim.fullName")}><input name="claimantName" required minLength={2} defaultValue={currentUser.name} className={inputClass} /></Field>
             <Field label={t("claim.accountEmail")}><input value={currentUser.email || ""} readOnly className={`${inputClass} bg-slate-100 text-left`} dir="ltr" /></Field>
             <Field label={t("claim.businessEmail")}><input name="officialBusinessEmail" type="email" required defaultValue={business.email || ""} className={`${inputClass} text-left`} dir="ltr" /></Field>
@@ -168,10 +192,36 @@ export function BusinessEditButton({ business, currentUser }: Props) {
           </form> : null}
 
           {relation && relation !== "OWNER" && currentUser ? <form onSubmit={submitSuggestion} className="mt-6 grid gap-4">
-            <Field label={t("suggestion.field")}><select name="field" className={inputClass}>{editableFields.map((field) => <option key={field} value={field}>{t(`fields.${field}`)}</option>)}</select></Field>
-            <Field label={t("suggestion.value")}><textarea name="value" required rows={4} className={inputClass} /></Field>
-            <Field label={t("suggestion.context")}><textarea name="additionalContext" rows={3} className={inputClass} /></Field>
-            <Field label={t("suggestion.evidence")}><input name="evidenceUrl" type="text" inputMode="url" placeholder="example.com" className={`${inputClass} text-left`} dir="ltr" /></Field>
+            <Field label={t("suggestion.field")}>
+              <select name="field" value={selectedField} onChange={(e) => setSelectedField(e.target.value as any)} className={inputClass}>
+                {editableFields.map((field) => <option key={field} value={field}>{t(`fields.${field}`)}</option>)}
+              </select>
+            </Field>
+
+            <Field label={t("suggestion.value")}>
+              {["phone", "mobile", "whatsapp"].includes(selectedField) ? (
+                <input name="value" type="tel" required pattern="[+0-9\s\-()]{3,30}" placeholder="+49 30 1234567" className={`${inputClass} text-left`} dir="ltr" />
+              ) : selectedField === "email" ? (
+                <input name="value" type="email" required placeholder="example@domain.com" className={`${inputClass} text-left`} dir="ltr" />
+              ) : ["website", "instagram", "telegram", "facebook", "youtube", "linkedin"].includes(selectedField) ? (
+                <input name="value" type="text" inputMode="url" required placeholder="https://..." className={`${inputClass} text-left`} dir="ltr" />
+              ) : selectedField === "postalCode" ? (
+                <input name="value" type="text" required pattern="[a-zA-Z0-9\s\-]{3,15}" placeholder="12345" className={`${inputClass} text-left`} dir="ltr" />
+              ) : selectedField === "establishedYear" ? (
+                <input name="value" type="number" required min={1800} max={2100} placeholder="2020" className={`${inputClass} text-left`} dir="ltr" />
+              ) : selectedField === "priceRange" ? (
+                <select name="value" required className={inputClass}>
+                  <option value="BUDGET">{t("priceRanges.BUDGET")}</option>
+                  <option value="MODERATE">{t("priceRanges.MODERATE")}</option>
+                  <option value="EXPENSIVE">{t("priceRanges.EXPENSIVE")}</option>
+                  <option value="LUXURY">{t("priceRanges.LUXURY")}</option>
+                </select>
+              ) : (
+                <textarea name="value" required rows={selectedField === "description" ? 5 : 3} className={inputClass} placeholder={t("suggestion.valuePlaceholder")} />
+              )}
+            </Field>
+
+            <Field label={t("suggestion.context")}><textarea name="additionalContext" rows={3} className={inputClass} placeholder={t("suggestion.contextPlaceholder")} /></Field>
             <button disabled={pending} className={primaryButton}>{pending ? t("submitting") : t("suggestion.submit")}</button>
           </form> : null}
 

@@ -88,8 +88,8 @@ function businessContactData(formData: FormData) {
 
 async function validateBusinessTaxonomy(categoryId: number, subCategoryId: number | null, specialtyIds: number[]) {
   if (!subCategoryId) {
-    if (specialtyIds.length) throw new Error("Select a subcategory before selecting specialties.");
-    return;
+    if (specialtyIds.length) throw new Error("لطفاً قبل از انتخاب تخصص، زیردسته‌بندی را انتخاب کنید.");
+    return { subCategoryId: null, specialtyIds: [], specialtyId: null };
   }
 
   const [subCategory, matchingSpecialties] = await Promise.all([
@@ -98,10 +98,17 @@ async function validateBusinessTaxonomy(categoryId: number, subCategoryId: numbe
       ? prisma.specialty.count({ where: { id: { in: specialtyIds }, subCategoryId } })
       : Promise.resolve(0),
   ]);
-  if (!subCategory) throw new Error("The selected subcategory does not belong to this category.");
-  if (matchingSpecialties !== specialtyIds.length) {
-    throw new Error("One or more selected specialties do not belong to this subcategory.");
+
+  if (!subCategory) {
+    if (!specialtyIds.length) return { subCategoryId: null, specialtyIds: [], specialtyId: null };
+    throw new Error("زیردسته‌بندی انتخاب‌شده با دسته‌بندی اصلی مطابقت ندارد.");
   }
+
+  if (matchingSpecialties !== specialtyIds.length) {
+    throw new Error("یک یا چند تخصص انتخاب‌شده با این زیردسته‌بندی مطابقت ندارند.");
+  }
+
+  return { subCategoryId, specialtyIds, specialtyId: specialtyIds[0] ?? null };
 }
 
 function slugValue(formData: FormData, key: string) {
@@ -333,7 +340,7 @@ export async function updateBusinessDetails(formData: FormData) {
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
   }
-  await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
+  const taxonomy = await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
 
   if (ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
@@ -361,8 +368,8 @@ export async function updateBusinessDetails(formData: FormData) {
         description: source.description,
         legalName: nullableValue(formData, "legalName"),
         categoryId,
-        subCategoryId,
-        specialtyId,
+        subCategoryId: taxonomy.subCategoryId,
+        specialtyId: taxonomy.specialtyId,
         ownerId,
         cityId,
         districtId: intValue(formData, "districtId"),
@@ -427,7 +434,7 @@ export async function createBusinessDetails(formData: FormData) {
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
   }
-  await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
+  const taxonomy = await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
 
   if (ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
@@ -457,8 +464,8 @@ export async function createBusinessDetails(formData: FormData) {
         description: source.description,
         legalName: nullableValue(formData, "legalName"),
         categoryId,
-        subCategoryId,
-        specialtyId,
+        subCategoryId: taxonomy.subCategoryId,
+        specialtyId: taxonomy.specialtyId,
         ownerId,
         cityId,
         districtId: intValue(formData, "districtId"),
