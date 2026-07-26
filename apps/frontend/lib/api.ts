@@ -1,4 +1,5 @@
 import type { AppLocale, BusinessSearchBody, LocationOrigin } from "@fargo/shared";
+import { cache } from "react";
 
 type CategoryApiItem = {
   id: number;
@@ -646,16 +647,24 @@ function localizedText(locale: string, item?: { nameFa: string; nameEn: string }
   return getLocalizedName(locale, item);
 }
 
-export async function fetchBusinessBySlug(
-  locale: string,
-  slug: string,
-): Promise<BusinessDetailData | null> {
-  try {
-    const localizedRes = await fetch(`${API_BASE}/v1/businesses/slug/${encodeURIComponent(slug)}?locale=${encodeURIComponent(locale)}`, {
-      cache: "no-store",
-    });
+export const fetchBusinessBySlug = cache(
+  async (locale: string, slug: string): Promise<BusinessDetailData | null> => {
+    try {
+      let localizedRes: Response | undefined;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          localizedRes = await fetch(
+            `${API_BASE}/v1/businesses/slug/${encodeURIComponent(slug)}?locale=${encodeURIComponent(locale)}`,
+            { cache: "no-store" },
+          );
+          if (localizedRes.ok || localizedRes.status === 404) break;
+        } catch (error) {
+          if (attempt === 1) return null;
+        }
+        if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 300));
+      }
 
-    if (!localizedRes.ok) return null;
+      if (!localizedRes || !localizedRes.ok) return null;
 
     const json = (await localizedRes.json()) as BusinessDetailApiResponse;
     const business = json.data;
@@ -785,7 +794,7 @@ export async function fetchBusinessBySlug(
   } catch {
     return null;
   }
-}
+});
 
 export async function fetchBusinessReviews(businessId: string): Promise<BusinessReviewItem[]> {
   try {
