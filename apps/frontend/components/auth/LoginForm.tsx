@@ -22,10 +22,41 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
     setLoading(true);
     setError("");
     const form = new FormData(event.currentTarget);
+    const email = String(form.get("email") ?? "");
+    const password = String(form.get("password") ?? "");
+
+    // Step 1: Check credentials and whether 2FA is needed
+    const challengeResponse = await fetch("/api/auth/two-factor/challenge", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!challengeResponse.ok) {
+      const result = await challengeResponse.json().catch(() => ({}));
+      if (challengeResponse.status === 429) {
+        setError(t("login.tooManyAttempts"));
+      } else {
+        setError(result.error || t("login.invalidCredentials"));
+      }
+      setLoading(false);
+      return;
+    }
+
+    const data = await challengeResponse.json();
+
+    if (data.twoFactorRequired) {
+      // Step 2: 2FA needed — redirect to verification page
+      window.location.assign(
+        localizePathname(`/verify-2fa?callbackUrl=${encodeURIComponent(callbackUrl)}`, activeLocale),
+      );
+      return;
+    }
+
+    // No 2FA — complete sign-in normally
     const result = await signIn("credentials", {
-      email: form.get("email"),
-      password: form.get("password"),
-      totpCode: form.get("totpCode"),
+      email,
+      password,
       redirect: false,
     });
 
@@ -67,8 +98,16 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
         </Link>
       </div>
 
-      <h1 className="mt-6 text-3xl font-black text-slate-950">{t("login.title")}</h1>
-      <p className="mt-2 text-sm text-slate-500">{t("login.description")}</p>
+      <div className="mt-6 text-center">
+        <h1 className="text-3xl font-black text-slate-950">{t("login.title")}</h1>
+        <p className="mt-2 text-sm font-bold text-slate-950">{t("login.description")}</p>
+        <p className="mt-2 text-xs leading-5 text-slate-500">
+          {t.rich("login.terms", {
+            terms: (chunks) => <a href="/terms" className="text-primary hover:underline">{chunks}</a>,
+            privacy: (chunks) => <a href="/privacy" className="text-primary hover:underline">{chunks}</a>,
+          })}
+        </p>
+      </div>
       {verification === "success" ? <p className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">{t("login.emailVerified")}</p> : null}
       {verification === "invalid" ? <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">{t("login.verificationInvalid")}</p> : null}
 
@@ -91,7 +130,7 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
         <span className="h-px flex-1 bg-slate-200" />
       </div>
 
-      {error ? <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
+      {error ? <p role="alert" className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
 
       <form onSubmit={submit} className="space-y-4">
         <Field name="email" label={t("fields.email")} type="email" autoComplete="email" />
@@ -106,15 +145,6 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
             icon: showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />,
           }}
         />
-        <Field
-          name="totpCode"
-          label={t("fields.adminCode")}
-          inputMode="numeric"
-          pattern="[0-9]{6}"
-          maxLength={6}
-          autoComplete="one-time-code"
-          required={false}
-        />
         <button
           disabled={loading}
           className="h-12 w-full rounded-xl bg-primary font-bold text-white disabled:opacity-60"
@@ -123,24 +153,17 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
         </button>
       </form>
 
-      <Link href="/forgot-password" className="mt-4 block text-center text-sm font-bold text-primary">
-        فراموشی یا تنظیم رمز عبور
-      </Link>
-      <details className="mt-4 rounded-xl border border-slate-200 p-3 text-sm">
-        <summary className="cursor-pointer font-bold text-primary">{t("login.resendVerification")}</summary>
-        <form onSubmit={resendVerification} className="mt-3 flex gap-2">
-          <input required name="verificationEmail" type="email" placeholder={t("fields.email")} className="h-10 min-w-0 flex-1 rounded-lg border px-3 text-left" dir="ltr" />
-          <button className="rounded-lg bg-slate-900 px-3 font-bold text-white">{t("login.resend")}</button>
-        </form>
-        {resendMessage ? <p className="mt-2 text-emerald-700">{resendMessage}</p> : null}
-      </details>
-
-      <p className="mt-6 text-center text-sm text-slate-600">
-        {t("login.noAccount")}{" "}
-        <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary">
-          {t("tabs.register")}
+      <div className="mt-6 flex flex-col items-center gap-4">
+        <Link href="/forgot-password" className="text-sm font-bold text-slate-600 transition hover:text-slate-900">
+          فراموشی یا تنظیم رمز عبور
         </Link>
-      </p>
+        <p className="text-sm text-slate-600">
+          {t("login.noAccount")}{" "}
+          <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary transition hover:text-primary-dark">
+            {t("tabs.register")}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

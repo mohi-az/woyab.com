@@ -128,8 +128,16 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
         </Link>
       </div>
 
-      <h1 className="mt-6 text-3xl font-black text-slate-950">{t("register.title")}</h1>
-      <p className="mt-2 text-sm text-slate-500">{t("register.description")}</p>
+      <div className="mt-6 text-center">
+        <h1 className="text-3xl font-black text-slate-950">{t("register.title")}</h1>
+        <p className="mt-2 text-sm font-bold text-slate-950">{t("login.description")}</p>
+        <p className="mt-2 text-xs leading-5 text-slate-500">
+          {t.rich("login.terms", {
+            terms: (chunks) => <a href="/terms" className="text-primary hover:underline">{chunks}</a>,
+            privacy: (chunks) => <a href="/privacy" className="text-primary hover:underline">{chunks}</a>,
+          })}
+        </p>
+      </div>
 
       <div className="mt-6 space-y-3">
         <button
@@ -241,12 +249,14 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
         </button>
       </form>}
 
-      <p className="mt-6 text-center text-sm text-slate-600">
-        {t("register.haveAccount")}{" "}
-        <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary">
-          {t("tabs.login")}
-        </Link>
-      </p>
+      <div className="mt-8 flex flex-col items-center gap-4">
+        <p className="text-sm text-slate-600">
+          {t("register.haveAccount")}{" "}
+          <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="font-bold text-primary transition hover:text-primary-dark">
+            {t("tabs.login")}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

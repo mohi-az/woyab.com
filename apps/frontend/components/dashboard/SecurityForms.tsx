@@ -2,31 +2,46 @@
 
 import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 
 export function SecurityForms({ hasPassword }: { hasPassword: boolean }) {
   const t = useTranslations("Dashboard.security.form");
   const locale = useLocale();
   const [message, setMessage] = useState("");
-  const [devLink, setDevLink] = useState("");
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const [deleteMessage, setDeleteMessage] = useState("");
   const activeLocale = isAppLocale(locale) ? locale : "de";
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => setCountdown(c => c - 1), 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   async function requestPasswordLink() {
     setLoading(true);
     setMessage("");
-    setDevLink("");
-    const response = await fetch("/api/auth/password-reset/request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
-    const result = await response.json();
-    setMessage(t("resetSent"));
-    if (result.devLink) setDevLink(result.devLink);
-    setLoading(false);
+    try {
+      const response = await fetch("/api/auth/password-reset/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const result = await response.json().catch(() => ({ error: "Server error" }));
+      
+      if (!response.ok) {
+        setMessage(result.error || "خطا در ارسال ایمیل.");
+      } else {
+        setMessage(t("resetSent"));
+        setCountdown(60);
+      }
+    } catch (e) {
+      setMessage("خطا در برقراری ارتباط با سرور.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function deleteAccount(event: React.FormEvent<HTMLFormElement>) {
@@ -48,9 +63,13 @@ export function SecurityForms({ hasPassword }: { hasPassword: boolean }) {
           : t("googleText")}
       </p>
       {message ? <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">{message}</p> : null}
-      {devLink ? <a href={devLink} className="block break-all text-sm font-bold text-primary">{devLink}</a> : null}
-      <button type="button" onClick={requestPasswordLink} disabled={loading} className="rounded-xl bg-primary px-5 py-3 font-bold text-white disabled:opacity-60">
-        {loading ? t("sending") : hasPassword ? t("sendChangeLink") : t("sendCreateLink")}
+      <button type="button" onClick={requestPasswordLink} disabled={loading || countdown > 0} className="rounded-xl bg-primary px-5 py-3 font-bold text-white disabled:opacity-60">
+        {loading 
+          ? t("sending") 
+          : countdown > 0 
+            ? `ارسال مجدد (${countdown}s)` 
+            : hasPassword ? t("sendChangeLink") : t("sendCreateLink")
+        }
       </button>
     </section>
     <form onSubmit={deleteAccount} className="space-y-4 rounded-2xl border border-red-200 bg-red-50 p-6">

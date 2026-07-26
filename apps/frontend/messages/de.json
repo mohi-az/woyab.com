@@ -485,9 +485,22 @@
       "passwordMismatch": "Die Passwörter stimmen nicht überein.",
       "emailExists": "Für diese E-Mail existiert bereits ein Konto."
     },
+    "twoFactor": {
+      "title": "Zwei-Faktor-Authentifizierung",
+      "description": "Geben Sie den 6-stelligen Code ein, der in Ihrer Authenticator-App angezeigt wird.",
+      "codeExpiry": "Code läuft ab in",
+      "codeLabel": "Bestätigungscode",
+      "placeholder": "6-stelliger Code",
+      "submit": "Bestätigen & Anmelden",
+      "submitting": "Bestätigen...",
+      "error": "Der eingegebene Code ist falsch.",
+      "wrongAccount": "Nicht Ihr Konto?",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
     "login": {
       "title": "Bei Fargo anmelden",
-      "description": "Google ist der schnellste Weg. Alternativ konnen Sie sich mit E-Mail und Passwort anmelden.",
+      "description": "Verbinden Sie sich mit großartigen lokalen Unternehmen",
+      "terms": "Indem Sie fortfahren, stimmen Sie den <terms>Nutzungsbedingungen</terms> von Fargo zu und erkennen die <privacy>Datenschutzrichtlinie</privacy> von Fargo an.",
       "submit": "Anmelden",
       "submitting": "Anmeldung lauft...",
       "invalidCredentials": "Anmeldedaten oder Administrator-Code sind nicht korrekt.",
@@ -500,7 +513,6 @@
     },
     "register": {
       "title": "Konto erstellen",
-      "description": "Am einfachsten starten Nutzer mit Google. Wenn Sie mochten, konnen Sie auch ein Passwortkonto anlegen.",
       "submit": "Konto erstellen",
       "submitting": "Konto wird erstellt...",
       "failed": "Die Registrierung konnte nicht abgeschlossen werden.",
@@ -515,8 +527,8 @@
       "fallbackName": "Freund",
       "description": "Verwalten Sie hier Ihre Kontoinformationen und Aktivit?ten.",
       "favorites": "Favoriten",
-      "addresses": "Adressen",
-      "reviews": "Bewertungen",
+      "addresses": "Meine Adressen",
+      "reviews": "Meine Bewertungen",
       "reports": "Meine Meldungen",
       "completionTitle": "Konto vervollst?ndigen",
       "completionDescription": "Erg?nzen Sie Name, Telefonnummer und Profilbild f?r eine pers?nlichere Erfahrung.",

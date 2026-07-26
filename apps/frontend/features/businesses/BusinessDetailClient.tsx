@@ -788,14 +788,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 </div>
               )}
             </section>
-          ) : (
-            <section className="order-5 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
-              <h2 className="text-2xl font-black text-slate-950">{t("contactForm.title")}</h2>
-              <p className="mt-3 rounded-3xl border border-slate-200 bg-slate-50 px-5 py-6 text-sm leading-7 text-slate-600">
-                {t("contactForm.unavailable")}
-              </p>
-            </section>
-          )}
+          ) : null}
 
           {business.attributes.length ? (
             <section className="order-2 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">

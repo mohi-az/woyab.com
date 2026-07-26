@@ -11,7 +11,9 @@ import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 import { requestIp } from "@/lib/rate-limit";
 
 const providers: NextAuthConfig["providers"] = [
+  // Standard credentials provider (email + password, no 2FA code required here)
   Credentials({
+    id: "credentials",
     name: "Email and password",
     credentials: {
       email: { label: "Email", type: "email" },
@@ -31,14 +33,28 @@ const providers: NextAuthConfig["providers"] = [
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user?.passwordHash || !user.active || !user.emailVerified) return null;
       if (!(await compare(parsed.data.password, user.passwordHash))) return null;
+
       const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
-      let twoFactorVerified = !isAdmin;
-      if (isAdmin && user.twoFactorEnabledAt) {
-        const code = typeof credentials.totpCode === "string" ? credentials.totpCode.trim() : "";
-        if (!user.twoFactorSecretEncrypted || !verifyTotp(decryptTwoFactorSecret(user.twoFactorSecretEncrypted), code)) {
-          return null;
+
+      // If 2FA is enabled, deny direct login — must go through challenge → verify flow.
+      // Exception: admins may still pass totpCode directly (backward-compatible legacy path).
+      if (user.twoFactorEnabledAt) {
+        if (isAdmin) {
+          const code = typeof credentials.totpCode === "string" ? credentials.totpCode.trim() : "";
+          if (code && user.twoFactorSecretEncrypted && verifyTotp(decryptTwoFactorSecret(user.twoFactorSecretEncrypted), code)) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              image: user.avatarUrl,
+              role: user.role,
+              authVersion: user.authVersion,
+              twoFactorVerified: true,
+            };
+          }
         }
-        twoFactorVerified = true;
+        // All users with 2FA must use the new challenge flow
+        return null;
       }
 
       return {
@@ -48,7 +64,52 @@ const providers: NextAuthConfig["providers"] = [
         image: user.avatarUrl,
         role: user.role,
         authVersion: user.authVersion,
-        twoFactorVerified,
+        twoFactorVerified: true,
+      };
+    },
+  }),
+
+  // Used after the user successfully verifies their TOTP code via /api/auth/two-factor/verify.
+  // The verify API validates the challenge cookie and TOTP before calling signIn with this provider.
+  Credentials({
+    id: "two-factor-verified",
+    name: "Two-factor verified",
+    credentials: {
+      userId: { label: "User ID", type: "text" },
+      internalSecret: { label: "Internal secret", type: "text" },
+    },
+    authorize: async (credentials) => {
+      const userId = typeof credentials?.userId === "string" ? credentials.userId.trim() : "";
+      const internalSecret = typeof credentials?.internalSecret === "string" ? credentials.internalSecret : "";
+
+      const expectedSecret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "fargo-default-dev-secret-key-for-2fa";
+      if (!internalSecret || !expectedSecret || internalSecret !== expectedSecret) return null;
+      if (!userId) return null;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatarUrl: true,
+          role: true,
+          authVersion: true,
+          active: true,
+          twoFactorEnabledAt: true,
+        },
+      });
+
+      if (!user?.active || !user.twoFactorEnabledAt) return null;
+
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.avatarUrl,
+        role: user.role,
+        authVersion: user.authVersion,
+        twoFactorVerified: true,
       };
     },
   }),

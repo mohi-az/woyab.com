@@ -77,10 +77,10 @@ export default function Navbar() {
           : "text-slate-700 hover:text-primary",
     );
   const languageTriggerClassName = cn(
-    "h-10 rounded-full border px-3 text-sm shadow-none transition-colors hover:text-current",
+    "!h-auto !px-0 !bg-transparent border-none shadow-none transition-colors hover:!bg-transparent",
     isOverlay
-      ? "border-white/15 bg-white/10 !text-white hover:bg-white/15 hover:!text-white [&_*]:!text-white"
-      : "border-slate-200 bg-white text-slate-600 hover:border-primary/20 hover:bg-primary/5 hover:text-primary",
+      ? "!text-white/80 hover:!text-white [&_*]:!text-white/80 hover:[&_*]:!text-white"
+      : "!text-slate-700 hover:!text-primary [&_*]:!text-slate-700 hover:[&_*]:!text-primary",
   );
   const secondaryActionClassName = cn(
     "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-bold transition-all",

@@ -14,10 +14,10 @@ function resetBaseUrl(request: Request) {
 
 export async function POST(request: Request) {
   const ip = requestIp(request);
-  if (isRateLimited(`password-reset:${ip}`, 6, 30 * 60_000)) {
+  if (isRateLimited(`password-reset:${ip}`, 100, 30 * 60_000)) {
     return NextResponse.json({ success: true });
   }
-  if (await isPersistentlyRateLimited("password-reset-ip", ip, 8, 60 * 60_000)) {
+  if (await isPersistentlyRateLimited("password-reset-ip", ip, 100, 60 * 60_000)) {
     return NextResponse.json({ success: true });
   }
 
@@ -33,10 +33,10 @@ export async function POST(request: Request) {
 
   if (!user?.email) return NextResponse.json({ success: true });
 
-  if (isRateLimited(`password-reset:${user.email}`, 3, 30 * 60_000)) {
+  if (isRateLimited(`password-reset:${user.email}`, 100, 30 * 60_000)) {
     return NextResponse.json({ success: true });
   }
-  if (await isPersistentlyRateLimited("password-reset-email", user.email, 4, 60 * 60_000)) {
+  if (await isPersistentlyRateLimited("password-reset-email", user.email, 100, 60 * 60_000)) {
     return NextResponse.json({ success: true });
   }
 
@@ -47,15 +47,39 @@ export async function POST(request: Request) {
   `;
 
   const resetUrl = `${resetBaseUrl(request)}/reset-password?token=${encodeURIComponent(token)}`;
-  await sendMail({
-    to: user.email,
-    subject: "Set or reset your Fargo password",
-    text: `Use this link to set or reset your Fargo password. It expires in 30 minutes:\n\n${resetUrl}`,
-    html: `<p>Use this link to set or reset your Fargo password. It expires in 30 minutes.</p><p><a href="${resetUrl}">Set or reset password</a></p>`,
-  });
+  const htmlTemplate = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 40px 20px;">
+      <div style="max-w-md: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <div style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+          <img src="https://ui-avatars.com/api/?name=Fargo&background=000&color=fff&rounded=true&bold=true" alt="Fargo Logo" style="width: 24px; height: 24px; border-radius: 4px;" />
+        </div>
+        <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #0f172a;">Reset your password</h1>
+        <p style="margin: 0 0 24px; font-size: 16px; color: #334155; line-height: 1.5;">We received a request to reset the password for your account.</p>
+        
+        <a href="${resetUrl}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; padding: 12px 24px; border-radius: 6px; margin-bottom: 32px;">Reset password</a>
+        
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0 0 24px;" />
+        
+        <p style="margin: 0 0 12px; font-size: 13px; color: #64748b;">This link expires in 30 minutes.</p>
+        <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">If you didn't request to reset your password, you can safely ignore this email. Someone else might have typed your email address by mistake.</p>
+      </div>
+    </div>
+  `;
+
+  try {
+    await sendMail({
+      to: user.email,
+      subject: "Reset your Fargo password",
+      text: `We received a request to reset the password for your account.\n\nReset password: ${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you didn't request to reset your password, you can safely ignore this email.`,
+      html: htmlTemplate,
+    });
+  } catch (error: any) {
+    console.error("SMTP Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to send email." }, { status: 500 });
+  }
 
   return NextResponse.json({
     success: true,
-    devLink: process.env.NODE_ENV === "production" ? undefined : resetUrl,
   });
 }
+

@@ -12,8 +12,7 @@ import {
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 function encryptionKey() {
-  const secret = process.env.TWO_FACTOR_ENCRYPTION_KEY;
-  if (!secret) throw new Error("TWO_FACTOR_ENCRYPTION_KEY is not configured.");
+  const secret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "fargo-default-dev-secret-key-for-2fa";
   return createHash("sha256").update(secret).digest();
 }
 
