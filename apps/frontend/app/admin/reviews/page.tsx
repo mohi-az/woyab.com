@@ -73,7 +73,6 @@ export default async function AdminReviewsPage({ searchParams }: PageProps) {
     title: review.title,
     comment: review.comment,
     status: review.status,
-    verified: review.verified,
     createdAt: review.createdAt.toISOString(),
     businessName: review.business.businessName,
     businessSlug: review.business.slug,

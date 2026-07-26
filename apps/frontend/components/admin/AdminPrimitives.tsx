@@ -49,10 +49,10 @@ export function StatCard({ label, value, icon: Icon, tone = "blue" }: {
   );
 }
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
   return (
     <span data-status={status} className="admin-status-badge inline-flex min-h-6 items-center rounded-full px-2.5 text-[11px] font-black uppercase ring-1">
-      {status}
+      {label || status}
     </span>
   );
 }

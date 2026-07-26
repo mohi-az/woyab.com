@@ -894,6 +894,11 @@
       "entity": "موجودیت",
       "metadata": "متادیتا"
     },
+    "statuses": {
+      "PENDING": "در انتظار بررسی",
+      "APPROVED": "منتشر شده",
+      "REJECTED": "رد شده"
+    },
     "actions": {
       "filter": "فیلتر",
       "save": "ذخیره",

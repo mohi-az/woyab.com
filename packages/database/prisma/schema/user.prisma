@@ -1,0 +1,74 @@
+model User {
+  id                       String                  @id @default(cuid())
+  phone                    String?                 @unique
+  email                    String?                 @unique
+  name                     String?
+  avatarUrl                String?
+  role                     UserRole                @default(USER)
+  active                   Boolean                 @default(true)
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+  emailVerified            DateTime?
+  passwordHash             String?
+  passwordChangedAt        DateTime?
+  authVersion              Int                     @default(0)
+  twoFactorSecretEncrypted String?
+  twoFactorEnabledAt       DateTime?
+  emailVerificationTokens  EmailVerificationToken[]
+  adminAuditLogs           AdminAuditLog[]
+  adminSettings            AdminSetting[]
+  businessClaims           BusinessClaim[]         @relation("BusinessClaimClaimant")
+  reviewedBusinessClaims   BusinessClaim[]         @relation("BusinessClaimReviewer")
+  businessChangeRequests   BusinessChangeRequest[] @relation("BusinessChangeRequestSubmitter")
+  reviewedChangeRequests   BusinessChangeRequest[] @relation("BusinessChangeRequestReviewer")
+  businessRemovals         Business[]              @relation("BusinessRemovedBy")
+  businesses               Business[]
+  directoryReports         DirectoryReport[]       @relation("DirectoryReportReporter")
+  resolvedDirectoryReports DirectoryReport[]       @relation("DirectoryReportResolver")
+  favorites                Favorite[]
+  reviewOwnerReplies       ReviewOwnerReply[]
+  reviewHelpfulVotes       ReviewHelpfulVote[]
+  reviews                  Review[]
+  assignedSupportTickets   SupportTicket[]         @relation("SupportTicketAssignee")
+  supportTickets           SupportTicket[]         @relation("SupportTicketUser")
+  supportTicketReplies     SupportTicketReply[]
+  savedLocations           UserSavedLocation[]
+
+  @@map("users")
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("email_verification_tokens")
+}
+
+model SecurityRateLimit {
+  id              String   @id
+  action          String
+  keyHash         String
+  hits            Int      @default(1)
+  windowStartedAt DateTime @default(now())
+  expiresAt       DateTime
+  updatedAt       DateTime @updatedAt
+
+  @@unique([action, keyHash])
+  @@index([expiresAt])
+  @@map("security_rate_limits")
+}
+
+enum UserRole {
+  USER
+  OWNER
+  ADMIN
+  SUPER_ADMIN
+
+  @@map("user_role")
+}

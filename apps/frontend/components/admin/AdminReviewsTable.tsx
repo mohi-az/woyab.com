@@ -4,9 +4,9 @@ import { Button, ConfigProvider, Input, Select, Table } from "antd";
 import type { TableProps } from "antd";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { FiCheckCircle, FiSearch, FiTrash2, FiX } from "react-icons/fi";
-import { deleteReview, setReviewStatus, setReviewVerified } from "@/lib/admin-actions";
+import { useOptimistic, useState, useTransition } from "react";
+import { FiLoader, FiSearch, FiTrash2, FiX } from "react-icons/fi";
+import { deleteReview, setReviewStatus } from "@/lib/admin-actions";
 import { StatusBadge } from "@/components/admin/AdminPrimitives";
 
 const statuses = ["PENDING", "APPROVED", "REJECTED"] as const;
@@ -17,7 +17,6 @@ export type AdminReviewRow = {
   title: string | null;
   comment: string | null;
   status: (typeof statuses)[number];
-  verified: boolean;
   createdAt: string;
   businessName: string;
   businessSlug: string;
@@ -35,7 +34,6 @@ type Props = {
     author?: string;
     status?: string;
     rating?: string;
-    verified?: string;
   };
 };
 
@@ -96,6 +94,15 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [isPending, startTransition] = useTransition();
+  const [pendingReviewId, setPendingReviewId] = useState<string | null>(null);
+
+  const [optimisticReviews, setOptimisticStatus] = useOptimistic(
+    reviews,
+    (current, update: { id: string; status: AdminReviewRow["status"] }) =>
+      current.map((item) => (item.id === update.id ? { ...item, status: update.status } : item))
+  );
+
   function pushParam(param: keyof Props["filters"] | "page", value: string) {
     const query = new URLSearchParams(searchParams.toString());
     if (value) query.set(param, value);
@@ -110,14 +117,13 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
       title: t("fields.review"),
       dataIndex: "comment",
       key: "review",
-      width: "42%",
+      width: "40%",
       filterIcon: () => filterIcon(Boolean(filters.q)),
       filterDropdown: () => <FilterBox param="q" value={filters.q} placeholder={t("filters.search")} onApply={pushParam} />,
       render: (_, review) => (
         <div className="max-w-2xl">
           <div className="flex items-center gap-2">
             <Stars rating={review.rating} />
-            {review.verified ? <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[11px] font-black text-emerald-300">{t("fields.verified")}</span> : null}
           </div>
           {review.title ? <p className="admin-title mt-1 font-black">{review.title}</p> : null}
           <p className="admin-muted mt-1 line-clamp-2 text-sm leading-6">{review.comment || "-"}</p>
@@ -148,9 +154,8 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
     },
     {
       title: t("fields.status"),
-      dataIndex: "status",
       key: "status",
-      width: 130,
+      width: 140,
       filterIcon: () => filterIcon(Boolean(filters.status)),
       filterDropdown: () => (
         <FilterBox
@@ -158,10 +163,13 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
           value={filters.status}
           placeholder={t("filters.allStatuses")}
           onApply={pushParam}
-          options={statuses.map((status) => ({ value: status, label: status }))}
+          options={statuses.map((status) => ({
+            value: status,
+            label: t(`statuses.${status}`),
+          }))}
         />
       ),
-      render: (status) => <StatusBadge status={status} />,
+      render: (_, review) => <StatusBadge status={review.status} label={t(`statuses.${review.status}`)} />,
     },
     {
       title: t("fields.rating"),
@@ -184,40 +192,48 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
       title: t("fields.actions"),
       key: "actions",
       width: 180,
-      render: (_, review) => (
-        <div className="flex items-center gap-2">
-          <form action={setReviewStatus}>
-            <input type="hidden" name="reviewId" value={review.id} />
-            <select
-              name="status"
-              defaultValue={review.status}
-              className="admin-input h-9 w-[112px] rounded-lg px-2 text-xs font-black outline-none focus:border-sky-400"
-              aria-label={t("fields.status")}
-              onChange={(event) => event.currentTarget.form?.requestSubmit()}
-            >
-              {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
-            </select>
-          </form>
-          <form action={setReviewVerified}>
-            <input type="hidden" name="reviewId" value={review.id} />
-            <input type="hidden" name="verified" value={String(!review.verified)} />
-            <button
-              type="submit"
-              className={`admin-icon-button grid h-9 w-9 place-items-center rounded-lg border ${review.verified ? "text-emerald-400" : ""}`}
-              title={review.verified ? t("actions.unverify") : t("actions.verify")}
-              aria-label={review.verified ? t("actions.unverify") : t("actions.verify")}
-            >
-              <FiCheckCircle />
-            </button>
-          </form>
-          <form action={deleteReview}>
-            <input type="hidden" name="reviewId" value={review.id} />
-            <button type="submit" className="admin-icon-button grid h-9 w-9 place-items-center rounded-lg border text-rose-400" title={t("actions.delete")} aria-label={t("actions.delete")}>
-              <FiTrash2 />
-            </button>
-          </form>
-        </div>
-      ),
+      render: (_, review) => {
+        const isRowPending = isPending && pendingReviewId === review.id;
+        return (
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Select
+                value={review.status}
+                disabled={isRowPending}
+                loading={isRowPending}
+                onChange={(nextStatus) => {
+                  setPendingReviewId(review.id);
+                  startTransition(async () => {
+                    setOptimisticStatus({ id: review.id, status: nextStatus });
+                    const formData = new FormData();
+                    formData.append("reviewId", review.id);
+                    formData.append("status", nextStatus);
+                    await setReviewStatus(formData);
+                  });
+                }}
+                options={statuses.map((status) => ({
+                  value: status,
+                  label: t(`statuses.${status}`),
+                }))}
+                className="admin-ant-select w-[140px]"
+                popupClassName="admin-ant-select-dropdown"
+              />
+            </div>
+
+            <form action={deleteReview}>
+              <input type="hidden" name="reviewId" value={review.id} />
+              <button
+                type="submit"
+                className="admin-icon-button grid h-9 w-9 place-items-center rounded-lg border text-rose-400"
+                title={t("actions.delete")}
+                aria-label={t("actions.delete")}
+              >
+                <FiTrash2 />
+              </button>
+            </form>
+          </div>
+        );
+      },
     },
   ];
 
@@ -227,7 +243,7 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
         rowKey="id"
         className="admin-ant-table"
         columns={columns}
-        dataSource={reviews}
+        dataSource={optimisticReviews}
         size="middle"
         pagination={{
           current: page,
@@ -243,3 +259,4 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
     </ConfigProvider>
   );
 }
+

@@ -10,13 +10,13 @@ export const createReviewBodySchema = z.object({
   visitDate: z.string().datetime().optional().transform((v) => (v ? new Date(v) : undefined)),
 });
 
+
 export const updateReviewBodySchema = z.object({
   rating: z.number().int().min(1).max(5).optional(),
   title: z.string().max(200).optional(),
   comment: z.string().max(2000).optional(),
   visitDate: z.string().datetime().optional().transform((v) => (v ? new Date(v) : undefined)),
   status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-  verified: z.boolean().optional(),
 });
 
 export const reviewParamsSchema = z.object({

@@ -43,7 +43,6 @@ export async function PATCH(request: Request, context: RouteContext) {
         title: parsed.data.title || null,
         comment: parsed.data.comment,
         status: "PENDING",
-        verified: false,
         helpfulCount: 0,
       },
     });

@@ -896,6 +896,11 @@
       "entity": "Entity",
       "metadata": "Metadata"
     },
+    "statuses": {
+      "PENDING": "Pending review",
+      "APPROVED": "Published",
+      "REJECTED": "Rejected"
+    },
     "actions": {
       "filter": "Filter",
       "save": "Save",

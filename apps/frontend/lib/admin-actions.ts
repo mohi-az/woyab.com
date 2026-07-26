@@ -533,17 +533,6 @@ export async function setReviewStatus(formData: FormData) {
   refreshAdmin();
 }
 
-export async function setReviewVerified(formData: FormData) {
-  const actor = await requireAdmin();
-  const reviewId = value(formData, "reviewId");
-  const verified = booleanValue(formData, "verified");
-  if (!reviewId) throw new Error("Review is required.");
-
-  await prisma.review.update({ where: { id: reviewId }, data: { verified } });
-  await audit(actor.id, "review.verified", "Review", reviewId, { verified });
-  refreshAdmin();
-}
-
 export async function deleteReview(formData: FormData) {
   const actor = await requireAdmin();
   const reviewId = value(formData, "reviewId");

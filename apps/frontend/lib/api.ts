@@ -364,7 +364,6 @@ export type BusinessReviewItem = {
   createdAt: string;
   visitDate?: string | null;
   helpfulCount: number;
-  verified: boolean;
   status?: "PENDING" | "APPROVED" | "REJECTED";
   user: {
     id: string;
@@ -804,7 +803,6 @@ export async function fetchBusinessReviews(businessId: string): Promise<Business
       createdAt: review.createdAt,
       visitDate: review.visitDate,
       helpfulCount: review.helpfulCount ?? 0,
-      verified: Boolean(review.verified),
       status: review.status,
       user: {
         id: review.user?.id ?? "anonymous",
