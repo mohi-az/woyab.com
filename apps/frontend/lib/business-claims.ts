@@ -114,7 +114,7 @@ export async function sendBusinessClaimUnderReviewEmail(input: {
   const isEn = input.locale?.toLowerCase().startsWith("en");
   const isFa = !isDe && !isEn;
 
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/dashboard/claims`;
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/business-portal`;
 
   let badgeText = "در حال بررسی";
   let title = "درخواست مالکیت شما دریافت شد";
@@ -186,7 +186,7 @@ export async function sendBusinessClaimApprovedEmail(input: {
   const isEn = input.locale?.toLowerCase().startsWith("en");
   const isFa = !isDe && !isEn;
 
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/dashboard/claims`;
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/business-portal`;
 
   let badgeText = "تایید شد";
   let title = "تایید درخواست مالکیت کسب‌وکار";

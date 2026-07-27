@@ -6,17 +6,19 @@ import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
   const [userId, t] = await Promise.all([requireUserId(), getTranslations("Dashboard.overview")]);
-  const [user, favorites, addresses, reviews, businesses] = await Promise.all([
+  const [user, favorites, addresses, reviews, businesses, pendingClaims] = await Promise.all([
     prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true, role: true, avatarUrl: true, phone: true } }),
     prisma.favorite.count({ where: { userId } }),
     prisma.userSavedLocation.count({ where: { userId } }),
     prisma.review.count({ where: { userId } }),
     prisma.business.count({ where: { ownerId: userId } }),
+    prisma.businessClaim.count({ where: { claimantUserId: userId } }),
   ]);
 
   const displayName = user.name || t("fallbackName");
   const hasOwnerAccess =
     businesses > 0 ||
+    pendingClaims > 0 ||
     user.role === "OWNER" ||
     user.role === "ADMIN" ||
     user.role === "SUPER_ADMIN";
@@ -31,6 +33,28 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {hasOwnerAccess && (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shadow-lg">
+          <div className="relative z-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-2xl">
+                <FiBriefcase />
+              </span>
+              <div>
+                <h2 className="text-lg font-black">{t("businessPortalBannerTitle") || "پنل مدیریت کسب‌وکار"}</h2>
+                <p className="mt-1 max-w-md text-sm text-slate-300">{t("businessPortalBannerDescription") || "برای مدیریت کسب‌وکارهای خود یا پیگیری درخواست‌های مالکیت، به پنل اختصاصی کسب‌وکارها مراجعه کنید."}</p>
+              </div>
+            </div>
+            <Link
+              href="/business-portal"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark"
+            >
+              {t("businessPortalBannerButton") || "ورود به پنل کسب‌وکار"}
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Welcome card */}
       <div className="flex items-center gap-4 rounded-[28px] bg-white p-6 shadow-sm border border-slate-200">
         {user.avatarUrl ? (

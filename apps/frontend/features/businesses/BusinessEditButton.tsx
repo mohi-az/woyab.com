@@ -261,7 +261,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
                 {claimResult === "APPROVED" ? t("claimSuccess.approvedDescription") : t("claimSuccess.reviewDescription")}
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link href="/dashboard/claims" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark">
+                <Link href="/business-portal" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark">
                   {t("claimSuccess.viewDashboard")}
                 </Link>
                 <button type="button" onClick={close} className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">

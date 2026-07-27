@@ -3,6 +3,7 @@ import { FiBriefcase, FiBarChart2, FiEdit, FiExternalLink, FiMessageSquare, FiPl
 import { Link } from "@/i18n/navigation";
 import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
+import { ClaimDetailCard } from "@/components/dashboard/ClaimDetailCard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Business Portal | Fargo" };
@@ -31,7 +32,44 @@ export default async function BusinessPortalPage() {
     },
   });
 
-  if (!businesses.length) {
+  const claims = await prisma.businessClaim.findMany({
+    where: { claimantUserId: userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      officialBusinessEmail: true,
+      claimantName: true,
+      verifiedAt: true,
+      reviewedAt: true,
+      decisionReason: true,
+      business: { select: { businessName: true, slug: true } },
+      notes: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          content: true,
+          attachmentUrl: true,
+          attachmentName: true,
+          attachments: true,
+          isAdminNote: true,
+          createdAt: true,
+          author: { select: { name: true, role: true } },
+        },
+      },
+    },
+  });
+
+  const serializedClaims = claims.map((c) => ({
+    ...c,
+    createdAt: c.createdAt.toISOString(),
+    verifiedAt: c.verifiedAt?.toISOString() ?? null,
+    reviewedAt: c.reviewedAt?.toISOString() ?? null,
+    notes: c.notes.map((n) => ({ ...n, createdAt: n.createdAt.toISOString() })),
+  }));
+
+  if (!businesses.length && !claims.length) {
     return (
       <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center shadow-sm">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-2xl text-primary">
@@ -160,6 +198,18 @@ export default async function BusinessPortalPage() {
           );
         })}
       </div>
+
+      {/* Pending Claims Section */}
+      {serializedClaims.length > 0 && (
+        <div className="mt-12 space-y-4">
+          <h2 className="text-xl font-black text-slate-950 mb-4">{t("claimsTitle") || "درخواست‌های مالکیت در جریان"}</h2>
+          <div className="space-y-4">
+            {serializedClaims.map((claim) => (
+              <ClaimDetailCard key={claim.id} claim={claim} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

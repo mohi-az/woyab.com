@@ -19,7 +19,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
     redirect("/login?callbackUrl=/business-portal");
   }
 
-  const [user, businesses, unreadMessages, unansweredReviews] = await Promise.all([
+  const [user, businesses, unreadMessages, unansweredReviews, pendingClaims] = await Promise.all([
     prisma.user.findUniqueOrThrow({
       where: { id: userId },
       select: { name: true, email: true, avatarUrl: true, role: true, _count: { select: { businesses: true } } },
@@ -37,13 +37,17 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
         ownerReply: null,
       },
     }),
+    prisma.businessClaim.count({
+      where: { claimantUserId: userId },
+    }),
   ]);
 
   const hasOwnerAccess =
     user.role === "OWNER" ||
     user.role === "ADMIN" ||
     user.role === "SUPER_ADMIN" ||
-    user._count.businesses > 0;
+    user._count.businesses > 0 ||
+    pendingClaims > 0;
 
   // Regular users with no businesses see an access-denied screen (not a hard redirect)
   if (!hasOwnerAccess) {

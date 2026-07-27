@@ -612,7 +612,10 @@
       "reports": "My reports",
       "completionTitle": "Complete your account",
       "completionDescription": "Add your name, phone number and profile photo for a more personal experience.",
-      "editProfile": "Edit profile"
+      "editProfile": "Edit profile",
+      "businessPortalBannerTitle": "Business Management Portal",
+      "businessPortalBannerDescription": "Visit the dedicated business portal to manage your businesses or track ownership claims.",
+      "businessPortalBannerButton": "Enter Business Portal"
     },
     "sidebar": {
       "fallbackName": "Fargo user",
@@ -628,45 +631,6 @@
       "addBusiness": "Add business",
       "claims": "Ownership claims",
       "security": "Account security"
-    },
-    "claims": {
-      "title": "Ownership Claims",
-      "description": "Track the status of your business ownership claims.",
-      "empty": "You haven't submitted any ownership claims yet.",
-      "viewBusiness": "View business page",
-      "statuses": {
-        "pendingVerification": "Pending email verification",
-        "underReview": "Under review",
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "cancelled": "Cancelled",
-        "expired": "Expired"
-      },
-      "fields": {
-        "claimant": "Applicant",
-        "email": "Official email",
-        "verified": "Email verified",
-        "status": "Status",
-        "reason": "Decision reason"
-      },
-      "notes": {
-        "title": "Messages & correspondence",
-        "admin": "Fargo Team",
-        "you": "You",
-        "empty": "No messages yet.",
-        "placeholder": "Write a message, attach evidence or additional details...",
-        "attachFile": "Attach file",
-        "attachment": "Attachment",
-        "send": "Send",
-        "sending": "Sending..."
-      },
-      "cancel": {
-        "button": "Withdraw claim",
-        "confirm": "Are you sure you want to withdraw this ownership claim? This action cannot be undone.",
-        "yes": "Yes, withdraw",
-        "no": "No, go back",
-        "cancelling": "Withdrawing..."
-      }
     },
     "ownerMessages": {
       "title": "Business messages",
@@ -1242,7 +1206,8 @@
       "totalViews": "Total views",
       "totalReviews": "Total reviews",
       "removedWarning": "This business is hidden from public view.",
-      "removedAction": "Restore"
+      "removedAction": "Restore",
+      "claimsTitle": "Pending Ownership Claims"
     },
     "edit": {
       "title": "Edit business",
@@ -1276,6 +1241,45 @@
         "PENDING": "Waiting for you",
         "RESOLVED": "Resolved",
         "CLOSED": "Closed"
+      }
+    },
+    "claims": {
+      "title": "Ownership Claims",
+      "description": "Track the status of your business ownership claims.",
+      "empty": "You haven't submitted any ownership claims yet.",
+      "viewBusiness": "View business page",
+      "statuses": {
+        "pendingVerification": "Pending email verification",
+        "underReview": "Under review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "expired": "Expired"
+      },
+      "fields": {
+        "claimant": "Applicant",
+        "email": "Official email",
+        "verified": "Email verified",
+        "status": "Status",
+        "reason": "Decision reason"
+      },
+      "notes": {
+        "title": "Messages & correspondence",
+        "admin": "Fargo Team",
+        "you": "You",
+        "empty": "No messages yet.",
+        "placeholder": "Write a message, attach evidence or additional details...",
+        "attachFile": "Attach file",
+        "attachment": "Attachment",
+        "send": "Send",
+        "sending": "Sending..."
+      },
+      "cancel": {
+        "button": "Withdraw claim",
+        "confirm": "Are you sure you want to withdraw this ownership claim? This action cannot be undone.",
+        "yes": "Yes, withdraw",
+        "no": "No, go back",
+        "cancelling": "Withdrawing..."
       }
     }
   },

@@ -1,0 +1,444 @@
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@map("admin_audit_logs")
+}
+
+model AdminSetting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  updatedBy   User?    @relation(fields: [updatedById], references: [id])
+
+  @@index([updatedById])
+  @@map("admin_settings")
+}
+
+model BusinessClaim {
+  id                      String                              @id @default(cuid())
+  businessId              String
+  claimantUserId          String?
+  claimantName            String
+  claimantEmail           String
+  claimantPhone           String?
+  message                 String?
+  officialBusinessEmail   String?
+  officialUrl             String?
+  privacyNoticeVersion    String?
+  privacyNoticeAcceptedAt DateTime?
+  termsVersion            String?
+  termsAcceptedAt         DateTime?
+  otpHash                 String?
+  otpExpiresAt            DateTime?
+  otpAttempts             Int                                 @default(0)
+  otpBlockedUntil         DateTime?
+  otpSentAt               DateTime?
+  otpSendCount            Int                                 @default(0)
+  otpWindowStartedAt      DateTime?
+  verifiedAt              DateTime?
+  verificationMethod      business_claim_verification_method?
+  emailMatchesListing     Boolean                             @default(false)
+  status                  business_claim_status               @default(PENDING_VERIFICATION)
+  reviewedById            String?
+  reviewedAt              DateTime?
+  decisionReason          String?
+  ownershipEndedAt        DateTime?
+  retentionReviewAt       DateTime?
+  legalHoldUntil          DateTime?
+  legalHoldReason         String?
+  anonymizedAt            DateTime?
+  createdAt               DateTime                            @default(now())
+  updatedAt               DateTime                            @default(now()) @updatedAt
+  business                Business                            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  claimant                User?                               @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id], onDelete: SetNull)
+  reviewedBy              User?                               @relation("BusinessClaimReviewer", fields: [reviewedById], references: [id])
+  notes                   ClaimNote[]
+
+  @@index([businessId])
+  @@index([claimantUserId])
+  @@index([status])
+  @@index([retentionReviewAt])
+  @@map("business_claims")
+}
+
+model ClaimNote {
+  id             String        @id @default(cuid())
+  claimId        String
+  authorId       String
+  content        String
+  attachmentUrl  String?
+  attachmentName String?
+  attachments    Json?
+  isAdminNote    Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  claim          BusinessClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  author         User          @relation("ClaimNoteAuthor", fields: [authorId], references: [id])
+
+  @@index([claimId])
+  @@map("claim_notes")
+}
+
+model BusinessChangeRequest {
+  id                String                             @id @default(cuid())
+  businessId        String
+  submitterUserId   String?
+  submitterRelation business_change_submitter_relation
+  kind              business_change_request_kind
+  payloadVersion    Int                                @default(1)
+  payload           Json
+  snapshot          Json
+  businessUpdatedAt DateTime
+  additionalContext String?
+  evidenceUrl       String?
+  status            business_change_request_status     @default(PENDING)
+  reviewedById      String?
+  reviewedAt        DateTime?
+  decisionReason    String?
+  retentionReviewAt DateTime?
+  legalHoldUntil    DateTime?
+  legalHoldReason   String?
+  anonymizedAt      DateTime?
+  createdAt         DateTime                           @default(now())
+  updatedAt         DateTime                           @default(now()) @updatedAt
+  business          Business                           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  submitter         User?                              @relation("BusinessChangeRequestSubmitter", fields: [submitterUserId], references: [id], onDelete: SetNull)
+  reviewedBy        User?                              @relation("BusinessChangeRequestReviewer", fields: [reviewedById], references: [id])
+
+  @@index([businessId, status])
+  @@index([submitterUserId])
+  @@index([reviewedById])
+  @@index([retentionReviewAt])
+  @@map("business_change_requests")
+}
+
+model business_location_hours {
+  id         Int       @id @default(autoincrement())
+  locationId String
+  dayOfWeek  DayOfWeek
+  openTime   String?
+  closeTime  String?
+  isClosed   Boolean   @default(false)
+
+  @@unique([locationId, dayOfWeek])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model business_locations {
+  id              String                    @id
+  businessId      String                    @unique(map: "business_locations_one_primary", where: raw("(\"isPrimary\" = true)"))
+  type            business_location_type
+  legacyBranchId  String?                   @unique
+  name            String?
+  phone           String?
+  mobile          String?
+  address         String?
+  postalCode      String?
+  countryCode     String                    @default("DE")
+  latitude        Float
+  longitude       Float
+  geo_point       Unsupported("geography")? @default(dbgenerated("(st_setsrid(st_makepoint(longitude, latitude), 4326))::geography"))
+  cityId          Int?
+  districtId      Int?
+  provider        location_provider         @default(MANUAL)
+  providerPlaceId String?
+  active          Boolean                   @default(true)
+  isPrimary       Boolean                   @default(false)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @default(now())
+
+  @@index([businessId])
+  @@index([cityId])
+  @@index([districtId])
+}
+
+model BusinessViewDaily {
+  id         String   @id @default(cuid())
+  businessId String
+  day        DateTime
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, day])
+  @@index([day])
+  @@map("business_view_daily")
+}
+
+model BusinessAnalyticsEvent {
+  id         String   @id @default(cuid())
+  businessId String
+  visitorId  String
+  sessionId  String
+  occurredAt DateTime @default(now())
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([occurredAt])
+  @@index([businessId, occurredAt])
+  @@index([visitorId, occurredAt])
+  @@index([sessionId, occurredAt])
+  @@map("business_analytics_events")
+}
+
+model ContactMessage {
+  id            String                       @id @default(cuid())
+  businessId    String
+  name          String
+  email         String
+  phone         String?
+  message       String
+  status        contact_message_status       @default(NEW)
+  emailStatus   contact_message_email_status @default(PENDING)
+  ownerViewedAt DateTime?
+  emailError    String?
+  deliveryMode  String?
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @default(now()) @updatedAt
+  business      Business                     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([emailStatus])
+  @@index([status])
+  @@map("contact_messages")
+}
+
+model DirectoryReport {
+  id             String                  @id @default(cuid())
+  businessId     String?
+  reviewId       String?
+  reporterUserId String?
+  reporterName   String?
+  reporterEmail  String?
+  reasonCode     directory_report_reason @default(OTHER)
+  reason         String
+  message        String?
+  status         directory_report_status @default(OPEN)
+  targetUrl      String?
+  targetSnapshot Json?
+  resolvedById   String?
+  resolvedAt     DateTime?
+  moderatorNote  String?
+  decisionReason String?
+  actionTaken    String?
+  notifiedAt     DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @default(now()) @updatedAt
+  business       Business?               @relation(fields: [businessId], references: [id])
+  reporter       User?                   @relation("DirectoryReportReporter", fields: [reporterUserId], references: [id], onDelete: SetNull)
+  resolvedBy     User?                   @relation("DirectoryReportResolver", fields: [resolvedById], references: [id])
+  review         Review?                 @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([createdAt])
+  @@index([reporterUserId])
+  @@index([reasonCode])
+  @@index([reviewId])
+  @@index([status])
+  @@map("directory_reports")
+}
+
+model Favorite {
+  userId     String
+  businessId String
+  createdAt  DateTime @default(now())
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, businessId])
+  @@index([businessId])
+  @@map("favorites")
+}
+
+model ReviewOwnerReply {
+  id        String   @id @default(cuid())
+  reviewId  String   @unique
+  ownerId   String?
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  owner     User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@map("review_owner_replies")
+}
+
+model SupportTicket {
+  id           String                  @id @default(cuid())
+  userId       String?
+  subject      String
+  message      String
+  status       support_ticket_status   @default(OPEN)
+  priority     support_ticket_priority @default(NORMAL)
+  assignedToId String?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @default(now()) @updatedAt
+  assignedTo   User?                   @relation("SupportTicketAssignee", fields: [assignedToId], references: [id])
+  user         User?                   @relation("SupportTicketUser", fields: [userId], references: [id])
+  replies      SupportTicketReply[]
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([userId])
+  @@map("support_tickets")
+}
+
+model SupportTicketReply {
+  id        String        @id @default(cuid())
+  ticketId  String
+  authorId  String
+  message   String
+  createdAt DateTime      @default(now())
+  author    User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([ticketId, createdAt])
+  @@map("support_ticket_replies")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model UserSavedLocation {
+  id              String              @id @default(cuid())
+  userId          String              @unique(map: "user_saved_locations_one_default", where: raw("(\"isDefault\" = true)"))
+  label           String
+  icon            saved_location_icon @default(OTHER)
+  address         String
+  cityName        String?
+  districtName    String?
+  cityId          Int?
+  districtId      Int?
+  latitude        Float
+  longitude       Float
+  provider        location_provider   @default(MANUAL)
+  providerPlaceId String?
+  isDefault       Boolean             @default(false)
+  sortOrder       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @default(now()) @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, label])
+  @@index([userId])
+  @@map("user_saved_locations")
+}
+
+enum business_claim_status {
+  PENDING_VERIFICATION
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+  SUPERSEDED
+}
+
+enum business_claim_verification_method {
+  EMAIL_OTP
+}
+
+enum business_change_submitter_relation {
+  OWNER
+  EMPLOYEE
+  CUSTOMER
+}
+
+enum business_change_request_kind {
+  DETAILS
+  HOURS
+  ATTRIBUTES
+  TAGS
+  SERVICE_CREATE
+  SERVICE_UPDATE
+  SERVICE_DEACTIVATE
+}
+
+enum business_change_request_status {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum business_location_type {
+  PRIMARY
+  BRANCH
+}
+
+enum contact_message_status {
+  NEW
+  READ
+  ARCHIVED
+}
+
+enum contact_message_email_status {
+  PENDING
+  SENT
+  FAILED
+  NOT_CONFIGURED
+}
+
+enum directory_report_status {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum directory_report_reason {
+  SPAM
+  FAKE_OR_MANIPULATED
+  WRONG_BUSINESS
+  ILLEGAL_CONTENT
+  PERSONAL_DATA
+  HATE_OR_HARASSMENT
+  COPYRIGHT
+  OTHER
+}
+
+enum location_provider {
+  MANUAL
+  MAPBOX
+}
+
+enum saved_location_icon {
+  HOME
+  WORK
+  FAVORITE
+  OTHER
+}
+
+enum support_ticket_priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum support_ticket_status {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}

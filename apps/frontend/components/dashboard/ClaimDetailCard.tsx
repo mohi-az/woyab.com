@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { FiChevronDown, FiChevronUp, FiClock, FiFileText, FiMessageCircle, FiPaperclip, FiSend, FiXCircle, FiShield, FiUser, FiDownload } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiClock, FiFileText, FiPaperclip, FiSend, FiXCircle, FiShield, FiUser, FiDownload } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 
 type ClaimNote = {
@@ -11,7 +11,7 @@ type ClaimNote = {
   content: string;
   attachmentUrl: string | null;
   attachmentName: string | null;
-  attachments?: { url: string; name: string }[] | null | any;
+  attachments?: { url: string; name: string }[] | null;
   isAdminNote: boolean;
   createdAt: string;
   author: { name: string | null; role: string };
@@ -40,7 +40,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
 };
 
 export function ClaimDetailCard({ claim }: { claim: ClaimData }) {
-  const t = useTranslations("Dashboard.claims");
+  const t = useTranslations("BusinessPortal.claims");
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [notes, setNotes] = useState<ClaimNote[]>(claim.notes);
@@ -222,7 +222,7 @@ export function ClaimDetailCard({ claim }: { claim: ClaimData }) {
                       {/* Multiple attachments */}
                       {note.attachments && Array.isArray(note.attachments) && note.attachments.length > 0 && (
                         <div className="mt-3 flex flex-col gap-1.5 border-t border-slate-800/40 pt-2.5">
-                          {note.attachments.map((att: any, idx: number) => (
+                          {note.attachments.map((att: { url: string; name?: string }, idx: number) => (
                             <a
                               key={idx}
                               href={att.url}
