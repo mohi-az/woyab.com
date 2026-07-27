@@ -73,12 +73,29 @@ model BusinessClaim {
   business                Business                            @relation(fields: [businessId], references: [id], onDelete: Cascade)
   claimant                User?                               @relation("BusinessClaimClaimant", fields: [claimantUserId], references: [id], onDelete: SetNull)
   reviewedBy              User?                               @relation("BusinessClaimReviewer", fields: [reviewedById], references: [id])
+  notes                   ClaimNote[]
 
   @@index([businessId])
   @@index([claimantUserId])
   @@index([status])
   @@index([retentionReviewAt])
   @@map("business_claims")
+}
+
+model ClaimNote {
+  id             String        @id @default(cuid())
+  claimId        String
+  authorId       String
+  content        String
+  attachmentUrl  String?
+  attachmentName String?
+  isAdminNote    Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  claim          BusinessClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  author         User          @relation("ClaimNoteAuthor", fields: [authorId], references: [id])
+
+  @@index([claimId])
+  @@map("claim_notes")
 }
 
 model BusinessChangeRequest {

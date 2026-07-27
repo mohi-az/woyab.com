@@ -331,15 +331,21 @@
     "editBusiness": {
       "ownerUnavailable": "Dieses Unternehmen hat bereits einen bestätigten Inhaber und kann nicht übernommen werden.",
       "ownedGuidance": {
-        "title": "Für diesen Eintrag ist bereits ein Inhaberzugang aktiv.",
-        "description": "Der Inhaberzugang kann nicht automatisch übertragen werden. Wenn Sie der rechtmäßige Inhaber sind oder die Inhaberschaft gewechselt hat, melden Sie einen Eigentumskonflikt und wählen Sie „Sonstiges“. Geben Sie Ihre Kontaktdaten und mögliche Nachweise an, damit Fargo den Fall prüfen kann, bevor der Zugang geändert wird.",
-        "action": "Inhaberschaftsproblem melden"
+        "title": "Dieses Unternehmen hat einen verifizierten Inhaber",
+        "description": "Nach der E-Mail-Verifizierung wird Ihr Antrag direkt an das Fargo-Team zur Prüfung weitergeleitet. Bei Bestätigung der neuen Inhaberschaft wird der Zugang des bisherigen Inhabers entzogen.",
+        "action": "Inhaberanspruch einreichen"
       },
       "button": "Änderung vorschlagen", "title": "Unternehmensdaten bearbeiten", "close": "Schließen",
       "roles": { "owner": "Ich bin Inhaber", "employee": "Ich arbeite hier", "customer": "Ich bin Kunde" },
       "authRequired": "Melden Sie sich an oder erstellen Sie ein Konto. Danach kehren Sie zu diesem Unternehmen zurück.",
       "signIn": "Anmelden und fortfahren", "submitting": "Wird gesendet...",
       "claim": { "fullName": "Vollständiger Name", "accountEmail": "Konto-E-Mail", "businessEmail": "Offizielle geschäftliche E-Mail", "officialUrl": "Offizielle Website oder Social-Media-Seite (optional)", "agreement": "Ich stimme den <terms>Nutzungsbedingungen für Unternehmen</terms> zu und bestätige, dass ich den <privacy>Datenschutzhinweis für Unternehmensansprüche</privacy> gelesen habe.", "process": "Wir senden einen sechsstelligen Code an die offizielle Geschäfts-E-Mail; nach der Bestätigung wird der Anspruch genehmigt oder von einem Administrator geprüft.", "sendCode": "Bestätigungscode senden", "code": "Sechsstelliger Bestätigungscode", "verify": "Inhaberschaft bestätigen", "resend": "Neuen Code senden", "codeSent": "Ein Einmalcode wurde ausschließlich an die offizielle Geschäfts-E-Mail gesendet.", "approved": "Die Inhaberschaft wurde bestätigt. Der Inhaberzugang ist aktiv.", "review": "Die E-Mail wurde bestätigt. Der Anspruch wartet auf die Admin-Prüfung." },
+      "claimSuccess": {
+        "title": "Ihr Antrag wurde erfolgreich eingereicht",
+        "approvedDescription": "Ihre Inhaberschaft wurde bestätigt! Sie können Ihre Unternehmensseite jetzt über das Inhaber-Dashboard verwalten.",
+        "reviewDescription": "Ihre E-Mail wurde bestätigt und der Inhaberanspruch wurde zur Prüfung an das Fargo-Team weitergeleitet. Sie werden per E-Mail und Dashboard benachrichtigt.",
+        "viewDashboard": "Im Dashboard ansehen"
+      },
       "suggestion": { "field": "Zu ändernde Information", "value": "Neue oder korrekte Informationen", "valuePlaceholder": "Geben Sie hier die neuen oder korrigierten Angaben ein...", "context": "Zusätzlicher Kontext zur Überprüfung", "contextPlaceholder": "Geben Sie optionale Details oder Quellen an, die bei der Überprüfung helfen...", "evidence": "Beleg-Link (optional)", "submit": "Vorschlag einreichen", "submitted": "Vielen Dank für Ihre Unterstützung! Ihr Änderungsvorschlag wurde erfolgreich eingereicht und wird in Kürze geprüft." },
       "fields": { "businessName": "Unternehmensname", "legalName": "Rechtlicher Name", "shortDescription": "Kurzbeschreibung", "description": "Vollständige Beschreibung", "email": "Geschäftliche E-Mail", "phone": "Telefonnummer", "mobile": "Mobilnummer", "whatsapp": "WhatsApp-Nummer", "website": "Website-URL", "instagram": "Instagram-Seite", "telegram": "Telegram-Kanal / Handle", "facebook": "Facebook-Seite", "youtube": "YouTube-Kanal", "linkedin": "LinkedIn-Seite", "address": "Adresse & Anschrift", "postalCode": "Postleitzahl", "categoryId": "Hauptkategorie", "subCategoryId": "Unterkategorie", "specialtyId": "Spezialisierung / Hauptdienstleistung", "cityId": "Stadt", "districtId": "Stadtteil / Bezirk", "latitude": "Breitengrad auf der Karte", "longitude": "Längengrad auf der Karte", "establishedYear": "Gründungsjahr", "priceRange": "Preisklasse" },
       "priceRanges": { "BUDGET": "Günstig (€)", "MODERATE": "Mittel (€€)", "EXPENSIVE": "Teuer (€€€)", "LUXURY": "Luxuriös (€€€€)" },
@@ -549,7 +555,41 @@
       "ownerMessages": "Unternehmensnachrichten",
       "supportTickets": "Support-Tickets",
       "addBusiness": "Eintrag hinzufugen",
+      "claims": "Inhaberansprüche",
       "security": "Kontosicherheit"
+    },
+    "claims": {
+      "title": "Inhaberansprüche",
+      "description": "Verfolgen Sie den Status Ihrer Inhaberansprüche.",
+      "empty": "Sie haben noch keine Inhaberansprüche eingereicht.",
+      "viewBusiness": "Unternehmensseite ansehen",
+      "statuses": {
+        "pendingVerification": "E-Mail-Bestätigung ausstehend",
+        "underReview": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "cancelled": "Zurückgezogen",
+        "expired": "Abgelaufen"
+      },
+      "fields": { "claimant": "Antragsteller", "email": "Offizielle E-Mail", "verified": "E-Mail bestätigt", "status": "Status", "reason": "Entscheidungsgrund" },
+      "notes": {
+        "title": "Nachrichten & Korrespondenz",
+        "admin": "Fargo-Team",
+        "you": "Sie",
+        "empty": "Noch keine Nachrichten.",
+        "placeholder": "Nachricht, Nachweis oder zusätzliche Angaben schreiben...",
+        "attachFile": "Datei anhängen",
+        "attachment": "Anhang",
+        "send": "Senden",
+        "sending": "Wird gesendet..."
+      },
+      "cancel": {
+        "button": "Anspruch zurückziehen",
+        "confirm": "Sind Sie sicher, dass Sie diesen Inhaberanspruch zurückziehen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "yes": "Ja, zurückziehen",
+        "no": "Nein, zurück",
+        "cancelling": "Wird zurückgezogen..."
+      }
     },
     "ownerMessages": {
       "title": "Unternehmensnachrichten", "description": "Nachrichten an Ihre Unternehmen lesen und verwalten.", "allBusinesses": "Alle Unternehmen", "allStatuses": "Alle Status", "filter": "Filtern", "open": "Nachricht öffnen", "empty": "Keine Nachrichten gefunden.", "selectMessage": "Wählen Sie eine Nachricht aus.", "from": "Von", "contact": "Kontaktdaten", "emailDelivery": "E-Mail-Benachrichtigung", "reply": "Per E-Mail antworten", "archive": "Archivieren", "close": "Schließen",

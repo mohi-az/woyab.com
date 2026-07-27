@@ -331,15 +331,21 @@
     "editBusiness": {
       "ownerUnavailable": "This business already has a verified owner and cannot be claimed.",
       "ownedGuidance": {
-        "title": "This listing already has active owner access.",
-        "description": "Owner access cannot be transferred automatically. If you are the legitimate owner or ownership has changed, report an ownership issue and choose “Other.” Include your contact details and any supporting evidence so Fargo can review the case before changing access.",
-        "action": "Report an ownership issue"
+        "title": "This business has a verified owner",
+        "description": "After email verification, your request will be sent directly to the Fargo team for review. If the new ownership is confirmed, the previous owner's access will be revoked.",
+        "action": "Submit ownership claim"
       },
       "button": "Suggest an edit", "title": "Suggest edit for business details", "close": "Close",
       "roles": { "owner": "I am the owner", "employee": "I work here", "customer": "I am a customer" },
       "authRequired": "Sign in or create an account to continue. You will return to this business after authentication.",
       "signIn": "Sign in to continue", "submitting": "Submitting...",
       "claim": { "fullName": "Full name", "accountEmail": "Account email", "businessEmail": "Official business email", "officialUrl": "Official website or social media (optional)", "agreement": "I agree to the <terms>Business Terms of Use</terms> and acknowledge the <privacy>Business Claim Privacy Notice</privacy>.", "process": "We will email a six-digit code to the official business address; after verification, the claim is approved or sent to an administrator for review.", "sendCode": "Send verification code", "code": "Six-digit verification code", "verify": "Verify ownership", "resend": "Send a new code", "codeSent": "A one-time code was sent only to the official business email.", "approved": "Ownership was verified. Your owner access is now active.", "review": "The email was verified. This claim is awaiting admin review." },
+      "claimSuccess": {
+        "title": "Your request was submitted successfully",
+        "approvedDescription": "Your ownership has been verified! You can now manage your business page through the owner dashboard.",
+        "reviewDescription": "Your email was verified and the ownership request has been sent to the Fargo team for review. You will be notified via email and dashboard.",
+        "viewDashboard": "View in dashboard"
+      },
       "suggestion": { "field": "Information to change", "value": "New or correct information", "valuePlaceholder": "Enter the new or corrected details here...", "context": "Additional context for verification", "contextPlaceholder": "Provide any additional details or sources to help verify this change (optional)...", "evidence": "Supporting link (optional)", "submit": "Submit suggestion", "submitted": "Thank you for your contribution! Your edit suggestion was submitted and will be reviewed shortly." },
       "fields": { "businessName": "Business name", "legalName": "Legal name", "shortDescription": "Short description", "description": "Full description", "email": "Business email", "phone": "Phone number", "mobile": "Mobile number", "whatsapp": "WhatsApp number", "website": "Website URL", "instagram": "Instagram page", "telegram": "Telegram handle / channel", "facebook": "Facebook page", "youtube": "YouTube channel", "linkedin": "LinkedIn page", "address": "Address & location", "postalCode": "Postal code", "categoryId": "Main category", "subCategoryId": "Subcategory", "specialtyId": "Specialty / Core service", "cityId": "City", "districtId": "District / Neighborhood", "latitude": "Latitude on map", "longitude": "Longitude on map", "establishedYear": "Established year", "priceRange": "Price range" },
       "priceRanges": { "BUDGET": "Budget (€)", "MODERATE": "Moderate (€€)", "EXPENSIVE": "Expensive (€€€)", "LUXURY": "Luxury (€€€€)" },
@@ -549,7 +555,41 @@
       "ownerMessages": "Business messages",
       "supportTickets": "Support tickets",
       "addBusiness": "Add business",
+      "claims": "Ownership claims",
       "security": "Account security"
+    },
+    "claims": {
+      "title": "Ownership Claims",
+      "description": "Track the status of your business ownership claims.",
+      "empty": "You haven't submitted any ownership claims yet.",
+      "viewBusiness": "View business page",
+      "statuses": {
+        "pendingVerification": "Pending email verification",
+        "underReview": "Under review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "expired": "Expired"
+      },
+      "fields": { "claimant": "Applicant", "email": "Official email", "verified": "Email verified", "status": "Status", "reason": "Decision reason" },
+      "notes": {
+        "title": "Messages & correspondence",
+        "admin": "Fargo Team",
+        "you": "You",
+        "empty": "No messages yet.",
+        "placeholder": "Write a message, attach evidence or additional details...",
+        "attachFile": "Attach file",
+        "attachment": "Attachment",
+        "send": "Send",
+        "sending": "Sending..."
+      },
+      "cancel": {
+        "button": "Withdraw claim",
+        "confirm": "Are you sure you want to withdraw this ownership claim? This action cannot be undone.",
+        "yes": "Yes, withdraw",
+        "no": "No, go back",
+        "cancelling": "Withdrawing..."
+      }
     },
     "ownerMessages": {
       "title": "Business messages", "description": "Read and manage messages sent to your businesses.", "allBusinesses": "All businesses", "allStatuses": "All statuses", "filter": "Filter", "open": "Open message", "empty": "No messages found.", "selectMessage": "Select a message to read it.", "from": "From", "contact": "Contact details", "emailDelivery": "Email notification", "reply": "Reply by email", "archive": "Archive", "close": "Close",

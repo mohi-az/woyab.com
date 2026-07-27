@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { FiAlertCircle, FiBriefcase, FiGrid, FiHeart, FiLock, FiMapPin, FiShield, FiStar, FiUser } from "react-icons/fi";
+import { FiAlertCircle, FiBriefcase, FiGrid, FiHeart, FiKey, FiLock, FiMapPin, FiShield, FiStar, FiUser } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 import { stripLocalePrefix } from "@/i18n/config";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,7 @@ const links = [
   { href: "/dashboard/favorites", labelKey: "favorites", icon: FiHeart, exact: false },
   { href: "/dashboard/addresses", labelKey: "addresses", icon: FiMapPin, exact: false },
   { href: "/dashboard/reviews", labelKey: "reviews", icon: FiStar, exact: false },
+  { href: "/dashboard/claims", labelKey: "claims", icon: FiKey, exact: false },
   { href: "/dashboard/reports", labelKey: "reports", icon: FiAlertCircle, exact: false },
   { href: "/dashboard/security", labelKey: "security", icon: FiLock, exact: false },
 ] as const;

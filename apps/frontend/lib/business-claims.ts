@@ -108,31 +108,70 @@ export async function sendBusinessClaimUnderReviewEmail(input: {
   businessName: string;
   claimantName: string;
   officialBusinessEmail: string;
+  locale?: string;
 }) {
+  const isDe = input.locale?.toLowerCase().startsWith("de");
+  const isEn = input.locale?.toLowerCase().startsWith("en");
+  const isFa = !isDe && !isEn;
+
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/dashboard/claims`;
+
+  let badgeText = "در حال بررسی";
+  let title = "درخواست مالکیت شما دریافت شد";
+  let subtitle = `سلام ${input.claimantName} عزیز،<br/>از ثبت درخواست شما برای مدیریت کسب‌وکار <strong>${input.businessName}</strong> سپاسگزاریم. ایمیل شما با موفقیت تایید شد و درخواست شما جهت بررسی نهایی به تیم پشتیبانی فارگو ارسال گردید.<br/><br/>اطلاعات ارسالی شما توسط کارشناسان بررسی خواهد شد و نتیجه آن به زودی از طریق همین ایمیل اطلاع‌رسانی می‌گردد.`;
+  let details = [
+    { label: "نام کسب‌وکار", value: input.businessName },
+    { label: "نام متقاضی", value: input.claimantName },
+    { label: "ایمیل رسمی ثبت‌شده", value: input.officialBusinessEmail },
+    { label: "وضعیت درخواست", value: "در انتظار بررسی توسط مدیران (Under Review)" },
+  ];
+  let footerNote = "با تشکر از صبر و همکاری شما،<br/><strong>تیم پشتیبانی فارگو (Fargo Team)</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>این پیام به منظور انجام اقدامات پیش‌قراردادی و بررسی درخواست شما ارسال شده است (مطابق ماده 6(1)(b) قانون GDPR). شما می‌توانید در هر زمان از طریق داشبورد خود از این درخواست انصراف دهید.</small>";
+  let actionBtn = { label: "مشاهده وضعیت در داشبورد", url: dashboardUrl };
+  let subject = `درخواست مالکیت کسب‌وکار ${input.businessName} ثبت شد | Fargo`;
+
+  if (isDe) {
+    badgeText = "In Prüfung";
+    title = "Ihr Inhaberantrag wurde empfangen";
+    subtitle = `Hallo ${input.claimantName},<br/>vielen Dank für Ihren Antrag auf Verwaltung des Unternehmens <strong>${input.businessName}</strong>. Ihre E-Mail wurde erfolgreich verifiziert und Ihr Antrag wurde zur abschließenden Prüfung an das Fargo-Support-Team weitergeleitet.<br/><br/>Ihre Angaben werden von unseren Experten geprüft und das Ergebnis wird Ihnen in Kürze per E-Mail mitgeteilt.`;
+    details = [
+      { label: "Unternehmensname", value: input.businessName },
+      { label: "Antragsteller", value: input.claimantName },
+      { label: "Offizielle E-Mail", value: input.officialBusinessEmail },
+      { label: "Status", value: "In Prüfung durch Moderatoren (Under Review)" },
+    ];
+    footerNote = "Vielen Dank für Ihre Geduld und Zusammenarbeit,<br/><strong>Ihr Fargo Support Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>Diese Nachricht wurde zur Durchführung vorvertraglicher Maßnahmen und zur Prüfung Ihres Antrags gesendet (gemäß Art. 6 Abs. 1 lit. b DSGVO). Sie können Ihren Antrag jederzeit über Ihr Dashboard zurückziehen.</small>";
+    actionBtn = { label: "Status im Dashboard ansehen", url: dashboardUrl };
+    subject = `Inhaberantrag für ${input.businessName} eingereicht | Fargo`;
+  } else if (isEn) {
+    badgeText = "Under Review";
+    title = "Your ownership claim was received";
+    subtitle = `Hello ${input.claimantName},<br/>Thank you for submitting a claim to manage <strong>${input.businessName}</strong>. Your email was successfully verified and your request has been forwarded to the Fargo support team for final review.<br/><br/>Your submitted information will be reviewed by our specialists and you will be notified of the result shortly.`;
+    details = [
+      { label: "Business name", value: input.businessName },
+      { label: "Applicant", value: input.claimantName },
+      { label: "Official email", value: input.officialBusinessEmail },
+      { label: "Status", value: "Awaiting admin review" },
+    ];
+    footerNote = "Thank you for your patience and cooperation,<br/><strong>Fargo Support Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>This message is sent for the performance of pre-contractual measures and to process your request (according to Art. 6(1)(b) GDPR). You can withdraw this request at any time via your dashboard.</small>";
+    actionBtn = { label: "View status in dashboard", url: dashboardUrl };
+    subject = `Ownership claim for ${input.businessName} submitted | Fargo`;
+  }
+
   const html = renderEmailCard({
-    badgeText: "در حال بررسی",
+    badgeText,
     badgeBg: "#f59e0b",
-    title: `درخواست مالکیت شما دریافت شد`,
-    subtitle: `سلام ${input.claimantName} عزیز،<br/>از ثبت درخواست شما برای مدیریت کسب‌وکار <strong>${input.businessName}</strong> سپاسگزاریم. ایمیل شما با موفقیت تایید شد و درخواست شما جهت بررسی نهایی به تیم پشتیبانی فارگو ارسال گردید.<br/><br/>اطلاعات ارسالی شما توسط کارشناسان بررسی خواهد شد و نتیجه آن به زودی از طریق همین ایمیل اطلاع‌رسانی می‌گردد.`,
-    details: [
-      { label: "نام کسب‌وکار", value: input.businessName },
-      { label: "نام متقاضی", value: input.claimantName },
-      { label: "ایمیل رسمی ثبت‌شده", value: input.officialBusinessEmail },
-      { label: "وضعیت درخواست", value: "در انتظار بررسی توسط مدیران (Under Review)" },
-    ],
-    footerNote: "با تشکر از صبر و همکاری شما،<br/><strong>تیم پشتیبانی فارگو (Fargo Team)</strong>",
+    title,
+    subtitle,
+    details,
+    actionButton: actionBtn,
+    footerNote,
+    locale: input.locale || "fa",
   });
 
   await sendMail({
     to: input.to,
-    subject: `درخواست مالکیت کسب‌وکار ${input.businessName} ثبت شد | Fargo`,
-    text: [
-      `سلام ${input.claimantName} عزیز،`,
-      `از ثبت درخواست شما برای مدیریت کسب‌وکار "${input.businessName}" سپاسگزاریم.`,
-      `ایمیل شما تایید شد و درخواست جهت بررسی نهایی به تیم پشتیبانی فارگو ارسال گردید.`,
-      `نتیجه بررسی به زودی به اطلاع شما خواهد رسید.`,
-      `با تشکر، تیم فارگو`,
-    ].join("\n\n"),
+    subject,
+    text: title,
     html,
   });
 }
@@ -141,28 +180,67 @@ export async function sendBusinessClaimApprovedEmail(input: {
   to: string;
   businessName: string;
   claimantName: string;
+  locale?: string;
 }) {
+  const isDe = input.locale?.toLowerCase().startsWith("de");
+  const isEn = input.locale?.toLowerCase().startsWith("en");
+  const isFa = !isDe && !isEn;
+
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/dashboard/claims`;
+
+  let badgeText = "تایید شد";
+  let title = "تایید درخواست مالکیت کسب‌وکار";
+  let subtitle = `سلام ${input.claimantName} عزیز،<br/>با خوشحالی به اطلاع می‌رسانیم که درخواست مالکیت شما برای کسب‌وکار <strong>${input.businessName}</strong> با موفقیت تایید شد.<br/><br/>اکنون دسترسی کامل پنل مدیریت این کسب‌وکار برای حساب شما فعال شده است.`;
+  let details = [
+    { label: "نام کسب‌وکار", value: input.businessName },
+    { label: "نام متقاضی", value: input.claimantName },
+    { label: "وضعیت دسترسی", value: "فعال (Owner Access)" },
+  ];
+  let footerNote = "با تشکر از همراهی شما،<br/><strong>تیم فارگو (Fargo Team)</strong>";
+  let actionBtn = { label: "ورود به داشبورد صاحب کسب‌وکار", url: dashboardUrl };
+  let subject = `مالکیت کسب‌وکار ${input.businessName} تایید شد | Fargo`;
+
+  if (isDe) {
+    badgeText = "Genehmigt";
+    title = "Inhaberantrag genehmigt";
+    subtitle = `Hallo ${input.claimantName},<br/>wir freuen uns Ihnen mitteilen zu können, dass Ihr Inhaberantrag für das Unternehmen <strong>${input.businessName}</strong> erfolgreich genehmigt wurde.<br/><br/>Der volle Zugriff auf das Verwaltungs-Dashboard dieses Unternehmens ist nun für Ihr Konto freigeschaltet.`;
+    details = [
+      { label: "Unternehmensname", value: input.businessName },
+      { label: "Antragsteller", value: input.claimantName },
+      { label: "Zugriffsstatus", value: "Aktiv (Owner Access)" },
+    ];
+    footerNote = "Vielen Dank für Ihre Unterstützung,<br/><strong>Ihr Fargo Team</strong>";
+    actionBtn = { label: "Zum Inhaber-Dashboard", url: dashboardUrl };
+    subject = `Inhaberschaft für ${input.businessName} genehmigt | Fargo`;
+  } else if (isEn) {
+    badgeText = "Approved";
+    title = "Ownership claim approved";
+    subtitle = `Hello ${input.claimantName},<br/>We are happy to inform you that your ownership claim for <strong>${input.businessName}</strong> has been successfully approved.<br/><br/>Full management access to this business is now activated for your account.`;
+    details = [
+      { label: "Business name", value: input.businessName },
+      { label: "Applicant", value: input.claimantName },
+      { label: "Access status", value: "Active (Owner Access)" },
+    ];
+    footerNote = "Thank you for being with us,<br/><strong>Fargo Team</strong>";
+    actionBtn = { label: "Go to owner dashboard", url: dashboardUrl };
+    subject = `Ownership for ${input.businessName} approved | Fargo`;
+  }
+
   const html = renderEmailCard({
-    badgeText: "تایید شد",
+    badgeText,
     badgeBg: "#10b981",
-    title: `تایید درخواست مالکیت کسب‌وکار`,
-    subtitle: `سلام ${input.claimantName} عزیز،<br/>با خوشحالی به اطلاع می‌رسانیم که درخواست مالکیت شما برای کسب‌وکار <strong>${input.businessName}</strong> با موفقیت تایید شد.<br/><br/>اکنون دسترسی کامل پنل مدیریت این کسب‌وکار برای حساب شما فعال شده است.`,
-    details: [
-      { label: "نام کسب‌وکار", value: input.businessName },
-      { label: "نام متقاضی", value: input.claimantName },
-      { label: "وضعیت دسترسی", value: "فعال (Owner Access)" },
-    ],
-    footerNote: "با تشکر از همراهی شما،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+    title,
+    subtitle,
+    details,
+    actionButton: actionBtn,
+    footerNote,
+    locale: input.locale || "fa",
   });
 
   await sendMail({
     to: input.to,
-    subject: `مالکیت کسب‌وکار ${input.businessName} تایید شد | Fargo`,
-    text: [
-      `سلام ${input.claimantName} عزیز،`,
-      `درخواست مالکیت شما برای کسب‌وکار "${input.businessName}" تایید شد!`,
-      "اکنون دسترسی مدیریت این صفحه برای شما فعال است.",
-    ].join("\n\n"),
+    subject,
+    text: title,
     html,
   });
 }

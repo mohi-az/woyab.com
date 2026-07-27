@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   if (!business) return error("BUSINESS_NOT_FOUND", "Business not found.", 404);
   if (business.removedAt) return error("BUSINESS_REMOVED", "This business is not publicly available.", 409);
   if (business.status !== "ACTIVE") return error("BUSINESS_NOT_FOUND", "Business not found.", 404);
-  if (business.ownerId) return error("BUSINESS_ALREADY_OWNED", "This business already has a verified owner.", 409);
+  if (business.ownerId === userId) return error("ALREADY_OWNER", "You already own this business.", 409);
   if (activeClaim) return error("CLAIM_ALREADY_ACTIVE", "You already have an active claim for this business.", 409, { claimId: activeClaim.id, status: activeClaim.status });
 
   let deliverable = false;

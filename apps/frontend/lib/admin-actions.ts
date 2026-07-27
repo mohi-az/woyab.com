@@ -1079,3 +1079,28 @@ export async function updateAdminSetting(formData: FormData) {
   await audit(actor.id, "setting.update", "AdminSetting", key, { value: settingValue });
   refreshAdmin();
 }
+
+export async function addClaimNote(formData: FormData) {
+  const actor = await requireAdmin();
+  const claimId = value(formData, "claimId");
+  const content = value(formData, "content");
+  if (!claimId || !content || content.trim().length < 1) throw new Error("Claim ID and content are required.");
+
+  const claim = await prisma.businessClaim.findUnique({
+    where: { id: claimId },
+    select: { id: true, status: true },
+  });
+  if (!claim) throw new Error("Claim not found.");
+
+  await prisma.claimNote.create({
+    data: {
+      claimId,
+      authorId: actor.id,
+      content: content.trim(),
+      isAdminNote: true,
+    },
+  });
+
+  await audit(actor.id, "claim.note_added", "BusinessClaim", claimId, { contentLength: content.trim().length });
+  refreshAdmin();
+}

@@ -33,6 +33,7 @@ model User {
   supportTickets           SupportTicket[]         @relation("SupportTicketUser")
   supportTicketReplies     SupportTicketReply[]
   savedLocations           UserSavedLocation[]
+  claimNotes               ClaimNote[]             @relation("ClaimNoteAuthor")
 
   @@map("users")
 }

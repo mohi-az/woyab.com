@@ -1,4 +1,5 @@
 import { businessClaimVerifySchema, claimVerificationDecision, otpFailureState } from "@fargo/shared";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";
 import { claimOtpBlockMs, claimOtpMatches, claimRetentionDate, sendBusinessClaimApprovedEmail, sendBusinessClaimUnderReviewEmail } from "@/lib/business-claims";
@@ -13,6 +14,10 @@ export async function POST(request: Request, context: Context) {
   if (!parsed.success) return reply("OTP_INVALID", "Enter a six-digit code.", 400);
   const { id } = await context.params;
   const now = new Date();
+  
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("NEXT_LOCALE")?.value || "fa";
+
   const claim = await prisma.businessClaim.findFirst({
     where: { id, claimantUserId: userId },
     include: {
@@ -25,13 +30,6 @@ export async function POST(request: Request, context: Context) {
   if (claim.status !== "PENDING_VERIFICATION") return reply("CLAIM_NOT_PENDING", "This claim is no longer awaiting a code.", 409, { status: claim.status });
   if (claim.business.removedAt) return reply("BUSINESS_REMOVED", "This business is not publicly available.", 409);
   if (claim.business.status !== "ACTIVE") return reply("BUSINESS_REMOVED", "This business is not publicly available.", 409);
-  if (claim.business.ownerId) {
-    await prisma.businessClaim.updateMany({
-      where: { id, claimantUserId: userId, status: "PENDING_VERIFICATION" },
-      data: { status: "CANCELLED", otpHash: null, otpExpiresAt: null, retentionReviewAt: claimRetentionDate(90) },
-    });
-    return reply("BUSINESS_ALREADY_OWNED", "This business already has a verified owner.", 409);
-  }
   if (claim.otpBlockedUntil && claim.otpBlockedUntil > now) return reply("OTP_BLOCKED", "Too many attempts. Try again after the block ends.", 429, { blockedUntil: claim.otpBlockedUntil });
   if (claim.otpBlockedUntil && claim.otpBlockedUntil <= now) {
     await prisma.businessClaim.updateMany({ where: { id, status: "PENDING_VERIFICATION" }, data: { otpAttempts: 0, otpBlockedUntil: null } });
@@ -90,6 +88,7 @@ export async function POST(request: Request, context: Context) {
         to: claim.claimantEmail,
         businessName: claim.business.businessName,
         claimantName: claim.claimantName,
+        locale,
       });
     } catch {
       // Email delivery error should not block successful DB transaction
@@ -101,6 +100,7 @@ export async function POST(request: Request, context: Context) {
         businessName: claim.business.businessName,
         claimantName: claim.claimantName,
         officialBusinessEmail: claim.officialBusinessEmail || claim.claimantEmail,
+        locale,
       });
     } catch {
       // Email delivery error should not block successful DB transaction

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
-import { FiAlertCircle, FiBriefcase, FiEdit3, FiUser, FiUsers, FiX } from "react-icons/fi";
+import { FiAlertCircle, FiBriefcase, FiCheck, FiEdit3, FiUser, FiUsers, FiX } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
+import { Link } from "@/i18n/navigation";
 import type { BusinessDetailData, CurrentUser } from "@/lib/api";
 
 type Relation = "OWNER" | "EMPLOYEE" | "CUSTOMER";
@@ -28,6 +29,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
   const [feedback, setFeedback] = useState("");
 
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [claimResult, setClaimResult] = useState<"APPROVED" | "UNDER_REVIEW" | null>(null);
 
   const [selectedField, setSelectedField] = useState<typeof editableFields[number]>("businessName");
 
@@ -54,14 +56,10 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     setSelectedField("businessName");
     setFeedback("");
     setResendCooldown(0);
+    setClaimResult(null);
   }
 
-  function openOwnershipReport() {
-    close();
-    window.setTimeout(() => {
-      document.querySelector<HTMLButtonElement>("#business-report-trigger button")?.click();
-    }, 0);
-  }
+
 
   async function submitClaim(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,7 +80,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     });
     const result = await response.json().catch(() => null);
     setPending(false);
-    if (!response.ok) { setFeedback(result?.code === "BUSINESS_ALREADY_OWNED" ? t("ownerUnavailable") : result?.error || t("errors.submit")); return; }
+    if (!response.ok) { setFeedback(result?.code === "ALREADY_OWNER" ? t("ownerUnavailable") : result?.error || t("errors.submit")); return; }
     setClaimId(result.data.id); setFeedback(t("claim.codeSent")); setResendCooldown(60);
   }
 
@@ -95,8 +93,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     const result = await response.json().catch(() => null);
     setPending(false);
     if (!response.ok) { setFeedback(result?.error || t("errors.verify")); return; }
-    setFeedback(result.data.status === "APPROVED" ? t("claim.approved") : t("claim.review"));
-    if (result.data.status === "APPROVED") setClaimId(null);
+    setClaimResult(result.data.status === "APPROVED" ? "APPROVED" : "UNDER_REVIEW");
   }
 
   async function resendClaim() {
@@ -173,24 +170,21 @@ export function BusinessEditButton({ business, currentUser }: Props) {
             <RoleButton icon={FiUser} label={t("roles.customer")} onClick={() => setRelation("CUSTOMER")} />
           </div> : null}
 
-          {relation === "OWNER" && business.hasOwner ? (
-            <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+          {relation === "OWNER" && business.hasOwner && currentUser ? (
+            <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
               <div className="flex items-start gap-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-100 text-xl text-amber-800"><FiAlertCircle /></span>
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-100 text-lg text-amber-700"><FiAlertCircle /></span>
                 <div>
-                  <h3 className="text-lg font-black">{t("ownedGuidance.title")}</h3>
-                  <p className="mt-2 text-sm leading-7 text-amber-900">{t("ownedGuidance.description")}</p>
+                  <h3 className="text-sm font-black text-amber-900">{t("ownedGuidance.title")}</h3>
+                  <p className="mt-1 text-xs leading-5 text-amber-800">{t("ownedGuidance.description")}</p>
                 </div>
               </div>
-              <button type="button" onClick={openOwnershipReport} className="mt-4 inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-amber-900 px-5 text-sm font-black text-white transition hover:bg-amber-950">
-                {t("ownedGuidance.action")}
-              </button>
             </div>
           ) : null}
 
           {relation && !currentUser ? <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"><p>{t("authRequired")}</p><a href={loginHref} className="mt-4 inline-flex rounded-xl bg-primary px-5 py-3 font-black text-white">{t("signIn")}</a></div> : null}
 
-          {relation === "OWNER" && !business.hasOwner && currentUser && !claimId ? <form onSubmit={submitClaim} className="mt-6 grid gap-4">
+          {relation === "OWNER" && currentUser && !claimId ? <form onSubmit={submitClaim} className="mt-6 grid gap-4">
             <Field label={t("claim.fullName")}><input name="claimantName" required minLength={2} defaultValue={currentUser.name} className={inputClass} /></Field>
             <Field label={t("claim.accountEmail")}><input value={currentUser.email || ""} readOnly className={`${inputClass} bg-slate-100 text-left`} dir="ltr" /></Field>
             <Field label={t("claim.businessEmail")}><input name="officialBusinessEmail" type="email" required defaultValue={business.email || ""} className={`${inputClass} text-left`} dir="ltr" /></Field>
@@ -245,7 +239,48 @@ export function BusinessEditButton({ business, currentUser }: Props) {
             <button disabled={pending} className={primaryButton}>{pending ? t("submitting") : t("suggestion.submit")}</button>
           </form> : null}
 
-          {feedback ? <p role="status" className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm font-bold text-slate-700">{feedback}</p> : null}
+          {feedback && !claimResult ? <p role="status" className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm font-bold text-slate-700">{feedback}</p> : null}
+
+          {claimResult ? (
+            <div className="mt-6 flex flex-col items-center py-4 text-center">
+              <div className={`grid h-20 w-20 place-items-center rounded-full ${claimResult === "APPROVED" ? "bg-emerald-100" : "bg-amber-100"}`}>
+                <svg className="claim-success-check h-10 w-10" viewBox="0 0 24 24" fill="none" stroke={claimResult === "APPROVED" ? "#059669" : "#d97706"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" className="claim-check-path" />
+                </svg>
+              </div>
+              <h3 className="mt-5 text-xl font-black text-slate-950">
+                {claimResult === "APPROVED" ? t("claim.approved") : t("claimSuccess.title")}
+              </h3>
+              <p className="mt-3 max-w-sm text-sm leading-7 text-slate-600">
+                {claimResult === "APPROVED" ? t("claimSuccess.approvedDescription") : t("claimSuccess.reviewDescription")}
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link href="/dashboard/claims" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary-dark">
+                  {t("claimSuccess.viewDashboard")}
+                </Link>
+                <button type="button" onClick={close} className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                  {t("close")}
+                </button>
+              </div>
+              <style>{`
+                .claim-check-path {
+                  stroke-dasharray: 30;
+                  stroke-dashoffset: 30;
+                  animation: claim-draw-check 0.5s ease-out 0.2s forwards;
+                }
+                @keyframes claim-draw-check {
+                  to { stroke-dashoffset: 0; }
+                }
+                .claim-success-check {
+                  animation: claim-scale-in 0.3s ease-out;
+                }
+                @keyframes claim-scale-in {
+                  from { transform: scale(0.5); opacity: 0; }
+                  to { transform: scale(1); opacity: 1; }
+                }
+              `}</style>
+            </div>
+          ) : null}
         </div>
       </div>, document.body) : null}
   </>;
