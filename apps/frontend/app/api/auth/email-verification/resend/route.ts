@@ -5,7 +5,10 @@ import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 import { prisma } from "@/lib/prisma";
 import { requestIp } from "@/lib/rate-limit";
 
-const schema = z.object({ email: z.email().transform((value) => value.trim().toLowerCase()) });
+const schema = z.object({
+  email: z.email().transform((value) => value.trim().toLowerCase()),
+  callbackUrl: z.string().optional(),
+});
 
 export async function POST(request: NextRequest) {
   const parsed = schema.safeParse(await request.json().catch(() => null));
@@ -25,6 +28,7 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       email: user.email,
       name: user.name,
+      callbackUrl: parsed.data.callbackUrl,
       request,
     }).catch(() => undefined);
   }

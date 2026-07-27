@@ -90,7 +90,7 @@ export function RegisterForm({ googleEnabled, callbackUrl }: { googleEnabled: bo
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify({ ...values, callbackUrl }),
     });
     const result = await response.json();
 

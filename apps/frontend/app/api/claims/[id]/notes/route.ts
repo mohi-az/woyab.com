@@ -30,6 +30,7 @@ export async function GET(_request: Request, context: Context) {
       content: true,
       attachmentUrl: true,
       attachmentName: true,
+      attachments: true,
       isAdminNote: true,
       createdAt: true,
       author: { select: { name: true, role: true } },
@@ -61,43 +62,62 @@ export async function POST(request: Request, context: Context) {
 
   let attachmentUrl: string | null = null;
   let attachmentName: string | null = null;
-  const file = formData.get("attachment");
+  const files = formData.getAll("attachment");
+  const attachments: { url: string; name: string }[] = [];
 
-  if (file && file instanceof File && file.size > 0) {
-    if (file.size > MAX_FILE_SIZE) {
-      return reply("FILE_TOO_LARGE", "File must be under 5 MB.", 400);
+  for (const file of files) {
+    if (file && file instanceof File && file.size > 0) {
+      if (file.size > MAX_FILE_SIZE) {
+        return reply("FILE_TOO_LARGE", `File ${file.name} exceeds 5 MB limit.`, 400);
+      }
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        return reply("INVALID_FILE_TYPE", `File ${file.name} is not a supported type.`, 400);
+      }
+      const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+      const filename = `${randomUUID()}.${ext}`;
+      await mkdir(UPLOAD_DIR, { recursive: true });
+      const buffer = Buffer.from(await file.arrayBuffer());
+      await writeFile(join(UPLOAD_DIR, filename), buffer);
+      attachments.push({
+        url: `/uploads/claim-notes/${filename}`,
+        name: file.name
+      });
     }
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return reply("INVALID_FILE_TYPE", "Only PDF, JPG, PNG, and WEBP files are allowed.", 400);
-    }
-    const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
-    const filename = `${randomUUID()}.${ext}`;
-    await mkdir(UPLOAD_DIR, { recursive: true });
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(join(UPLOAD_DIR, filename), buffer);
-    attachmentUrl = `/uploads/claim-notes/${filename}`;
-    attachmentName = file.name;
+  }
+  
+  // For backwards compatibility with single-file expectations in legacy clients
+  if (attachments.length > 0) {
+    attachmentUrl = attachments[0].url;
+    attachmentName = attachments[0].name;
   }
 
-  const note = await prisma.claimNote.create({
-    data: {
-      claimId: id,
-      authorId: userId,
-      content: content.trim(),
-      attachmentUrl,
-      attachmentName,
-      isAdminNote: false,
-    },
-    select: {
-      id: true,
-      content: true,
-      attachmentUrl: true,
-      attachmentName: true,
-      isAdminNote: true,
-      createdAt: true,
-      author: { select: { name: true, role: true } },
-    },
-  });
+  let note;
+  try {
+    note = await prisma.claimNote.create({
+      data: {
+        claimId: id,
+        authorId: userId,
+        content: content.trim(),
+        attachmentUrl,
+        attachmentName,
+        attachments: attachments.length > 0 ? attachments : undefined,
+        isAdminNote: false,
+      },
+      select: {
+        id: true,
+        content: true,
+        attachmentUrl: true,
+        attachmentName: true,
+        attachments: true,
+        isAdminNote: true,
+        createdAt: true,
+        author: { select: { name: true, role: true } },
+      },
+    });
+  } catch (error: any) {
+    console.error("Failed to create claim note:", error);
+    return reply("DATABASE_ERROR", error.message || "Failed to save note to database.", 500);
+  }
 
   return NextResponse.json({ success: true, data: note }, { status: 201 });
 }

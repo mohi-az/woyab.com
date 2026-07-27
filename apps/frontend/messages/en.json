@@ -85,9 +85,9 @@
   },
   "Home": {
     "hero": {
-      "eyebrow": "Iranian businesses across Germany",
+      "eyebrow": "Persian-speaking businesses across Germany",
       "title": "Are You Looking<br></br>For A Business?",
-      "description": "Fargo is the directory for discovering Iranian-owned businesses across Germany, from restaurants and pharmacies to lawyers and beauty salons.",
+      "description": "Fargo is the directory for discovering Persian-speaking businesses across Germany, from restaurants and pharmacies to lawyers and beauty salons.",
       "queryPlaceholder": "I'm looking for",
       "categoriesLabel": "Categories",
       "allCategories": "All categories",
@@ -118,7 +118,7 @@
     "citiesSection": {
       "eyebrow": "Explore by location",
       "title": "Find businesses in your city",
-      "description": "Discover Iranian-owned businesses in Germany's most active cities.",
+      "description": "Discover Persian-speaking businesses in Germany's most active cities.",
       "allCitiesTitle": "All supported cities",
       "allCitiesDescription": "See the full city list and browse businesses beyond the featured locations.",
       "listingCount": "{count} listings",
@@ -128,7 +128,7 @@
     },
     "categoriesSection": {
       "title": "Most Popular Categories",
-      "description": "Browse Iranian-owned businesses in Germany by category",
+      "description": "Browse Persian-speaking businesses in Germany by category",
       "items": {
         "restaurantCafe": "Restaurant and cafe",
         "healthBeauty": "Health and beauty",
@@ -162,7 +162,8 @@
     "resultCountTemplate": "{count} businesses found",
     "showing": "Showing {from}-{to}",
     "loading": "Updating results",
-    "error": "Results could not be updated. Please try again.",
+    "error": "Failed to fetch results. Please try again.",
+    "retry": "Try again",
     "filters": {
       "title": "Filters",
       "search": "Business name",
@@ -174,9 +175,9 @@
       "city": "City",
       "allCities": "All cities",
       "location": "Location",
-        "reset": "Reset",
-        "favoritesOnly": "Show only my favorites",
-        "openNow": "Open now"
+      "reset": "Reset",
+      "favoritesOnly": "Show only my favorites",
+      "openNow": "Open now"
     },
     "sort": {
       "label": "Sort by:",
@@ -335,21 +336,91 @@
         "description": "After email verification, your request will be sent directly to the Fargo team for review. If the new ownership is confirmed, the previous owner's access will be revoked.",
         "action": "Submit ownership claim"
       },
-      "button": "Suggest an edit", "title": "Suggest edit for business details", "close": "Close",
-      "roles": { "owner": "I am the owner", "employee": "I work here", "customer": "I am a customer" },
+      "button": "Suggest an edit",
+      "title": "Suggest edit for business details",
+      "close": "Close",
+      "roles": {
+        "owner": "I am the owner",
+        "employee": "I work here",
+        "customer": "I am a customer"
+      },
       "authRequired": "Sign in or create an account to continue. You will return to this business after authentication.",
-      "signIn": "Sign in to continue", "submitting": "Submitting...",
-      "claim": { "fullName": "Full name", "accountEmail": "Account email", "businessEmail": "Official business email", "officialUrl": "Official website or social media (optional)", "agreement": "I agree to the <terms>Business Terms of Use</terms> and acknowledge the <privacy>Business Claim Privacy Notice</privacy>.", "process": "We will email a six-digit code to the official business address; after verification, the claim is approved or sent to an administrator for review.", "sendCode": "Send verification code", "code": "Six-digit verification code", "verify": "Verify ownership", "resend": "Send a new code", "codeSent": "A one-time code was sent only to the official business email.", "approved": "Ownership was verified. Your owner access is now active.", "review": "The email was verified. This claim is awaiting admin review." },
+      "signIn": "Sign in to continue",
+      "submitting": "Submitting...",
+      "claim": {
+        "fullName": "Full name",
+        "accountEmail": "Account email",
+        "businessEmail": "Official business email",
+        "officialUrl": "Official website or social media (optional)",
+        "agreement": "I agree to the <terms>Business Terms of Use</terms> and acknowledge the <privacy>Business Claim Privacy Notice</privacy>.",
+        "process": "We will email a six-digit code to the official business address; after verification, the claim is approved or sent to an administrator for review.",
+        "sendCode": "Send verification code",
+        "code": "Six-digit verification code",
+        "verify": "Verify ownership",
+        "resend": "Send a new code",
+        "codeSent": "A one-time code was sent only to the official business email.",
+        "approved": "Ownership was verified. Your owner access is now active.",
+        "review": "The email was verified. This claim is awaiting admin review."
+      },
       "claimSuccess": {
         "title": "Your request was submitted successfully",
         "approvedDescription": "Your ownership has been verified! You can now manage your business page through the owner dashboard.",
         "reviewDescription": "Your email was verified and the ownership request has been sent to the Fargo team for review. You will be notified via email and dashboard.",
         "viewDashboard": "View in dashboard"
       },
-      "suggestion": { "field": "Information to change", "value": "New or correct information", "valuePlaceholder": "Enter the new or corrected details here...", "context": "Additional context for verification", "contextPlaceholder": "Provide any additional details or sources to help verify this change (optional)...", "evidence": "Supporting link (optional)", "submit": "Submit suggestion", "submitted": "Thank you for your contribution! Your edit suggestion was submitted and will be reviewed shortly." },
-      "fields": { "businessName": "Business name", "legalName": "Legal name", "shortDescription": "Short description", "description": "Full description", "email": "Business email", "phone": "Phone number", "mobile": "Mobile number", "whatsapp": "WhatsApp number", "website": "Website URL", "instagram": "Instagram page", "telegram": "Telegram handle / channel", "facebook": "Facebook page", "youtube": "YouTube channel", "linkedin": "LinkedIn page", "address": "Address & location", "postalCode": "Postal code", "categoryId": "Main category", "subCategoryId": "Subcategory", "specialtyId": "Specialty / Core service", "cityId": "City", "districtId": "District / Neighborhood", "latitude": "Latitude on map", "longitude": "Longitude on map", "establishedYear": "Established year", "priceRange": "Price range" },
-      "priceRanges": { "BUDGET": "Budget (€)", "MODERATE": "Moderate (€€)", "EXPENSIVE": "Expensive (€€€)", "LUXURY": "Luxury (€€€€)" },
-      "errors": { "submit": "The request could not be submitted. Please check the entered values.", "verify": "The verification code is invalid or has expired.", "alreadyActive": "A pending suggestion for this specific field already exists for this business.", "rateLimited": "Too many requests. Please try again later.", "invalidEmail": "Please enter a valid email address.", "invalidPhone": "Please enter a valid phone number.", "invalidUrl": "Please enter a valid URL (starting with https).", "invalidPostalCode": "Please enter a valid postal code." }
+      "suggestion": {
+        "field": "Information to change",
+        "value": "New or correct information",
+        "valuePlaceholder": "Enter the new or corrected details here...",
+        "context": "Additional context for verification",
+        "contextPlaceholder": "Provide any additional details or sources to help verify this change (optional)...",
+        "evidence": "Supporting link (optional)",
+        "submit": "Submit suggestion",
+        "submitted": "Thank you for your contribution! Your edit suggestion was submitted and will be reviewed shortly."
+      },
+      "fields": {
+        "businessName": "Business name",
+        "legalName": "Legal name",
+        "shortDescription": "Short description",
+        "description": "Full description",
+        "email": "Business email",
+        "phone": "Phone number",
+        "mobile": "Mobile number",
+        "whatsapp": "WhatsApp number",
+        "website": "Website URL",
+        "instagram": "Instagram page",
+        "telegram": "Telegram handle / channel",
+        "facebook": "Facebook page",
+        "youtube": "YouTube channel",
+        "linkedin": "LinkedIn page",
+        "address": "Address & location",
+        "postalCode": "Postal code",
+        "categoryId": "Main category",
+        "subCategoryId": "Subcategory",
+        "specialtyId": "Specialty / Core service",
+        "cityId": "City",
+        "districtId": "District / Neighborhood",
+        "latitude": "Latitude on map",
+        "longitude": "Longitude on map",
+        "establishedYear": "Established year",
+        "priceRange": "Price range"
+      },
+      "priceRanges": {
+        "BUDGET": "Budget (€)",
+        "MODERATE": "Moderate (€€)",
+        "EXPENSIVE": "Expensive (€€€)",
+        "LUXURY": "Luxury (€€€€)"
+      },
+      "errors": {
+        "submit": "The request could not be submitted. Please check the entered values.",
+        "verify": "The verification code is invalid or has expired.",
+        "alreadyActive": "A pending suggestion for this specific field already exists for this business.",
+        "rateLimited": "Too many requests. Please try again later.",
+        "invalidEmail": "Please enter a valid email address.",
+        "invalidPhone": "Please enter a valid phone number.",
+        "invalidUrl": "Please enter a valid URL (starting with https).",
+        "invalidPostalCode": "Please enter a valid postal code."
+      }
     },
     "hoursTitle": "Business hours",
     "hoursUnavailable": "Business hours are not available yet.",
@@ -414,7 +485,7 @@
     }
   },
   "Footer": {
-    "description": "Discover trusted Iranian-owned businesses and services across Germany in one practical directory.",
+    "description": "Discover trusted Persian-speaking businesses and services across Germany in one practical directory.",
     "linksTitle": "Useful links",
     "home": "Home",
     "businesses": "All businesses",
@@ -427,7 +498,7 @@
     "emailPlaceholder": "Your email address",
     "comingSoon": "Coming soon",
     "copyright": "© {year} Fargo. All rights reserved.",
-    "madeFor": "Iranian businesses in Germany",
+    "madeFor": "Persian-speaking businesses in Germany",
     "legal": "Terms of Use & Legal Notice",
     "privacy": "Privacy Policy",
     "cookieSettings": "Cookie settings"
@@ -571,7 +642,13 @@
         "cancelled": "Cancelled",
         "expired": "Expired"
       },
-      "fields": { "claimant": "Applicant", "email": "Official email", "verified": "Email verified", "status": "Status", "reason": "Decision reason" },
+      "fields": {
+        "claimant": "Applicant",
+        "email": "Official email",
+        "verified": "Email verified",
+        "status": "Status",
+        "reason": "Decision reason"
+      },
       "notes": {
         "title": "Messages & correspondence",
         "admin": "Fargo Team",
@@ -592,8 +669,31 @@
       }
     },
     "ownerMessages": {
-      "title": "Business messages", "description": "Read and manage messages sent to your businesses.", "allBusinesses": "All businesses", "allStatuses": "All statuses", "filter": "Filter", "open": "Open message", "empty": "No messages found.", "selectMessage": "Select a message to read it.", "from": "From", "contact": "Contact details", "emailDelivery": "Email notification", "reply": "Reply by email", "archive": "Archive", "close": "Close",
-      "statuses": { "NEW": "New", "READ": "Read", "ARCHIVED": "Archived" }, "emailStatuses": { "PENDING": "Pending", "SENT": "Sent", "FAILED": "Failed", "NOT_CONFIGURED": "Not available" }
+      "title": "Business messages",
+      "description": "Read and manage messages sent to your businesses.",
+      "allBusinesses": "All businesses",
+      "allStatuses": "All statuses",
+      "filter": "Filter",
+      "open": "Open message",
+      "empty": "No messages found.",
+      "selectMessage": "Select a message to read it.",
+      "from": "From",
+      "contact": "Contact details",
+      "emailDelivery": "Email notification",
+      "reply": "Reply by email",
+      "archive": "Archive",
+      "close": "Close",
+      "statuses": {
+        "NEW": "New",
+        "READ": "Read",
+        "ARCHIVED": "Archived"
+      },
+      "emailStatuses": {
+        "PENDING": "Pending",
+        "SENT": "Sent",
+        "FAILED": "Failed",
+        "NOT_CONFIGURED": "Not available"
+      }
     },
     "profile": {
       "title": "My profile",
@@ -731,12 +831,38 @@
     }
   },
   "Analytics": {
-    "title": "Visitor analytics", "adminDescription": "Explore visits across businesses, cities and categories.", "ownerDescription": "Track visits to your business listings.",
-    "ranges": { "7": "Last 7 days", "30": "Last 30 days", "90": "Last 90 days", "365": "Last 12 months" },
-    "allCities": "All cities", "allCategories": "All categories", "allBusinesses": "All businesses", "apply": "Apply",
-    "totalViews": "Total views", "uniqueVisitors": "Unique visitors", "sessions": "Sessions", "activeBusinesses": "Viewed businesses", "dailyAverage": "Daily average", "coveredCities": "Cities reached",
-    "trend": "Visit trend", "trendDescription": "Daily public business-page views.", "topBusinesses": "Top businesses", "topCities": "Top cities", "topCategories": "Top categories", "empty": "No visit data for this period",
-    "openBusinessReport": "Open full business report", "businessReportTitle": "Business performance", "businessReportDescription": "A detailed 30-day comparison of reach, repeat visits and engagement across every active business.", "searchBusinesses": "Search business, city or category", "periodChange": "30-day change", "viewsPerVisitor": "Views / visitor", "business": "Business"
+    "title": "Visitor analytics",
+    "adminDescription": "Explore visits across businesses, cities and categories.",
+    "ownerDescription": "Track visits to your business listings.",
+    "ranges": {
+      "7": "Last 7 days",
+      "30": "Last 30 days",
+      "90": "Last 90 days",
+      "365": "Last 12 months"
+    },
+    "allCities": "All cities",
+    "allCategories": "All categories",
+    "allBusinesses": "All businesses",
+    "apply": "Apply",
+    "totalViews": "Total views",
+    "uniqueVisitors": "Unique visitors",
+    "sessions": "Sessions",
+    "activeBusinesses": "Viewed businesses",
+    "dailyAverage": "Daily average",
+    "coveredCities": "Cities reached",
+    "trend": "Visit trend",
+    "trendDescription": "Daily public business-page views.",
+    "topBusinesses": "Top businesses",
+    "topCities": "Top cities",
+    "topCategories": "Top categories",
+    "empty": "No visit data for this period",
+    "openBusinessReport": "Open full business report",
+    "businessReportTitle": "Business performance",
+    "businessReportDescription": "A detailed 30-day comparison of reach, repeat visits and engagement across every active business.",
+    "searchBusinesses": "Search business, city or category",
+    "periodChange": "30-day change",
+    "viewsPerVisitor": "Views / visitor",
+    "business": "Business"
   },
   "Admin": {
     "shell": {
@@ -838,7 +964,23 @@
     "claims": {
       "title": "Business claims",
       "description": "Approve or reject ownership requests for existing listings.",
-      "list": "Claim requests"
+      "list": "Claim requests",
+      "overview": "Overview",
+      "moderation": "Moderation",
+      "notesAndMessages": "Notes & Messages",
+      "sendMessage": "Send Message",
+      "noNotes": "No notes yet.",
+      "newStatus": "New Status",
+      "decisionReason": "Decision Reason",
+      "decisionReasonPlaceholder": "Provide reason for decision...",
+      "saveStatus": "Save Status",
+      "officialBusinessEmail": "Official Business Email",
+      "claimDetails": "Claim Details",
+      "noActionAvailable": "No moderation action is available. This claim is already {status}.",
+      "searchBusiness": "Search business",
+      "searchClaimant": "Search claimant",
+      "search": "Search",
+      "reset": "Reset"
     },
     "changeRequests": {
       "title": "Information Change Requests",
@@ -998,7 +1140,8 @@
       "actor": "Actor",
       "action": "Action",
       "entity": "Entity",
-      "metadata": "Metadata"
+      "metadata": "Metadata",
+      "delivery": "Delivery"
     },
     "statuses": {
       "PENDING": "Pending review",
@@ -1138,14 +1281,14 @@
   },
   "ForBusinesses": {
     "metaTitle": "Fargo for Businesses — Grow your local presence",
-    "metaDescription": "List your Iranian-owned business on Fargo and reach thousands of customers across Germany.",
+    "metaDescription": "List your Persian-speaking business on Fargo and reach thousands of customers across Germany.",
     "heroEyebrow": "For business owners",
     "heroTitle": "Grow your business with Fargo",
-    "heroDescription": "Join hundreds of Iranian-owned businesses already listed on Fargo. Reach new customers, manage your presence and track performance — all in one place.",
+    "heroDescription": "Join hundreds of Persian-speaking businesses already listed on Fargo. Reach new customers, manage your presence and track performance — all in one place.",
     "heroPrimary": "Add your business",
     "heroSecondary": "Manage existing businesses",
     "featuresTitle": "Everything you need to succeed",
-    "featuresDescription": "A professional toolkit designed for Iranian-owned businesses in Germany.",
+    "featuresDescription": "A professional toolkit designed for Persian-speaking businesses in Germany.",
     "feature1Title": "Free business listing",
     "feature1Description": "Create a comprehensive profile with photos, contact details, opening hours and service descriptions — completely free.",
     "feature2Title": "Visitor analytics",

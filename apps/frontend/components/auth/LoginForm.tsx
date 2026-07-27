@@ -75,7 +75,7 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
     await fetch("/api/auth/email-verification/resend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, callbackUrl }),
     });
     setResendMessage(t("login.resendSent"));
   }

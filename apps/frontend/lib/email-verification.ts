@@ -20,6 +20,7 @@ export async function sendAccountVerification(input: {
   userId: string;
   email: string;
   name?: string | null;
+  callbackUrl?: string;
   request?: Request;
 }) {
   const token = randomBytes(32).toString("base64url");
@@ -35,7 +36,11 @@ export async function sendAccountVerification(input: {
     }),
   ]);
 
-  const verifyUrl = `${appBaseUrl(input.request)}/api/auth/email-verification/verify?token=${encodeURIComponent(token)}`;
+  let verifyUrl = `${appBaseUrl(input.request)}/api/auth/email-verification/verify?token=${encodeURIComponent(token)}`;
+  if (input.callbackUrl) {
+    verifyUrl += `&callbackUrl=${encodeURIComponent(input.callbackUrl)}`;
+  }
+  
   await sendMail({
     to: input.email,
     subject: "Verify your Fargo email address",

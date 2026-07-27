@@ -5,7 +5,12 @@ import { requestIp } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token")?.trim() ?? "";
+  const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
   const loginUrl = new URL("/login", request.url);
+  if (callbackUrl) {
+    loginUrl.searchParams.set("callbackUrl", callbackUrl);
+  }
+  
   if (
     token.length < 32
     || await isPersistentlyRateLimited("verify-email-ip", requestIp(request), 30, 15 * 60_000)

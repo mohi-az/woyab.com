@@ -36,7 +36,13 @@ export function BusinessEditButton({ business, currentUser }: Props) {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setMounted(true);
-      if (new URLSearchParams(window.location.search).get("edit") === "1") setOpen(true);
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get("edit") === "1") {
+        setOpen(true);
+      } else if (searchParams.get("claim") === "1") {
+        setOpen(true);
+        setRelation("OWNER");
+      }
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);

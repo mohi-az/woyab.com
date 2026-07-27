@@ -26,19 +26,19 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de";
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: "Fargo — Iranische Unternehmen in Deutschland",
+    default: "Fargo — Persischsprachige Unternehmen in Deutschland",
     template: "%s | Fargo",
   },
   description:
-    "Fargo ist das umfassende Verzeichnis iranischer Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
+    "Fargo ist das umfassende Verzeichnis persischsprachiger Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
   keywords: [
-    "Iranian businesses Germany",
-    "iranische Unternehmen Deutschland",
-    "کسب‌وکار ایرانی آلمان",
+    "Persian-speaking businesses Germany",
+    "persischsprachige Unternehmen Deutschland",
+    "کسب‌وکار فارسی‌زبان آلمان",
     "Persian directory",
     "Fargo",
-    "iranische Restaurants",
-    "iranische Ärzte",
+    "persischsprachige Restaurants",
+    "persischsprachige Ärzte",
     "persische Dienstleistungen",
   ],
   authors: [{ name: "Fargo" }],

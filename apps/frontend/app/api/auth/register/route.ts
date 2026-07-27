@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         userId: existing.id,
         email,
         name: existing.name,
+        callbackUrl: typeof raw?.callbackUrl === "string" ? raw.callbackUrl : undefined,
         request,
       }).catch(() => undefined);
     }
@@ -53,12 +54,15 @@ export async function POST(request: Request) {
     select: { id: true, email: true, name: true },
   });
 
+  const callbackUrl = typeof raw?.callbackUrl === "string" ? raw.callbackUrl : undefined;
+
   let devLink: string | undefined;
   try {
     devLink = await sendAccountVerification({
       userId: user.id,
       email: user.email!,
       name: user.name,
+      callbackUrl,
       request,
     });
   } catch {

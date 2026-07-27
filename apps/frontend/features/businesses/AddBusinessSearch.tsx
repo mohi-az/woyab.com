@@ -119,7 +119,7 @@ export function AddBusinessSearch() {
                   {loading ? <p className="px-5 py-6 text-center text-sm font-bold text-slate-500">{t("loading")}</p> : null}
                   {error ? <p className="px-5 py-6 text-center text-sm font-bold text-rose-600">{t("error")}</p> : null}
                   {!loading && !error && items.map((item) => (
-                    <Link key={item.id} href={`/businesses/${item.slug}?edit=1`} className="group flex items-center gap-4 border-b border-slate-100 px-5 py-3.5 transition last:border-b-0 hover:bg-slate-50">
+                    <Link key={item.id} href={`/businesses/${item.slug}?claim=1`} className="group flex items-center gap-4 border-b border-slate-100 px-5 py-3.5 transition last:border-b-0 hover:bg-slate-50">
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-100 text-lg text-slate-600"><FiBriefcase /></span>
                       <strong className="min-w-0 flex-1 truncate text-base text-slate-900">{item.title}</strong>
                       <ArrowIcon className="shrink-0 text-lg text-slate-400 transition group-hover:translate-x-1 group-hover:text-primary rtl:group-hover:-translate-x-1" />

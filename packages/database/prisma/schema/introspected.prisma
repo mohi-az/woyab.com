@@ -89,6 +89,7 @@ model ClaimNote {
   content        String
   attachmentUrl  String?
   attachmentName String?
+  attachments    Json?
   isAdminNote    Boolean       @default(false)
   createdAt      DateTime      @default(now())
   claim          BusinessClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)

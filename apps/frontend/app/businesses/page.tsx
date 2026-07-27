@@ -88,6 +88,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
           showing: t("showing", { from: "{from}", to: "{to}" }),
           loading: t("loading"),
           error: t("error"),
+          retry: t("retry"),
           sort: {
             label: t("sort.label"),
             recommended: t("sort.recommended"),

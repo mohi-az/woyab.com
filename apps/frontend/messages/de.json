@@ -85,9 +85,9 @@
   },
   "Home": {
     "hero": {
-      "eyebrow": "Iranische Unternehmen in ganz Deutschland",
+      "eyebrow": "Persischsprachige Unternehmen in ganz Deutschland",
       "title": "Suchen Sie<br></br>ein Unternehmen?",
-      "description": "Fargo ist das Verzeichnis fur iranische Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
+      "description": "Fargo ist das Verzeichnis für persischsprachige Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
       "queryPlaceholder": "Ich suche nach",
       "categoriesLabel": "Kategorien",
       "allCategories": "Alle Kategorien",
@@ -118,7 +118,7 @@
     "citiesSection": {
       "eyebrow": "Nach Standort entdecken",
       "title": "Unternehmen in Ihrer Stadt finden",
-      "description": "Entdecken Sie iranische Unternehmen in den aktivsten Städten Deutschlands.",
+      "description": "Entdecken Sie persischsprachige Unternehmen in den aktivsten Städten Deutschlands.",
       "allCitiesTitle": "Alle unterstützten Städte",
       "allCitiesDescription": "Sehen Sie die vollständige Städte-Liste und entdecken Sie Unternehmen auch über diese Auswahl hinaus.",
       "listingCount": "{count} Einträge",
@@ -128,7 +128,7 @@
     },
     "categoriesSection": {
       "title": "Beliebteste Kategorien",
-      "description": "Entdecken Sie iranische Unternehmen in Deutschland nach Kategorien",
+      "description": "Entdecken Sie persischsprachige Unternehmen in Deutschland nach Kategorien",
       "items": {
         "restaurantCafe": "Restaurant und Cafe",
         "healthBeauty": "Gesundheit und Schonheit",
@@ -162,7 +162,8 @@
     "resultCountTemplate": "{count} Unternehmen gefunden",
     "showing": "{from}-{to} angezeigt",
     "loading": "Ergebnisse werden aktualisiert",
-    "error": "Die Ergebnisse konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+    "error": "Fehler beim Abrufen der Ergebnisse. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
     "filters": {
       "title": "Filter",
       "search": "Unternehmensname",
@@ -414,7 +415,7 @@
     }
   },
   "Footer": {
-    "description": "Entdecken Sie vertrauenswürdige iranische Unternehmen und Dienstleistungen in ganz Deutschland.",
+    "description": "Entdecken Sie vertrauenswürdige persischsprachige Unternehmen und Dienstleistungen in ganz Deutschland.",
     "linksTitle": "Nützliche Links",
     "home": "Startseite",
     "businesses": "Alle Unternehmen",
@@ -427,7 +428,7 @@
     "emailPlaceholder": "Ihre E-Mail-Adresse",
     "comingSoon": "Demnächst",
     "copyright": "© {year} Fargo. Alle Rechte vorbehalten.",
-    "madeFor": "Iranische Unternehmen in Deutschland",
+    "madeFor": "Persischsprachige Unternehmen in Deutschland",
     "legal": "Nutzungsbedingungen & Impressum",
     "privacy": "Datenschutzerklärung",
     "cookieSettings": "Cookie-Einstellungen"
@@ -1132,14 +1133,14 @@
   },
   "ForBusinesses": {
     "metaTitle": "Fargo für Unternehmen — Lokale Präsenz ausbauen",
-    "metaDescription": "Registrieren Sie Ihr iranisches Unternehmen auf Fargo und erreichen Sie Tausende von Kunden in ganz Deutschland.",
+    "metaDescription": "Registrieren Sie Ihr persischsprachiges Unternehmen auf Fargo und erreichen Sie Tausende von Kunden in ganz Deutschland.",
     "heroEyebrow": "Für Unternehmer",
     "heroTitle": "Wachsen Sie mit Fargo",
-    "heroDescription": "Schließen Sie sich Hunderten iranischer Unternehmen an, die bereits bei Fargo gelistet sind. Erreichen Sie neue Kunden, verwalten Sie Ihre Präsenz und verfolgen Sie Ihre Leistung.",
+    "heroDescription": "Schließen Sie sich Hunderten persischsprachiger Unternehmen an, die bereits bei Fargo gelistet sind. Erreichen Sie neue Kunden, verwalten Sie Ihre Präsenz und verfolgen Sie Ihre Leistung.",
     "heroPrimary": "Unternehmen hinzufügen",
     "heroSecondary": "Bestehende Unternehmen verwalten",
     "featuresTitle": "Alles, was Sie für den Erfolg brauchen",
-    "featuresDescription": "Ein professionelles Toolkit für iranische Unternehmen in Deutschland.",
+    "featuresDescription": "Ein professionelles Toolkit für persischsprachige Unternehmen in Deutschland.",
     "feature1Title": "Kostenloser Eintrag",
     "feature1Description": "Erstellen Sie ein umfassendes Profil mit Fotos, Kontaktdaten, Öffnungszeiten und Servicebeschreibungen — völlig kostenlos.",
     "feature2Title": "Besucheranalyse",

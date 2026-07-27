@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FiChevronLeft, FiChevronRight, FiInbox, FiLoader, FiMap } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiInbox, FiLoader, FiMap, FiRefreshCw } from "react-icons/fi";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { BusinessFilters, type BusinessFilterLabels } from "@/components/business/BusinessFilters";
 import { BusinessMap, type BusinessMapLabels } from "@/components/business/BusinessMap";
@@ -22,6 +22,7 @@ type Labels = {
   showing: string;
   loading: string;
   error: string;
+  retry: string;
   sort: {
     label: string;
     recommended: string;
@@ -75,6 +76,7 @@ export function BusinessDirectory({
   const [radiusKm, setRadiusKm] = useState<RadiusKm | null>(5);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [resetVersion, setResetVersion] = useState(0);
   const [mapOpen, setMapOpen] = useState(false);
   const [favoriteBusinessIds, setFavoriteBusinessIds] = useState<Set<string>>(new Set());
@@ -175,7 +177,7 @@ export function BusinessDirectory({
       });
 
     return () => controller.abort();
-  }, [filters, labels.error, locale, location, openNowRefreshKey, radiusKm]);
+  }, [filters, labels.error, locale, location, openNowRefreshKey, radiusKm, retryCount]);
 
   const currentPage = directory.totalPages > 0 ? Math.min(directory.page, directory.totalPages) : 1;
   const pages = visiblePages(currentPage, directory.totalPages);
@@ -255,7 +257,19 @@ export function BusinessDirectory({
             </div>
           </div>
 
-          {error ? <p role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+          {error ? (
+            <div role="alert" className="mb-5 flex flex-wrap items-center gap-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => setRetryCount((c) => c + 1)}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-red-100 px-3 py-1.5 font-medium text-red-800 transition hover:bg-red-200"
+              >
+                <FiRefreshCw className="h-4 w-4" />
+                {labels.retry}
+              </button>
+            </div>
+          ) : null}
 
           <div className="relative min-h-80" aria-busy={loading}>
             {directory.items.length > 0 ? (
