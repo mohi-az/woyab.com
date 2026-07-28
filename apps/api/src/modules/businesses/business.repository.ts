@@ -80,7 +80,7 @@ const businessCardSelect = {
 export const businessRepository = {
   findMany: (skip: number, take: number, where: BusinessFilter = {}, sortBy?: BusinessSort) =>
     prisma.business.findMany({
-      where: { AND: [where, { removedAt: null, status: "ACTIVE" }] },
+      where: { AND: [where, { removedAt: null, status: "ACTIVE", verified: true }] },
       skip,
       take,
       orderBy: sortBy === "latest"
@@ -90,17 +90,17 @@ export const businessRepository = {
     }),
 
   count: (where: BusinessFilter = {}) =>
-    prisma.business.count({ where: { AND: [where, { removedAt: null, status: "ACTIVE" }] } }),
+    prisma.business.count({ where: { AND: [where, { removedAt: null, status: "ACTIVE", verified: true }] } }),
 
   findManyByIds: (ids: string[]) =>
     prisma.business.findMany({
-      where: { id: { in: ids }, removedAt: null, status: "ACTIVE" },
+      where: { id: { in: ids }, removedAt: null, status: "ACTIVE", verified: true },
       select: businessCardSelect,
     }),
 
   findById: (id: string) =>
     prisma.business.findFirst({
-      where: { id, removedAt: null, status: "ACTIVE" },
+      where: { id, removedAt: null, status: "ACTIVE", verified: true },
       include: businessDetailInclude,
     }),
 
@@ -109,7 +109,7 @@ export const businessRepository = {
 
   findDetailBySlug: (slug: string) =>
     prisma.business.findFirst({
-      where: { slug, removedAt: null, status: "ACTIVE" },
+      where: { slug, removedAt: null, status: "ACTIVE", verified: true },
       include: businessDetailInclude,
     }),
 

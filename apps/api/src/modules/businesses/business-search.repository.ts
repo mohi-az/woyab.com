@@ -28,6 +28,7 @@ function spatialConditions(input: InternalBusinessSearchBody) {
   const requestedLocale = appLocaleToContentLocale(input.locale);
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
+    Prisma.sql`b."verified" = TRUE`,
     Prisma.sql`b."removedAt" IS NULL`,
     Prisma.sql`bl."active" = TRUE`,
     // Do not surface corrupt locations whose coordinates are hundreds of

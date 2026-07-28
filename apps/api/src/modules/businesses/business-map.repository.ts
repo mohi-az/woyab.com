@@ -57,6 +57,7 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
   const requestedLocale = appLocaleToContentLocale(input.locale);
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
+    Prisma.sql`b."verified" = TRUE`,
     Prisma.sql`b."removedAt" IS NULL`,
     Prisma.sql`bl."active" = TRUE`,
     Prisma.sql`(

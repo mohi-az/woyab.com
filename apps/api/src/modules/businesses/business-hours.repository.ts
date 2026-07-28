@@ -79,6 +79,7 @@ export async function findCurrentlyOpenBusinessIds() {
     SELECT b."id"
     FROM "businesses" b
     WHERE b."status" = 'ACTIVE'::"business_status"
+      AND b."verified" = TRUE
       AND b."removedAt" IS NULL
       AND ${condition}
   `);

@@ -61,6 +61,7 @@ test("public Next.js surfaces use ACTIVE businesses and APPROVED reviews", async
     frontendSource("app/api/directory-reports/route.ts"),
   ]);
   assert.match(sitemap, /status: "ACTIVE"/);
+  assert.match(sitemap, /verified: true/);
   assert.match(reviews, /status: "ACTIVE"/);
   assert.match(reports, /status: "APPROVED"/);
   assert.match(reports, /status: "ACTIVE"/);

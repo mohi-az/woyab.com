@@ -44,7 +44,7 @@ googlePlacesRouter.get("/businesses/:id/google-photos", googlePlacesRateLimit, a
   const { id } = businessIdSchema.parse(req.params);
 
   const business = await prisma.business.findFirst({
-    where: { id, removedAt: null, status: "ACTIVE" },
+    where: { id, removedAt: null, status: "ACTIVE", verified: true },
     select: { googlePlaceId: true },
   });
 
@@ -63,7 +63,7 @@ googlePlacesRouter.get("/businesses/:id/google-photos/*photoReference", googlePl
   const { photoReference } = photoReferenceSchema.parse({ photoReference: Array.isArray(photoReferenceSegments) ? photoReferenceSegments.join("/") : photoReferenceSegments });
   const { maxWidth } = photoQuerySchema.parse(req.query);
   const business = await prisma.business.findFirst({
-    where: { id, removedAt: null, status: "ACTIVE" },
+    where: { id, removedAt: null, status: "ACTIVE", verified: true },
     select: { googlePlaceId: true },
   });
   if (!business?.googlePlaceId) {
@@ -89,7 +89,7 @@ googlePlacesRouter.get("/businesses/:id/google-photo-thumbnail", googlePlacesRat
   const { maxWidth } = photoQuerySchema.parse(req.query);
 
   const business = await prisma.business.findFirst({
-    where: { id, removedAt: null, status: "ACTIVE" },
+    where: { id, removedAt: null, status: "ACTIVE", verified: true },
     select: { googlePlaceId: true },
   });
 

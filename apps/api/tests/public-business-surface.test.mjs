@@ -28,21 +28,27 @@ test("the public taxonomy and location routers expose no mutation handlers", asy
   }
 });
 
-test("all public business discovery paths require ACTIVE, non-removed records", async () => {
-  const [repository, mapRepository, searchRepository, googlePhotos] = await Promise.all([
+test("all public business discovery paths require ACTIVE, verified, non-removed records", async () => {
+  const [repository, mapRepository, searchRepository, googlePhotos, hoursRepository] = await Promise.all([
     source("src/modules/businesses/business.repository.ts"),
     source("src/modules/businesses/business-map.repository.ts"),
     source("src/modules/businesses/business-search.repository.ts"),
     source("src/modules/businesses/google-places.route.ts"),
+    source("src/modules/businesses/business-hours.repository.ts"),
   ]);
   assert.match(repository, /removedAt: null/);
   assert.match(mapRepository, /b\."removedAt" IS NULL/);
   assert.match(mapRepository, /b\."status" = 'ACTIVE'/);
+  assert.match(mapRepository, /b\."verified" = TRUE/);
   assert.match(searchRepository, /b\."removedAt" IS NULL/);
   assert.match(searchRepository, /b\."status" = 'ACTIVE'/);
+  assert.match(searchRepository, /b\."verified" = TRUE/);
+  assert.match(hoursRepository, /b\."verified" = TRUE/);
   assert.doesNotMatch(googlePhotos, /googlePlacesRouter\.get\("\/google-photos/);
   assert.match(repository, /removedAt: null, status: "ACTIVE"/);
+  assert.match(repository, /removedAt: null, status: "ACTIVE", verified: true/);
   assert.match(googlePhotos, /removedAt: null, status: "ACTIVE"/);
+  assert.match(googlePhotos, /removedAt: null, status: "ACTIVE", verified: true/);
 });
 
 test("public review reads expose only approved reviews on active businesses", async () => {
