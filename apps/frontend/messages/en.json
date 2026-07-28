@@ -351,6 +351,8 @@
         "fullName": "Full name",
         "accountEmail": "Account email",
         "businessEmail": "Official business email",
+        "useExistingEmail": "Send code to existing email:",
+        "useNewEmail": "Use a different email address",
         "officialUrl": "Official website or social media (optional)",
         "agreement": "I agree to the <terms>Business Terms of Use</terms> and acknowledge the <privacy>Business Claim Privacy Notice</privacy>.",
         "process": "We will email a six-digit code to the official business address; after verification, the claim is approved or sent to an administrator for review.",

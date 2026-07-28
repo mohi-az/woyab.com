@@ -29,10 +29,27 @@ export function claimVerificationDecision(input: {
   emailMatchesListing: boolean;
   officialBusinessEmail: string;
   hasOwner: boolean;
+  businessWebsite?: string | null;
 }) {
   const domain = input.officialBusinessEmail.slice(input.officialBusinessEmail.lastIndexOf("@") + 1).toLowerCase();
   const publicMailbox = PUBLIC_EMAIL_DOMAINS.has(domain);
-  return input.emailMatchesListing && !input.hasOwner && !publicMailbox ? "APPROVED" as const : "UNDER_REVIEW" as const;
+  
+  if (input.emailMatchesListing && !input.hasOwner && !publicMailbox) {
+    return "APPROVED" as const;
+  }
+
+  // Domain matching logic
+  if (input.businessWebsite && !input.hasOwner && !publicMailbox) {
+    const match = input.businessWebsite.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/i);
+    if (match && match[1]) {
+      const websiteDomain = match[1].toLowerCase();
+      if (domain === websiteDomain) {
+        return "APPROVED" as const;
+      }
+    }
+  }
+
+  return "UNDER_REVIEW" as const;
 }
 
 export function otpFailureState(attempts: number, nowMs: number, blockMs: number) {

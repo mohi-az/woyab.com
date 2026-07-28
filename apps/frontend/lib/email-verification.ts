@@ -3,6 +3,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { sendMail } from "@/lib/mail";
 import { prisma } from "@/lib/prisma";
+import { buildAccountVerificationEmail } from "@/lib/email-templates";
 
 const TOKEN_TTL_MS = 24 * 60 * 60_000;
 
@@ -40,12 +41,22 @@ export async function sendAccountVerification(input: {
   if (input.callbackUrl) {
     verifyUrl += `&callbackUrl=${encodeURIComponent(input.callbackUrl)}`;
   }
-  
+  let locale = "fa";
+  if (input.request) {
+    const cookieHeader = input.request.headers.get("cookie") || "";
+    if (cookieHeader.includes("NEXT_LOCALE=en")) locale = "en";
+    if (cookieHeader.includes("NEXT_LOCALE=de")) locale = "de";
+  }
+
+  const emailContent = buildAccountVerificationEmail({
+    name: input.name,
+    verifyUrl,
+    locale,
+  });
+
   await sendMail({
     to: input.email,
-    subject: "Verify your Fargo email address",
-    text: `Hello ${input.name || "there"},\n\nVerify your Fargo email address using this link. It expires in 24 hours:\n\n${verifyUrl}`,
-    html: `<p>Hello ${escapeHtml(input.name || "there")},</p><p>Verify your Fargo email address using the link below. It expires in 24 hours.</p><p><a href="${verifyUrl}">Verify email address</a></p>`,
+    ...emailContent,
   });
   return process.env.NODE_ENV === "production" ? undefined : verifyUrl;
 }
@@ -74,14 +85,4 @@ export async function consumeAccountVerification(token: string) {
     });
     return true;
   });
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[character] ?? character);
 }

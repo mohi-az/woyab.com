@@ -174,3 +174,62 @@ export function escapeHtml(value: string): string {
     '"': "&quot;",
   })[character] ?? character);
 }
+
+export function buildAccountVerificationEmail(input: {
+  name?: string | null;
+  verifyUrl: string;
+  locale?: string;
+}) {
+  const loc = (input.locale || "fa").toLowerCase();
+
+  if (loc.startsWith("de")) {
+    const title = "Bestätigen Sie Ihre E-Mail-Adresse";
+    const subtitle = `Hallo ${input.name ? escapeHtml(input.name) : ""},<br/>Bitte bestätigen Sie Ihre Fargo E-Mail-Adresse über den untenstehenden Button. Dieser Link ist 24 Stunden gültig.`;
+    
+    const html = renderEmailCard({
+      title,
+      subtitle,
+      actionButton: { label: "E-Mail-Adresse bestätigen", url: input.verifyUrl },
+      locale: "de",
+    });
+
+    return {
+      subject: "Bestätigen Sie Ihre E-Mail-Adresse | Fargo",
+      text: `Hallo ${input.name || "dort"},\n\nBestätigen Sie Ihre Fargo E-Mail-Adresse über diesen Link. Er ist 24 Stunden gültig:\n\n${input.verifyUrl}`,
+      html,
+    };
+  } else if (loc.startsWith("en")) {
+    const title = "Verify your email address";
+    const subtitle = `Hello ${input.name ? escapeHtml(input.name) : ""},<br/>Please verify your Fargo email address by clicking the button below. This link will expire in 24 hours.`;
+    
+    const html = renderEmailCard({
+      title,
+      subtitle,
+      actionButton: { label: "Verify email address", url: input.verifyUrl },
+      locale: "en",
+    });
+
+    return {
+      subject: "Verify your email address | Fargo",
+      text: `Hello ${input.name || "there"},\n\nVerify your Fargo email address using this link. It expires in 24 hours:\n\n${input.verifyUrl}`,
+      html,
+    };
+  } else {
+    // Default Persian (fa)
+    const title = "تایید آدرس ایمیل";
+    const subtitle = `سلام ${input.name ? `${escapeHtml(input.name)} عزیز` : "گرامی"}،<br/>لطفا آدرس ایمیل حساب کاربری فارگو خود را از طریق دکمه زیر تایید کنید. این لینک تا ۲۴ ساعت آینده معتبر است.`;
+    
+    const html = renderEmailCard({
+      title,
+      subtitle,
+      actionButton: { label: "تایید ایمیل", url: input.verifyUrl },
+      locale: "fa",
+    });
+
+    return {
+      subject: "تایید آدرس ایمیل | Fargo",
+      text: `سلام ${input.name || "کاربر گرامی"},\n\nلطفا آدرس ایمیل خود را از طریق لینک زیر تایید کنید. این لینک تا ۲۴ ساعت اعتبار دارد:\n\n${input.verifyUrl}`,
+      html,
+    };
+  }
+}

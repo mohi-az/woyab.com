@@ -2,7 +2,7 @@ import { businessClaimVerifySchema, claimVerificationDecision, otpFailureState }
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";
-import { claimOtpBlockMs, claimOtpMatches, claimRetentionDate, sendBusinessClaimApprovedEmail, sendBusinessClaimUnderReviewEmail } from "@/lib/business-claims";
+import { claimOtpBlockMs, claimOtpMatches, claimRetentionDate, sendBusinessClaimApprovedEmail, sendBusinessClaimUnderReviewEmail, sendBusinessClaimWarningEmailToCurrentOwner } from "@/lib/business-claims";
 import { prisma } from "@/lib/prisma";
 
 type Context = { params: Promise<{ id: string }> };
@@ -22,7 +22,7 @@ export async function POST(request: Request, context: Context) {
     where: { id, claimantUserId: userId },
     include: {
       business: {
-        select: { id: true, businessName: true, ownerId: true, email: true, removedAt: true, status: true },
+        select: { id: true, businessName: true, ownerId: true, email: true, website: true, removedAt: true, status: true },
       },
     },
   });
@@ -55,7 +55,7 @@ export async function POST(request: Request, context: Context) {
   }
 
   const emailMatches = Boolean(claim.business.email && claim.officialBusinessEmail && claim.business.email.trim().toLowerCase() === claim.officialBusinessEmail.trim().toLowerCase());
-  const decision = claimVerificationDecision({ emailMatchesListing: emailMatches, officialBusinessEmail: claim.officialBusinessEmail || "", hasOwner: Boolean(claim.business.ownerId) });
+  const decision = claimVerificationDecision({ emailMatchesListing: emailMatches, officialBusinessEmail: claim.officialBusinessEmail || "", hasOwner: Boolean(claim.business.ownerId), businessWebsite: claim.business.website });
   const result = await prisma.$transaction(async (tx) => {
     const transitioned = await tx.businessClaim.updateMany({
       where: { id, claimantUserId: userId, status: "PENDING_VERIFICATION", otpHash: claim.otpHash },
@@ -104,6 +104,19 @@ export async function POST(request: Request, context: Context) {
       });
     } catch {
       // Email delivery error should not block successful DB transaction
+    }
+
+    if (claim.business.owner?.email) {
+      try {
+        await sendBusinessClaimWarningEmailToCurrentOwner({
+          to: claim.business.owner.email,
+          businessName: claim.business.businessName,
+          claimantName: claim.claimantName,
+          locale,
+        });
+      } catch {
+        // Warning email delivery error should not block transaction
+      }
     }
   }
 

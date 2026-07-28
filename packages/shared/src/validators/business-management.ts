@@ -3,10 +3,14 @@ import { z } from "zod";
 export const businessClaimCreateSchema = z.object({
   businessId: z.string().min(1).max(191),
   claimantName: z.string().trim().min(2).max(120),
-  officialBusinessEmail: z.string().trim().toLowerCase().pipe(z.email().max(254)),
+  officialBusinessEmail: z.string().trim().toLowerCase().pipe(z.email().max(254)).optional(),
+  useExistingEmail: z.boolean().optional(),
   officialUrl: z.string().trim().pipe(z.url().max(2048).refine((value) => value.startsWith("https://"), "Use an HTTPS URL.")).optional(),
   termsAccepted: z.literal(true),
   privacyNoticeAccepted: z.literal(true),
+}).refine(data => data.useExistingEmail || data.officialBusinessEmail, {
+  message: "Either an official email or useExistingEmail must be provided",
+  path: ["officialBusinessEmail"],
 });
 
 export const businessClaimVerifySchema = z.object({

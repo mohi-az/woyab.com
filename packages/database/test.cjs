@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function main() { const b = await prisma.business.findFirst({ where: { businessName: { contains: 'Fanous' } }, include: { owner: true } }); console.log(JSON.stringify(b, null, 2)); } main().finally(() => prisma.$disconnect());

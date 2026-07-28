@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Table, Drawer, Button, Input, Space } from "antd";
+import { useState, useRef } from "react";
+import { Table, Drawer, Button, Input, Space, Tag } from "antd";
 import { FiSearch, FiX } from "react-icons/fi";
 import { addClaimNote, updateClaimStatus } from "@/lib/admin-actions";
 import { AdminButton, StatusBadge } from "@/components/admin/AdminPrimitives";
@@ -38,6 +38,28 @@ function SubmitButton({ children, tone }: { children: React.ReactNode, tone: "de
 
 export function AdminClaimsTable({ claims, translations: t }: { claims: ClaimWithDetails[], translations: Record<string, string> }) {
   const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  
+  const templates = [
+    {
+      label: "Gewerbe/Handelsregister",
+      text: "سلام. لطفاً برای تایید نهایی مالکیت، تصویر مدرک ثبت تجاری (Gewerbeanmeldung) یا خلاصه ثبت شرکت (Handelsregisterauszug) خود را که نام شما در آن قید شده باشد، ارسال نمایید."
+    },
+    {
+      label: "پزشکان (Arztausweis)",
+      text: "سلام. جهت تایید حساب کاربری، لطفاً تصویر کارت نظام پزشکی آلمان (Arztausweis) یا گواهی Approbationsurkunde خود را ارسال بفرمایید."
+    },
+    {
+      label: "قبض خدماتی",
+      text: "سلام. لطفاً جهت احراز هویت، یکی از قبوض خدماتی اخیر (مانند برق، آب یا اینترنت) که دارای نام شما و آدرس دقیق کسب‌وکار باشد را ضمیمه کنید."
+    }
+  ];
+
+  const applyTemplate = (text: string) => {
+    if (messageRef.current) {
+      messageRef.current.value = text;
+    }
+  };
   
   const selectedClaim = claims.find((c) => c.id === selectedClaimId) || null;
 
@@ -231,9 +253,22 @@ export function AdminClaimsTable({ claims, translations: t }: { claims: ClaimWit
                 {!selectedClaim.notes.length && <p className="text-sm text-slate-500 text-center py-4">{t.noNotes || "No notes yet."}</p>}
               </div>
 
-              <form action={addClaimNote} className="grid gap-3">
+              <form action={addClaimNote} className="grid gap-3" onSubmit={() => { setTimeout(() => { if (messageRef.current) messageRef.current.value = ""; }, 100); }}>
                 <input type="hidden" name="claimId" value={selectedClaim.id} />
-                <textarea name="content" required minLength={1} placeholder={t.decisionReasonPlaceholder || "Send a message or request documents..."} className="admin-input w-full min-h-20 rounded-lg px-3 py-2 text-sm outline-none focus:border-sky-400" />
+                <div className="flex flex-wrap gap-2 mb-1">
+                  <span className="text-xs text-slate-500 font-bold self-center mr-1">قالب‌های آماده:</span>
+                  {templates.map((tpl, i) => (
+                    <Tag 
+                      key={i} 
+                      color="blue" 
+                      className="cursor-pointer hover:opacity-80 transition"
+                      onClick={() => applyTemplate(tpl.text)}
+                    >
+                      {tpl.label}
+                    </Tag>
+                  ))}
+                </div>
+                <textarea ref={messageRef} name="content" required minLength={1} placeholder={t.decisionReasonPlaceholder || "Send a message or request documents..."} className="admin-input w-full min-h-20 rounded-lg px-3 py-2 text-sm outline-none focus:border-sky-400" />
                 <SubmitButton tone="default">{t.sendMessage || "Send Message"}</SubmitButton>
               </form>
             </div>

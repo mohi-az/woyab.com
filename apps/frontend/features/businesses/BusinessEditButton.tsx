@@ -55,6 +55,8 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     return () => window.clearInterval(interval);
   }, [resendCooldown]);
 
+  const [useExistingEmail, setUseExistingEmail] = useState(Boolean(business.email));
+
   function close() {
     setOpen(false);
     setRelation(null);
@@ -63,6 +65,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
     setFeedback("");
     setResendCooldown(0);
     setClaimResult(null);
+    setUseExistingEmail(Boolean(business.email));
   }
 
 
@@ -78,7 +81,8 @@ export function BusinessEditButton({ business, currentUser }: Props) {
       body: JSON.stringify({
         businessId: business.id,
         claimantName: form.get("claimantName"),
-        officialBusinessEmail: form.get("officialBusinessEmail"),
+        officialBusinessEmail: useExistingEmail ? undefined : form.get("officialBusinessEmail"),
+        useExistingEmail,
         officialUrl: normalizeOptionalUrl(form.get("officialUrl")),
         termsAccepted: termsAndPrivacyAccepted,
         privacyNoticeAccepted: termsAndPrivacyAccepted,
@@ -193,7 +197,23 @@ export function BusinessEditButton({ business, currentUser }: Props) {
           {relation === "OWNER" && currentUser && !claimId ? <form onSubmit={submitClaim} className="mt-6 grid gap-4">
             <Field label={t("claim.fullName")}><input name="claimantName" required minLength={2} defaultValue={currentUser.name} className={inputClass} /></Field>
             <Field label={t("claim.accountEmail")}><input value={currentUser.email || ""} readOnly className={`${inputClass} bg-slate-100 text-left`} dir="ltr" /></Field>
-            <Field label={t("claim.businessEmail")}><input name="officialBusinessEmail" type="email" required defaultValue={business.email || ""} className={`${inputClass} text-left`} dir="ltr" /></Field>
+            {business.email ? (
+              <div className="grid gap-3">
+                <label className="flex items-start gap-3 rounded-2xl border border-slate-200 p-4 text-sm leading-6">
+                  <input type="radio" name="emailOption" checked={useExistingEmail} onChange={() => setUseExistingEmail(true)} className="mt-1 shrink-0" />
+                  <span>{t("claim.useExistingEmail")} <b dir="ltr">{obfuscateEmail(business.email)}</b></span>
+                </label>
+                <label className="flex items-start gap-3 rounded-2xl border border-slate-200 p-4 text-sm leading-6">
+                  <input type="radio" name="emailOption" checked={!useExistingEmail} onChange={() => setUseExistingEmail(false)} className="mt-1 shrink-0" />
+                  <span>{t("claim.useNewEmail")}</span>
+                </label>
+                {!useExistingEmail && (
+                  <Field label={t("claim.businessEmail")}><input name="officialBusinessEmail" type="email" required={!useExistingEmail} className={`${inputClass} text-left`} dir="ltr" /></Field>
+                )}
+              </div>
+            ) : (
+              <Field label={t("claim.businessEmail")}><input name="officialBusinessEmail" type="email" required className={`${inputClass} text-left`} dir="ltr" /></Field>
+            )}
             <Field label={t("claim.officialUrl")}><input name="officialUrl" type="text" inputMode="url" defaultValue={business.website || ""} placeholder="example.com" className={`${inputClass} text-left`} dir="ltr" /></Field>
             <label className="flex items-start gap-3 rounded-2xl border border-slate-200 p-4 text-sm leading-6"><input name="termsAndPrivacyAccepted" type="checkbox" required className="mt-1 shrink-0" /><span>{t.rich("claim.agreement", {
               terms: (chunks) => <a href={`${claimPrivacyHref}#business-terms`} target="_blank" rel="noreferrer" className="font-black text-primary underline decoration-primary/30 underline-offset-4">{chunks}</a>,
@@ -302,4 +322,10 @@ function normalizeOptionalUrl(value: FormDataEntryValue | null) {
   const url = typeof value === "string" ? value.trim() : "";
   if (!url) return undefined;
   return /^https:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+function obfuscateEmail(email: string) {
+  const [name, domain] = email.split("@");
+  if (!name || !domain) return email;
+  return `${name[0]}***@${domain}`;
 }

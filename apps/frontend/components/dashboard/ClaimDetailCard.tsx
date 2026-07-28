@@ -165,6 +165,15 @@ export function ClaimDetailCard({ claim }: { claim: ClaimData }) {
             )}
           </div>
 
+          {claim.status === "UNDER_REVIEW" && (
+            <div className="mb-6 rounded-2xl border border-sky-200 bg-sky-50 p-4">
+              <h4 className="text-sm font-bold text-sky-900 mb-1">{t("documentUpload.title") || "نیاز به تایید مدارک"}</h4>
+              <p className="text-xs leading-6 text-sky-800">
+                {t("documentUpload.description") || "برای تسریع در روند بررسی، لطفاً مدارک اثبات مالکیت کسب‌وکار (مانند قبض یا جواز کسب) را از طریق بخش پیام‌ها در زیر آپلود کنید."}
+              </p>
+            </div>
+          )}
+
           <h4 className="font-bold text-slate-800 mb-3">{t("notes.title") || "پیام‌ها و مکاتبات"}</h4>
           <div className="rounded-2xl bg-slate-50/70 p-4 border border-slate-200/60 space-y-4 max-h-[500px] overflow-y-auto">
             {notes.length === 0 ? (

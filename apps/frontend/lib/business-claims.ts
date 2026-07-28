@@ -245,6 +245,74 @@ export async function sendBusinessClaimApprovedEmail(input: {
   });
 }
 
+export async function sendBusinessClaimWarningEmailToCurrentOwner(input: {
+  to: string;
+  businessName: string;
+  claimantName: string;
+  locale?: string;
+}) {
+  const isDe = input.locale?.toLowerCase().startsWith("de");
+  const isEn = input.locale?.toLowerCase().startsWith("en");
+
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/business-portal`;
+
+  let badgeText = "هشدار امنیتی";
+  let title = "تلاش برای انتقال مالکیت کسب‌وکار شما";
+  let subtitle = `مالک محترم کسب‌وکار <strong>${input.businessName}</strong>،<br/>به اطلاع می‌رسانیم که شخصی به نام <strong>${input.claimantName}</strong> به آدرس ایمیل رسمی کسب‌وکار شما دسترسی پیدا کرده و درخواست انتقال مالکیت در سیستم فارگو ثبت کرده است.<br/><br/>اگر شما این شخص را می‌شناسید (مثلاً مالک جدید یا کارمند شماست)، نیازی به انجام کاری نیست. اما اگر این درخواست بدون هماهنگی شما ثبت شده، لطفاً در اسرع وقت از طریق داشبورد به ما اطلاع دهید.`;
+  let details = [
+    { label: "نام کسب‌وکار", value: input.businessName },
+    { label: "متقاضی جدید", value: input.claimantName },
+    { label: "مهلت پاسخ‌گویی", value: "۱۴ روز" },
+  ];
+  let footerNote = "با تشکر،<br/><strong>تیم فارگو (Fargo Team)</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>این پیام مطابق با قوانین حفاظت از داده‌ها (GDPR Art. 6(1)(f)) و برای حفظ امنیت اطلاعات کسب‌وکار شما ارسال شده است.</small>";
+  let actionBtn = { label: "ورود به داشبورد", url: dashboardUrl };
+  let subject = `هشدار: درخواست مالکیت جدید برای ${input.businessName} | Fargo`;
+
+  if (isDe) {
+    badgeText = "Sicherheitswarnung";
+    title = "Versuch der Eigentumsübertragung";
+    subtitle = `Sehr geehrte(r) Inhaber(in) von <strong>${input.businessName}</strong>,<br/>wir möchten Sie darüber informieren, dass eine Person namens <strong>${input.claimantName}</strong> Zugriff auf die offizielle E-Mail-Adresse Ihres Unternehmens erhalten und einen Inhaberantrag bei Fargo gestellt hat.<br/><br/>Wenn Sie diese Person kennen, müssen Sie nichts weiter tun. Sollte dieser Antrag jedoch ohne Ihr Einverständnis gestellt worden sein, melden Sie sich bitte umgehend über Ihr Dashboard.`;
+    details = [
+      { label: "Unternehmen", value: input.businessName },
+      { label: "Neuer Antragsteller", value: input.claimantName },
+      { label: "Frist", value: "14 Tage" },
+    ];
+    footerNote = "Mit freundlichen Grüßen,<br/><strong>Ihr Fargo Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>Diese Nachricht wird in Übereinstimmung mit Art. 6 Abs. 1 lit. f DSGVO gesendet, um die Sicherheit Ihres Unternehmenskontos zu gewährleisten.</small>";
+    actionBtn = { label: "Zum Dashboard", url: dashboardUrl };
+    subject = `Warnung: Neuer Inhaberantrag für ${input.businessName} | Fargo`;
+  } else if (isEn) {
+    badgeText = "Security Warning";
+    title = "Attempted Ownership Transfer";
+    subtitle = `Dear Owner of <strong>${input.businessName}</strong>,<br/>We would like to inform you that a person named <strong>${input.claimantName}</strong> has accessed your official business email address and submitted an ownership claim on Fargo.<br/><br/>If you know this person (e.g., a new owner or employee), no action is required. However, if this request was submitted without your consent, please inform us immediately via your dashboard.`;
+    details = [
+      { label: "Business name", value: input.businessName },
+      { label: "New claimant", value: input.claimantName },
+      { label: "Deadline", value: "14 Days" },
+    ];
+    footerNote = "Thank you,<br/><strong>Fargo Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>This message is sent in accordance with GDPR Art. 6(1)(f) to protect the security of your business account.</small>";
+    actionBtn = { label: "Go to Dashboard", url: dashboardUrl };
+    subject = `Warning: New ownership claim for ${input.businessName} | Fargo`;
+  }
+
+  const html = renderEmailCard({
+    badgeText,
+    badgeBg: "#ef4444",
+    title,
+    subtitle,
+    details,
+    actionButton: actionBtn,
+    footerNote,
+    locale: input.locale || "fa",
+  });
+
+  await sendMail({
+    to: input.to,
+    subject,
+    text: title,
+    html,
+  });
+}
+
 export function claimRetentionDate(days: number) {
   return new Date(Date.now() + days * 24 * 60 * 60_000);
 }

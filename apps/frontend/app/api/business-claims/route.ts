@@ -49,9 +49,17 @@ export async function POST(request: Request) {
   if (business.ownerId === userId) return error("ALREADY_OWNER", "You already own this business.", 409);
   if (activeClaim) return error("CLAIM_ALREADY_ACTIVE", "You already have an active claim for this business.", 409, { claimId: activeClaim.id, status: activeClaim.status });
 
+  let officialBusinessEmail = parsed.data.officialBusinessEmail;
+  if (parsed.data.useExistingEmail) {
+    if (!business.email) return error("NO_EXISTING_EMAIL", "This business does not have an official email.", 400);
+    officialBusinessEmail = business.email.trim().toLowerCase();
+  }
+
+  if (!officialBusinessEmail) return error("INVALID_FIELDS", "An official email is required.", 400);
+
   let deliverable = false;
   try {
-    deliverable = await hasDeliverableEmailDomain(parsed.data.officialBusinessEmail);
+    deliverable = await hasDeliverableEmailDomain(officialBusinessEmail);
   } catch {
     return error("EMAIL_DOMAIN_UNAVAILABLE", "The email domain could not be checked. Please try again.", 503);
   }
@@ -59,7 +67,7 @@ export async function POST(request: Request) {
 
   const now = new Date();
   const otp = createClaimOtp();
-  const emailMatchesListing = Boolean(business.email && business.email.trim().toLowerCase() === parsed.data.officialBusinessEmail);
+  const emailMatchesListing = Boolean(business.email && business.email.trim().toLowerCase() === officialBusinessEmail);
 
   try {
     await prisma.businessClaim.create({
@@ -69,7 +77,7 @@ export async function POST(request: Request) {
         claimantUserId: user.id,
         claimantName: parsed.data.claimantName,
         claimantEmail: user.email,
-        officialBusinessEmail: parsed.data.officialBusinessEmail,
+        officialBusinessEmail,
         officialUrl: parsed.data.officialUrl,
         privacyNoticeVersion: claimPrivacyNoticeVersion(),
         privacyNoticeAcceptedAt: now,
@@ -93,7 +101,7 @@ export async function POST(request: Request) {
 
   try {
     await sendBusinessClaimOtp({
-      to: parsed.data.officialBusinessEmail,
+      to: officialBusinessEmail,
       businessName: business.businessName,
       claimantName: parsed.data.claimantName,
       code: otp.code,
