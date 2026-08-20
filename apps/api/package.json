@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --env-file=../../packages/database/.env.development --loader ts-node/esm --watch src/server.ts",
     "build": "pnpm --dir ../.. --filter @fargo/shared build && pnpm --dir ../.. --filter @fargo/database generate && tsc",
-    "start": "node dist/server.js",
+    "start": "pnpm --dir ../.. --filter @fargo/database generate && node dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
