@@ -1,11 +1,12 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import { resolve } from "node:path";
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@fargo/database", "@fargo/shared"],
   turbopack: {
-    root: "../../",
+    root: resolve(process.cwd(), "../.."),
   },
   images: {
     remotePatterns: [

@@ -66,7 +66,11 @@ export default async function BusinessPortalPage() {
     createdAt: c.createdAt.toISOString(),
     verifiedAt: c.verifiedAt?.toISOString() ?? null,
     reviewedAt: c.reviewedAt?.toISOString() ?? null,
-    notes: c.notes.map((n) => ({ ...n, createdAt: n.createdAt.toISOString() })),
+    notes: c.notes.map((n) => ({
+      ...n,
+      attachments: claimNoteAttachments(n.attachments),
+      createdAt: n.createdAt.toISOString(),
+    })),
   }));
 
   if (!businesses.length && !claims.length) {
@@ -212,6 +216,19 @@ export default async function BusinessPortalPage() {
       )}
     </div>
   );
+}
+
+function claimNoteAttachments(value: unknown): Array<{ url: string; name: string }> | null {
+  if (!Array.isArray(value)) return null;
+
+  const attachments = value.flatMap((attachment) => {
+    if (!attachment || typeof attachment !== "object") return [];
+    const { url, name } = attachment as { url?: unknown; name?: unknown };
+    if (typeof url !== "string" || !url) return [];
+    return [{ url, name: typeof name === "string" && name ? name : "Attachment" }];
+  });
+
+  return attachments.length ? attachments : null;
 }
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
