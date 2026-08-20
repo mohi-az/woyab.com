@@ -2,15 +2,16 @@
   "name": "@fargo/database",
   "version": "1.0.0",
   "description": "Database package for Fargo - Prisma schema, migrations, and generated client.",
-  "main": "./index.ts",
+  "main": "./generated/prisma/index.js",
+  "types": "./generated/prisma/index.d.ts",
   "exports": {
     ".": {
-      "types": "./index.ts",
-      "default": "./index.ts"
+      "types": "./generated/prisma/index.d.ts",
+      "default": "./generated/prisma/index.js"
     },
     "./client": {
-      "types": "./generated/prisma/client.ts",
-      "default": "./generated/prisma/client.ts"
+      "types": "./generated/prisma/client.d.ts",
+      "default": "./generated/prisma/client.js"
     }
   },
   "scripts": {
