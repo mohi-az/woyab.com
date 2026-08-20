@@ -22,7 +22,16 @@ export async function POST(request: Request, context: Context) {
     where: { id, claimantUserId: userId },
     include: {
       business: {
-        select: { id: true, businessName: true, ownerId: true, email: true, website: true, removedAt: true, status: true },
+        select: {
+          id: true,
+          businessName: true,
+          ownerId: true,
+          email: true,
+          website: true,
+          removedAt: true,
+          status: true,
+          owner: { select: { email: true } },
+        },
       },
     },
   });
