@@ -1,7 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";
+import { storeBusinessImage } from "@/lib/business-image-storage";
 
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -33,13 +32,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "File size must not exceed 10 MB" }, { status: 413 });
   }
 
-  const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-  const filename = `${crypto.randomUUID()}.${ext}`;
-  const dir = join(process.cwd(), "public", "uploads", "businesses");
-
-  await mkdir(dir, { recursive: true });
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(join(dir, filename), buffer);
+  const url = await storeBusinessImage({
+    buffer,
+    contentType: file.type,
+    maxBytes: MAX_SIZE_BYTES,
+  });
 
-  return NextResponse.json({ url: `/uploads/businesses/${filename}` });
+  return NextResponse.json({ url });
 }

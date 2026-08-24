@@ -25,12 +25,14 @@ test("admin and owner writes resolve covers through one permanent-image service"
   assert.match(changeRequests, /applyBusinessChangeRequest[\s\S]*resolvePermanentBusinessCover/);
 });
 
-test("business lists use only permanent covers while details keep Google photos on demand", async () => {
+test("business lists prefer permanent covers while preserving a legacy fallback", async () => {
   const api = await frontendSource("lib/api.ts");
 
   const cardResolver = api.match(/function businessCardImageProps[\s\S]*?\n\}/)?.[0] ?? "";
   assert.match(cardResolver, /business\.coverImageUrl/);
-  assert.doesNotMatch(cardResolver, /google-photo-thumbnail/);
+  assert.match(cardResolver, /business\.coverImageUrl \|\| !business\.googlePlaceId/);
+  assert.match(cardResolver, /Compatibility fallback/);
+  assert.match(cardResolver, /google-photo-thumbnail/);
   assert.match(api, /index === 0 && business\.coverImageUrl/);
   assert.match(api, /google-photos\/\$\{photo\.photoReference\}\?maxWidth=800/);
 });

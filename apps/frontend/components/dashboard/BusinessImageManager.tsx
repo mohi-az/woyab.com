@@ -143,6 +143,7 @@ export function BusinessImageManager({
 
   return (
     <div className="grid gap-5">
+      <input type="hidden" name="imageMode" value={imageMode} />
       <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 sm:grid-cols-2">
         <button
           type="button"

@@ -31,8 +31,8 @@ test("claim matrix only auto-approves an exact non-public email or matching doma
 
   // Domain matching tests
   assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "manager@ali-cafe.de", businessWebsite: "https://www.ali-cafe.de", hasOwner: false }), "APPROVED");
-  assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "info@fargo.com", businessWebsite: "fargo.com", hasOwner: false }), "APPROVED");
-  assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "info@fargo.com", businessWebsite: "http://fargo.com/contact", hasOwner: false }), "APPROVED");
+  assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "info@woyab.com", businessWebsite: "woyab.com", hasOwner: false }), "APPROVED");
+  assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "info@woyab.com", businessWebsite: "http://woyab.com/contact", hasOwner: false }), "APPROVED");
   assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "info@gmail.com", businessWebsite: "https://gmail.com", hasOwner: false }), "UNDER_REVIEW");
   assert.equal(claimVerificationDecision({ emailMatchesListing: false, officialBusinessEmail: "manager@ali-cafe.de", businessWebsite: "https://www.other.de", hasOwner: false }), "UNDER_REVIEW");
 });

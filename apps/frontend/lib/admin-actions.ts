@@ -1,6 +1,6 @@
 "use server";
 
-import type { AttributeDataType, BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@fargo/database";
+import type { AttributeDataType, BusinessStatus, DayOfWeek, Prisma, ReviewStatus, UserRole } from "@woyab/database";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { appLocales } from "@/i18n/config";
@@ -10,6 +10,7 @@ import { ownershipRetentionDate } from "@/lib/business-claims";
 import { buildReviewModerationEmail, renderEmailCard } from "@/lib/email-templates";
 import { sendMail } from "@/lib/mail";
 import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
+import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 
@@ -336,6 +337,7 @@ export async function updateBusinessDetails(formData: FormData) {
   const specialtyIds = intValues(formData, "specialtyIds");
   const specialtyId = specialtyIds[0] ?? null;
   const ownerId = nullableValue(formData, "ownerId");
+  const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const contact = businessContactData(formData);
 
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
@@ -347,6 +349,26 @@ export async function updateBusinessDetails(formData: FormData) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
     if (!owner?.active) throw new Error("Selected owner is not an active user.");
   }
+
+  if (googlePlaceId) {
+    const duplicatePlace = await prisma.business.findFirst({
+      where: { googlePlaceId, id: { not: businessId }, removedAt: null },
+      select: { businessName: true },
+    });
+    if (duplicatePlace) throw new Error(`This Google Place ID already belongs to ${duplicatePlace.businessName}.`);
+  }
+
+  const currentBusiness = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { coverImageUrl: true, googlePlaceId: true },
+  });
+  if (!currentBusiness) throw new Error("Business not found.");
+  const coverImageUrl = await resolvePermanentBusinessCover({
+    googlePlaceId,
+    requestedCoverImageUrl: nullableValue(formData, "coverImageUrl"),
+    existingCoverImageUrl: currentBusiness.coverImageUrl,
+    refreshGoogleCover: currentBusiness.googlePlaceId !== googlePlaceId,
+  });
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
     locale,
@@ -378,7 +400,8 @@ export async function updateBusinessDetails(formData: FormData) {
         longitude: numberValue(formData, "longitude"),
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
-        googlePlaceId: nullableValue(formData, "googlePlaceId"),
+        googlePlaceId,
+        coverImageUrl,
         email: contact.email,
         phone: contact.phone,
         mobile: contact.mobile,
@@ -429,6 +452,7 @@ export async function createBusinessDetails(formData: FormData) {
   const specialtyIds = intValues(formData, "specialtyIds");
   const specialtyId = specialtyIds[0] ?? null;
   const ownerId = nullableValue(formData, "ownerId");
+  const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const contact = businessContactData(formData);
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
@@ -444,6 +468,18 @@ export async function createBusinessDetails(formData: FormData) {
 
   const duplicate = await prisma.business.findUnique({ where: { slug }, select: { id: true } });
   if (duplicate) throw new Error("This business slug already exists.");
+  if (googlePlaceId) {
+    const duplicatePlace = await prisma.business.findFirst({
+      where: { googlePlaceId, removedAt: null },
+      select: { businessName: true },
+    });
+    if (duplicatePlace) throw new Error(`This Google Place ID already belongs to ${duplicatePlace.businessName}.`);
+  }
+
+  const coverImageUrl = await resolvePermanentBusinessCover({
+    googlePlaceId,
+    requestedCoverImageUrl: nullableValue(formData, "coverImageUrl"),
+  });
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
     locale,
@@ -474,7 +510,8 @@ export async function createBusinessDetails(formData: FormData) {
         longitude: numberValue(formData, "longitude"),
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
-        googlePlaceId: nullableValue(formData, "googlePlaceId"),
+        googlePlaceId,
+        coverImageUrl,
         email: contact.email,
         phone: contact.phone,
         mobile: contact.mobile,
@@ -819,7 +856,7 @@ export async function updateReportStatus(formData: FormData) {
     try {
       await sendMail({
         to: recipient,
-        subject: `Fargo report decision: ${status}`,
+        subject: `woYab report decision: ${status}`,
         text: `Your report about ${target} was ${status.toLowerCase()}.\n\nDecision: ${decisionReason}\n${actionTaken ? `Action taken: ${actionTaken}` : ""}`,
         html: `<p>Your report about <strong>${escapeHtml(target)}</strong> was ${status.toLowerCase()}.</p><p><strong>Decision:</strong> ${escapeHtml(decisionReason || "")}</p>${actionTaken ? `<p><strong>Action taken:</strong> ${escapeHtml(actionTaken)}</p>` : ""}`,
       });
@@ -916,12 +953,12 @@ export async function updateClaimStatus(formData: FormData) {
         { label: "وضعیت درخواست", value: isApproved ? "تایید شده (Approved)" : "تایید نشد (Rejected)" },
         { label: "توضیح مدیریت", value: decisionReason || (isApproved ? "تایید مدارک و هویت" : "عدم احراز شرایط لازم") },
       ],
-      footerNote: "با تشکر از همراهی شما،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+      footerNote: "با تشکر از همراهی شما،<br/><strong>تیم woYab (woYab Team)</strong>",
     });
 
     await Promise.allSettled(recipients.map((to) => sendMail({
       to,
-      subject: `نتیجه بررسی درخواست مالکیت کسب‌وکار ${claim.business.businessName} | Fargo`,
+      subject: `نتیجه بررسی درخواست مالکیت کسب‌وکار ${claim.business.businessName} | woYab`,
       text: `The ownership claim for ${claim.business.businessName} is now ${status}. Reason: ${decisionReason || "No additional reason provided."}`,
       html,
     })));
@@ -960,19 +997,19 @@ export async function reviewBusinessChangeRequest(formData: FormData) {
       badgeBg: isApproved ? "#10b981" : "#ef4444",
       title: isApproved ? "پیشنهاد تغییرات شما تایید شد" : "نتیجه بررسی پیشنهاد تغییرات کسب‌وکار",
       subtitle: isApproved
-        ? `سلام،<br/>با تشکر از مشارکت و همکاری شما در فارگو، پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی توسط تیم فارگو تایید و روی صفحه کسب‌وکار اعمال گردید.`
+        ? `سلام،<br/>با تشکر از مشارکت و همکاری شما در woYab، پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی توسط تیم woYab تایید و روی صفحه کسب‌وکار اعمال گردید.`
         : `سلام،<br/>با تشکر از مشارکت شما، به اطلاع می‌رسانیم که پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی تایید نگردید.`,
       details: [
         { label: "نام کسب‌وکار", value: request.business.businessName },
         { label: "نتیجه بررسی", value: isApproved ? "تایید و اعمال شد" : "تایید نشد" },
         { label: "توضیح مدیریت", value: decisionReason || (isApproved ? "مطابق اطلاعات معتبر" : "اطلاعات پیشنهادی تایید نشد") },
       ],
-      footerNote: "با تشکر از همراهی شما در بهبود اطلاعات فارگو،<br/><strong>تیم فارگو (Fargo Team)</strong>",
+      footerNote: "با تشکر از همراهی شما در بهبود اطلاعات woYab،<br/><strong>تیم woYab (woYab Team)</strong>",
     });
 
     await sendMail({
       to: request.submitter.email,
-      subject: `نتیجه بررسی پیشنهاد تغییرات کسب‌وکار ${request.business.businessName} | Fargo`,
+      subject: `نتیجه بررسی پیشنهاد تغییرات کسب‌وکار ${request.business.businessName} | woYab`,
       text: `Your change request for ${request.business.businessName} was ${isApproved ? "approved" : "rejected"}. Reason: ${decisionReason}`,
       html,
     }).catch(() => undefined);

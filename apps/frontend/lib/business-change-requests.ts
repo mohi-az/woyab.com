@@ -1,8 +1,9 @@
 import "server-only";
 
-import type { Prisma } from "@fargo/database";
-import { publicBusinessDetailsChangeSchema } from "@fargo/shared";
+import type { Prisma } from "@woyab/database";
+import { publicBusinessDetailsChangeSchema } from "@woyab/shared";
 import { z } from "zod";
+import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { prisma } from "@/lib/prisma";
 
 const daySchema = z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]);
@@ -98,10 +99,24 @@ export async function businessChangeSnapshot(businessId: string) {
 }
 
 export async function applyBusinessChangeRequest(requestId: string, reviewerId: string, decisionReason: string) {
+  const coverContext = await prisma.businessChangeRequest.findUnique({
+    where: { id: requestId },
+    select: {
+      status: true,
+      business: { select: { coverImageUrl: true, googlePlaceId: true } },
+    },
+  });
+  const permanentCoverImageUrl = coverContext?.status === "PENDING" && !coverContext.business.coverImageUrl
+    ? await resolvePermanentBusinessCover({
+        googlePlaceId: coverContext.business.googlePlaceId,
+        existingCoverImageUrl: coverContext.business.coverImageUrl,
+      })
+    : null;
+
   return prisma.$transaction(async (tx) => {
     const request = await tx.businessChangeRequest.findUnique({ where: { id: requestId } });
     if (!request || request.status !== "PENDING") throw new Error("Change request is not pending.");
-    const business = await tx.business.findUnique({ where: { id: request.businessId }, select: { id: true, updatedAt: true, sourceLocale: true, removedAt: true, categoryId: true, subCategoryId: true, specialtyId: true, cityId: true, districtId: true } });
+    const business = await tx.business.findUnique({ where: { id: request.businessId }, select: { id: true, updatedAt: true, sourceLocale: true, removedAt: true, coverImageUrl: true, categoryId: true, subCategoryId: true, specialtyId: true, cityId: true, districtId: true } });
     if (!business) throw new Error("Business not found.");
     if (business.removedAt) throw new Error("BUSINESS_REMOVED");
 
@@ -180,6 +195,13 @@ export async function applyBusinessChangeRequest(requestId: string, reviewerId: 
         await tx.service.update({ where: { id: service.id }, data: { active: false } });
       }
       await tx.business.update({ where: { id: business.id }, data: { updatedAt: new Date() } });
+    }
+
+    if (!business.coverImageUrl && permanentCoverImageUrl) {
+      await tx.business.update({
+        where: { id: business.id },
+        data: { coverImageUrl: permanentCoverImageUrl },
+      });
     }
 
     await tx.businessChangeRequest.update({

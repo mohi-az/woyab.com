@@ -1,11 +1,12 @@
 "use server";
 
-import type { DayOfWeek, Prisma } from "@fargo/database";
+import type { DayOfWeek, Prisma } from "@woyab/database";
 import { revalidatePath } from "next/cache";
 import { redirectWithLocale } from "@/i18n/server";
 import { requireUserId } from "@/lib/auth-user";
 import { businessAttributeDefinitionSelect, extractBusinessAttributeValues, syncBusinessAttributes } from "@/lib/business-attributes";
 import { businessChangeSnapshot, parseChangePayload } from "@/lib/business-change-requests";
+import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { selectedTagIds, syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 import { ownerBusinessWizardSchema } from "@/lib/owner-business-validation";
@@ -249,12 +250,17 @@ export async function createOwnerBusiness(formData: FormData) {
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const latitude = numberValue(formData, "latitude");
   const longitude = numberValue(formData, "longitude");
+  const imageUrls = formData.getAll("imageUrl")
+    .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    .map((item) => item.trim());
+  const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
+  const coverImageUrl = await resolvePermanentBusinessCover({
+    googlePlaceId,
+    requestedCoverImageUrl,
+    useGoogleWhenMissing: value(formData, "imageMode") !== "manual",
+  });
 
   const business = await prisma.$transaction(async (tx) => {
-    // Collect uploaded image URLs (multiple hidden inputs named "imageUrl")
-    const imageUrls = formData.getAll("imageUrl").filter((v): v is string => typeof v === "string" && v.trim().length > 0).map((v) => v.trim());
-    const coverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
-
     const created = await tx.business.create({
       data: {
         ownerId: userId,

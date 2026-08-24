@@ -1,4 +1,4 @@
-import type { AppLocale, BusinessSearchBody, LocationOrigin } from "@fargo/shared";
+import type { AppLocale, BusinessSearchBody, LocationOrigin } from "@woyab/shared";
 import { cache } from "react";
 
 type CategoryApiItem = {
@@ -300,6 +300,8 @@ export type BusinessDetailData = {
     id: string;
     imageUrl: string;
     caption?: string | null;
+    sourceUri?: string | null;
+    authorAttributions?: Array<{ displayName: string; uri: string | null }>;
   }>;
   googlePlaceId?: string | null;
   categoryName?: string | null;
@@ -394,9 +396,11 @@ function businessCardImageProps(business: Pick<BusinessApiItem, "id" | "coverIma
     return { imageUrl: business.coverImageUrl, fallbackImageUrl: null };
   }
 
+  // Compatibility fallback for records created before permanent covers were
+  // introduced. Every active create/update flow now persists coverImageUrl.
   return {
     imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photo-thumbnail?maxWidth=640`,
-    fallbackImageUrl: business.coverImageUrl,
+    fallbackImageUrl: null,
   };
 }
 
@@ -674,16 +678,12 @@ export const fetchBusinessBySlug = cache(
       caption: image.caption,
     }));
 
-    if (gallery.length === 0 && business.coverImageUrl) {
-      gallery.push({
-        id: `${business.id}-cover`,
-        imageUrl: business.coverImageUrl,
-        caption: business.businessName,
-      });
-    }
+    const storedGoogleCover = business.coverImageUrl?.startsWith("/media/businesses/google-place-") === true
+      || business.coverImageUrl?.startsWith("/uploads/businesses/google-place-") === true;
 
-    // Google photos are the automatic fallback. A manually managed gallery always wins.
-    if (business.googlePlaceId && gallery.length === 0) {
+    // A manually managed gallery always wins. For Google-sourced businesses,
+    // the permanent local cover is first and the remaining photos stay on-demand.
+    if (business.googlePlaceId && gallery.length === 0 && (!business.coverImageUrl || storedGoogleCover)) {
       try {
         const googlePhotosRes = await fetch(
           `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
@@ -698,6 +698,12 @@ export const fetchBusinessBySlug = cache(
                 width: number;
                 height: number;
                 htmlAttributions: string[];
+                googleMapsUri: string | null;
+                authorAttributions: Array<{
+                  displayName: string;
+                  uri: string | null;
+                  photoUri: string | null;
+                }>;
               }>;
             };
           };
@@ -706,14 +712,29 @@ export const fetchBusinessBySlug = cache(
             // Replace gallery with Google photos (at least 2 if available)
             gallery = googlePhotos.map((photo, index) => ({
               id: `google-${index}`,
-              imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference}?maxWidth=800`,
+              imageUrl: index === 0 && business.coverImageUrl
+                ? business.coverImageUrl
+                : `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference}?maxWidth=800`,
               caption: photo.htmlAttributions[0] ?? business.businessName,
+              sourceUri: photo.googleMapsUri,
+              authorAttributions: photo.authorAttributions.map((author) => ({
+                displayName: author.displayName,
+                uri: author.uri,
+              })),
             }));
           }
         }
       } catch {
         // Fallback to local images silently
       }
+    }
+
+    if (gallery.length === 0 && business.coverImageUrl) {
+      gallery.push({
+        id: `${business.id}-cover`,
+        imageUrl: business.coverImageUrl,
+        caption: business.businessName,
+      });
     }
 
     return {
