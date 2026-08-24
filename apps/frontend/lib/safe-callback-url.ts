@@ -5,8 +5,8 @@ export function safeCallbackPath(value: string | string[] | undefined, fallback 
   }
 
   try {
-    const url = new URL(candidate, "https://fargo.local");
-    if (url.origin !== "https://fargo.local") return fallback;
+    const url = new URL(candidate, "https://woyab.local");
+    if (url.origin !== "https://woyab.local") return fallback;
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
     return fallback;

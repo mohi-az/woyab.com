@@ -6,7 +6,7 @@ import { businessTagOptionSelect } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Add Business | Business Portal | Fargo" };
+export const metadata: Metadata = { title: "Add Business | Business Portal | woYab" };
 
 type PageProps = { searchParams: Promise<{ businessName?: string | string[] }> };
 

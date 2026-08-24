@@ -57,10 +57,10 @@
     }
   },
   "AddBusinessPage": {
-    "metaTitle": "Unternehmen hinzufügen oder übernehmen | Fargo",
-    "metaDescription": "Suchen Sie Ihr Unternehmen bei Fargo, übernehmen Sie einen verfügbaren Eintrag oder legen Sie ein neues Unternehmen an.",
-    "eyebrow": "Fargo für Unternehmen",
-    "title": "Bringen Sie Ihr Unternehmen zu Fargo.",
+    "metaTitle": "Unternehmen hinzufügen oder übernehmen | woYab",
+    "metaDescription": "Suchen Sie Ihr Unternehmen bei woYab, übernehmen Sie einen verfügbaren Eintrag oder legen Sie ein neues Unternehmen an.",
+    "eyebrow": "woYab für Unternehmen",
+    "title": "Bringen Sie Ihr Unternehmen zu woYab.",
     "description": "Suchen Sie zuerst nach Ihrem Unternehmen. Sie können einen verfügbaren Eintrag übernehmen oder einen neuen anlegen, wenn er noch nicht vorhanden ist.",
     "fieldLabel": "Name Ihres Unternehmens",
     "placeholder": "Unternehmensnamen eingeben",
@@ -70,7 +70,7 @@
     "error": "Die Suche ist vorübergehend nicht verfügbar. Bitte versuchen Sie es erneut.",
     "noMatches": "Zu diesem Namen gibt es noch keinen passenden Eintrag.",
     "imageAlt": "Eine lokale Geschäftsinhaberin vor einem Geschäft im Viertel",
-    "artworkEyebrow": "Mit Fargo wachsen",
+    "artworkEyebrow": "Mit woYab wachsen",
     "artworkMessage": "Machen Sie lokale Suchanfragen zu neuen Kunden und sichern Sie Ihrem Unternehmen die Sichtbarkeit, die es zum Wachsen braucht."
   },
   "LocaleSwitcher": {
@@ -87,7 +87,7 @@
     "hero": {
       "eyebrow": "Persischsprachige Unternehmen in ganz Deutschland",
       "title": "Suchen Sie<br></br>ein Unternehmen?",
-      "description": "Fargo ist das Verzeichnis für persischsprachige Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
+      "description": "woYab ist das Verzeichnis für persischsprachige Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
       "queryPlaceholder": "Ich suche nach",
       "categoriesLabel": "Kategorien",
       "allCategories": "Alle Kategorien",
@@ -141,7 +141,7 @@
       }
     },
     "latestBusinessesSection": {
-      "eyebrow": "Neu bei Fargo",
+      "eyebrow": "Neu bei woYab",
       "title": "Neueste Unternehmen",
       "description": "Ein schneller Blick auf die neuesten aktiven Eintrage im Verzeichnis.",
       "cta": "Alle Unternehmen",
@@ -156,7 +156,7 @@
   "Businesses": {
     "eyebrow": "Lokale Unternehmen entdecken",
     "title": "Finden Sie das passende Unternehmen",
-    "description": "Durchsuchen Sie das Fargo-Verzeichnis und filtern Sie nach Kategorie, Fachgebiet und Stadt.",
+    "description": "Durchsuchen Sie das woYab-Verzeichnis und filtern Sie nach Kategorie, Fachgebiet und Stadt.",
     "resultsTitle": "Unternehmen",
     "resultCount": "{count, plural, =0 {Keine Unternehmen gefunden} one {# Unternehmen gefunden} other {# Unternehmen gefunden}}",
     "resultCountTemplate": "{count} Unternehmen gefunden",
@@ -333,7 +333,7 @@
       "ownerUnavailable": "Dieses Unternehmen hat bereits einen bestätigten Inhaber und kann nicht übernommen werden.",
       "ownedGuidance": {
         "title": "Dieses Unternehmen hat einen verifizierten Inhaber",
-        "description": "Nach der E-Mail-Verifizierung wird Ihr Antrag direkt an das Fargo-Team zur Prüfung weitergeleitet. Bei Bestätigung der neuen Inhaberschaft wird der Zugang des bisherigen Inhabers entzogen.",
+        "description": "Nach der E-Mail-Verifizierung wird Ihr Antrag direkt an das woYab-Team zur Prüfung weitergeleitet. Bei Bestätigung der neuen Inhaberschaft wird der Zugang des bisherigen Inhabers entzogen.",
         "action": "Inhaberanspruch einreichen"
       },
       "button": "Änderung vorschlagen", "title": "Unternehmensdaten bearbeiten", "close": "Schließen",
@@ -344,7 +344,7 @@
       "claimSuccess": {
         "title": "Ihr Antrag wurde erfolgreich eingereicht",
         "approvedDescription": "Ihre Inhaberschaft wurde bestätigt! Sie können Ihre Unternehmensseite jetzt über das Inhaber-Dashboard verwalten.",
-        "reviewDescription": "Ihre E-Mail wurde bestätigt und der Inhaberanspruch wurde zur Prüfung an das Fargo-Team weitergeleitet. Sie werden per E-Mail und Dashboard benachrichtigt.",
+        "reviewDescription": "Ihre E-Mail wurde bestätigt und der Inhaberanspruch wurde zur Prüfung an das woYab-Team weitergeleitet. Sie werden per E-Mail und Dashboard benachrichtigt.",
         "viewDashboard": "Im Dashboard ansehen"
       },
       "suggestion": { "field": "Zu ändernde Information", "value": "Neue oder korrekte Informationen", "valuePlaceholder": "Geben Sie hier die neuen oder korrigierten Angaben ein...", "context": "Zusätzlicher Kontext zur Überprüfung", "contextPlaceholder": "Geben Sie optionale Details oder Quellen an, die bei der Überprüfung helfen...", "evidence": "Beleg-Link (optional)", "submit": "Vorschlag einreichen", "submitted": "Vielen Dank für Ihre Unterstützung! Ihr Änderungsvorschlag wurde erfolgreich eingereicht und wird in Kürze geprüft." },
@@ -427,7 +427,7 @@
     "newsletterDescription": "Der Newsletter wird mit einem zukünftigen Update verfügbar sein.",
     "emailPlaceholder": "Ihre E-Mail-Adresse",
     "comingSoon": "Demnächst",
-    "copyright": "© {year} Fargo. Alle Rechte vorbehalten.",
+    "copyright": "© {year} woYab. Alle Rechte vorbehalten.",
     "madeFor": "Persischsprachige Unternehmen in Deutschland",
     "legal": "Nutzungsbedingungen & Impressum",
     "privacy": "Datenschutzerklärung",
@@ -435,7 +435,7 @@
   },
   "CookieConsent": {
     "bannerTitle": "Ihre Privatsphäre ist uns wichtig",
-    "bannerDescription": "Wir verwenden notwendige Cookies für den Betrieb von Fargo. Analyse- und Marketing-Technologien werden nur mit Ihrer Einwilligung aktiviert.",
+    "bannerDescription": "Wir verwenden notwendige Cookies für den Betrieb von woYab. Analyse- und Marketing-Technologien werden nur mit Ihrer Einwilligung aktiviert.",
     "acceptAll": "Alle akzeptieren",
     "rejectAll": "Alle ablehnen",
     "manage": "Einstellungen verwalten",
@@ -444,7 +444,7 @@
     "necessaryTitle": "Notwendig",
     "necessaryDescription": "Diese Technologien sind für grundlegende Funktionen und Sicherheit erforderlich und können nicht deaktiviert werden.",
     "analyticsTitle": "Analyse",
-    "analyticsDescription": "Hilft uns zu verstehen, wie Fargo genutzt wird, damit wir das Angebot verbessern können.",
+    "analyticsDescription": "Hilft uns zu verstehen, wie woYab genutzt wird, damit wir das Angebot verbessern können.",
     "marketingTitle": "Marketing",
     "marketingDescription": "Ermöglicht personalisierte Inhalte und die Messung von Kampagnen. Derzeit werden keine Marketing-Skripte geladen.",
     "save": "Auswahl speichern",
@@ -508,9 +508,9 @@
       "backToLogin": "Zurück zur Anmeldung"
     },
     "login": {
-      "title": "Bei Fargo anmelden",
+      "title": "Bei woYab anmelden",
       "description": "Verbinden Sie sich mit großartigen lokalen Unternehmen",
-      "terms": "Indem Sie fortfahren, stimmen Sie den <terms>Nutzungsbedingungen</terms> von Fargo zu und erkennen die <privacy>Datenschutzrichtlinie</privacy> von Fargo an.",
+      "terms": "Indem Sie fortfahren, stimmen Sie den <terms>Nutzungsbedingungen</terms> von woYab zu und erkennen die <privacy>Datenschutzrichtlinie</privacy> von woYab an.",
       "submit": "Anmelden",
       "submitting": "Anmeldung lauft...",
       "invalidCredentials": "Anmeldedaten oder Administrator-Code sind nicht korrekt.",
@@ -545,7 +545,7 @@
       "editProfile": "Profil bearbeiten"
     },
     "sidebar": {
-      "fallbackName": "Fargo-Nutzer",
+      "fallbackName": "woYab-Nutzer",
       "overview": "?bersicht",
       "profile": "Profil",
       "favorites": "Favoriten",
@@ -575,7 +575,7 @@
       "fields": { "claimant": "Antragsteller", "email": "Offizielle E-Mail", "verified": "E-Mail bestätigt", "status": "Status", "reason": "Entscheidungsgrund" },
       "notes": {
         "title": "Nachrichten & Korrespondenz",
-        "admin": "Fargo-Team",
+        "admin": "woYab-Team",
         "you": "Sie",
         "empty": "Noch keine Nachrichten.",
         "placeholder": "Nachricht, Nachweis oder zusätzliche Angaben schreiben...",
@@ -600,7 +600,7 @@
       "title": "Mein Profil",
       "description": "Verwalten Sie Ihre wichtigsten Informationen und Ihr Profilbild.",
       "form": {
-        "fallbackName": "Fargo-Nutzer",
+        "fallbackName": "woYab-Nutzer",
         "invalidImage": "Bitte w?hlen Sie eine g?ltige Bilddatei.",
         "imageTooLarge": "Das Bild muss kleiner als 5 MB sein.",
         "uploadFailed": "Bild konnte nicht hochgeladen werden.",
@@ -741,9 +741,9 @@
   },
   "Admin": {
     "shell": {
-      "fallbackName": "Fargo Admin",
+      "fallbackName": "woYab Admin",
       "ownerPanel": "Owner-Bereich",
-      "title": "Fargo Kontrollpanel",
+      "title": "woYab Kontrollpanel",
       "openMenu": "Admin-Menue oeffnen",
       "closeMenu": "Admin-Menue schliessen",
       "lightMode": "Hellen Modus nutzen",
@@ -769,7 +769,7 @@
     },
     "overview": {
       "title": "Willkommen zurueck",
-      "description": "Ueberwachen Sie Fargo-Betrieb, Moderation und Verzeichnisqualitaet an einem Ort.",
+      "description": "Ueberwachen Sie woYab-Betrieb, Moderation und Verzeichnisqualitaet an einem Ort.",
       "businessHealth": "Status der Eintraege",
       "businessHealthDescription": "Aktueller Veroeffentlichungsstatus.",
       "reviewHealth": "Status der Bewertungen",
@@ -1112,7 +1112,7 @@
     },
     "support": {
       "title": "Support-Tickets",
-      "description": "Sprechen Sie direkt mit der Fargo-Administration und verfolgen Sie Ihre Anfragen.",
+      "description": "Sprechen Sie direkt mit der woYab-Administration und verfolgen Sie Ihre Anfragen.",
       "newTicket": "Neues Ticket",
       "subject": "Betreff",
       "message": "Beschreiben Sie Ihr Anliegen mit ausreichend Details…",
@@ -1122,7 +1122,7 @@
       "reply": "Antworten",
       "closedNote": "Dieses Ticket ist geschlossen. Erstellen Sie ein neues Ticket, wenn Sie weitere Hilfe benötigen.",
       "youLabel": "Sie",
-      "fargoSupport": "Fargo-Support",
+      "woyabSupport": "woYab-Support",
       "statusLabels": {
         "OPEN": "Offen",
         "PENDING": "Warte auf Sie",
@@ -1132,11 +1132,11 @@
     }
   },
   "ForBusinesses": {
-    "metaTitle": "Fargo für Unternehmen — Lokale Präsenz ausbauen",
-    "metaDescription": "Registrieren Sie Ihr persischsprachiges Unternehmen auf Fargo und erreichen Sie Tausende von Kunden in ganz Deutschland.",
+    "metaTitle": "woYab für Unternehmen — Lokale Präsenz ausbauen",
+    "metaDescription": "Registrieren Sie Ihr persischsprachiges Unternehmen auf woYab und erreichen Sie Tausende von Kunden in ganz Deutschland.",
     "heroEyebrow": "Für Unternehmer",
-    "heroTitle": "Wachsen Sie mit Fargo",
-    "heroDescription": "Schließen Sie sich Hunderten persischsprachiger Unternehmen an, die bereits bei Fargo gelistet sind. Erreichen Sie neue Kunden, verwalten Sie Ihre Präsenz und verfolgen Sie Ihre Leistung.",
+    "heroTitle": "Wachsen Sie mit woYab",
+    "heroDescription": "Schließen Sie sich Hunderten persischsprachiger Unternehmen an, die bereits bei woYab gelistet sind. Erreichen Sie neue Kunden, verwalten Sie Ihre Präsenz und verfolgen Sie Ihre Leistung.",
     "heroPrimary": "Unternehmen hinzufügen",
     "heroSecondary": "Bestehende Unternehmen verwalten",
     "featuresTitle": "Alles, was Sie für den Erfolg brauchen",
@@ -1156,7 +1156,7 @@
     "ctaTitle": "Bereit loszulegen?",
     "ctaDescription": "Es dauert weniger als fünf Minuten, Ihr Unternehmen hinzuzufügen.",
     "ctaAction": "Jetzt Unternehmen hinzufügen",
-    "claimTitle": "Bereits bei Fargo gelistet?",
+    "claimTitle": "Bereits bei woYab gelistet?",
     "claimDescription": "Übernehmen Sie Ihren bestehenden Eintrag kostenlos.",
     "claimAction": "Eintrag übernehmen"
   }

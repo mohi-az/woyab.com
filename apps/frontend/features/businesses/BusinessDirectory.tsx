@@ -133,7 +133,7 @@ export function BusinessDirectory({
     setRadiusKm(5);
     setFilters({ page: 1, limit: initialFilters.limit });
     setResetVersion((version) => version + 1);
-    sessionStorage.removeItem("fargo:business-search-location");
+    sessionStorage.removeItem("woyab:business-search-location");
   }, [initialFilters.limit]);
 
   useEffect(() => {

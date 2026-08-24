@@ -20,29 +20,29 @@ export const viewport: Viewport = {
   userScalable: true,
 };
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: "Fargo — Persischsprachige Unternehmen in Deutschland",
-    template: "%s | Fargo",
+    default: "woYab — Persischsprachige Unternehmen in Deutschland",
+    template: "%s | woYab",
   },
   description:
-    "Fargo ist das umfassende Verzeichnis persischsprachiger Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
+    "woYab ist das umfassende Verzeichnis persischsprachiger Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
   keywords: [
     "Persian-speaking businesses Germany",
     "persischsprachige Unternehmen Deutschland",
     "کسب‌وکار فارسی‌زبان آلمان",
     "Persian directory",
-    "Fargo",
+    "woYab",
     "persischsprachige Restaurants",
     "persischsprachige Ärzte",
     "persische Dienstleistungen",
   ],
-  authors: [{ name: "Fargo" }],
-  creator: "Fargo",
-  publisher: "Fargo",
+  authors: [{ name: "woYab" }],
+  creator: "woYab",
+  publisher: "woYab",
   robots: {
     index: true,
     follow: true,
@@ -56,8 +56,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Fargo",
-    title: "Fargo — Iranische Unternehmen in Deutschland",
+    siteName: "woYab",
+    title: "woYab — Iranische Unternehmen in Deutschland",
     description:
       "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland. Restaurants, Ärzte, Anwälte und mehr.",
     locale: "de_DE",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Fargo — Iranische Unternehmen in Deutschland",
+    title: "woYab — Iranische Unternehmen in Deutschland",
     description:
       "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland.",
   },
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Fargo",
+    title: "woYab",
   },
   formatDetection: { telephone: false },
   icons: {

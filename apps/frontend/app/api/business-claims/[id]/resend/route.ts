@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { claimResendDecision } from "@fargo/shared";
+import { claimResendDecision } from "@woyab/shared";
 import { currentUserId } from "@/lib/auth-user";
 import {
   claimOtpMaxSendsPerWindow,

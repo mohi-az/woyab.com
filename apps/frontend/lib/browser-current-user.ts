@@ -2,7 +2,7 @@
 
 import type { CurrentUser } from "@/lib/api";
 
-const STORAGE_KEY = "fargo:current-user";
+const STORAGE_KEY = "woyab:current-user";
 
 export function getStoredCurrentUser(): CurrentUser | null {
   if (typeof window === "undefined") return null;

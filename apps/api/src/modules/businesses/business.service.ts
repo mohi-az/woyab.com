@@ -1,4 +1,4 @@
-import type { AppLocale, BusinessSearchBody } from "@fargo/shared";
+import type { AppLocale, BusinessSearchBody } from "@woyab/shared";
 
 import { ApiError } from "../../errors/api-error.js";
 import type { CreateBusinessBody, ListBusinessesQuery, UpdateBusinessBody } from "./business.schema.js";

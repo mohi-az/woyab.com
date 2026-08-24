@@ -25,7 +25,7 @@ export function claimTermsVersion() {
 function otpSecret() {
   const secret = process.env.AUTH_SECRET;
   if (!secret && process.env.NODE_ENV === "production") throw new Error("AUTH_SECRET is required for claim OTPs.");
-  return secret || "fargo-local-development-claim-secret";
+  return secret || "woyab-local-development-claim-secret";
 }
 
 export function createClaimOtp() {
@@ -87,12 +87,12 @@ export async function sendBusinessClaimOtp(input: {
       { label: "کد ۶ رقمی تایید", value: input.code },
       { label: "مدت اعتبار", value: "۱۰ دقیقه" },
     ],
-    footerNote: "اگر شما این درخواست را ثبت نکرده‌اید، می‌توانید این ایمیل را نادیده بگیرید.<br/><strong>تیم فارگو (Fargo Team)</strong>",
+    footerNote: "اگر شما این درخواست را ثبت نکرده‌اید، می‌توانید این ایمیل را نادیده بگیرید.<br/><strong>تیم woYab (woYab Team)</strong>",
   });
 
   await sendMail({
     to: input.to,
-    subject: `کد تایید احراز مالکیت کسب‌وکار ${input.businessName} | Fargo`,
+    subject: `کد تایید احراز مالکیت کسب‌وکار ${input.businessName} | woYab`,
     text: [
       `کسب‌وکار: ${input.businessName}`,
       `متقاضی: ${input.claimantName}`,
@@ -114,47 +114,47 @@ export async function sendBusinessClaimUnderReviewEmail(input: {
   const isEn = input.locale?.toLowerCase().startsWith("en");
   const isFa = !isDe && !isEn;
 
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/business-portal`;
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://woyab.ir"}/${input.locale || "fa"}/business-portal`;
 
   let badgeText = "در حال بررسی";
   let title = "درخواست مالکیت شما دریافت شد";
-  let subtitle = `سلام ${input.claimantName} عزیز،<br/>از ثبت درخواست شما برای مدیریت کسب‌وکار <strong>${input.businessName}</strong> سپاسگزاریم. ایمیل شما با موفقیت تایید شد و درخواست شما جهت بررسی نهایی به تیم پشتیبانی فارگو ارسال گردید.<br/><br/>اطلاعات ارسالی شما توسط کارشناسان بررسی خواهد شد و نتیجه آن به زودی از طریق همین ایمیل اطلاع‌رسانی می‌گردد.`;
+  let subtitle = `سلام ${input.claimantName} عزیز،<br/>از ثبت درخواست شما برای مدیریت کسب‌وکار <strong>${input.businessName}</strong> سپاسگزاریم. ایمیل شما با موفقیت تایید شد و درخواست شما جهت بررسی نهایی به تیم پشتیبانی woYab ارسال گردید.<br/><br/>اطلاعات ارسالی شما توسط کارشناسان بررسی خواهد شد و نتیجه آن به زودی از طریق همین ایمیل اطلاع‌رسانی می‌گردد.`;
   let details = [
     { label: "نام کسب‌وکار", value: input.businessName },
     { label: "نام متقاضی", value: input.claimantName },
     { label: "ایمیل رسمی ثبت‌شده", value: input.officialBusinessEmail },
     { label: "وضعیت درخواست", value: "در انتظار بررسی توسط مدیران (Under Review)" },
   ];
-  let footerNote = "با تشکر از صبر و همکاری شما،<br/><strong>تیم پشتیبانی فارگو (Fargo Team)</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>این پیام به منظور انجام اقدامات پیش‌قراردادی و بررسی درخواست شما ارسال شده است (مطابق ماده 6(1)(b) قانون GDPR). شما می‌توانید در هر زمان از طریق داشبورد خود از این درخواست انصراف دهید.</small>";
+  let footerNote = "با تشکر از صبر و همکاری شما،<br/><strong>تیم پشتیبانی woYab (woYab Team)</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>این پیام به منظور انجام اقدامات پیش‌قراردادی و بررسی درخواست شما ارسال شده است (مطابق ماده 6(1)(b) قانون GDPR). شما می‌توانید در هر زمان از طریق داشبورد خود از این درخواست انصراف دهید.</small>";
   let actionBtn = { label: "مشاهده وضعیت در داشبورد", url: dashboardUrl };
-  let subject = `درخواست مالکیت کسب‌وکار ${input.businessName} ثبت شد | Fargo`;
+  let subject = `درخواست مالکیت کسب‌وکار ${input.businessName} ثبت شد | woYab`;
 
   if (isDe) {
     badgeText = "In Prüfung";
     title = "Ihr Inhaberantrag wurde empfangen";
-    subtitle = `Hallo ${input.claimantName},<br/>vielen Dank für Ihren Antrag auf Verwaltung des Unternehmens <strong>${input.businessName}</strong>. Ihre E-Mail wurde erfolgreich verifiziert und Ihr Antrag wurde zur abschließenden Prüfung an das Fargo-Support-Team weitergeleitet.<br/><br/>Ihre Angaben werden von unseren Experten geprüft und das Ergebnis wird Ihnen in Kürze per E-Mail mitgeteilt.`;
+    subtitle = `Hallo ${input.claimantName},<br/>vielen Dank für Ihren Antrag auf Verwaltung des Unternehmens <strong>${input.businessName}</strong>. Ihre E-Mail wurde erfolgreich verifiziert und Ihr Antrag wurde zur abschließenden Prüfung an das woYab-Support-Team weitergeleitet.<br/><br/>Ihre Angaben werden von unseren Experten geprüft und das Ergebnis wird Ihnen in Kürze per E-Mail mitgeteilt.`;
     details = [
       { label: "Unternehmensname", value: input.businessName },
       { label: "Antragsteller", value: input.claimantName },
       { label: "Offizielle E-Mail", value: input.officialBusinessEmail },
       { label: "Status", value: "In Prüfung durch Moderatoren (Under Review)" },
     ];
-    footerNote = "Vielen Dank für Ihre Geduld und Zusammenarbeit,<br/><strong>Ihr Fargo Support Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>Diese Nachricht wurde zur Durchführung vorvertraglicher Maßnahmen und zur Prüfung Ihres Antrags gesendet (gemäß Art. 6 Abs. 1 lit. b DSGVO). Sie können Ihren Antrag jederzeit über Ihr Dashboard zurückziehen.</small>";
+    footerNote = "Vielen Dank für Ihre Geduld und Zusammenarbeit,<br/><strong>Ihr woYab Support Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>Diese Nachricht wurde zur Durchführung vorvertraglicher Maßnahmen und zur Prüfung Ihres Antrags gesendet (gemäß Art. 6 Abs. 1 lit. b DSGVO). Sie können Ihren Antrag jederzeit über Ihr Dashboard zurückziehen.</small>";
     actionBtn = { label: "Status im Dashboard ansehen", url: dashboardUrl };
-    subject = `Inhaberantrag für ${input.businessName} eingereicht | Fargo`;
+    subject = `Inhaberantrag für ${input.businessName} eingereicht | woYab`;
   } else if (isEn) {
     badgeText = "Under Review";
     title = "Your ownership claim was received";
-    subtitle = `Hello ${input.claimantName},<br/>Thank you for submitting a claim to manage <strong>${input.businessName}</strong>. Your email was successfully verified and your request has been forwarded to the Fargo support team for final review.<br/><br/>Your submitted information will be reviewed by our specialists and you will be notified of the result shortly.`;
+    subtitle = `Hello ${input.claimantName},<br/>Thank you for submitting a claim to manage <strong>${input.businessName}</strong>. Your email was successfully verified and your request has been forwarded to the woYab support team for final review.<br/><br/>Your submitted information will be reviewed by our specialists and you will be notified of the result shortly.`;
     details = [
       { label: "Business name", value: input.businessName },
       { label: "Applicant", value: input.claimantName },
       { label: "Official email", value: input.officialBusinessEmail },
       { label: "Status", value: "Awaiting admin review" },
     ];
-    footerNote = "Thank you for your patience and cooperation,<br/><strong>Fargo Support Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>This message is sent for the performance of pre-contractual measures and to process your request (according to Art. 6(1)(b) GDPR). You can withdraw this request at any time via your dashboard.</small>";
+    footerNote = "Thank you for your patience and cooperation,<br/><strong>woYab Support Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>This message is sent for the performance of pre-contractual measures and to process your request (according to Art. 6(1)(b) GDPR). You can withdraw this request at any time via your dashboard.</small>";
     actionBtn = { label: "View status in dashboard", url: dashboardUrl };
-    subject = `Ownership claim for ${input.businessName} submitted | Fargo`;
+    subject = `Ownership claim for ${input.businessName} submitted | woYab`;
   }
 
   const html = renderEmailCard({
@@ -186,7 +186,7 @@ export async function sendBusinessClaimApprovedEmail(input: {
   const isEn = input.locale?.toLowerCase().startsWith("en");
   const isFa = !isDe && !isEn;
 
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/business-portal`;
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://woyab.ir"}/${input.locale || "fa"}/business-portal`;
 
   let badgeText = "تایید شد";
   let title = "تایید درخواست مالکیت کسب‌وکار";
@@ -196,9 +196,9 @@ export async function sendBusinessClaimApprovedEmail(input: {
     { label: "نام متقاضی", value: input.claimantName },
     { label: "وضعیت دسترسی", value: "فعال (Owner Access)" },
   ];
-  let footerNote = "با تشکر از همراهی شما،<br/><strong>تیم فارگو (Fargo Team)</strong>";
+  let footerNote = "با تشکر از همراهی شما،<br/><strong>تیم woYab (woYab Team)</strong>";
   let actionBtn = { label: "ورود به داشبورد صاحب کسب‌وکار", url: dashboardUrl };
-  let subject = `مالکیت کسب‌وکار ${input.businessName} تایید شد | Fargo`;
+  let subject = `مالکیت کسب‌وکار ${input.businessName} تایید شد | woYab`;
 
   if (isDe) {
     badgeText = "Genehmigt";
@@ -209,9 +209,9 @@ export async function sendBusinessClaimApprovedEmail(input: {
       { label: "Antragsteller", value: input.claimantName },
       { label: "Zugriffsstatus", value: "Aktiv (Owner Access)" },
     ];
-    footerNote = "Vielen Dank für Ihre Unterstützung,<br/><strong>Ihr Fargo Team</strong>";
+    footerNote = "Vielen Dank für Ihre Unterstützung,<br/><strong>Ihr woYab Team</strong>";
     actionBtn = { label: "Zum Inhaber-Dashboard", url: dashboardUrl };
-    subject = `Inhaberschaft für ${input.businessName} genehmigt | Fargo`;
+    subject = `Inhaberschaft für ${input.businessName} genehmigt | woYab`;
   } else if (isEn) {
     badgeText = "Approved";
     title = "Ownership claim approved";
@@ -221,9 +221,9 @@ export async function sendBusinessClaimApprovedEmail(input: {
       { label: "Applicant", value: input.claimantName },
       { label: "Access status", value: "Active (Owner Access)" },
     ];
-    footerNote = "Thank you for being with us,<br/><strong>Fargo Team</strong>";
+    footerNote = "Thank you for being with us,<br/><strong>woYab Team</strong>";
     actionBtn = { label: "Go to owner dashboard", url: dashboardUrl };
-    subject = `Ownership for ${input.businessName} approved | Fargo`;
+    subject = `Ownership for ${input.businessName} approved | woYab`;
   }
 
   const html = renderEmailCard({
@@ -254,44 +254,44 @@ export async function sendBusinessClaimWarningEmailToCurrentOwner(input: {
   const isDe = input.locale?.toLowerCase().startsWith("de");
   const isEn = input.locale?.toLowerCase().startsWith("en");
 
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://fargo.ir"}/${input.locale || "fa"}/business-portal`;
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://woyab.ir"}/${input.locale || "fa"}/business-portal`;
 
   let badgeText = "هشدار امنیتی";
   let title = "تلاش برای انتقال مالکیت کسب‌وکار شما";
-  let subtitle = `مالک محترم کسب‌وکار <strong>${input.businessName}</strong>،<br/>به اطلاع می‌رسانیم که شخصی به نام <strong>${input.claimantName}</strong> به آدرس ایمیل رسمی کسب‌وکار شما دسترسی پیدا کرده و درخواست انتقال مالکیت در سیستم فارگو ثبت کرده است.<br/><br/>اگر شما این شخص را می‌شناسید (مثلاً مالک جدید یا کارمند شماست)، نیازی به انجام کاری نیست. اما اگر این درخواست بدون هماهنگی شما ثبت شده، لطفاً در اسرع وقت از طریق داشبورد به ما اطلاع دهید.`;
+  let subtitle = `مالک محترم کسب‌وکار <strong>${input.businessName}</strong>،<br/>به اطلاع می‌رسانیم که شخصی به نام <strong>${input.claimantName}</strong> به آدرس ایمیل رسمی کسب‌وکار شما دسترسی پیدا کرده و درخواست انتقال مالکیت در سیستم woYab ثبت کرده است.<br/><br/>اگر شما این شخص را می‌شناسید (مثلاً مالک جدید یا کارمند شماست)، نیازی به انجام کاری نیست. اما اگر این درخواست بدون هماهنگی شما ثبت شده، لطفاً در اسرع وقت از طریق داشبورد به ما اطلاع دهید.`;
   let details = [
     { label: "نام کسب‌وکار", value: input.businessName },
     { label: "متقاضی جدید", value: input.claimantName },
     { label: "مهلت پاسخ‌گویی", value: "۱۴ روز" },
   ];
-  let footerNote = "با تشکر،<br/><strong>تیم فارگو (Fargo Team)</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>این پیام مطابق با قوانین حفاظت از داده‌ها (GDPR Art. 6(1)(f)) و برای حفظ امنیت اطلاعات کسب‌وکار شما ارسال شده است.</small>";
+  let footerNote = "با تشکر،<br/><strong>تیم woYab (woYab Team)</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>این پیام مطابق با قوانین حفاظت از داده‌ها (GDPR Art. 6(1)(f)) و برای حفظ امنیت اطلاعات کسب‌وکار شما ارسال شده است.</small>";
   let actionBtn = { label: "ورود به داشبورد", url: dashboardUrl };
-  let subject = `هشدار: درخواست مالکیت جدید برای ${input.businessName} | Fargo`;
+  let subject = `هشدار: درخواست مالکیت جدید برای ${input.businessName} | woYab`;
 
   if (isDe) {
     badgeText = "Sicherheitswarnung";
     title = "Versuch der Eigentumsübertragung";
-    subtitle = `Sehr geehrte(r) Inhaber(in) von <strong>${input.businessName}</strong>,<br/>wir möchten Sie darüber informieren, dass eine Person namens <strong>${input.claimantName}</strong> Zugriff auf die offizielle E-Mail-Adresse Ihres Unternehmens erhalten und einen Inhaberantrag bei Fargo gestellt hat.<br/><br/>Wenn Sie diese Person kennen, müssen Sie nichts weiter tun. Sollte dieser Antrag jedoch ohne Ihr Einverständnis gestellt worden sein, melden Sie sich bitte umgehend über Ihr Dashboard.`;
+    subtitle = `Sehr geehrte(r) Inhaber(in) von <strong>${input.businessName}</strong>,<br/>wir möchten Sie darüber informieren, dass eine Person namens <strong>${input.claimantName}</strong> Zugriff auf die offizielle E-Mail-Adresse Ihres Unternehmens erhalten und einen Inhaberantrag bei woYab gestellt hat.<br/><br/>Wenn Sie diese Person kennen, müssen Sie nichts weiter tun. Sollte dieser Antrag jedoch ohne Ihr Einverständnis gestellt worden sein, melden Sie sich bitte umgehend über Ihr Dashboard.`;
     details = [
       { label: "Unternehmen", value: input.businessName },
       { label: "Neuer Antragsteller", value: input.claimantName },
       { label: "Frist", value: "14 Tage" },
     ];
-    footerNote = "Mit freundlichen Grüßen,<br/><strong>Ihr Fargo Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>Diese Nachricht wird in Übereinstimmung mit Art. 6 Abs. 1 lit. f DSGVO gesendet, um die Sicherheit Ihres Unternehmenskontos zu gewährleisten.</small>";
+    footerNote = "Mit freundlichen Grüßen,<br/><strong>Ihr woYab Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>Diese Nachricht wird in Übereinstimmung mit Art. 6 Abs. 1 lit. f DSGVO gesendet, um die Sicherheit Ihres Unternehmenskontos zu gewährleisten.</small>";
     actionBtn = { label: "Zum Dashboard", url: dashboardUrl };
-    subject = `Warnung: Neuer Inhaberantrag für ${input.businessName} | Fargo`;
+    subject = `Warnung: Neuer Inhaberantrag für ${input.businessName} | woYab`;
   } else if (isEn) {
     badgeText = "Security Warning";
     title = "Attempted Ownership Transfer";
-    subtitle = `Dear Owner of <strong>${input.businessName}</strong>,<br/>We would like to inform you that a person named <strong>${input.claimantName}</strong> has accessed your official business email address and submitted an ownership claim on Fargo.<br/><br/>If you know this person (e.g., a new owner or employee), no action is required. However, if this request was submitted without your consent, please inform us immediately via your dashboard.`;
+    subtitle = `Dear Owner of <strong>${input.businessName}</strong>,<br/>We would like to inform you that a person named <strong>${input.claimantName}</strong> has accessed your official business email address and submitted an ownership claim on woYab.<br/><br/>If you know this person (e.g., a new owner or employee), no action is required. However, if this request was submitted without your consent, please inform us immediately via your dashboard.`;
     details = [
       { label: "Business name", value: input.businessName },
       { label: "New claimant", value: input.claimantName },
       { label: "Deadline", value: "14 Days" },
     ];
-    footerNote = "Thank you,<br/><strong>Fargo Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>This message is sent in accordance with GDPR Art. 6(1)(f) to protect the security of your business account.</small>";
+    footerNote = "Thank you,<br/><strong>woYab Team</strong><br/><br/><small style='color:#64748b;font-size:11px;display:block;margin-top:10px;'>This message is sent in accordance with GDPR Art. 6(1)(f) to protect the security of your business account.</small>";
     actionBtn = { label: "Go to Dashboard", url: dashboardUrl };
-    subject = `Warning: New ownership claim for ${input.businessName} | Fargo`;
+    subject = `Warning: New ownership claim for ${input.businessName} | woYab`;
   }
 
   const html = renderEmailCard({

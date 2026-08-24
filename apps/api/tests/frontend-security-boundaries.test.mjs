@@ -39,9 +39,10 @@ test("private panels are never stored by middleware or the service worker", asyn
 });
 
 test("authenticated Google proxy routes send the server-only internal credential", async () => {
-  const [photo, photos, proxy] = await Promise.all([
+  const [photo, photos, details, proxy] = await Promise.all([
     frontendSource("app/api/place-photo/route.ts"),
     frontendSource("app/api/place-photos/[placeId]/route.ts"),
+    frontendSource("app/api/place-details/[placeId]/route.ts"),
     frontendSource("lib/server-api.ts"),
   ]);
   for (const route of [photo, photos]) {
@@ -49,8 +50,13 @@ test("authenticated Google proxy routes send the server-only internal credential
     assert.match(route, /isRateLimited/);
     assert.match(route, /\{ internal: true \}/);
   }
+  assert.match(details, /currentUser\(\)/);
+  assert.match(details, /isAdminRole/);
+  assert.match(details, /twoFactorVerified/);
+  assert.match(details, /isRateLimited/);
+  assert.match(details, /\{ internal: true \}/);
   assert.match(photo, /placeId/);
-  assert.match(proxy, /x-fargo-internal-secret/);
+  assert.match(proxy, /x-woyab-internal-secret/);
   assert.doesNotMatch(proxy, /NEXT_PUBLIC_INTERNAL/);
 });
 
@@ -113,20 +119,25 @@ test("the platform privacy policy is public and linked from the footer", async (
     frontendSource("components/layout/Footer.tsx"),
     frontendSource("app/sitemap.ts"),
   ]);
-  assert.match(policy, /Fargo Privacy Policy/);
-  assert.match(policy, /سیاست حریم خصوصی فارگو/);
-  assert.match(policy, /Datenschutzerklärung von Fargo/);
+  assert.match(policy, /woYab Privacy Policy/);
+  assert.match(policy, /سیاست حریم خصوصی woYab/);
+  assert.match(policy, /Datenschutzerklärung von woYab/);
   assert.match(footer, /href\("\/privacy"\)/);
   assert.match(sitemap, /"\/privacy"/);
 });
 
 test("final moderation decisions notify reporters and contributors", async () => {
-  const actions = await frontendSource("lib/admin-actions.ts");
+  const [actions, emailTemplates] = await Promise.all([
+    frontendSource("lib/admin-actions.ts"),
+    frontendSource("lib/email-templates.ts"),
+  ]);
   assert.match(actions, /report\.notification_failed/);
   assert.match(actions, /Your report about/);
-  assert.match(actions, /Fargo ownership decision/);
-  assert.match(actions, /Fargo business change request/);
-  assert.match(actions, /Your Fargo review was/);
+  assert.match(actions, /woYab report decision/);
+  assert.match(actions, /The ownership claim for/);
+  assert.match(actions, /Your change request for/);
+  assert.match(emailTemplates, /Update on your review for/);
+  assert.match(emailTemplates, /\| woYab/);
 });
 
 test("administrator access requires encrypted TOTP enrollment and verification", async () => {

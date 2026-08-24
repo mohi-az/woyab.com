@@ -1,4 +1,4 @@
 export {
   locationSuggestionQuerySchema,
   reverseGeocodeBodySchema,
-} from "@fargo/shared";
+} from "@woyab/shared";

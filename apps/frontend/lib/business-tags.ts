@@ -1,4 +1,4 @@
-import type { Prisma } from "@fargo/database";
+import type { Prisma } from "@woyab/database";
 
 export type BusinessTagOption = {
   id: number;

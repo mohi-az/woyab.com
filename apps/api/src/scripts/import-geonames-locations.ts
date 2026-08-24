@@ -2,13 +2,12 @@ import { readFile } from "node:fs/promises";
 import { inflateRawSync } from "node:zlib";
 
 import { PrismaPg } from "@prisma/adapter-pg";
-import { LocationCatalogKind, PrismaClient } from "@fargo/database";
+import { LocationCatalogKind, PrismaClient } from "@woyab/database";
 import { Pool } from "pg";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const GEONAMES_URL = process.env.GEONAMES_DE_URL ?? "https://download.geonames.org/export/dump/DE.zip";
 const GEONAMES_FILE = process.env.GEONAMES_DE_FILE;
-const RDS_CA_URL = "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem";
 const SOURCE = "GEONAMES";
 const BATCH_SIZE = 1_000;
 
@@ -110,21 +109,6 @@ async function loadGeoNamesText() {
   return extractDeText(Buffer.from(await response.arrayBuffer()));
 }
 
-async function createDatabasePool() {
-  const databaseUrl = new URL(DATABASE_URL!);
-  if (!databaseUrl.hostname.endsWith(".rds.amazonaws.com")) {
-    return new Pool({ connectionString: DATABASE_URL });
-  }
-
-  const response = await fetch(RDS_CA_URL);
-  if (!response.ok) throw new Error(`Amazon RDS CA download failed with HTTP ${response.status}`);
-  databaseUrl.searchParams.delete("sslmode");
-  return new Pool({
-    connectionString: databaseUrl.toString(),
-    ssl: { ca: await response.text(), rejectUnauthorized: true },
-  });
-}
-
 function normalizedSearchText(values: string[]) {
   const text = values.join(" ").toLocaleLowerCase("de-DE");
   return `${text} ${text.normalize("NFKD").replace(/\p{M}/gu, "")}`;
@@ -216,7 +200,7 @@ async function main() {
   assignDistrictParents(rows);
   if (rows.length === 0) throw new Error("GeoNames archive did not contain usable German places");
 
-  const pool = await createDatabasePool();
+  const pool = new Pool({ connectionString: DATABASE_URL });
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter } as ConstructorParameters<typeof PrismaClient>[0]);
   try {

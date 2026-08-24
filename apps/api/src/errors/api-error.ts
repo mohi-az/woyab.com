@@ -1,4 +1,4 @@
-import type { ApiErrorCode, ApiErrorDetail } from "@fargo/shared";
+import type { ApiErrorCode, ApiErrorDetail } from "@woyab/shared";
 
 type ApiErrorOptions = {
   code: ApiErrorCode;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { paginationQuerySchema } from "@fargo/shared";
+import { paginationQuerySchema } from "@woyab/shared";
 
 export const createServiceBodySchema = z.object({
   title: z.string().min(1),

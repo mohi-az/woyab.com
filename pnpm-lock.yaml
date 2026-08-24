@@ -209,10 +209,10 @@ importers:
 
   apps/api:
     dependencies:
-      '@fargo/database':
+      '@woyab/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@fargo/shared':
+      '@woyab/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@prisma/adapter-pg':
@@ -306,10 +306,10 @@ importers:
 
   apps/frontend:
     dependencies:
-      '@fargo/database':
+      '@woyab/database':
         specifier: link:../../packages/database
         version: link:../../packages/database
-      '@fargo/shared':
+      '@woyab/shared':
         specifier: link:../../packages/shared
         version: link:../../packages/shared
       '@prisma/adapter-pg':

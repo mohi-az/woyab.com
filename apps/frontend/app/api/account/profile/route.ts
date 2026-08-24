@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { profileSchema } from "@fargo/shared";
+import { profileSchema } from "@woyab/shared";
 import { currentUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 

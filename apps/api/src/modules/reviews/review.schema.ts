@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { paginationQuerySchema } from "@fargo/shared";
+import { paginationQuerySchema } from "@woyab/shared";
 
 export const createReviewBodySchema = z.object({
   userId: z.string().min(1),

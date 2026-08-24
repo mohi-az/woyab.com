@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { PrismaClient } from "@fargo/database";
+import { PrismaClient } from "@woyab/database";
 
 import { env } from "../config/env.js";
 

@@ -1,4 +1,4 @@
-import { businessChangeRequestCreateSchema } from "@fargo/shared";
+import { businessChangeRequestCreateSchema } from "@woyab/shared";
 import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";
 import { businessChangeSnapshot, parseChangePayload } from "@/lib/business-change-requests";

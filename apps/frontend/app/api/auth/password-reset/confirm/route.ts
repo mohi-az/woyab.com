@@ -1,6 +1,6 @@
 import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
-import { passwordResetConfirmSchema } from "@fargo/shared";
+import { passwordResetConfirmSchema } from "@woyab/shared";
 import { hashPasswordResetToken } from "@/lib/password-reset";
 import { prisma } from "@/lib/prisma";
 import { isRateLimited, requestIp } from "@/lib/rate-limit";

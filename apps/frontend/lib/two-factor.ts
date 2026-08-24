@@ -12,7 +12,7 @@ import {
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 function encryptionKey() {
-  const secret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "fargo-default-dev-secret-key-for-2fa";
+  const secret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "woyab-default-dev-secret-key-for-2fa";
   return createHash("sha256").update(secret).digest();
 }
 
@@ -48,7 +48,7 @@ export function verifyTotp(secret: string, code: string, now = Date.now()) {
 }
 
 export function twoFactorUri(email: string, secret: string) {
-  const issuer = "Fargo";
+  const issuer = "woYab";
   const label = encodeURIComponent(`${issuer}:${email}`);
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 }

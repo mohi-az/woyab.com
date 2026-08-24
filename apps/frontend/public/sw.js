@@ -1,12 +1,12 @@
 /**
- * Fargo PWA — Service Worker
+ * woYab PWA — Service Worker
  * استراتژی‌های کش:
  *  - Navigation (صفحات): network-first با fallback به /offline
  *  - API (/api/*):       network-first بدون کش
  *  - آیکون‌ها/static:   stale-while-revalidate
  */
 
-const CACHE_NAME = "fargo-cache-v2";
+const CACHE_NAME = "woyab-cache-v2";
 
 // منابع حیاتی که در install کش می‌شوند
 const PRECACHE_URLS = ["/", "/offline", "/manifest.webmanifest"];

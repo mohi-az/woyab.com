@@ -1,4 +1,4 @@
-// انواع داده‌های پایه اپلیکیشن Fargo
+// انواع داده‌های پایه اپلیکیشن woYab
 
 export interface Business {
   id: string;

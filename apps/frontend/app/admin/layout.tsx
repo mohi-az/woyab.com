@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const [user, cookieStore] = await Promise.all([requireAdmin(), cookies()]);
-  const initialTheme = cookieStore.get("fargo-admin-theme")?.value === "light" ? "light" : "dark";
+  const initialTheme = cookieStore.get("woyab-admin-theme")?.value === "light" ? "light" : "dark";
 
   return (
     <AdminShell

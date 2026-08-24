@@ -1,4 +1,4 @@
-import type { Prisma } from "@fargo/database";
+import type { Prisma } from "@woyab/database";
 
 export async function recalculatePublicBusinessRating(
   tx: Prisma.TransactionClient,

@@ -33,54 +33,54 @@ export default async function NotFound() {
   const BackIcon = locale === "fa" ? FiArrowRight : FiArrowLeft;
 
   return (
-    <section className="fargo-not-found-page h-[calc(100dvh-4rem)] overflow-hidden bg-white px-4 py-4 sm:px-6 lg:h-[calc(100dvh-4.75rem)]">
+    <section className="woyab-not-found-page h-[calc(100dvh-4rem)] overflow-hidden bg-white px-4 py-4 sm:px-6 lg:h-[calc(100dvh-4.75rem)]">
       <NotFoundTelemetry />
       <style
         dangerouslySetInnerHTML={{
           __html: `
-            body:has(.fargo-not-found-page) header {
+            body:has(.woyab-not-found-page) header {
               background: rgb(255 255 255 / 0.96) !important;
               border-bottom: 1px solid rgb(226 232 240 / 0.9) !important;
               box-shadow: 0 6px 30px rgb(15 23 42 / 0.08) !important;
               backdrop-filter: blur(16px);
             }
 
-            html:has(.fargo-not-found-page),
-            body:has(.fargo-not-found-page),
-            body:has(.fargo-not-found-page) main {
+            html:has(.woyab-not-found-page),
+            body:has(.woyab-not-found-page),
+            body:has(.woyab-not-found-page) main {
               overflow: hidden !important;
             }
 
-            body:has(.fargo-not-found-page) header a[aria-label="Fargo"] > span:last-child,
-            body:has(.fargo-not-found-page) header nav a,
-            body:has(.fargo-not-found-page) header a[href*="/login"] {
+            body:has(.woyab-not-found-page) header a[aria-label="woYab"] > span:last-child,
+            body:has(.woyab-not-found-page) header nav a,
+            body:has(.woyab-not-found-page) header a[href*="/login"] {
               color: #0f172a !important;
             }
 
-            body:has(.fargo-not-found-page) header nav a:hover,
-            body:has(.fargo-not-found-page) header a[href*="/login"]:hover {
+            body:has(.woyab-not-found-page) header nav a:hover,
+            body:has(.woyab-not-found-page) header a[href*="/login"]:hover {
               color: #f15b3f !important;
             }
 
-            body:has(.fargo-not-found-page) header .dropdown > div[role="button"] > button {
+            body:has(.woyab-not-found-page) header .dropdown > div[role="button"] > button {
               background: #f15b3f !important;
               border-color: #f15b3f !important;
               color: #ffffff !important;
             }
 
-            body:has(.fargo-not-found-page) header .dropdown > div[role="button"] > button,
-            body:has(.fargo-not-found-page) header .dropdown > div[role="button"] > button * {
+            body:has(.woyab-not-found-page) header .dropdown > div[role="button"] > button,
+            body:has(.woyab-not-found-page) header .dropdown > div[role="button"] > button * {
               color: #ffffff !important;
             }
 
-            body:has(.fargo-not-found-page) header a[href*="/register"],
-            body:has(.fargo-not-found-page) header a[href*="/dashboard"] {
+            body:has(.woyab-not-found-page) header a[href*="/register"],
+            body:has(.woyab-not-found-page) header a[href*="/dashboard"] {
               background: #ffffff !important;
               border-color: #e2e8f0 !important;
               color: #334155 !important;
             }
 
-            body:has(.fargo-not-found-page) header > div > div > button[aria-label] {
+            body:has(.woyab-not-found-page) header > div > div > button[aria-label] {
               background: #ffffff !important;
               border-color: #e2e8f0 !important;
               color: #1e293b !important;

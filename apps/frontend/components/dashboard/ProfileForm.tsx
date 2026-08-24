@@ -93,7 +93,7 @@ export function ProfileForm({ initial }: { initial: Profile }) {
       setAvatarUrl(result.data.avatarUrl ?? "");
       setSelectedImage("");
       setMessage(t("saved"));
-      window.dispatchEvent(new CustomEvent("fargo:profile-updated", {
+      window.dispatchEvent(new CustomEvent("woyab:profile-updated", {
         detail: { name, email: initial.email, avatarUrl: result.data.avatarUrl ?? "" },
       }));
       router.refresh();

@@ -41,10 +41,10 @@ export function renderEmailCard(options: EmailCardOptions): string {
     : "";
 
   const defaultFooter = isRtl
-    ? "با تشکر از همراهی شما،<br/><strong>تیم پشتیبانی فارگو (Fargo Team)</strong>"
+    ? "با تشکر از همراهی شما،<br/><strong>تیم پشتیبانی woYab (woYab Team)</strong>"
     : options.locale?.toLowerCase().startsWith("de")
-    ? "Vielen Dank für Ihre Unterstützung,<br/><strong>Ihr Fargo Team</strong>"
-    : "Thank you for choosing Fargo,<br/><strong>Fargo Support Team</strong>";
+    ? "Vielen Dank für Ihre Unterstützung,<br/><strong>Ihr woYab Team</strong>"
+    : "Thank you for choosing woYab,<br/><strong>woYab Support Team</strong>";
 
   const footerHtml = `
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
@@ -83,7 +83,7 @@ export function buildReviewModerationEmail(input: {
   if (loc.startsWith("de")) {
     const title = isApproved ? "Ihre Bewertung wurde veröffentlicht" : "Ergebnis der Bewertungsprüfung";
     const subtitle = isApproved
-      ? `Hallo ${input.userName || ""},<br/>vielen Dank für Ihre Bewertung! Ihre Bewertung für <strong>${escapeHtml(input.businessName)}</strong> wurde erfolgreich geprüft und auf Fargo veröffentlicht.`
+      ? `Hallo ${input.userName || ""},<br/>vielen Dank für Ihre Bewertung! Ihre Bewertung für <strong>${escapeHtml(input.businessName)}</strong> wurde erfolgreich geprüft und auf woYab veröffentlicht.`
       : `Hallo ${input.userName || ""},<br/>vielen Dank für Ihren Beitrag. Ihre Bewertung für <strong>${escapeHtml(input.businessName)}</strong> konnte nach der Prüfung leider nicht veröffentlicht werden, da sie nicht unseren Richtlinien entspricht.`;
 
     const details = [
@@ -103,14 +103,14 @@ export function buildReviewModerationEmail(input: {
     });
 
     return {
-      subject: `Ergebnis Ihrer Bewertung für ${input.businessName} | Fargo`,
+      subject: `Ergebnis Ihrer Bewertung für ${input.businessName} | woYab`,
       text: `Ihre Bewertung für ${input.businessName} wurde ${isApproved ? "genehmigt und veröffentlicht" : "abgelehnt"}.`,
       html,
     };
   } else if (loc.startsWith("en")) {
     const title = isApproved ? "Your review has been published" : "Review Moderation Update";
     const subtitle = isApproved
-      ? `Hello ${input.userName || ""},<br/>Thank you for your feedback! Your review for <strong>${escapeHtml(input.businessName)}</strong> has been approved and published on Fargo.`
+      ? `Hello ${input.userName || ""},<br/>Thank you for your feedback! Your review for <strong>${escapeHtml(input.businessName)}</strong> has been approved and published on woYab.`
       : `Hello ${input.userName || ""},<br/>Thank you for your submission. Your review for <strong>${escapeHtml(input.businessName)}</strong> was reviewed but could not be published as it does not meet our content guidelines.`;
 
     const details = [
@@ -130,7 +130,7 @@ export function buildReviewModerationEmail(input: {
     });
 
     return {
-      subject: `Update on your review for ${input.businessName} | Fargo`,
+      subject: `Update on your review for ${input.businessName} | woYab`,
       text: `Your review for ${input.businessName} was ${isApproved ? "approved and published" : "rejected"}.`,
       html,
     };
@@ -139,7 +139,7 @@ export function buildReviewModerationEmail(input: {
     const title = isApproved ? "نظر شما تایید و منتشر گردید" : "نتیجه بررسی نظر شما";
     const subtitle = isApproved
       ? `سلام ${input.userName ? `${escapeHtml(input.userName)} عزیز` : "گرامی"}،<br/>با تشکر از دیدگاه ارزشمند شما، نظر ارسالی شما برای کسب‌وکار <strong>${escapeHtml(input.businessName)}</strong> پس از بررسی و پایش محتوا تایید و روی سایت منتشر گردید.`
-      : `سلام ${input.userName ? `${escapeHtml(input.userName)} عزیز` : "گرامی"}،<br/>به اطلاع می‌رسانیم نظر ارسالی شما برای کسب‌وکار <strong>${escapeHtml(input.businessName)}</strong> پس از بررسی، به دلیل عدم مطابقت کامل با ضوابط انتشار نظرات در فارگو تایید نگردید.`;
+      : `سلام ${input.userName ? `${escapeHtml(input.userName)} عزیز` : "گرامی"}،<br/>به اطلاع می‌رسانیم نظر ارسالی شما برای کسب‌وکار <strong>${escapeHtml(input.businessName)}</strong> پس از بررسی، به دلیل عدم مطابقت کامل با ضوابط انتشار نظرات در woYab تایید نگردید.`;
 
     const details = [
       { label: "نام کسب‌وکار", value: input.businessName },
@@ -158,7 +158,7 @@ export function buildReviewModerationEmail(input: {
     });
 
     return {
-      subject: `نتیجه بررسی نظر شما برای ${input.businessName} | Fargo`,
+      subject: `نتیجه بررسی نظر شما برای ${input.businessName} | woYab`,
       text: `نظر شما برای ${input.businessName} ${isApproved ? "تایید و منتشر شد" : "تایید نشد"}.`,
       html,
     };
@@ -184,7 +184,7 @@ export function buildAccountVerificationEmail(input: {
 
   if (loc.startsWith("de")) {
     const title = "Bestätigen Sie Ihre E-Mail-Adresse";
-    const subtitle = `Hallo ${input.name ? escapeHtml(input.name) : ""},<br/>Bitte bestätigen Sie Ihre Fargo E-Mail-Adresse über den untenstehenden Button. Dieser Link ist 24 Stunden gültig.`;
+    const subtitle = `Hallo ${input.name ? escapeHtml(input.name) : ""},<br/>Bitte bestätigen Sie Ihre woYab E-Mail-Adresse über den untenstehenden Button. Dieser Link ist 24 Stunden gültig.`;
     
     const html = renderEmailCard({
       title,
@@ -194,13 +194,13 @@ export function buildAccountVerificationEmail(input: {
     });
 
     return {
-      subject: "Bestätigen Sie Ihre E-Mail-Adresse | Fargo",
-      text: `Hallo ${input.name || "dort"},\n\nBestätigen Sie Ihre Fargo E-Mail-Adresse über diesen Link. Er ist 24 Stunden gültig:\n\n${input.verifyUrl}`,
+      subject: "Bestätigen Sie Ihre E-Mail-Adresse | woYab",
+      text: `Hallo ${input.name || "dort"},\n\nBestätigen Sie Ihre woYab E-Mail-Adresse über diesen Link. Er ist 24 Stunden gültig:\n\n${input.verifyUrl}`,
       html,
     };
   } else if (loc.startsWith("en")) {
     const title = "Verify your email address";
-    const subtitle = `Hello ${input.name ? escapeHtml(input.name) : ""},<br/>Please verify your Fargo email address by clicking the button below. This link will expire in 24 hours.`;
+    const subtitle = `Hello ${input.name ? escapeHtml(input.name) : ""},<br/>Please verify your woYab email address by clicking the button below. This link will expire in 24 hours.`;
     
     const html = renderEmailCard({
       title,
@@ -210,14 +210,14 @@ export function buildAccountVerificationEmail(input: {
     });
 
     return {
-      subject: "Verify your email address | Fargo",
-      text: `Hello ${input.name || "there"},\n\nVerify your Fargo email address using this link. It expires in 24 hours:\n\n${input.verifyUrl}`,
+      subject: "Verify your email address | woYab",
+      text: `Hello ${input.name || "there"},\n\nVerify your woYab email address using this link. It expires in 24 hours:\n\n${input.verifyUrl}`,
       html,
     };
   } else {
     // Default Persian (fa)
     const title = "تایید آدرس ایمیل";
-    const subtitle = `سلام ${input.name ? `${escapeHtml(input.name)} عزیز` : "گرامی"}،<br/>لطفا آدرس ایمیل حساب کاربری فارگو خود را از طریق دکمه زیر تایید کنید. این لینک تا ۲۴ ساعت آینده معتبر است.`;
+    const subtitle = `سلام ${input.name ? `${escapeHtml(input.name)} عزیز` : "گرامی"}،<br/>لطفا آدرس ایمیل حساب کاربری woYab خود را از طریق دکمه زیر تایید کنید. این لینک تا ۲۴ ساعت آینده معتبر است.`;
     
     const html = renderEmailCard({
       title,
@@ -227,7 +227,7 @@ export function buildAccountVerificationEmail(input: {
     });
 
     return {
-      subject: "تایید آدرس ایمیل | Fargo",
+      subject: "تایید آدرس ایمیل | woYab",
       text: `سلام ${input.name || "کاربر گرامی"},\n\nلطفا آدرس ایمیل خود را از طریق لینک زیر تایید کنید. این لینک تا ۲۴ ساعت اعتبار دارد:\n\n${input.verifyUrl}`,
       html,
     };

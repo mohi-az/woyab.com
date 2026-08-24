@@ -5,7 +5,7 @@ import { Table, Drawer, Button, Input, Space, Tag } from "antd";
 import { FiSearch, FiX } from "react-icons/fi";
 import { addClaimNote, updateClaimStatus } from "@/lib/admin-actions";
 import { AdminButton, StatusBadge } from "@/components/admin/AdminPrimitives";
-import type { Prisma } from "@fargo/database/client";
+import type { Prisma } from "@woyab/database/client";
 import { useFormStatus } from "react-dom";
 
 type ClaimWithDetails = Prisma.BusinessClaimGetPayload<{

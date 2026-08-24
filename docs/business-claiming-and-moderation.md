@@ -1,6 +1,6 @@
 # Business Claiming, Edit Suggestions, Moderation, and Public Removal
 
-This document describes the implemented business ownership claiming, edit suggestion, moderation, and public removal system in Fargo.
+This document describes the implemented business ownership claiming, edit suggestion, moderation, and public removal system in woYab.
 
 - [فارسی](#نسخهٔ-فارسی)
 - [English](#english-version)

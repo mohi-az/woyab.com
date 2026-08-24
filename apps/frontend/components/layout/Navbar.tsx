@@ -54,8 +54,8 @@ export default function Navbar() {
       if (detail) setProfileOverride(detail);
     };
 
-    window.addEventListener("fargo:profile-updated", syncProfile);
-    return () => window.removeEventListener("fargo:profile-updated", syncProfile);
+    window.addEventListener("woyab:profile-updated", syncProfile);
+    return () => window.removeEventListener("woyab:profile-updated", syncProfile);
   }, []);
 
   const headerClassName = cn(
@@ -102,11 +102,11 @@ export default function Navbar() {
     return (
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/95 shadow-[0_6px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 lg:h-[4.75rem]">
-          <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="Fargo">
+          <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label="woYab">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-lg text-white shadow-[0_9px_22px_rgba(241,91,63,0.28)]">
               <FaClipboardList />
             </span>
-            <span className="truncate text-xl font-black tracking-tight text-slate-950 sm:text-2xl">Fargo</span>
+            <span className="truncate text-xl font-black tracking-tight text-slate-950 sm:text-2xl">woYab</span>
             <span className="hidden h-5 w-px bg-slate-200 min-[380px]:block" aria-hidden="true" />
             <span className="hidden whitespace-nowrap text-xs font-black uppercase tracking-[0.13em] text-slate-500 min-[380px]:inline sm:text-sm">{t("businessHeader.label")}</span>
           </Link>
@@ -141,11 +141,11 @@ export default function Navbar() {
     <header className={headerClassName}>
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between lg:h-[4.75rem]">
-          <Link href="/" className="flex flex-shrink-0 items-center gap-3" aria-label="Fargo">
+          <Link href="/" className="flex flex-shrink-0 items-center gap-3" aria-label="woYab">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-lg text-white shadow-[0_9px_22px_rgba(241,91,63,0.28)]">
               <FaClipboardList />
             </span>
-            <span className={cn("text-2xl font-black tracking-tight transition-colors", brandTextClassName)}>Fargo</span>
+            <span className={cn("text-2xl font-black tracking-tight transition-colors", brandTextClassName)}>woYab</span>
           </Link>
 
           <nav className="hidden items-center gap-7 lg:flex" aria-label={t("navigationLabel")}>

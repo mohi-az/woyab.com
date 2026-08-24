@@ -1,5 +1,5 @@
 import type { ErrorRequestHandler } from "express";
-import type { ApiErrorResponse } from "@fargo/shared";
+import type { ApiErrorResponse } from "@woyab/shared";
 import { ZodError } from "zod";
 
 import { env } from "../config/env.js";

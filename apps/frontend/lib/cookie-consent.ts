@@ -1,6 +1,6 @@
-export const COOKIE_CONSENT_STORAGE_KEY = "fargo_cookie_consent";
-export const COOKIE_CONSENT_EVENT = "fargo:cookie-consent-change";
-export const COOKIE_PREFERENCES_EVENT = "fargo:open-cookie-preferences";
+export const COOKIE_CONSENT_STORAGE_KEY = "woyab_cookie_consent";
+export const COOKIE_CONSENT_EVENT = "woyab:cookie-consent-change";
+export const COOKIE_PREFERENCES_EVENT = "woyab:open-cookie-preferences";
 
 const CONSENT_VERSION = 1;
 const CONSENT_DURATION_MS = 365 * 24 * 60 * 60 * 1000;
@@ -55,9 +55,9 @@ export function saveCookieConsent(preferences: Pick<CookieConsent, "analytics" |
   window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(consent));
 
   if (!consent.analytics) {
-    window.localStorage.removeItem("fargo_analytics_visitor");
-    window.localStorage.removeItem("fargo_analytics_session");
-    window.localStorage.removeItem("fargo_analytics_session_activity");
+    window.localStorage.removeItem("woyab_analytics_visitor");
+    window.localStorage.removeItem("woyab_analytics_session");
+    window.localStorage.removeItem("woyab_analytics_session_activity");
   }
 
   window.dispatchEvent(new CustomEvent<CookieConsent>(COOKIE_CONSENT_EVENT, { detail: consent }));

@@ -21,7 +21,7 @@ export default async function Footer() {
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white">
               <FaClipboardList />
             </span>
-            Fargo
+            woYab
           </Link>
           <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">{t("description")}</p>
         </div>

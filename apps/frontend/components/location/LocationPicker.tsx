@@ -82,7 +82,7 @@ export function LocationPicker({
   onRadiusChange,
   savedLocations = [],
   proximity,
-  storageKey = "fargo:business-search-location",
+  storageKey = "woyab:business-search-location",
 }: Props) {
   const listboxId = useId();
   const [query, setQuery] = useState(value?.label ?? "");

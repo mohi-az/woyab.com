@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, Button, Collapse, ConfigProvider, Modal } from "antd";
 import { useLocale, useTranslations } from "next-intl";
 import { FiAlertCircle, FiCheck, FiClock, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminMultiSelect, AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
+import { GooglePlaceImport, type GooglePlaceImportData } from "@/components/admin/GooglePlaceImport";
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
 import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor, type BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
@@ -28,6 +29,7 @@ type Option = {
 };
 
 type SubCategoryOption = Option & { categoryId: number };
+type DistrictOption = Option & { cityId: number };
 type SpecialtyOption = {
   id: number;
   nameEn: string | null;
@@ -93,6 +95,7 @@ type Props = {
   subCategories: SubCategoryOption[];
   specialties: SpecialtyOption[];
   cities: Option[];
+  districts: DistrictOption[];
   ownerOptions: OwnerOption[];
   attributeDefinitions: BusinessAttributeDefinition[];
   tagOptions: BusinessTagOption[];
@@ -126,6 +129,19 @@ function translationMap(business: AdminBusinessRow | null) {
     description: business.description,
   });
   return map;
+}
+
+function translationDrafts(business: AdminBusinessRow | null) {
+  const map = translationMap(business);
+  return Object.fromEntries(locales.map((locale) => {
+    const translation = map.get(locale);
+    return [locale, {
+      locale,
+      businessName: translation?.businessName ?? "",
+      shortDescription: translation?.shortDescription ?? "",
+      description: translation?.description ?? "",
+    }];
+  })) as Record<(typeof locales)[number], Translation>;
 }
 
 function emptyBusiness(): AdminBusinessRow | null {
@@ -192,6 +208,7 @@ export function AdminBusinessGrid({
   subCategories,
   specialties,
   cities,
+  districts,
   ownerOptions,
   attributeDefinitions,
   tagOptions,
@@ -212,17 +229,24 @@ export function AdminBusinessGrid({
   const [operationError, setOperationError] = useState("");
   const [saving, setSaving] = useState(false);
   const [sourceLocaleDraft, setSourceLocaleDraft] = useState<"DE" | "EN" | "FA">("DE");
+  const [translationValues, setTranslationValues] = useState(() => translationDrafts(null));
   const [categoryIdDraft, setCategoryIdDraft] = useState(String(categories[0]?.id ?? ""));
   const [subCategoryIdDraft, setSubCategoryIdDraft] = useState("");
+  const [cityIdDraft, setCityIdDraft] = useState(String(cities[0]?.id ?? ""));
+  const [districtIdDraft, setDistrictIdDraft] = useState("");
+  const [locationDraft, setLocationDraft] = useState<{ address: string; latitude: number | null; longitude: number | null }>({ address: "", latitude: null, longitude: null });
+  const [hoursDraft, setHoursDraft] = useState<BusinessHourValue[]>([]);
+  const [importVersion, setImportVersion] = useState(0);
   const [rowUiStates, setRowUiStates] = useState<Record<string, RowUiState>>({});
+  const formRef = useRef<HTMLFormElement>(null);
   const modalOpen = creating || Boolean(editing);
-  const modalTranslations = useMemo(() => translationMap(editing), [editing]);
   const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
   const featureText = localizedFeatureText(locale);
   const tagText = localizedTagText(locale);
   const visibleSubCategories = subCategories.filter((item) => String(item.categoryId) === categoryIdDraft);
   const visibleSpecialties = specialties.filter((item) => String(item.subCategoryId) === subCategoryIdDraft);
+  const visibleDistricts = districts.filter((item) => String(item.cityId) === cityIdDraft);
   const wizardSteps = [t("businessWizard.identity"), t("businessWizard.translations"), `${featureText} / ${tagText}`, t("businessWizard.location"), t("businessWizard.hours")];
   const cardBasicInfo = locale === "fa" ? "اطلاعات پایه" : "Basic Information";
   const cardTaxonomy = locale === "fa" ? "دسته‌بندی و تخصص" : "Category & Taxonomy";
@@ -273,8 +297,14 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(false);
     setSourceLocaleDraft("DE");
+    setTranslationValues(translationDrafts(null));
     setCategoryIdDraft(String(defaultCategoryId));
     setSubCategoryIdDraft("");
+    setCityIdDraft(String(defaultCityId));
+    setDistrictIdDraft("");
+    setLocationDraft({ address: "", latitude: null, longitude: null });
+    setHoursDraft([]);
+    setImportVersion(0);
   }
 
   function openCreate() {
@@ -286,8 +316,14 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(false);
     setSourceLocaleDraft("DE");
+    setTranslationValues(translationDrafts(null));
     setCategoryIdDraft(String(defaultCategoryId));
     setSubCategoryIdDraft("");
+    setCityIdDraft(String(defaultCityId));
+    setDistrictIdDraft("");
+    setLocationDraft({ address: "", latitude: null, longitude: null });
+    setHoursDraft([]);
+    setImportVersion(0);
   }
 
   function openEdit(business: AdminBusinessRow) {
@@ -299,8 +335,69 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(false);
     setSourceLocaleDraft(business.sourceLocale);
+    setTranslationValues(translationDrafts(business));
     setCategoryIdDraft(String(business.categoryId));
     setSubCategoryIdDraft(business.subCategoryId ? String(business.subCategoryId) : "");
+    setCityIdDraft(String(business.cityId));
+    setDistrictIdDraft(business.districtId ? String(business.districtId) : "");
+    setLocationDraft({
+      address: business.address ?? "",
+      latitude: business.latitude,
+      longitude: business.longitude,
+    });
+    setHoursDraft(business.businessHours);
+    setImportVersion(0);
+  }
+
+  function setFormField(name: string, nextValue: string | number | null) {
+    const field = formRef.current?.elements.namedItem(name);
+    if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement) {
+      field.value = nextValue === null ? "" : String(nextValue);
+    }
+  }
+
+  function suggestedSlug(name: string, placeId: string) {
+    const normalized = name
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/ß/g, "ss")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80);
+    return normalized || `place-${placeId.slice(-10).toLowerCase()}`;
+  }
+
+  function applyGooglePlace(place: GooglePlaceImportData) {
+    const currentSlug = String((formRef.current?.elements.namedItem("slug") as HTMLInputElement | null)?.value ?? "").trim();
+    if (creating && !currentSlug) setFormField("slug", suggestedSlug(place.displayName, place.placeId));
+    setFormField("phone", place.phone);
+    setFormField("website", place.website);
+    setFormField("postalCode", place.postalCode);
+
+    setTranslationValues((current) => ({
+      ...current,
+      [sourceLocaleDraft]: {
+        ...current[sourceLocaleDraft],
+        businessName: place.displayName,
+      },
+    }));
+    setLocationDraft({
+      address: place.formattedAddress,
+      latitude: place.latitude,
+      longitude: place.longitude,
+    });
+    if (place.catalogMatch.city) {
+      setCityIdDraft(String(place.catalogMatch.city.id));
+      setDistrictIdDraft(place.catalogMatch.district ? String(place.catalogMatch.district.id) : "");
+      clearError("cityId");
+    } else if (creating) {
+      setCityIdDraft("");
+      setDistrictIdDraft("");
+    }
+    if (place.hours.length) setHoursDraft(place.hours);
+    clearError(`businessName_${sourceLocaleDraft}`);
+    setImportVersion((version) => version + 1);
   }
 
   function clearError(field: string) {
@@ -557,13 +654,13 @@ export function AdminBusinessGrid({
           getContainer={false}
           className="admin-business-modal"
         >
-            <form action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] overflow-y-auto pt-4">
+            <form ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {!locationPickerMounted ? (
                 <>
-                  <input type="hidden" name="latitude" value={editing?.latitude ?? ""} />
-                  <input type="hidden" name="longitude" value={editing?.longitude ?? ""} />
-                  <input type="hidden" name="address" value={editing?.address ?? ""} />
+                  <input type="hidden" name="latitude" value={locationDraft.latitude ?? ""} />
+                  <input type="hidden" name="longitude" value={locationDraft.longitude ?? ""} />
+                  <input type="hidden" name="address" value={locationDraft.address} />
                 </>
               ) : null}
               <div className="grid gap-6 px-1 pb-1">
@@ -613,6 +710,13 @@ export function AdminBusinessGrid({
 
                 {/* Step 0: Identity */}
                 <section className={wizardStep === 0 ? "grid gap-6" : "hidden"}>
+                  <GooglePlaceImport
+                    key={`google-place-${editing?.id ?? "new"}`}
+                    initialPlaceId={editing?.googlePlaceId}
+                    sourceLocale={sourceLocaleDraft}
+                    editingBusinessId={editing?.id}
+                    onApply={applyGooglePlace}
+                  />
                   <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
                     <div className="admin-wizard-card-group flex flex-col gap-4">
                       <h3 className="admin-wizard-card-title">{cardBasicInfo}</h3>
@@ -623,11 +727,8 @@ export function AdminBusinessGrid({
                         <FieldShell label={t("fields.legalName")}>
                           <input name="legalName" defaultValue={editing?.legalName ?? ""} className={inputClassName} />
                         </FieldShell>
-                        <FieldShell label="Google Place ID">
-                          <input name="googlePlaceId" defaultValue={editing?.googlePlaceId ?? ""} className={inputClassName} placeholder="ChIJ..." />
-                        </FieldShell>
                         <FieldShell label={t("fields.sourceLocale")} required error={errors.sourceLocale}>
-                          <select name="sourceLocale" defaultValue={editing?.sourceLocale ?? "DE"} className={inputClassName}>
+                          <select name="sourceLocale" value={sourceLocaleDraft} onChange={(event) => setSourceLocaleDraft(event.target.value as "DE" | "EN" | "FA")} className={inputClassName}>
                             {locales.map((item) => <option key={item} value={item}>{item}</option>)}
                           </select>
                         </FieldShell>
@@ -664,7 +765,14 @@ export function AdminBusinessGrid({
                           <AdminMultiSelect key={`specialty-${editing?.id ?? (creating ? "new" : "none")}-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={subCategoryIdDraft && String(editing?.subCategoryId ?? "") === subCategoryIdDraft ? (editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])) : []} options={visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
                         </FieldShell>
                         <FieldShell label={t("fields.city")} required error={errors.cityId}>
-                          <AdminSearchSelect key={`city-${editing?.id ?? (creating ? "new" : "none")}-${editing?.cityId ?? defaultCityId}`} name="cityId" defaultValue={editing?.cityId ?? editing?.city?.id ?? defaultCityId} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={clearError} />
+                          <AdminSearchSelect key={`city-${editing?.id ?? (creating ? "new" : "none")}-${cityIdDraft}`} name="cityId" defaultValue={cityIdDraft} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {
+                            clearError(name);
+                            setCityIdDraft(value);
+                            setDistrictIdDraft("");
+                          }} />
+                        </FieldShell>
+                        <FieldShell label="District / Bezirk / منطقه">
+                          <AdminSearchSelect key={`district-${editing?.id ?? (creating ? "new" : "none")}-${cityIdDraft}-${districtIdDraft}`} name="districtId" defaultValue={districtIdDraft} allowClear options={visibleDistricts.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(_, value) => setDistrictIdDraft(value)} />
                         </FieldShell>
                       </div>
                     </div>
@@ -700,7 +808,7 @@ export function AdminBusinessGrid({
                       className="admin-business-collapse border-0 bg-transparent"
                       defaultActiveKey={[sourceLocaleDraft]}
                       items={locales.map((locale) => {
-                        const translation = modalTranslations.get(locale);
+                        const translation = translationValues[locale];
                         return {
                           key: locale,
                           label: (
@@ -711,13 +819,13 @@ export function AdminBusinessGrid({
                           children: (
                             <div className="grid gap-4">
                               <FieldShell label={t("fields.businessName")} required={locale === sourceLocaleDraft} error={errors[`businessName_${locale}`]}>
-                                <input name={`businessName_${locale}`} defaultValue={translation?.businessName ?? ""} placeholder={t("fields.businessName")} className={inputClassName} />
+                                <input name={`businessName_${locale}`} value={translation.businessName} onChange={(event) => setTranslationValues((current) => ({ ...current, [locale]: { ...current[locale], businessName: event.target.value } }))} placeholder={t("fields.businessName")} className={inputClassName} />
                               </FieldShell>
                               <FieldShell label={t("fields.shortDescription")}>
-                                <input name={`shortDescription_${locale}`} defaultValue={translation?.shortDescription ?? ""} placeholder={t("fields.shortDescription")} className={inputClassName} />
+                                <input name={`shortDescription_${locale}`} value={translation.shortDescription ?? ""} onChange={(event) => setTranslationValues((current) => ({ ...current, [locale]: { ...current[locale], shortDescription: event.target.value } }))} placeholder={t("fields.shortDescription")} className={inputClassName} />
                               </FieldShell>
                               <FieldShell label={t("fields.description")}>
-                                <textarea name={`description_${locale}`} defaultValue={translation?.description ?? ""} placeholder={t("fields.description")} rows={4} className={textAreaClassName} />
+                                <textarea name={`description_${locale}`} value={translation.description ?? ""} onChange={(event) => setTranslationValues((current) => ({ ...current, [locale]: { ...current[locale], description: event.target.value } }))} placeholder={t("fields.description")} rows={4} className={textAreaClassName} />
                               </FieldShell>
                             </div>
                           ),
@@ -753,9 +861,10 @@ export function AdminBusinessGrid({
                     <h3 className="admin-wizard-card-title">{t("location.title")}</h3>
                     {locationPickerMounted ? (
                       <BusinessLocationPicker
-                        defaultAddress={editing?.address}
-                        defaultLatitude={editing?.latitude}
-                        defaultLongitude={editing?.longitude}
+                        key={`location-${editing?.id ?? "new"}-${importVersion}`}
+                        defaultAddress={locationDraft.address}
+                        defaultLatitude={locationDraft.latitude}
+                        defaultLongitude={locationDraft.longitude}
                       />
                     ) : null}
                   </div>
@@ -765,7 +874,7 @@ export function AdminBusinessGrid({
                 <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
                     <h3 className="admin-wizard-card-title">{tHours("title")}</h3>
-                    <BusinessHoursEditor variant="admin" defaultHours={editing?.businessHours ?? []} />
+                    <BusinessHoursEditor key={`hours-${editing?.id ?? "new"}-${importVersion}`} variant="admin" defaultHours={hoursDraft} />
                   </div>
                 </section>
 

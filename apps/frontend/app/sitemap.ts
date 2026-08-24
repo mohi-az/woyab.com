@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { appLocales } from "@/i18n/config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
 
   // Static pages with alternates for each locale
   const staticPaths = ["/", "/businesses", "/legal/terms", "/privacy", "/privacy/business-claims"];

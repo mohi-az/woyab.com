@@ -1,5 +1,5 @@
-import { Prisma } from "@fargo/database";
-import type { BusinessSearchBody } from "@fargo/shared";
+import { Prisma } from "@woyab/database";
+import type { BusinessSearchBody } from "@woyab/shared";
 
 import { prisma } from "../../lib/prisma.js";
 import { appLocaleToContentLocale } from "./business-localization.js";

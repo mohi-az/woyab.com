@@ -5,13 +5,13 @@
   "scripts": {
     "admin:upsert": "dotenv -e ../../packages/database/.env.development -- node scripts/upsert-admin.mjs",
     "dev": "dotenv -e ../../packages/database/.env.development -- next dev",
-    "build": "pnpm --dir ../.. --filter @fargo/shared build && pnpm --dir ../.. --filter @fargo/database generate && next build",
+    "build": "pnpm --dir ../.. --filter @woyab/shared build && pnpm --dir ../.. --filter @woyab/database generate && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@fargo/database": "link:../../packages/database",
-    "@fargo/shared": "link:../../packages/shared",
+    "@woyab/database": "link:../../packages/database",
+    "@woyab/shared": "link:../../packages/shared",
     "@prisma/adapter-pg": "^7.8.0",
     "@sentry/nextjs": "^10.64.0",
     "antd": "^6.5.0",

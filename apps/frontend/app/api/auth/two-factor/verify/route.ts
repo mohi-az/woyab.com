@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   cookieStore.delete(CHALLENGE_COOKIE_NAME);
 
   // Sign in via the two-factor-verified provider
-  const internalSecret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "fargo-default-dev-secret-key-for-2fa";
+  const internalSecret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "woyab-default-dev-secret-key-for-2fa";
   try {
     await signIn("two-factor-verified", {
       userId: user.id,

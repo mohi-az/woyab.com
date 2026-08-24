@@ -1,4 +1,4 @@
-import { Prisma } from "@fargo/database";
+import { Prisma } from "@woyab/database";
 
 import { env } from "../../config/env.js";
 import { ApiError } from "../../errors/api-error.js";

@@ -44,8 +44,8 @@ export function DashboardSidebar({ initialUser }: { initialUser: DashboardUser }
       const detail = (event as CustomEvent<Partial<DashboardUser>>).detail;
       setUser((current) => ({ ...current, ...detail }));
     }
-    window.addEventListener("fargo:profile-updated", updateAvatar);
-    return () => window.removeEventListener("fargo:profile-updated", updateAvatar);
+    window.addEventListener("woyab:profile-updated", updateAvatar);
+    return () => window.removeEventListener("woyab:profile-updated", updateAvatar);
   }, []);
 
   const isActive = (href: string, exact: boolean) =>

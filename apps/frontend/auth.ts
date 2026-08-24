@@ -4,7 +4,7 @@ import { compare } from "bcryptjs";
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { credentialsSchema } from "@fargo/shared";
+import { credentialsSchema } from "@woyab/shared";
 import { prisma } from "@/lib/prisma";
 import { decryptTwoFactorSecret, verifyTotp } from "@/lib/two-factor";
 import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
@@ -82,7 +82,7 @@ const providers: NextAuthConfig["providers"] = [
       const userId = typeof credentials?.userId === "string" ? credentials.userId.trim() : "";
       const internalSecret = typeof credentials?.internalSecret === "string" ? credentials.internalSecret : "";
 
-      const expectedSecret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "fargo-default-dev-secret-key-for-2fa";
+      const expectedSecret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "woyab-default-dev-secret-key-for-2fa";
       if (!internalSecret || !expectedSecret || internalSecret !== expectedSecret) return null;
       if (!userId) return null;
 
@@ -123,7 +123,7 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  secret: process.env.AUTH_SECRET ?? (process.env.NODE_ENV === "development" ? "fargo-local-development-secret-change-me" : undefined),
+  secret: process.env.AUTH_SECRET ?? (process.env.NODE_ENV === "development" ? "woyab-local-development-secret-change-me" : undefined),
   providers,
   pages: { signIn: "/login" },
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },

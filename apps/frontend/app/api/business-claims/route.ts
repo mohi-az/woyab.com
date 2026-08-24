@@ -1,4 +1,4 @@
-import { businessClaimCreateSchema } from "@fargo/shared";
+import { businessClaimCreateSchema } from "@woyab/shared";
 import { NextResponse } from "next/server";
 import {
   claimPrivacyNoticeVersion,

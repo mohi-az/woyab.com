@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import { PrismaClient } from "@fargo/database/client";
+import { PrismaClient } from "@woyab/database/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 

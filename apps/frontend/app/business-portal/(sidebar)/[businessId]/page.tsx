@@ -11,7 +11,7 @@ type Props = { params: Promise<{ businessId: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { businessId } = await params;
   const b = await prisma.business.findFirst({ where: { id: businessId }, select: { businessName: true } });
-  return { title: `${b?.businessName ?? "Business"} | Business Portal | Fargo` };
+  return { title: `${b?.businessName ?? "Business"} | Business Portal | woYab` };
 }
 
 export default async function BusinessPortalBusinessPage({ params }: Props) {

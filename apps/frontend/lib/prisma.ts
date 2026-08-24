@@ -1,7 +1,7 @@
 import "server-only";
 
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@fargo/database/client";
+import { PrismaClient } from "@woyab/database/client";
 import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {

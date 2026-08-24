@@ -104,7 +104,7 @@ function readResponse(socket: SmtpSocket, expectedCode: number) {
 }
 
 function buildMessage(from: string, mail: Mail) {
-  const boundary = `fargo-${Date.now()}`;
+  const boundary = `woyab-${Date.now()}`;
   const safeFrom = safeHeader(from);
   const safeTo = safeHeader(mail.to);
   const safeSubject = safeHeader(mail.subject);

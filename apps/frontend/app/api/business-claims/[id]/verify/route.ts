@@ -1,4 +1,4 @@
-import { businessClaimVerifySchema, claimVerificationDecision, otpFailureState } from "@fargo/shared";
+import { businessClaimVerifySchema, claimVerificationDecision, otpFailureState } from "@woyab/shared";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { currentUserId } from "@/lib/auth-user";

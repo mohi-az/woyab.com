@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Support | Business Portal | Fargo" };
+export const metadata: Metadata = { title: "Support | Business Portal | woYab" };
 
 export default async function BusinessPortalSupportPage({
   searchParams,
@@ -121,7 +121,7 @@ export default async function BusinessPortalSupportPage({
                   >
                     <p className="whitespace-pre-line text-sm leading-7 text-slate-800">{reply.message}</p>
                     <span className="mt-2 block text-xs text-slate-500">
-                      {isOwner ? t("youLabel") : reply.author.name || t("fargoSupport")} · {reply.createdAt.toLocaleString()}
+                      {isOwner ? t("youLabel") : reply.author.name || t("woyabSupport")} · {reply.createdAt.toLocaleString()}
                     </span>
                   </article>
                 );

@@ -1,4 +1,4 @@
-import { Prisma } from "@fargo/database";
+import { Prisma } from "@woyab/database";
 import { prisma } from "../../lib/prisma.js";
 
 const DAYS = [

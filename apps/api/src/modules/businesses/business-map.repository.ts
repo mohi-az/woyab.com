@@ -1,5 +1,5 @@
-import { Prisma } from "@fargo/database";
-import type { BusinessMapBody } from "@fargo/shared";
+import { Prisma } from "@woyab/database";
+import type { BusinessMapBody } from "@woyab/shared";
 
 import { prisma } from "../../lib/prisma.js";
 import { appLocaleToContentLocale } from "./business-localization.js";

@@ -1,5 +1,5 @@
-import type { ContentLocale, Prisma } from "@fargo/database";
-import type { AppLocale } from "@fargo/shared";
+import type { ContentLocale, Prisma } from "@woyab/database";
+import type { AppLocale } from "@woyab/shared";
 
 const appToDbLocaleMap: Record<AppLocale, ContentLocale> = {
   de: "DE",

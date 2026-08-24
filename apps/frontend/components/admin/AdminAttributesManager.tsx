@@ -1,6 +1,6 @@
 "use client";
 
-import type { AttributeDataType } from "@fargo/database";
+import type { AttributeDataType } from "@woyab/database";
 import type { TableProps } from "antd";
 import { Button, ConfigProvider, Form, Input, InputNumber, Popconfirm, Select, Space, Switch, Table, Tooltip } from "antd";
 import { useLocale } from "next-intl";

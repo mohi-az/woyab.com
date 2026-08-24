@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const title = `${business.title} | Fargo`;
+  const title = `${business.title} | woYab`;
   const description = business.shortDescription ?? business.description ?? business.title;
 
   return {

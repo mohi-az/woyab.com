@@ -22,11 +22,11 @@ export default async function HomePage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Fargo",
-          url: process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de",
+          name: "woYab",
+          url: process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de",
           potentialAction: {
             "@type": "SearchAction",
-            target: `${process.env.NEXT_PUBLIC_APP_URL || "https://fargo.de"}/businesses?search={search_term_string}`,
+            target: `${process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de"}/businesses?search={search_term_string}`,
             "query-input": "required name=search_term_string",
           },
         }}

@@ -7,7 +7,7 @@ export const runtime = "edge";
 const BRAND_COLOR = "#f5735c";
 const BRAND_COLOR_DARK = "#c94d38";
 
-// آیکون برند Fargo به صورت داینامیک تولید می‌شود
+// آیکون برند woYab به صورت داینامیک تولید می‌شود
 // مثال: GET /pwa-icons/192  →  PNG 192×192
 export async function GET(
   _req: NextRequest,

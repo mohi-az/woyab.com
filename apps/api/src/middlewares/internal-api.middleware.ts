@@ -3,7 +3,7 @@ import type { RequestHandler } from "express";
 
 import { env } from "../config/env.js";
 
-const INTERNAL_SECRET_HEADER = "x-fargo-internal-secret";
+const INTERNAL_SECRET_HEADER = "x-woyab-internal-secret";
 
 function secretsMatch(provided: string, expected: string) {
   const providedBuffer = Buffer.from(provided);

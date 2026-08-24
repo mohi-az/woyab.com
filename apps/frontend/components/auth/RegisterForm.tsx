@@ -1,7 +1,7 @@
 "use client";
 
-import type { RegisterInput } from "@fargo/shared";
-import { registerSchema } from "@fargo/shared";
+import type { RegisterInput } from "@woyab/shared";
+import { registerSchema } from "@woyab/shared";
 import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";

@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { UserRole } from "@fargo/database";
+import type { UserRole } from "@woyab/database";
 import { auth } from "@/auth";
 import { redirectWithLocale } from "@/i18n/server";
 import { prisma } from "@/lib/prisma";

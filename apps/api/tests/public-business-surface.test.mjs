@@ -79,5 +79,6 @@ test("costly unbound Google endpoints require an internal secret and rate limiti
   ]);
   assert.match(geoRoute, /place-photos\/:placeId", requireInternalApi, internalGoogleRateLimit/);
   assert.match(geoRoute, /place-photo", requireInternalApi, internalGoogleRateLimit/);
+  assert.match(geoRoute, /place-details\/:placeId", requireInternalApi, internalGoogleRateLimit/);
   assert.match(googleRoute, /googlePlacesRateLimit/);
 });

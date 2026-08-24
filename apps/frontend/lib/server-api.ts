@@ -19,7 +19,7 @@ export async function proxyApi(
       Accept: "application/json",
       ...(body ? { "Content-Type": "application/json" } : {}),
       ...(options.internal && process.env.INTERNAL_API_SECRET
-        ? { "x-fargo-internal-secret": process.env.INTERNAL_API_SECRET }
+        ? { "x-woyab-internal-secret": process.env.INTERNAL_API_SECRET }
         : {}),
     },
     cache: "no-store",

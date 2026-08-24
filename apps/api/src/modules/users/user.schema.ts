@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { paginationQuerySchema } from "@fargo/shared";
+import { paginationQuerySchema } from "@woyab/shared";
 
 export const createUserBodySchema = z.object({
   phone: z.string().min(1).optional(),

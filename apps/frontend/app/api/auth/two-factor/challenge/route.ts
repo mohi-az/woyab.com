@@ -12,11 +12,11 @@ const bodySchema = z.object({
   password: z.string().min(1),
 });
 
-export const CHALLENGE_COOKIE_NAME = "fargo_2fa_challenge";
+export const CHALLENGE_COOKIE_NAME = "woyab_2fa_challenge";
 const CHALLENGE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 function hmacSecret() {
-  const secret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "fargo-default-dev-secret-key-for-2fa";
+  const secret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "woyab-default-dev-secret-key-for-2fa";
   return secret;
 }
 

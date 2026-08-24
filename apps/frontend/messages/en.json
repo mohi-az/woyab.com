@@ -57,10 +57,10 @@
     }
   },
   "AddBusinessPage": {
-    "metaTitle": "Add or claim your business | Fargo",
-    "metaDescription": "Search Fargo for your business, claim an available listing, or add a new business.",
-    "eyebrow": "Fargo for businesses",
-    "title": "Bring your business to Fargo.",
+    "metaTitle": "Add or claim your business | woYab",
+    "metaDescription": "Search woYab for your business, claim an available listing, or add a new business.",
+    "eyebrow": "woYab for businesses",
+    "title": "Bring your business to woYab.",
     "description": "Search for your business first. You can claim an available listing or add a new one if it is not here yet.",
     "fieldLabel": "Your business name",
     "placeholder": "Start typing a business name",
@@ -70,7 +70,7 @@
     "error": "Search is temporarily unavailable. Please try again.",
     "noMatches": "No existing listings match this name yet.",
     "imageAlt": "A local business owner standing outside a neighborhood shop",
-    "artworkEyebrow": "Grow with Fargo",
+    "artworkEyebrow": "Grow with woYab",
     "artworkMessage": "Turn local searches into new customers and give your business the visibility it needs to grow."
   },
   "LocaleSwitcher": {
@@ -87,7 +87,7 @@
     "hero": {
       "eyebrow": "Persian-speaking businesses across Germany",
       "title": "Are You Looking<br></br>For A Business?",
-      "description": "Fargo is the directory for discovering Persian-speaking businesses across Germany, from restaurants and pharmacies to lawyers and beauty salons.",
+      "description": "woYab is the directory for discovering Persian-speaking businesses across Germany, from restaurants and pharmacies to lawyers and beauty salons.",
       "queryPlaceholder": "I'm looking for",
       "categoriesLabel": "Categories",
       "allCategories": "All categories",
@@ -141,7 +141,7 @@
       }
     },
     "latestBusinessesSection": {
-      "eyebrow": "Fresh on Fargo",
+      "eyebrow": "Fresh on woYab",
       "title": "Latest businesses",
       "description": "Take a quick look at the newest active businesses added to the directory.",
       "cta": "All businesses",
@@ -156,7 +156,7 @@
   "Businesses": {
     "eyebrow": "Discover local businesses",
     "title": "Find the right business for you",
-    "description": "Search Fargo's directory and narrow the results by category, specialty and city.",
+    "description": "Search woYab's directory and narrow the results by category, specialty and city.",
     "resultsTitle": "Businesses",
     "resultCount": "{count, plural, =0 {No businesses found} one {# business found} other {# businesses found}}",
     "resultCountTemplate": "{count} businesses found",
@@ -333,7 +333,7 @@
       "ownerUnavailable": "This business already has a verified owner and cannot be claimed.",
       "ownedGuidance": {
         "title": "This business has a verified owner",
-        "description": "After email verification, your request will be sent directly to the Fargo team for review. If the new ownership is confirmed, the previous owner's access will be revoked.",
+        "description": "After email verification, your request will be sent directly to the woYab team for review. If the new ownership is confirmed, the previous owner's access will be revoked.",
         "action": "Submit ownership claim"
       },
       "button": "Suggest an edit",
@@ -367,7 +367,7 @@
       "claimSuccess": {
         "title": "Your request was submitted successfully",
         "approvedDescription": "Your ownership has been verified! You can now manage your business page through the owner dashboard.",
-        "reviewDescription": "Your email was verified and the ownership request has been sent to the Fargo team for review. You will be notified via email and dashboard.",
+        "reviewDescription": "Your email was verified and the ownership request has been sent to the woYab team for review. You will be notified via email and dashboard.",
         "viewDashboard": "View in dashboard"
       },
       "suggestion": {
@@ -499,7 +499,7 @@
     "newsletterDescription": "Newsletter subscriptions will be available in a future update.",
     "emailPlaceholder": "Your email address",
     "comingSoon": "Coming soon",
-    "copyright": "© {year} Fargo. All rights reserved.",
+    "copyright": "© {year} woYab. All rights reserved.",
     "madeFor": "Persian-speaking businesses in Germany",
     "legal": "Terms of Use & Legal Notice",
     "privacy": "Privacy Policy",
@@ -507,7 +507,7 @@
   },
   "CookieConsent": {
     "bannerTitle": "Your privacy matters",
-    "bannerDescription": "We use necessary cookies to operate Fargo. Analytics and marketing technologies are activated only with your consent.",
+    "bannerDescription": "We use necessary cookies to operate woYab. Analytics and marketing technologies are activated only with your consent.",
     "acceptAll": "Accept all",
     "rejectAll": "Reject all",
     "manage": "Manage preferences",
@@ -516,7 +516,7 @@
     "necessaryTitle": "Necessary",
     "necessaryDescription": "These technologies are required for core functionality and security and cannot be disabled.",
     "analyticsTitle": "Analytics",
-    "analyticsDescription": "Helps us understand how Fargo is used so we can improve the service.",
+    "analyticsDescription": "Helps us understand how woYab is used so we can improve the service.",
     "marketingTitle": "Marketing",
     "marketingDescription": "Allows personalized content and campaign measurement. No marketing scripts are currently loaded.",
     "save": "Save selection",
@@ -580,9 +580,9 @@
       "backToLogin": "Back to login"
     },
     "login": {
-      "title": "Log in to Fargo",
+      "title": "Log in to woYab",
       "description": "Connect with great local businesses",
-      "terms": "By continuing, you agree to Fargo’s <terms>Terms of Service</terms> and acknowledge Fargo’s <privacy>Privacy Policy</privacy>.",
+      "terms": "By continuing, you agree to woYab’s <terms>Terms of Service</terms> and acknowledge woYab’s <privacy>Privacy Policy</privacy>.",
       "submit": "Login",
       "submitting": "Logging in...",
       "invalidCredentials": "Your credentials or administrator code are incorrect.",
@@ -620,7 +620,7 @@
       "businessPortalBannerButton": "Enter Business Portal"
     },
     "sidebar": {
-      "fallbackName": "Fargo user",
+      "fallbackName": "woYab user",
       "overview": "Overview",
       "profile": "Profile",
       "favorites": "Favorites",
@@ -665,7 +665,7 @@
       "title": "My profile",
       "description": "Manage your main information and profile photo.",
       "form": {
-        "fallbackName": "Fargo user",
+        "fallbackName": "woYab user",
         "invalidImage": "Please choose a valid image file.",
         "imageTooLarge": "Image size must be under 5 MB.",
         "uploadFailed": "Image upload failed.",
@@ -832,9 +832,9 @@
   },
   "Admin": {
     "shell": {
-      "fallbackName": "Fargo admin",
+      "fallbackName": "woYab admin",
       "ownerPanel": "Owner workspace",
-      "title": "Fargo Control Panel",
+      "title": "woYab Control Panel",
       "openMenu": "Open admin menu",
       "closeMenu": "Close admin menu",
       "lightMode": "Use light mode",
@@ -860,7 +860,7 @@
     },
     "overview": {
       "title": "Welcome back",
-      "description": "Monitor Fargo operations, moderation queues and directory quality from one place.",
+      "description": "Monitor woYab operations, moderation queues and directory quality from one place.",
       "businessHealth": "Business status",
       "businessHealthDescription": "Current listing publication state.",
       "reviewHealth": "Review status",
@@ -1227,7 +1227,7 @@
     },
     "support": {
       "title": "Support tickets",
-      "description": "Talk directly with the Fargo administration and follow your requests.",
+      "description": "Talk directly with the woYab administration and follow your requests.",
       "newTicket": "New ticket",
       "subject": "Subject",
       "message": "Describe your request with enough detail…",
@@ -1237,7 +1237,7 @@
       "reply": "Reply",
       "closedNote": "This ticket is closed. Create a new ticket if you need more help.",
       "youLabel": "You",
-      "fargoSupport": "Fargo support",
+      "woyabSupport": "woYab support",
       "statusLabels": {
         "OPEN": "Open",
         "PENDING": "Waiting for you",
@@ -1267,7 +1267,7 @@
       },
       "notes": {
         "title": "Messages & correspondence",
-        "admin": "Fargo Team",
+        "admin": "woYab Team",
         "you": "You",
         "empty": "No messages yet.",
         "placeholder": "Write a message, attach evidence or additional details...",
@@ -1286,11 +1286,11 @@
     }
   },
   "ForBusinesses": {
-    "metaTitle": "Fargo for Businesses — Grow your local presence",
-    "metaDescription": "List your Persian-speaking business on Fargo and reach thousands of customers across Germany.",
+    "metaTitle": "woYab for Businesses — Grow your local presence",
+    "metaDescription": "List your Persian-speaking business on woYab and reach thousands of customers across Germany.",
     "heroEyebrow": "For business owners",
-    "heroTitle": "Grow your business with Fargo",
-    "heroDescription": "Join hundreds of Persian-speaking businesses already listed on Fargo. Reach new customers, manage your presence and track performance — all in one place.",
+    "heroTitle": "Grow your business with woYab",
+    "heroDescription": "Join hundreds of Persian-speaking businesses already listed on woYab. Reach new customers, manage your presence and track performance — all in one place.",
     "heroPrimary": "Add your business",
     "heroSecondary": "Manage existing businesses",
     "featuresTitle": "Everything you need to succeed",
@@ -1310,7 +1310,7 @@
     "ctaTitle": "Ready to get started?",
     "ctaDescription": "It takes less than five minutes to add your business and start reaching new customers.",
     "ctaAction": "Add your business now",
-    "claimTitle": "Already listed on Fargo?",
+    "claimTitle": "Already listed on woYab?",
     "claimDescription": "Claim your existing listing for free to take control of your business page and unlock owner tools.",
     "claimAction": "Claim your listing"
   }

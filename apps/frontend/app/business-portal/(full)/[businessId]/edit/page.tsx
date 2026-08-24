@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     where: { id: businessId },
     select: { businessName: true },
   });
-  return { title: `Edit ${business?.businessName ?? "Business"} | Business Portal | Fargo` };
+  return { title: `Edit ${business?.businessName ?? "Business"} | Business Portal | woYab` };
 }
 
 export default async function BusinessEditPage({ params }: PageProps) {

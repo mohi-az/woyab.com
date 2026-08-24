@@ -3,10 +3,10 @@ export const appLocales = ["de", "en", "fa"] as const;
 export type AppLocale = (typeof appLocales)[number];
 
 export const defaultLocale: AppLocale = "de";
-export const localeStorageKey = "fargo-locale";
-export const localeCookieName = "FARGO_LOCALE";
+export const localeStorageKey = "woyab-locale";
+export const localeCookieName = "WOYAB_LOCALE";
 export const localeCookieMaxAge = 60 * 60 * 24 * 365;
-export const localeHeaderName = "x-fargo-locale";
+export const localeHeaderName = "x-woyab-locale";
 
 export const localeLabels: Record<AppLocale, string> = {
   de: "Deutsch",
@@ -44,7 +44,7 @@ export function localizePathname(pathname: string, locale: AppLocale) {
     return pathname;
   }
 
-  const url = new URL(pathname.startsWith("/") ? pathname : `/${pathname}`, "http://fargo.local");
+  const url = new URL(pathname.startsWith("/") ? pathname : `/${pathname}`, "http://woyab.local");
   const localizedPath = stripLocalePrefix(url.pathname);
 
   return `/${locale}${localizedPath === "/" ? "" : localizedPath}${url.search}${url.hash}`;

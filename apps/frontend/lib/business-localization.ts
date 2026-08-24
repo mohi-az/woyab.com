@@ -1,4 +1,4 @@
-import type { ContentLocale } from "@fargo/database";
+import type { ContentLocale } from "@woyab/database";
 import type { AppLocale } from "@/i18n/config";
 
 type TranslationRecord = {

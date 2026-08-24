@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { savedLocationSchema } from "@fargo/shared";
+import { savedLocationSchema } from "@woyab/shared";
 import { currentUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 

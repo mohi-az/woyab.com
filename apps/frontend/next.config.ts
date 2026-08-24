@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@fargo/database", "@fargo/shared"],
+  transpilePackages: ["@woyab/database", "@woyab/shared"],
   turbopack: {
     root: resolve(process.cwd(), "../.."),
   },

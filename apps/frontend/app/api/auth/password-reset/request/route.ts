@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
-import { passwordResetRequestSchema } from "@fargo/shared";
+import { passwordResetRequestSchema } from "@woyab/shared";
 import { currentUserId } from "@/lib/auth-user";
 import { sendMail } from "@/lib/mail";
 import { createPasswordResetToken, passwordResetExpiry } from "@/lib/password-reset";
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 40px 20px;">
       <div style="max-w-md: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
         <div style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
-          <img src="https://ui-avatars.com/api/?name=Fargo&background=000&color=fff&rounded=true&bold=true" alt="Fargo Logo" style="width: 24px; height: 24px; border-radius: 4px;" />
+          <img src="https://ui-avatars.com/api/?name=woYab&background=000&color=fff&rounded=true&bold=true" alt="woYab Logo" style="width: 24px; height: 24px; border-radius: 4px;" />
         </div>
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #0f172a;">Reset your password</h1>
         <p style="margin: 0 0 24px; font-size: 16px; color: #334155; line-height: 1.5;">We received a request to reset the password for your account.</p>
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   try {
     await sendMail({
       to: user.email,
-      subject: "Reset your Fargo password",
+      subject: "Reset your woYab password",
       text: `We received a request to reset the password for your account.\n\nReset password: ${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you didn't request to reset your password, you can safely ignore this email.`,
       html: htmlTemplate,
     });

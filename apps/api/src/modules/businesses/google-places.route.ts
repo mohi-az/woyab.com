@@ -80,7 +80,7 @@ googlePlacesRouter.get("/businesses/:id/google-photos/*photoReference", googlePl
     res.status(404).json({ success: false, error: "Business photo not found" });
     return;
   }
-  res.set({ "Content-Type": result.contentType, "Cache-Control": "public, max-age=604800, immutable", "Content-Length": String(result.buffer.length) });
+  res.set({ "Content-Type": result.contentType, "Cache-Control": "private, no-store", "Content-Length": String(result.buffer.length) });
   res.send(result.buffer);
 });
 
@@ -112,7 +112,7 @@ googlePlacesRouter.get("/businesses/:id/google-photo-thumbnail", googlePlacesRat
 
   res.set({
     "Content-Type": result.contentType,
-    "Cache-Control": "public, max-age=604800, immutable",
+    "Cache-Control": "private, no-store",
     "Content-Length": String(result.buffer.length),
   });
   res.send(result.buffer);

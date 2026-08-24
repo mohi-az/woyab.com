@@ -202,9 +202,9 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
       if (recorded || !getCookieConsent()?.analytics) return;
       recorded = true;
 
-      const visitorKey = "fargo_analytics_visitor";
-      const sessionKey = "fargo_analytics_session";
-      const sessionActivityKey = "fargo_analytics_session_activity";
+      const visitorKey = "woyab_analytics_visitor";
+      const sessionKey = "woyab_analytics_session";
+      const sessionActivityKey = "woyab_analytics_session_activity";
       const now = Date.now();
       const newId = () => crypto.randomUUID().replaceAll("-", "");
       let visitorId = localStorage.getItem(visitorKey);
@@ -457,6 +457,20 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 <div className="flex h-full items-center justify-center text-sm font-bold text-slate-500">{business.title}</div>
               )}
             </div>
+
+            {activeImage?.sourceUri || activeImage?.authorAttributions?.length ? (
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 px-4 py-2 text-xs text-slate-500">
+                <span>
+                  {activeImage.authorAttributions?.map((author, index) => (
+                    <span key={`${author.displayName}-${index}`}>
+                      {author.uri ? <a href={author.uri} target="_blank" rel="noreferrer" className="font-bold hover:text-primary">{author.displayName}</a> : author.displayName}
+                      {index < (activeImage.authorAttributions?.length ?? 0) - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </span>
+                {activeImage.sourceUri ? <a href={activeImage.sourceUri} target="_blank" rel="noreferrer" className="font-black text-primary hover:underline">Google Maps</a> : null}
+              </div>
+            ) : null}
 
             {business.gallery.length > 1 ? (
               <div className="grid grid-cols-4 gap-3 p-4 sm:grid-cols-6">

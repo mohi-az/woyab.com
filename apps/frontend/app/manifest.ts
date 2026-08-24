@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Fargo - Iranian Businesses in Germany",
-    short_name: "Fargo",
+    name: "woYab - Iranian Businesses in Germany",
+    short_name: "woYab",
     description:
       "Verzeichnis iranischer Unternehmen in Deutschland - Restaurants, Apotheken, Anwalte und mehr",
     start_url: "/",

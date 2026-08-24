@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { appLocaleSchema, paginationQuerySchema } from "@fargo/shared";
-export { businessMapBodySchema, businessSearchBodySchema } from "@fargo/shared";
+import { appLocaleSchema, paginationQuerySchema } from "@woyab/shared";
+export { businessMapBodySchema, businessSearchBodySchema } from "@woyab/shared";
 
 const businessTranslationInputSchema = z.object({
   locale: appLocaleSchema,

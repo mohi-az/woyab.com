@@ -108,7 +108,7 @@ export function AdminShell({ user, children, initialTheme }: {
             <span className="admin-brand-icon grid h-10 w-10 place-items-center rounded-lg border">
               <FiBarChart2 className="h-5 w-5" />
             </span>
-            <span className="admin-brand text-2xl font-black tracking-wide">Fargo</span>
+            <span className="admin-brand text-2xl font-black tracking-wide">woYab</span>
           </Link>
           <button type="button" className="admin-icon-button rounded-lg p-2 lg:hidden" onClick={() => setSidebarOpen(false)} aria-label={t("shell.closeMenu")}>
             <FiX className="h-5 w-5" />
@@ -179,7 +179,7 @@ export function AdminShell({ user, children, initialTheme }: {
               className="admin-icon-button grid h-11 w-11 place-items-center rounded-full border"
               onClick={() => setDark((current) => {
                 const next = !current;
-                document.cookie = `fargo-admin-theme=${next ? "dark" : "light"}; path=/; max-age=31536000; samesite=lax`;
+                document.cookie = `woyab-admin-theme=${next ? "dark" : "light"}; path=/; max-age=31536000; samesite=lax`;
                 return next;
               })}
               aria-label={dark ? t("shell.lightMode") : t("shell.darkMode")}

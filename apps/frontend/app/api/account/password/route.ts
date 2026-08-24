@@ -1,6 +1,6 @@
 import { compare, hash } from "bcryptjs";
 import { NextResponse } from "next/server";
-import { changePasswordSchema } from "@fargo/shared";
+import { changePasswordSchema } from "@woyab/shared";
 import { currentUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 import { isRateLimited, requestIp } from "@/lib/rate-limit";

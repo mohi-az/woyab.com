@@ -1,6 +1,6 @@
 import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
-import { registerSchema } from "@fargo/shared";
+import { registerSchema } from "@woyab/shared";
 import { sendAccountVerification } from "@/lib/email-verification";
 import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 import { prisma } from "@/lib/prisma";

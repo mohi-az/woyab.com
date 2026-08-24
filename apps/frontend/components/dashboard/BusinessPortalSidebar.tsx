@@ -39,8 +39,8 @@ export function BusinessPortalSidebar({ user, businesses, unreadMessages, unansw
       const detail = (event as CustomEvent<Partial<PortalUser>>).detail;
       if (detail) setLocalUser((prev) => ({ ...prev, ...detail }));
     };
-    window.addEventListener("fargo:profile-updated", sync);
-    return () => window.removeEventListener("fargo:profile-updated", sync);
+    window.addEventListener("woyab:profile-updated", sync);
+    return () => window.removeEventListener("woyab:profile-updated", sync);
   }, []);
 
   const displayName = localUser.name || t("businessPortal");

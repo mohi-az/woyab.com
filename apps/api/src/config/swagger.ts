@@ -22,7 +22,7 @@ export const openApiSpec = swaggerJSDoc({
     info: {
       title: env.APP_NAME,
       version: env.API_VERSION,
-      description: "Interactive API documentation for Fargo. Use Swagger UI to inspect and test endpoints directly.",
+      description: "Interactive API documentation for woYab. Use Swagger UI to inspect and test endpoints directly.",
     },
     servers: [
       {

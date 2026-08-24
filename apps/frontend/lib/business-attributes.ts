@@ -1,4 +1,4 @@
-import type { AttributeDataType, Prisma } from "@fargo/database";
+import type { AttributeDataType, Prisma } from "@woyab/database";
 
 export type BusinessAttributeDefinition = {
   id: number;
