@@ -5,7 +5,7 @@ import { archiveOwnerContactMessage, openOwnerContactMessage } from "@/lib/owner
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Messages | Business Portal | woYab" };
+export const metadata: Metadata = { title: "Messages | Business Portal | WoYab" };
 
 const inboxStatuses = ["NEW", "READ", "ARCHIVED"] as const;
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };

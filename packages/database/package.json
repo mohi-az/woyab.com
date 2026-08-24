@@ -1,7 +1,7 @@
 {
   "name": "@woyab/database",
   "version": "1.0.0",
-  "description": "Database package for woYab - Prisma schema, migrations, and generated client.",
+  "description": "Database package for WoYab - Prisma schema, migrations, and generated client.",
   "main": "./generated/prisma/index.js",
   "types": "./generated/prisma/index.d.ts",
   "exports": {

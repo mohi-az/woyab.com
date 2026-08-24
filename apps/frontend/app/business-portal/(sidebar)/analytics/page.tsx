@@ -7,7 +7,7 @@ import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Analytics | Business Portal | woYab" };
+export const metadata: Metadata = { title: "Analytics | Business Portal | WoYab" };
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);

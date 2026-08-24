@@ -4,13 +4,13 @@ import { z } from "zod";
 
 const envSchema = z.object({
   API_VERSION: z.string().min(1).default("v1"),
-  APP_NAME: z.string().min(1).default("woYab API"),
+  APP_NAME: z.string().min(1).default("WoYab API"),
   CORS_ORIGIN: z.string().min(1).default("*"),
   DATABASE_URL: z.string().min(1).optional(),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   MAPBOX_PUBLIC_TOKEN: z.string().min(1).optional(),
   NOMINATIM_REVERSE_URL: z.string().url().default("https://nominatim.openstreetmap.org/reverse"),
-  NOMINATIM_USER_AGENT: z.string().min(8).default("woYab/1.0 (https://woyab.local)"),
+  NOMINATIM_USER_AGENT: z.string().min(8).default("WoYab/1.0 (https://woyab.local)"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
   GOOGLE_PHOTO_CACHE_DIR: z.string().min(1).optional(),

@@ -47,12 +47,11 @@ export async function POST(request: Request) {
   `;
 
   const resetUrl = `${resetBaseUrl(request)}/reset-password?token=${encodeURIComponent(token)}`;
+  const brandLogoUrl = `${resetBaseUrl(request).replace(/\/$/, "")}/brand/woyab-logo.png`;
   const htmlTemplate = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 40px 20px;">
       <div style="max-w-md: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-        <div style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
-          <img src="https://ui-avatars.com/api/?name=woYab&background=000&color=fff&rounded=true&bold=true" alt="woYab Logo" style="width: 24px; height: 24px; border-radius: 4px;" />
-        </div>
+        <img src="${brandLogoUrl}" width="122" height="50" alt="WoYab" style="display: block; width: 122px; height: 50px; object-fit: contain; margin-bottom: 24px;" />
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #0f172a;">Reset your password</h1>
         <p style="margin: 0 0 24px; font-size: 16px; color: #334155; line-height: 1.5;">We received a request to reset the password for your account.</p>
         
@@ -69,13 +68,14 @@ export async function POST(request: Request) {
   try {
     await sendMail({
       to: user.email,
-      subject: "Reset your woYab password",
+      subject: "Reset your WoYab password",
       text: `We received a request to reset the password for your account.\n\nReset password: ${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you didn't request to reset your password, you can safely ignore this email.`,
       html: htmlTemplate,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("SMTP Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to send email." }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to send email.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 
   return NextResponse.json({

@@ -75,7 +75,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     } else {
       const safe = Object.fromEntries(Object.entries(payload).map(([key, value]) => [key, escapeHtml(value || "-")])) as Record<string, string>;
       const html = `<h2>New contact message</h2><p><strong>Business:</strong> ${escapeHtml(business.businessName)}</p><p><strong>Name:</strong> ${safe.name}</p><p><strong>Email:</strong> ${safe.email}</p><p><strong>Phone:</strong> ${safe.phone}</p><p><strong>Message:</strong></p><p>${safe.message.replace(/\n/g, "<br />")}</p>`;
-      delivery = await deliverWithResend(business.email, `New woYab contact message for ${business.businessName}`, html, payload.email);
+      delivery = await deliverWithResend(business.email, `New WoYab contact message for ${business.businessName}`, html, payload.email);
     }
 
     await prisma.contactMessage.update({

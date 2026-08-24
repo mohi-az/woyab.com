@@ -22,7 +22,7 @@ export default async function HomePage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "woYab",
+          name: "WoYab",
           url: process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de",
           potentialAction: {
             "@type": "SearchAction",

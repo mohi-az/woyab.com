@@ -51,7 +51,7 @@ export default async function NotFound() {
               overflow: hidden !important;
             }
 
-            body:has(.woyab-not-found-page) header a[aria-label="woYab"] > span:last-child,
+            body:has(.woyab-not-found-page) header a[aria-label="WoYab"] > span:last-child,
             body:has(.woyab-not-found-page) header nav a,
             body:has(.woyab-not-found-page) header a[href*="/login"] {
               color: #0f172a !important;

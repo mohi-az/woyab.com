@@ -36,7 +36,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # Authentication setup
 
-The frontend uses Auth.js (NextAuth v5) as the only session authority. Email/password accounts and Google accounts are stored in the shared woYab database.
+The frontend uses Auth.js (NextAuth v5) as the only session authority. Email/password accounts and Google accounts are stored in the shared WoYab database.
 
 1. Copy `.env.example` to `.env.local` and set a strong `AUTH_SECRET` (`npx auth secret` can generate one).
 2. In Firebase Authentication, enable Google sign-in. Open the linked Google Cloud OAuth web client and copy its client ID and secret to `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`.

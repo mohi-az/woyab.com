@@ -856,7 +856,7 @@ export async function updateReportStatus(formData: FormData) {
     try {
       await sendMail({
         to: recipient,
-        subject: `woYab report decision: ${status}`,
+        subject: `WoYab report decision: ${status}`,
         text: `Your report about ${target} was ${status.toLowerCase()}.\n\nDecision: ${decisionReason}\n${actionTaken ? `Action taken: ${actionTaken}` : ""}`,
         html: `<p>Your report about <strong>${escapeHtml(target)}</strong> was ${status.toLowerCase()}.</p><p><strong>Decision:</strong> ${escapeHtml(decisionReason || "")}</p>${actionTaken ? `<p><strong>Action taken:</strong> ${escapeHtml(actionTaken)}</p>` : ""}`,
       });
@@ -953,12 +953,12 @@ export async function updateClaimStatus(formData: FormData) {
         { label: "وضعیت درخواست", value: isApproved ? "تایید شده (Approved)" : "تایید نشد (Rejected)" },
         { label: "توضیح مدیریت", value: decisionReason || (isApproved ? "تایید مدارک و هویت" : "عدم احراز شرایط لازم") },
       ],
-      footerNote: "با تشکر از همراهی شما،<br/><strong>تیم woYab (woYab Team)</strong>",
+      footerNote: "با تشکر از همراهی شما،<br/><strong>تیم WoYab (WoYab Team)</strong>",
     });
 
     await Promise.allSettled(recipients.map((to) => sendMail({
       to,
-      subject: `نتیجه بررسی درخواست مالکیت کسب‌وکار ${claim.business.businessName} | woYab`,
+      subject: `نتیجه بررسی درخواست مالکیت کسب‌وکار ${claim.business.businessName} | WoYab`,
       text: `The ownership claim for ${claim.business.businessName} is now ${status}. Reason: ${decisionReason || "No additional reason provided."}`,
       html,
     })));
@@ -997,19 +997,19 @@ export async function reviewBusinessChangeRequest(formData: FormData) {
       badgeBg: isApproved ? "#10b981" : "#ef4444",
       title: isApproved ? "پیشنهاد تغییرات شما تایید شد" : "نتیجه بررسی پیشنهاد تغییرات کسب‌وکار",
       subtitle: isApproved
-        ? `سلام،<br/>با تشکر از مشارکت و همکاری شما در woYab، پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی توسط تیم woYab تایید و روی صفحه کسب‌وکار اعمال گردید.`
+        ? `سلام،<br/>با تشکر از مشارکت و همکاری شما در WoYab، پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی توسط تیم WoYab تایید و روی صفحه کسب‌وکار اعمال گردید.`
         : `سلام،<br/>با تشکر از مشارکت شما، به اطلاع می‌رسانیم که پیشنهاد تغییرات ارسالی شما برای کسب‌وکار <strong>${request.business.businessName}</strong> پس از بررسی تایید نگردید.`,
       details: [
         { label: "نام کسب‌وکار", value: request.business.businessName },
         { label: "نتیجه بررسی", value: isApproved ? "تایید و اعمال شد" : "تایید نشد" },
         { label: "توضیح مدیریت", value: decisionReason || (isApproved ? "مطابق اطلاعات معتبر" : "اطلاعات پیشنهادی تایید نشد") },
       ],
-      footerNote: "با تشکر از همراهی شما در بهبود اطلاعات woYab،<br/><strong>تیم woYab (woYab Team)</strong>",
+      footerNote: "با تشکر از همراهی شما در بهبود اطلاعات WoYab،<br/><strong>تیم WoYab (WoYab Team)</strong>",
     });
 
     await sendMail({
       to: request.submitter.email,
-      subject: `نتیجه بررسی پیشنهاد تغییرات کسب‌وکار ${request.business.businessName} | woYab`,
+      subject: `نتیجه بررسی پیشنهاد تغییرات کسب‌وکار ${request.business.businessName} | WoYab`,
       text: `Your change request for ${request.business.businessName} was ${isApproved ? "approved" : "rejected"}. Reason: ${decisionReason}`,
       html,
     }).catch(() => undefined);

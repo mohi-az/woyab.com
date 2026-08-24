@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { FaClipboardList } from "react-icons/fa";
 import { FiArrowRight, FiClock, FiMail, FiMapPin } from "react-icons/fi";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { CookiePreferencesButton } from "@/components/privacy/CookiePreferencesButton";
 
@@ -17,11 +17,8 @@ export default async function Footer() {
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 lg:grid-cols-[1.3fr_.75fr_.9fr_1.25fr] lg:gap-12 lg:py-20">
         <div>
-          <Link href={href("/")} className="inline-flex items-center gap-3 text-2xl font-black">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white">
-              <FaClipboardList />
-            </span>
-            woYab
+          <Link href={href("/")} className="inline-flex rounded-xl bg-white px-3 py-2" aria-label="WoYab">
+            <BrandLogo className="h-11 max-w-[8.5rem]" />
           </Link>
           <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">{t("description")}</p>
         </div>

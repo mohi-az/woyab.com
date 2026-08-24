@@ -25,24 +25,24 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: "woYab — Persischsprachige Unternehmen in Deutschland",
-    template: "%s | woYab",
+    default: "WoYab — Persischsprachige Unternehmen in Deutschland",
+    template: "%s | WoYab",
   },
   description:
-    "woYab ist das umfassende Verzeichnis persischsprachiger Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
+    "WoYab ist das umfassende Verzeichnis persischsprachiger Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
   keywords: [
     "Persian-speaking businesses Germany",
     "persischsprachige Unternehmen Deutschland",
     "کسب‌وکار فارسی‌زبان آلمان",
     "Persian directory",
-    "woYab",
+    "WoYab",
     "persischsprachige Restaurants",
     "persischsprachige Ärzte",
     "persische Dienstleistungen",
   ],
-  authors: [{ name: "woYab" }],
-  creator: "woYab",
-  publisher: "woYab",
+  authors: [{ name: "WoYab" }],
+  creator: "WoYab",
+  publisher: "WoYab",
   robots: {
     index: true,
     follow: true,
@@ -56,8 +56,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "woYab",
-    title: "woYab — Iranische Unternehmen in Deutschland",
+    siteName: "WoYab",
+    title: "WoYab — Iranische Unternehmen in Deutschland",
     description:
       "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland. Restaurants, Ärzte, Anwälte und mehr.",
     locale: "de_DE",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "woYab — Iranische Unternehmen in Deutschland",
+    title: "WoYab — Iranische Unternehmen in Deutschland",
     description:
       "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland.",
   },
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "woYab",
+    title: "WoYab",
   },
   formatDetection: { telephone: false },
   icons: {

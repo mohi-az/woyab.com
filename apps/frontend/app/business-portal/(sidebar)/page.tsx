@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { ClaimDetailCard } from "@/components/dashboard/ClaimDetailCard";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Business Portal | woYab" };
+export const metadata: Metadata = { title: "Business Portal | WoYab" };
 
 export default async function BusinessPortalPage() {
   const [userId, t] = await Promise.all([requireUserId(), getTranslations("BusinessPortal.overview")]);

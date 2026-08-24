@@ -119,9 +119,9 @@ test("the platform privacy policy is public and linked from the footer", async (
     frontendSource("components/layout/Footer.tsx"),
     frontendSource("app/sitemap.ts"),
   ]);
-  assert.match(policy, /woYab Privacy Policy/);
-  assert.match(policy, /سیاست حریم خصوصی woYab/);
-  assert.match(policy, /Datenschutzerklärung von woYab/);
+  assert.match(policy, /WoYab Privacy Policy/);
+  assert.match(policy, /سیاست حریم خصوصی WoYab/);
+  assert.match(policy, /Datenschutzerklärung von WoYab/);
   assert.match(footer, /href\("\/privacy"\)/);
   assert.match(sitemap, /"\/privacy"/);
 });
@@ -133,11 +133,11 @@ test("final moderation decisions notify reporters and contributors", async () =>
   ]);
   assert.match(actions, /report\.notification_failed/);
   assert.match(actions, /Your report about/);
-  assert.match(actions, /woYab report decision/);
+  assert.match(actions, /WoYab report decision/);
   assert.match(actions, /The ownership claim for/);
   assert.match(actions, /Your change request for/);
   assert.match(emailTemplates, /Update on your review for/);
-  assert.match(emailTemplates, /\| woYab/);
+  assert.match(emailTemplates, /\| WoYab/);
 });
 
 test("administrator access requires encrypted TOTP enrollment and verification", async () => {

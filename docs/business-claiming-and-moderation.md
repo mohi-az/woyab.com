@@ -1,6 +1,6 @@
 # Business Claiming, Edit Suggestions, Moderation, and Public Removal
 
-This document describes the implemented business ownership claiming, edit suggestion, moderation, and public removal system in woYab.
+This document describes the implemented business ownership claiming, edit suggestion, moderation, and public removal system in WoYab.
 
 - [فارسی](#نسخهٔ-فارسی)
 - [English](#english-version)

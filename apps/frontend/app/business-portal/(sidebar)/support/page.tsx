@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Support | Business Portal | woYab" };
+export const metadata: Metadata = { title: "Support | Business Portal | WoYab" };
 
 export default async function BusinessPortalSupportPage({
   searchParams,

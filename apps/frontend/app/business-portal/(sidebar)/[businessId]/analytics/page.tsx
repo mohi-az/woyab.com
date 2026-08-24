@@ -17,7 +17,7 @@ const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { businessId } = await params;
   const b = await prisma.business.findFirst({ where: { id: businessId }, select: { businessName: true } });
-  return { title: `Analytics — ${b?.businessName ?? "Business"} | Business Portal | woYab` };
+  return { title: `Analytics — ${b?.businessName ?? "Business"} | Business Portal | WoYab` };
 }
 
 export default async function BusinessAnalyticsPage({ params, searchParams }: Props) {

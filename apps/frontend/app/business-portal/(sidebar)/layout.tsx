@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { FaClipboardList } from "react-icons/fa";
 import { FiLogIn } from "react-icons/fi";
+import { BrandMark } from "@/components/brand/BrandLogo";
 import { BusinessPortalSidebar } from "@/components/dashboard/BusinessPortalSidebar";
 import { Link } from "@/i18n/navigation";
 import { currentUserId } from "@/lib/auth-user";
@@ -55,9 +55,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
     return (
       <div className="flex min-h-[70vh] items-center justify-center bg-[#f8f5f1] px-4">
         <div className="w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-2xl text-primary">
-            <FaClipboardList />
-          </span>
+          <BrandMark className="mx-auto h-20 w-20" priority />
           <h1 className="mt-6 text-2xl font-black text-slate-950">{t("title")}</h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-7 text-slate-500">{t("description")}</p>
           <Link

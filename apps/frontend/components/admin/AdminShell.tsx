@@ -26,6 +26,7 @@ import {
 } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 
 type AdminUser = {
   name: string | null;
@@ -104,11 +105,8 @@ export function AdminShell({ user, children, initialTheme }: {
         )}
       >
         <div className="admin-sidebar-border flex h-[70px] items-center justify-between border-b px-5">
-          <Link href="/admin" className="flex items-center gap-3">
-            <span className="admin-brand-icon grid h-10 w-10 place-items-center rounded-lg border">
-              <FiBarChart2 className="h-5 w-5" />
-            </span>
-            <span className="admin-brand text-2xl font-black tracking-wide">woYab</span>
+          <Link href="/admin" className="rounded-lg bg-white px-2 py-1" aria-label="WoYab">
+            <BrandLogo className="h-9 max-w-[7.5rem]" priority />
           </Link>
           <button type="button" className="admin-icon-button rounded-lg p-2 lg:hidden" onClick={() => setSidebarOpen(false)} aria-label={t("shell.closeMenu")}>
             <FiX className="h-5 w-5" />

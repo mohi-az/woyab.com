@@ -48,7 +48,7 @@ export function verifyTotp(secret: string, code: string, now = Date.now()) {
 }
 
 export function twoFactorUri(email: string, secret: string) {
-  const issuer = "woYab";
+  const issuer = "WoYab";
   const label = encodeURIComponent(`${issuer}:${email}`);
   return `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 }

@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
-  name: "woYab",
+  name: "WoYab",
   tagline: "Iranian Businesses in Germany",
   description: "Directory for Iranian businesses in Germany",
   apiBaseUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",

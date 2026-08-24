@@ -1,4 +1,4 @@
-// انواع داده‌های پایه اپلیکیشن woYab
+// انواع داده‌های پایه اپلیکیشن WoYab
 
 export interface Business {
   id: string;

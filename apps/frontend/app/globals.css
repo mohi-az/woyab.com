@@ -189,15 +189,6 @@ body[data-admin-theme="light"],
   border-color: var(--admin-border);
 }
 
-.admin-brand,
-.admin-brand-icon {
-  color: var(--admin-brand);
-}
-
-.admin-brand-icon {
-  border-color: color-mix(in srgb, var(--admin-brand) 45%, transparent);
-}
-
 .admin-avatar-fallback {
   background: color-mix(in srgb, #38bdf8 18%, transparent);
   color: #7dd3fc;

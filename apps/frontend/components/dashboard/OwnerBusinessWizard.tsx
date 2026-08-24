@@ -187,7 +187,7 @@ function localizedText(locale: string) {
       },
       eyebrow: "ثبت کسب‌وکار برای صاحبان",
       pageTitle: "کسب‌وکار خود را اضافه کنید",
-      pageDescription: "اطلاعات کامل کسب‌وکار را برای بررسی ارسال کنید. آگهی تا زمان تأیید تیم woYab در وضعیت در انتظار باقی می‌ماند.",
+      pageDescription: "اطلاعات کامل کسب‌وکار را برای بررسی ارسال کنید. آگهی تا زمان تأیید تیم WoYab در وضعیت در انتظار باقی می‌ماند.",
       businessName: "نام کسب‌وکار",
       legalName: "نام حقوقی",
       contactTitle: "اطلاعات تماس",
@@ -238,7 +238,7 @@ function localizedText(locale: string) {
       },
       eyebrow: "Eintrag für Geschäftsinhaber",
       pageTitle: "Unternehmen hinzufügen",
-      pageDescription: "Senden Sie einen vollständigen Unternehmenseintrag zur Prüfung. Er bleibt ausstehend, bis das woYab-Team ihn freigibt.",
+      pageDescription: "Senden Sie einen vollständigen Unternehmenseintrag zur Prüfung. Er bleibt ausstehend, bis das WoYab-Team ihn freigibt.",
       businessName: "Unternehmensname",
       legalName: "Rechtlicher Name",
       contactTitle: "Kontaktdaten",
@@ -288,7 +288,7 @@ function localizedText(locale: string) {
     },
     eyebrow: "Owner listing wizard",
     pageTitle: "Add your business",
-    pageDescription: "Submit a complete listing for review. It will remain pending until the woYab team approves it.",
+    pageDescription: "Submit a complete listing for review. It will remain pending until the WoYab team approves it.",
     businessName: "Business name",
     legalName: "Legal name",
     contactTitle: "Contact information",
@@ -573,7 +573,7 @@ export function OwnerBusinessWizard({
                   minLength={2}
                   maxLength={200}
                   className={inputClass}
-                  placeholder="woYab Cafe"
+                  placeholder="WoYab Cafe"
                 />
               </Field>
               <Field label={text.legalName} locale={locale} error={fieldErrors.legalName}>

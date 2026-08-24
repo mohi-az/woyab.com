@@ -1,7 +1,7 @@
 {
   "name": "@woyab/shared",
   "version": "1.0.0",
-  "description": "Shared contracts, constants, validators, and utilities for woYab apps.",
+  "description": "Shared contracts, constants, validators, and utilities for WoYab apps.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
