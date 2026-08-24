@@ -4,18 +4,40 @@ import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiAlertCircle, FiEye, FiEyeOff, FiLoader } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 
-export function LoginForm({ googleEnabled, callbackUrl, verification }: { googleEnabled: boolean; callbackUrl: string; verification?: string }) {
+export function LoginForm({ googleEnabled, callbackUrl, verification, authError }: { googleEnabled: boolean; callbackUrl: string; verification?: string; authError?: string }) {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const initialAuthError = authError === "AccessDenied"
+    ? t("login.errors.accessDenied")
+    : authError === "OAuthAccountNotLinked"
+      ? t("login.errors.accountNotLinked")
+      : authError === "Configuration"
+        ? t("login.errors.configuration")
+        : authError
+          ? t("login.errors.googleFailed")
+          : "";
+  const [error, setError] = useState(initialAuthError);
   const [showPassword, setShowPassword] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
   const activeLocale = isAppLocale(locale) ? locale : "de";
+
+  async function signInWithGoogle() {
+    setGoogleLoading(true);
+    setError("");
+
+    try {
+      await signIn("google", { redirectTo: localizePathname(callbackUrl, activeLocale) });
+    } catch {
+      setError(t("login.errors.googleFailed"));
+      setGoogleLoading(false);
+    }
+  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,12 +136,12 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
       <div className="mt-6 space-y-3">
         <button
           type="button"
-          disabled={!googleEnabled}
-          onClick={() => signIn("google", { redirectTo: localizePathname(callbackUrl, activeLocale) })}
+          disabled={!googleEnabled || googleLoading || loading}
+          onClick={() => void signInWithGoogle()}
           className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
         >
-          <FcGoogle className="text-xl" aria-hidden="true" />
-          {t("google.login")}
+          {googleLoading ? <FiLoader className="animate-spin text-xl" aria-hidden="true" /> : <FcGoogle className="text-xl" aria-hidden="true" />}
+          {googleLoading ? t("google.redirecting") : t("google.login")}
         </button>
         {!googleEnabled ? <p className="text-xs text-amber-700">{t("google.unavailable")}</p> : null}
       </div>
@@ -130,7 +152,15 @@ export function LoginForm({ googleEnabled, callbackUrl, verification }: { google
         <span className="h-px flex-1 bg-slate-200" />
       </div>
 
-      {error ? <p role="alert" className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <div role="alert" className="mb-4 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 shadow-sm">
+          <FiAlertCircle className="mt-0.5 shrink-0 text-xl" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-black">{t("login.errors.title")}</p>
+            <p className="mt-1 text-sm leading-6">{error}</p>
+          </div>
+        </div>
+      ) : null}
 
       <form onSubmit={submit} className="space-y-4">
         <Field name="email" label={t("fields.email")} type="email" autoComplete="email" />

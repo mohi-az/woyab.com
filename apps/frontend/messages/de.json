@@ -470,6 +470,7 @@
     "divider": "oder mit E-Mail fortfahren",
     "google": {
       "login": "Mit Google fortfahren",
+      "redirecting": "Weiterleitung zu Google...",
       "register": "Mit Google registrieren",
       "unavailable": "Google-Anmeldung ist noch nicht konfiguriert. Tragen Sie AUTH_GOOGLE_ID und AUTH_GOOGLE_SECRET in die Frontend-Env-Datei ein."
     },
@@ -512,13 +513,20 @@
       "description": "Verbinden Sie sich mit großartigen lokalen Unternehmen",
       "terms": "Indem Sie fortfahren, stimmen Sie den <terms>Nutzungsbedingungen</terms> von WoYab zu und erkennen die <privacy>Datenschutzrichtlinie</privacy> von WoYab an.",
       "submit": "Anmelden",
-      "submitting": "Anmeldung lauft...",
+      "submitting": "Anmeldung läuft...",
       "invalidCredentials": "Anmeldedaten oder Administrator-Code sind nicht korrekt.",
       "emailVerified": "Ihre E-Mail-Adresse wurde bestätigt. Sie können sich jetzt anmelden.",
       "verificationInvalid": "Dieser Bestätigungslink ist ungültig oder abgelaufen. Registrieren Sie sich erneut mit derselben E-Mail-Adresse.",
       "resendVerification": "Benötigen Sie einen neuen Bestätigungslink?",
       "resend": "Senden",
       "resendSent": "Falls ein unbestätigtes Konto existiert, wurde ein neuer Link gesendet.",
+      "errors": {
+        "title": "Anmeldung nicht erfolgreich",
+        "accessDenied": "Die Google-Anmeldung ist für dieses Konto nicht erlaubt. Verwenden Sie für ein Administratorkonto Ihre E-Mail-Adresse, Ihr Passwort und den Zwei-Faktor-Code.",
+        "accountNotLinked": "Diese E-Mail-Adresse ist bereits mit einer anderen Anmeldemethode registriert. Melden Sie sich zuerst mit E-Mail-Adresse und Passwort an.",
+        "configuration": "Der Anmeldedienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es gleich noch einmal.",
+        "googleFailed": "Die Google-Anmeldung konnte nicht abgeschlossen werden. Versuchen Sie es erneut oder melden Sie sich mit E-Mail-Adresse und Passwort an."
+      },
       "noAccount": "Noch kein Konto?"
     },
     "register": {
