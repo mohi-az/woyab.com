@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { useState } from "react";
 import { FiAlertTriangle, FiCheck, FiExternalLink, FiImage, FiLoader, FiMapPin, FiSearch, FiStar } from "react-icons/fi";
 
@@ -91,6 +92,12 @@ const copy = {
     outsideGermany: "This place is outside Germany. Verify that it belongs in this directory.",
     relevance: "Google returns a limited review sample ordered by relevance. These reviews are preview-only and are not imported.",
     source: "View on Google Maps",
+    type: "Type",
+    phone: "Phone",
+    postalCode: "Postal code",
+    matchedCity: "Matched city",
+    website: "Website",
+    googleMaps: "Google Maps",
   },
   de: {
     title: "Aus Google Place ID importieren",
@@ -111,6 +118,12 @@ const copy = {
     outsideGermany: "Dieser Ort liegt außerhalb Deutschlands. Bitte prüfen Sie, ob er in dieses Verzeichnis gehört.",
     relevance: "Google liefert eine begrenzte, nach Relevanz sortierte Auswahl. Rezensionen werden nur zur Vorschau gezeigt und nicht importiert.",
     source: "Auf Google Maps ansehen",
+    type: "Typ",
+    phone: "Telefon",
+    postalCode: "Postleitzahl",
+    matchedCity: "Zugeordnete Stadt",
+    website: "Website",
+    googleMaps: "Google Maps",
   },
   fa: {
     title: "ورود از Google Place ID",
@@ -131,6 +144,12 @@ const copy = {
     outsideGermany: "این مکان خارج از آلمان است؛ مطمئن شوید که باید در این دایرکتوری ثبت شود.",
     relevance: "گوگل تعداد محدودی ریویو را بر اساس ارتباط نمایش می‌دهد. ریویوها فقط برای پیش‌نمایش هستند و وارد دیتابیس نمی‌شوند.",
     source: "مشاهده در Google Maps",
+    type: "نوع",
+    phone: "تلفن",
+    postalCode: "کد پستی",
+    matchedCity: "شهرِ تطبیق‌داده‌شده",
+    website: "وب‌سایت",
+    googleMaps: "Google Maps",
   },
 } as const;
 
@@ -145,8 +164,10 @@ function responseError(payload: unknown, fallback: string) {
 }
 
 export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusinessId, onApply }: Props) {
+  const locale = useLocale();
   const language = sourceLocale.toLowerCase() as "de" | "en" | "fa";
-  const text = copy[language];
+  const interfaceLanguage = locale === "de" || locale === "fa" ? locale : "en";
+  const text = copy[interfaceLanguage];
   const [placeId, setPlaceId] = useState(initialPlaceId ?? "");
   const [place, setPlace] = useState<GooglePlaceImportData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -258,13 +279,13 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
                 ) : null}
               </div>
               <dl className="mt-4 grid gap-2 text-xs sm:grid-cols-2">
-                {place.primaryTypeLabel ? <div><dt className="text-slate-500">Type</dt><dd className="font-bold text-slate-200">{place.primaryTypeLabel}</dd></div> : null}
-                {place.phone ? <div><dt className="text-slate-500">Phone</dt><dd className="font-bold text-slate-200" dir="ltr">{place.phone}</dd></div> : null}
-                {place.postalCode ? <div><dt className="text-slate-500">Postal code</dt><dd className="font-bold text-slate-200">{place.postalCode}</dd></div> : null}
-                {place.catalogMatch.city ? <div><dt className="text-slate-500">Matched city</dt><dd className="font-bold text-emerald-300">{place.catalogMatch.city.nameEn}</dd></div> : null}
+                {place.primaryTypeLabel ? <div><dt className="text-slate-500">{text.type}</dt><dd className="font-bold text-slate-200">{place.primaryTypeLabel}</dd></div> : null}
+                {place.phone ? <div><dt className="text-slate-500">{text.phone}</dt><dd className="font-bold text-slate-200" dir="ltr">{place.phone}</dd></div> : null}
+                {place.postalCode ? <div><dt className="text-slate-500">{text.postalCode}</dt><dd className="font-bold text-slate-200">{place.postalCode}</dd></div> : null}
+                {place.catalogMatch.city ? <div><dt className="text-slate-500">{text.matchedCity}</dt><dd className="font-bold text-emerald-300">{place.catalogMatch.city.nameEn}</dd></div> : null}
               </dl>
               <div className="mt-4 flex flex-wrap gap-3 text-xs font-bold">
-                {place.website ? <a href={place.website} target="_blank" rel="noreferrer" className="text-sky-300 hover:text-sky-200">Website <FiExternalLink className="inline" /></a> : null}
+                {place.website ? <a href={place.website} target="_blank" rel="noreferrer" className="text-sky-300 hover:text-sky-200">{text.website} <FiExternalLink className="inline" /></a> : null}
                 {place.googleMapsUri ? <a href={place.googleMapsUri} target="_blank" rel="noreferrer" className="text-sky-300 hover:text-sky-200">{text.source} <FiExternalLink className="inline" /></a> : null}
               </div>
             </div>
@@ -303,7 +324,7 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
                             {index < photo.authorAttributions.length - 1 ? ", " : ""}
                           </span>
                         ))}
-                        {sourceUri ? <a href={sourceUri} target="_blank" rel="noreferrer" className="ms-2 text-sky-300">Google Maps</a> : null}
+                        {sourceUri ? <a href={sourceUri} target="_blank" rel="noreferrer" className="ms-2 text-sky-300">{text.googleMaps}</a> : null}
                       </figcaption>
                     </figure>
                   );

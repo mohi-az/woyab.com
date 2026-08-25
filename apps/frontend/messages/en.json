@@ -592,9 +592,10 @@
       "resendVerification": "Need a new email verification link?",
       "resend": "Send",
       "resendSent": "If an unverified account exists, a new link has been sent.",
+      "forgotPassword": "Forgot or set password",
       "errors": {
         "title": "Sign-in unsuccessful",
-        "accessDenied": "Google sign-in is not permitted for this account. If this is an administrator account, sign in with your email, password, and two-factor verification code.",
+        "accessDenied": "Sign-in was not permitted for this account. The account may be inactive, or Google may not have provided the required account information.",
         "accountNotLinked": "This email is already registered with another sign-in method. Sign in with your email and password first.",
         "configuration": "The sign-in service is temporarily unavailable. Please try again shortly.",
         "googleFailed": "Google sign-in could not be completed. Try again or sign in with your email and password."
@@ -634,6 +635,7 @@
       "favorites": "Favorites",
       "addresses": "My addresses",
       "reviews": "My reviews",
+      "reports": "My reports",
       "owner": "Owner dashboard",
       "adminPanel": "Admin Panel",
       "ownerMessages": "Business messages",
@@ -743,6 +745,41 @@
         "passwordConfirm": "Enter your current password to confirm",
         "deleteConfirm": "Type DELETE to confirm",
         "deleteButton": "Permanently delete account"
+      },
+      "twoFactor": {
+        "disabledTitle": "Two-factor authentication is off",
+        "disabledDescription": "Add an extra layer of protection to your account with an authenticator app.",
+        "startSetup": "Set up two-factor authentication",
+        "enabledTitle": "Two-factor authentication is on",
+        "enabledDescription": "Your account is protected with an authenticator app.",
+        "disable": "Turn off two-factor authentication",
+        "disableWarning": "Turning this off reduces your account security.",
+        "passwordLabel": "Current password",
+        "disabling": "Turning off...",
+        "confirmDisable": "Turn off",
+        "cancel": "Cancel",
+        "scanInstructions": "Scan this QR code with your authenticator app, then enter the six-digit code it generates.",
+        "manualSecret": "Or enter this key manually",
+        "enterCode": "Verification code",
+        "activating": "Activating...",
+        "activate": "Activate two-factor authentication",
+        "starting": "Starting...",
+        "wizard": {
+          "authTitleCurrent": "Confirm your password",
+          "authTitleNew": "Create a password",
+          "authDescCurrent": "Enter your current password to start setting up two-factor authentication.",
+          "authDescNew": "Create a password before setting up two-factor authentication.",
+          "newPasswordLabel": "New password",
+          "confirmPasswordLabel": "Confirm new password",
+          "continueBtn": "Continue",
+          "passwordMismatch": "Passwords do not match.",
+          "passwordTooShort": "Password must be at least 10 characters."
+        },
+        "errors": {
+          "startFailed": "Could not start two-factor authentication setup. Please try again.",
+          "invalidCode": "The verification code is invalid.",
+          "disableFailed": "Could not turn off two-factor authentication. Please try again."
+        }
       }
     },
     "addresses": {
@@ -1145,8 +1182,16 @@
       "identity": "Identity",
       "classification": "Classification",
       "translations": "Translations",
+      "features": "Amenities and features",
+      "tags": "Tags",
       "location": "Location",
-      "hours": "Hours"
+      "hours": "Hours",
+      "cards": {
+        "basicInfo": "Basic information",
+        "taxonomy": "Category and taxonomy",
+        "contactInfo": "Contact information",
+        "translations": "Business translations"
+      }
     },
     "validation": {
       "required": "This field is required.",

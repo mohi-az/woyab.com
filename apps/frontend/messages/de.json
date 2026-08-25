@@ -520,9 +520,10 @@
       "resendVerification": "Benötigen Sie einen neuen Bestätigungslink?",
       "resend": "Senden",
       "resendSent": "Falls ein unbestätigtes Konto existiert, wurde ein neuer Link gesendet.",
+      "forgotPassword": "Passwort vergessen oder festlegen",
       "errors": {
         "title": "Anmeldung nicht erfolgreich",
-        "accessDenied": "Die Google-Anmeldung ist für dieses Konto nicht erlaubt. Verwenden Sie für ein Administratorkonto Ihre E-Mail-Adresse, Ihr Passwort und den Zwei-Faktor-Code.",
+        "accessDenied": "Die Anmeldung wurde für dieses Konto nicht zugelassen. Das Konto ist möglicherweise inaktiv oder Google hat die erforderlichen Kontoinformationen nicht bereitgestellt.",
         "accountNotLinked": "Diese E-Mail-Adresse ist bereits mit einer anderen Anmeldemethode registriert. Melden Sie sich zuerst mit E-Mail-Adresse und Passwort an.",
         "configuration": "Der Anmeldedienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es gleich noch einmal.",
         "googleFailed": "Die Google-Anmeldung konnte nicht abgeschlossen werden. Versuchen Sie es erneut oder melden Sie sich mit E-Mail-Adresse und Passwort an."
@@ -678,6 +679,41 @@
         "passwordConfirm": "Geben Sie zur Best?tigung Ihr aktuelles Passwort ein",
         "deleteConfirm": "Geben Sie DELETE zur Best?tigung ein",
         "deleteButton": "Konto dauerhaft l?schen"
+      },
+      "twoFactor": {
+        "disabledTitle": "Zwei-Faktor-Authentifizierung ist deaktiviert",
+        "disabledDescription": "Schützen Sie Ihr Konto zusätzlich mit einer Authenticator-App.",
+        "startSetup": "Zwei-Faktor-Authentifizierung einrichten",
+        "enabledTitle": "Zwei-Faktor-Authentifizierung ist aktiviert",
+        "enabledDescription": "Ihr Konto ist durch eine Authenticator-App geschützt.",
+        "disable": "Zwei-Faktor-Authentifizierung deaktivieren",
+        "disableWarning": "Dadurch wird die Sicherheit Ihres Kontos verringert.",
+        "passwordLabel": "Aktuelles Passwort",
+        "disabling": "Wird deaktiviert...",
+        "confirmDisable": "Deaktivieren",
+        "cancel": "Abbrechen",
+        "scanInstructions": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App und geben Sie anschließend den erzeugten sechsstelligen Code ein.",
+        "manualSecret": "Oder diesen Schlüssel manuell eingeben",
+        "enterCode": "Bestätigungscode",
+        "activating": "Wird aktiviert...",
+        "activate": "Zwei-Faktor-Authentifizierung aktivieren",
+        "starting": "Wird gestartet...",
+        "wizard": {
+          "authTitleCurrent": "Passwort bestätigen",
+          "authTitleNew": "Passwort erstellen",
+          "authDescCurrent": "Geben Sie Ihr aktuelles Passwort ein, um die Zwei-Faktor-Authentifizierung einzurichten.",
+          "authDescNew": "Erstellen Sie ein Passwort, bevor Sie die Zwei-Faktor-Authentifizierung einrichten.",
+          "newPasswordLabel": "Neues Passwort",
+          "confirmPasswordLabel": "Neues Passwort bestätigen",
+          "continueBtn": "Weiter",
+          "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+          "passwordTooShort": "Das Passwort muss mindestens 10 Zeichen lang sein."
+        },
+        "errors": {
+          "startFailed": "Die Einrichtung der Zwei-Faktor-Authentifizierung konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
+          "invalidCode": "Der Bestätigungscode ist ungültig.",
+          "disableFailed": "Die Zwei-Faktor-Authentifizierung konnte nicht deaktiviert werden. Bitte versuchen Sie es erneut."
+        }
       }
     },
     "addresses": {
@@ -964,8 +1000,13 @@
       "subCategory": "Unterkategorie",
       "specialty": "Spezialgebiet",
       "city": "Stadt",
+      "status": "Status",
+      "flags": "Markierungen",
+      "actions": "Aktionen",
       "verified": "Verifiziert",
       "featured": "Hervorgehoben",
+      "legalName": "Rechtlicher Name",
+      "sourceLocale": "Ausgangssprache",
       "email": "E-Mail",
       "phone": "Telefon",
       "mobile": "Mobil",
@@ -1031,8 +1072,16 @@
       "identity": "Basis",
       "classification": "Zuordnung",
       "translations": "Uebersetzungen",
+      "features": "Ausstattung und Merkmale",
+      "tags": "Tags",
       "location": "Standort",
-      "hours": "Zeiten"
+      "hours": "Zeiten",
+      "cards": {
+        "basicInfo": "Grundinformationen",
+        "taxonomy": "Kategorie und Zuordnung",
+        "contactInfo": "Kontaktinformationen",
+        "translations": "Business-Uebersetzungen"
+      }
     },
     "validation": {
       "required": "Dieses Feld ist erforderlich.",

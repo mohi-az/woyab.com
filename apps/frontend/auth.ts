@@ -137,9 +137,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       const existingUser = await prisma.user.findUnique({
         where: { email },
-        select: { avatarUrl: true, role: true },
+        select: { avatarUrl: true, active: true },
       });
-      if (existingUser && (existingUser.role === "ADMIN" || existingUser.role === "SUPER_ADMIN")) return false;
+      if (existingUser && !existingUser.active) return false;
       const googleAvatar = typeof profile.picture === "string" ? profile.picture : undefined;
       const avatarUrl = existingUser?.avatarUrl?.startsWith("/uploads/avatars/")
         ? undefined

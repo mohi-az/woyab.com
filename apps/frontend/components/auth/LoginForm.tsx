@@ -24,7 +24,6 @@ export function LoginForm({ googleEnabled, callbackUrl, verification, authError 
           : "";
   const [error, setError] = useState(initialAuthError);
   const [showPassword, setShowPassword] = useState(false);
-  const [resendMessage, setResendMessage] = useState("");
   const activeLocale = isAppLocale(locale) ? locale : "de";
 
   async function signInWithGoogle() {
@@ -91,17 +90,6 @@ export function LoginForm({ googleEnabled, callbackUrl, verification, authError 
     window.location.assign(localizePathname(callbackUrl, activeLocale));
   }
 
-  async function resendVerification(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const email = new FormData(event.currentTarget).get("verificationEmail");
-    await fetch("/api/auth/email-verification/resend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, callbackUrl }),
-    });
-    setResendMessage(t("login.resendSent"));
-  }
-
   return (
     <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-xl sm:p-9">
       <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
@@ -138,7 +126,7 @@ export function LoginForm({ googleEnabled, callbackUrl, verification, authError 
           type="button"
           disabled={!googleEnabled || googleLoading || loading}
           onClick={() => void signInWithGoogle()}
-          className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
+          className="flex h-12 w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
         >
           {googleLoading ? <FiLoader className="animate-spin text-xl" aria-hidden="true" /> : <FcGoogle className="text-xl" aria-hidden="true" />}
           {googleLoading ? t("google.redirecting") : t("google.login")}
@@ -177,7 +165,7 @@ export function LoginForm({ googleEnabled, callbackUrl, verification, authError 
         />
         <button
           disabled={loading}
-          className="h-12 w-full rounded-xl bg-primary font-bold text-white disabled:opacity-60"
+          className="h-12 w-full cursor-pointer rounded-xl bg-primary font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? t("login.submitting") : t("login.submit")}
         </button>
@@ -185,7 +173,7 @@ export function LoginForm({ googleEnabled, callbackUrl, verification, authError 
 
       <div className="mt-6 flex flex-col items-center gap-4">
         <Link href="/forgot-password" className="text-sm font-bold text-slate-600 transition hover:text-slate-900">
-          فراموشی یا تنظیم رمز عبور
+          {t("login.forgotPassword")}
         </Link>
         <p className="text-sm text-slate-600">
           {t("login.noAccount")}{" "}

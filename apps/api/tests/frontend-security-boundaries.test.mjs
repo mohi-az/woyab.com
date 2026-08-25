@@ -141,16 +141,19 @@ test("final moderation decisions notify reporters and contributors", async () =>
 });
 
 test("administrator access requires encrypted TOTP enrollment and verification", async () => {
-  const [auth, adminAuth, twoFactor, route] = await Promise.all([
+  const [auth, adminAuth, twoFactor, route, verifyRoute] = await Promise.all([
     frontendSource("auth.ts"),
     frontendSource("lib/admin-auth.ts"),
     frontendSource("lib/two-factor.ts"),
     frontendSource("app/api/admin/two-factor/route.ts"),
+    frontendSource("app/api/auth/two-factor/verify/route.ts"),
   ]);
   assert.match(auth, /verifyTotp/);
   assert.match(auth, /twoFactorVerified/);
   assert.match(adminAuth, /twoFactorEnabledAt/);
   assert.match(adminAuth, /twoFactorVerified/);
+  assert.match(adminAuth, /\/verify-2fa\?callbackUrl=\/admin/);
+  assert.match(verifyRoute, /sessionUserId/);
   assert.match(twoFactor, /aes-256-gcm/);
   assert.match(route, /admin\.two_factor\.enabled/);
 });

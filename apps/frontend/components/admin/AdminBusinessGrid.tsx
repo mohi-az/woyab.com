@@ -160,18 +160,6 @@ function requiredLabel(label: string) {
   return <span>{label} <span className="text-rose-400">*</span></span>;
 }
 
-function localizedFeatureText(locale: string) {
-  if (locale === "fa") return "\u0627\u0645\u06a9\u0627\u0646\u0627\u062a";
-  if (locale === "fa") return "امکانات";
-  if (locale === "de") return "Ausstattung";
-  return "Amenities and features";
-}
-
-function localizedTagText(locale: string) {
-  if (locale === "fa") return "\u0628\u0631\u0686\u0633\u0628\u200c\u0647\u0627";
-  return "Tags";
-}
-
 function actionToggleClassName(active: boolean, tone: "verified" | "featured") {
   if (!active) {
     return "grid h-9 w-9 place-items-center rounded-lg border border-[var(--admin-border)] bg-transparent text-[var(--admin-muted)] transition hover:border-sky-300/60 hover:bg-white/8 hover:text-white disabled:cursor-not-allowed disabled:opacity-70";
@@ -220,6 +208,7 @@ export function AdminBusinessGrid({
   const t = useTranslations("Admin");
   const tHours = useTranslations("BusinessHours");
   const locale = useLocale();
+  const defaultSourceLocale = locale === "fa" ? "FA" : locale === "en" ? "EN" : "DE";
   const [editing, setEditing] = useState<AdminBusinessRow | null>(emptyBusiness());
   const [creating, setCreating] = useState(initialCreateOpen);
   const [wizardStep, setWizardStep] = useState(0);
@@ -228,7 +217,7 @@ export function AdminBusinessGrid({
   const [submitError, setSubmitError] = useState("");
   const [operationError, setOperationError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [sourceLocaleDraft, setSourceLocaleDraft] = useState<"DE" | "EN" | "FA">("DE");
+  const [sourceLocaleDraft, setSourceLocaleDraft] = useState<"DE" | "EN" | "FA">(defaultSourceLocale);
   const [translationValues, setTranslationValues] = useState(() => translationDrafts(null));
   const [categoryIdDraft, setCategoryIdDraft] = useState(String(categories[0]?.id ?? ""));
   const [subCategoryIdDraft, setSubCategoryIdDraft] = useState("");
@@ -242,16 +231,20 @@ export function AdminBusinessGrid({
   const modalOpen = creating || Boolean(editing);
   const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
-  const featureText = localizedFeatureText(locale);
-  const tagText = localizedTagText(locale);
   const visibleSubCategories = subCategories.filter((item) => String(item.categoryId) === categoryIdDraft);
   const visibleSpecialties = specialties.filter((item) => String(item.subCategoryId) === subCategoryIdDraft);
   const visibleDistricts = districts.filter((item) => String(item.cityId) === cityIdDraft);
-  const wizardSteps = [t("businessWizard.identity"), t("businessWizard.translations"), `${featureText} / ${tagText}`, t("businessWizard.location"), t("businessWizard.hours")];
-  const cardBasicInfo = locale === "fa" ? "اطلاعات پایه" : "Basic Information";
-  const cardTaxonomy = locale === "fa" ? "دسته‌بندی و تخصص" : "Category & Taxonomy";
-  const cardContactInfo = locale === "fa" ? "اطلاعات تماس" : "Contact Information";
-  const cardTranslations = locale === "fa" ? "ترجمه نام و توضیحات کسب‌وکار" : "Business Translations";
+  const wizardSteps = [
+    t("businessWizard.identity"),
+    t("businessWizard.translations"),
+    `${t("businessWizard.features")} / ${t("businessWizard.tags")}`,
+    t("businessWizard.location"),
+    t("businessWizard.hours"),
+  ];
+  const cardBasicInfo = t("businessWizard.cards.basicInfo");
+  const cardTaxonomy = t("businessWizard.cards.taxonomy");
+  const cardContactInfo = t("businessWizard.cards.contactInfo");
+  const cardTranslations = t("businessWizard.cards.translations");
 
   function changeWizardStep(step: number) {
     setWizardStep(step);
@@ -296,7 +289,7 @@ export function AdminBusinessGrid({
     setErrors({});
     setSubmitError("");
     setSaving(false);
-    setSourceLocaleDraft("DE");
+    setSourceLocaleDraft(defaultSourceLocale);
     setTranslationValues(translationDrafts(null));
     setCategoryIdDraft(String(defaultCategoryId));
     setSubCategoryIdDraft("");
@@ -315,7 +308,7 @@ export function AdminBusinessGrid({
     setErrors({});
     setSubmitError("");
     setSaving(false);
-    setSourceLocaleDraft("DE");
+    setSourceLocaleDraft(defaultSourceLocale);
     setTranslationValues(translationDrafts(null));
     setCategoryIdDraft(String(defaultCategoryId));
     setSubCategoryIdDraft("");

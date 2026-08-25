@@ -43,7 +43,7 @@ export async function requireRole(roles: UserRole[]) {
       throw new Error("Administrator two-factor enrollment is required.");
     }
     if (!user.twoFactorVerified) {
-      await redirectWithLocale("/login?callbackUrl=/admin&twoFactor=required");
+      await redirectWithLocale("/verify-2fa?callbackUrl=/admin");
       throw new Error("Administrator two-factor verification is required.");
     }
   }

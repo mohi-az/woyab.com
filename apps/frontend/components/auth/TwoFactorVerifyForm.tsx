@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { signOut } from "next-auth/react";
 import { FiAlertCircle, FiClock, FiKey, FiLogIn } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
-import { Link } from "@/i18n/navigation";
 
 const TOTP_PERIOD = 30; // seconds
 
@@ -145,12 +145,13 @@ export function TwoFactorVerifyForm({ callbackUrl }: { callbackUrl: string }) {
       {/* Back link */}
       <p className="mt-5 text-center text-sm text-slate-500">
         {t("wrongAccount")}{" "}
-        <Link
-          href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+        <button
+          type="button"
+          onClick={() => void signOut({ redirectTo: localizePathname(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`, activeLocale) })}
           className="font-bold text-primary transition hover:text-primary-dark"
         >
           {t("backToLogin")}
-        </Link>
+        </button>
       </p>
     </div>
   );

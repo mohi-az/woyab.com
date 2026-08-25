@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
@@ -21,12 +21,16 @@ export async function POST(request: Request) {
 
   const cookieStore = await cookies();
   const challengeToken = cookieStore.get(CHALLENGE_COOKIE_NAME)?.value;
+  const session = await auth();
+  const sessionUserId = session?.user?.id && !session.user.invalid && !session.user.twoFactorVerified
+    ? session.user.id
+    : null;
 
-  if (!challengeToken) {
+  if (!challengeToken && !sessionUserId) {
     return NextResponse.json({ error: "Session expired. Please log in again." }, { status: 401 });
   }
 
-  const userId = verifyChallengeCookie(challengeToken);
+  const userId = sessionUserId ?? (challengeToken ? verifyChallengeCookie(challengeToken) : null);
   if (!userId) {
     cookieStore.delete(CHALLENGE_COOKIE_NAME);
     return NextResponse.json({ error: "Session expired. Please log in again." }, { status: 401 });
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
   }
 
   // Code verified — delete challenge cookie
-  cookieStore.delete(CHALLENGE_COOKIE_NAME);
+  if (challengeToken) cookieStore.delete(CHALLENGE_COOKIE_NAME);
 
   // Sign in via the two-factor-verified provider
   const internalSecret = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.AUTH_SECRET || "woyab-default-dev-secret-key-for-2fa";
