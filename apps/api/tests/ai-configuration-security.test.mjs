@@ -51,7 +51,8 @@ test("shared AI generation disables OpenAI response storage and resolves only en
   assert.match(providers, /store: false/);
   assert.match(providers, /x-goog-api-key/);
   assert.match(providers, /type: "json_schema"/);
-  assert.match(providers, /responseFormat/);
+  assert.match(providers, /responseMimeType/);
+  assert.match(providers, /responseJsonSchema/);
   assert.match(service, /where: \{ enabled: true, isDefault: true \}/);
   assert.match(service, /decryptAiApiKey/);
 });

@@ -159,16 +159,50 @@ export async function generateWithOpenAi(input: ProviderGenerationInput): Promis
   };
 }
 
+const geminiJsonSchemaKeywords = new Set([
+  "$id",
+  "$defs",
+  "$ref",
+  "$anchor",
+  "type",
+  "format",
+  "title",
+  "description",
+  "enum",
+  "items",
+  "prefixItems",
+  "minItems",
+  "maxItems",
+  "minimum",
+  "maximum",
+  "anyOf",
+  "oneOf",
+  "properties",
+  "additionalProperties",
+  "required",
+]);
+
+function geminiJsonSchema(value: unknown, namedSchemas = false): unknown {
+  if (Array.isArray(value)) return value.map((item) => geminiJsonSchema(item));
+  if (!value || typeof value !== "object") return value;
+  const output: Record<string, unknown> = {};
+  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+    if (namedSchemas || geminiJsonSchemaKeywords.has(key)) {
+      output[key] = geminiJsonSchema(item, key === "properties" || key === "$defs");
+    }
+  }
+  return output;
+}
+
 export async function generateWithGemini(input: ProviderGenerationInput): Promise<AiGenerationResult> {
   const generationConfig: Record<string, unknown> = { maxOutputTokens: input.maxOutputTokens };
   if (input.temperature !== null && input.temperature !== undefined) generationConfig.temperature = input.temperature;
   if (input.structuredOutput) {
-    generationConfig.responseFormat = {
-      text: {
-        mimeType: "application/json",
-        schema: input.structuredOutput.schema,
-      },
-    };
+    // generateContent's stable structured-output fields accept the MIME string.
+    // The newer responseFormat.text.mimeType field expects an enum such as
+    // APPLICATION_JSON and rejects "application/json" on some Gemini models.
+    generationConfig.responseMimeType = "application/json";
+    generationConfig.responseJsonSchema = geminiJsonSchema(input.structuredOutput.schema);
   }
   const body: Record<string, unknown> = {
     contents: [{ role: "user", parts: [{ text: input.prompt }] }],

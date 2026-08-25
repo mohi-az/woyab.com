@@ -67,7 +67,9 @@ test("AI analysis uses native structured output, validates with Zod, and repairs
   ]);
 
   assert.match(providers, /type: "json_schema"/);
-  assert.match(providers, /mimeType: "application\/json"/);
+  assert.match(providers, /responseMimeType = "application\/json"/);
+  assert.match(providers, /responseJsonSchema = geminiJsonSchema/);
+  assert.doesNotMatch(providers, /generationConfig\.responseFormat\s*=/);
   assert.match(service, /aiBusinessProposalSchema\.safeParse\(JSON\.parse\(text\)\)/);
   assert.equal((service.match(/previous JSON was invalid/g) ?? []).length, 1);
   assert.match(service, /failed validation after one repair attempt/);
