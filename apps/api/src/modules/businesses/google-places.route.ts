@@ -57,6 +57,20 @@ googlePlacesRouter.get("/businesses/:id/google-photos", googlePlacesRateLimit, a
   res.json({ success: true, data: { photos } });
 });
 
+/**
+ * @openapi
+ * /businesses/{id}/google-photos/{photoReference}:
+ *   get:
+ *     summary: Get a Google Places photo for a business
+ *     tags: [Businesses]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: string } }
+ *       - { in: path, name: photoReference, required: true, schema: { type: string } }
+ *       - { in: query, name: maxWidth, schema: { type: integer, minimum: 100, maximum: 4800, default: 800 } }
+ *     responses:
+ *       200: { description: Image binary }
+ *       404: { description: Business or photo not found }
+ */
 googlePlacesRouter.get("/businesses/:id/google-photos/*photoReference", googlePlacesRateLimit, async (req: Request, res: Response) => {
   const { id } = businessIdSchema.parse(req.params);
   const photoReferenceSegments = (req.params as Record<string, string | string[]>).photoReference;
@@ -84,6 +98,19 @@ googlePlacesRouter.get("/businesses/:id/google-photos/*photoReference", googlePl
   res.send(result.buffer);
 });
 
+/**
+ * @openapi
+ * /businesses/{id}/google-photo-thumbnail:
+ *   get:
+ *     summary: Get the first Google Places photo as a thumbnail
+ *     tags: [Businesses]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: string } }
+ *       - { in: query, name: maxWidth, schema: { type: integer, minimum: 100, maximum: 4800, default: 800 } }
+ *     responses:
+ *       200: { description: Image binary }
+ *       404: { description: Business or photo not found }
+ */
 googlePlacesRouter.get("/businesses/:id/google-photo-thumbnail", googlePlacesRateLimit, async (req: Request, res: Response) => {
   const { id } = businessIdSchema.parse(req.params);
   const { maxWidth } = photoQuerySchema.parse(req.query);

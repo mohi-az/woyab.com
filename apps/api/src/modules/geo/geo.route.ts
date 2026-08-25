@@ -93,11 +93,81 @@ async function matchCatalogLocation(input: {
   };
 }
 
+/**
+ * @openapi
+ * /geo/map-config:
+ *   get:
+ *     summary: Get public map configuration
+ *     tags: [Geo]
+ *     responses:
+ *       200: { description: Map configuration }
+ */
 geoRouter.get("/map-config", geoController.mapConfig);
+/**
+ * @openapi
+ * /geo/suggestions:
+ *   post:
+ *     summary: Get location suggestions
+ *     tags: [Geo]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [q, language]
+ *             properties:
+ *               q: { type: string, minLength: 3, maxLength: 120, example: Berlin }
+ *               language: { type: string, enum: [de, en, fa], example: en }
+ *               proximityLatitude: { type: number, example: 52.52 }
+ *               proximityLongitude: { type: number, example: 13.405 }
+ *     responses:
+ *       200: { description: Location suggestions }
+ *       422: { description: Invalid suggestion request }
+ */
 geoRouter.post("/suggestions", geocodingRateLimit, validateRequest({ body: locationSuggestionQuerySchema }), geoController.suggest);
+/**
+ * @openapi
+ * /geo/reverse:
+ *   post:
+ *     summary: Reverse-geocode coordinates
+ *     tags: [Geo]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [latitude, longitude, language]
+ *             properties:
+ *               latitude: { type: number, minimum: -90, maximum: 90, example: 52.52 }
+ *               longitude: { type: number, minimum: -180, maximum: 180, example: 13.405 }
+ *               language: { type: string, enum: [de, en, fa], example: en }
+ *     responses:
+ *       200: { description: Reverse-geocoded address }
+ *       422: { description: Invalid coordinate request }
+ */
 geoRouter.post("/reverse", geocodingRateLimit, validateRequest({ body: reverseGeocodeBodySchema }), geoController.reverse);
 
 /** Admin import preview. No Google-provided content is persisted by this endpoint. */
+/**
+ * @openapi
+ * /geo/place-details/{placeId}:
+ *   get:
+ *     summary: Preview Google Place Details for an admin business import
+ *     tags: [Geo]
+ *     security: [{ internalApi: [] }]
+ *     parameters:
+ *       - { in: path, name: placeId, required: true, schema: { type: string }, example: ChIJHfBW2uNQqEcR_w2WKum4eJo }
+ *       - { in: query, name: language, schema: { type: string, enum: [de, en, fa], default: de } }
+ *     responses:
+ *       200: { description: Google Place import preview }
+ *       400: { description: Invalid place ID or Google rejected the request }
+ *       401: { description: Missing or invalid internal API secret }
+ *       404: { description: Google place not found }
+ *       429: { description: Rate limited }
+ *       503: { description: Google Places is unavailable or not configured }
+ */
 geoRouter.get("/place-details/:placeId", requireInternalApi, internalGoogleRateLimit, async (req: Request, res: Response) => {
   const placeId = placeIdSchema.parse(req.params.placeId);
   const language = placeLanguageSchema.parse(req.query.language ?? "de");
@@ -115,6 +185,20 @@ geoRouter.get("/place-details/:placeId", requireInternalApi, internalGoogleRateL
 });
 
 /** Direct place-photos lookup by Google Place ID (for wizard – no businessId needed) */
+/**
+ * @openapi
+ * /geo/place-photos/{placeId}:
+ *   get:
+ *     summary: List Google Place photo references for an authenticated internal caller
+ *     tags: [Geo]
+ *     security: [{ internalApi: [] }]
+ *     parameters:
+ *       - { in: path, name: placeId, required: true, schema: { type: string } }
+ *     responses:
+ *       200: { description: Google Place photo references }
+ *       401: { description: Missing or invalid internal API secret }
+ *       429: { description: Rate limited }
+ */
 geoRouter.get("/place-photos/:placeId", requireInternalApi, internalGoogleRateLimit, async (req: Request, res: Response) => {
   const placeId = placeIdSchema.parse(req.params.placeId);
   const photos = await getPlacePhotos(placeId);
@@ -123,6 +207,26 @@ geoRouter.get("/place-photos/:placeId", requireInternalApi, internalGoogleRateLi
 });
 
 /** Serve a single Google place photo binary (for wizard preview) */
+/**
+ * @openapi
+ * /geo/place-photo:
+ *   get:
+ *     summary: Get a Google Place photo binary for an authenticated internal caller
+ *     tags: [Geo]
+ *     security: [{ internalApi: [] }]
+ *     parameters:
+ *       - { in: query, name: placeId, required: true, schema: { type: string } }
+ *       - { in: query, name: ref, required: true, schema: { type: string } }
+ *       - { in: query, name: maxWidth, schema: { type: integer, minimum: 100, maximum: 4800, default: 800 } }
+ *     responses:
+ *       200:
+ *         description: Image binary
+ *         content:
+ *           image/jpeg: { schema: { type: string, format: binary } }
+ *       401: { description: Missing or invalid internal API secret }
+ *       404: { description: Photo not found }
+ *       429: { description: Rate limited }
+ */
 geoRouter.get("/place-photo", requireInternalApi, internalGoogleRateLimit, async (req: Request, res: Response) => {
   const ref = String(req.query.ref ?? "").trim();
   const placeId = String(req.query.placeId ?? "").trim();

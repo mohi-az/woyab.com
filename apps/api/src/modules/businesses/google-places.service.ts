@@ -258,6 +258,12 @@ async function fetchPlace(placeId: string, fieldMask: string, languageCode = "de
   if (!response.ok) {
     const responseText = await response.text();
     logger.warn({ status: response.status, placeId, responseText: responseText.slice(0, 500) }, "Google Places API error");
+    if (response.status === 401 || response.status === 403) {
+      throw ApiError.serviceUnavailable("Google Places access was denied. Check that Places API (New), billing, and this server's API key restrictions are configured.");
+    }
+    if (response.status === 429) {
+      throw ApiError.serviceUnavailable("Google Places quota was exceeded. Please try again later.");
+    }
     if (response.status >= 400 && response.status < 500) throw ApiError.badRequest("Google rejected this Place ID");
     throw ApiError.serviceUnavailable("Google Places is temporarily unavailable");
   }

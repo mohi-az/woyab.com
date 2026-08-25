@@ -35,6 +35,14 @@ export const openApiSpec = swaggerJSDoc({
       },
     ],
     components: {
+      securitySchemes: {
+        internalApi: {
+          type: "apiKey",
+          in: "header",
+          name: "x-woyab-internal-secret",
+          description: "Server-to-server credential for internal integration endpoints.",
+        },
+      },
       schemas: {
         ApiError: {
           type: "object",
@@ -73,6 +81,7 @@ export const openApiSpec = swaggerJSDoc({
       { name: "Reviews", description: "Review endpoints" },
       { name: "Tags", description: "Tag management endpoints" },
       { name: "Locations", description: "Country, province, city, and district endpoints" },
+      { name: "Geo", description: "Geocoding and protected Google Places integration endpoints" },
     ],
   },
 });

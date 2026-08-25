@@ -55,6 +55,41 @@ businessRouter.get("/", businessController.list);
  */
 businessRouter.post("/search", validateRequest({ body: businessSearchBodySchema }), businessController.search);
 
+/**
+ * @openapi
+ * /businesses/map:
+ *   post:
+ *     summary: Get businesses for a map viewport
+ *     tags: [Businesses]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [locale]
+ *             properties:
+ *               locale: { type: string, enum: [de, en, fa] }
+ *               categoryId: { type: integer }
+ *               subCategoryId: { type: integer }
+ *               cityId: { type: integer }
+ *               search: { type: string }
+ *               origin:
+ *                 type: object
+ *                 properties:
+ *                   latitude: { type: number }
+ *                   longitude: { type: number }
+ *               bounds:
+ *                 type: object
+ *                 properties:
+ *                   west: { type: number }
+ *                   south: { type: number }
+ *                   east: { type: number }
+ *                   north: { type: number }
+ *     responses:
+ *       200: { description: Map-ready business list }
+ *       422: { description: Invalid map query }
+ */
 businessRouter.post("/map", validateRequest({ body: businessMapBodySchema }), businessController.map);
 
 /**
