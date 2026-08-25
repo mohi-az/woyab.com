@@ -286,8 +286,6 @@ export type LatestBusinessCardItem = {
   matchedLocationName?: string | null;
   featured?: boolean;
   googlePlaceId?: string | null;
-  googleRating?: number | null;
-  googleUserRatingCount?: number | null;
   hours: BusinessHourItem[];
 };
 
@@ -472,8 +470,6 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       location: getLocalizedName(locale, business.city),
       featured: booleanFlag(business.featured),
       googlePlaceId: business.googlePlaceId,
-      googleRating: business.googleRating ?? null,
-      googleUserRatingCount: business.googleUserRatingCount ?? null,
       hours: business.businessHours ?? [],
     }));
   } catch {
