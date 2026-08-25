@@ -402,31 +402,48 @@ export function AdminBusinessGrid({
     }
   }
 
-  function suggestedSlug(name: string, placeId: string) {
-    const normalized = name
+  function slugSegment(value: string) {
+    return value
       .normalize("NFKD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
       .replace(/ß/g, "ss")
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 80);
-    return normalized || `place-${placeId.slice(-10).toLowerCase()}`;
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function suggestedSlug(place: GooglePlaceImportData) {
+    const parts = [place.displayName, place.city, place.primaryType ?? place.primaryTypeLabel]
+      .filter((value): value is string => Boolean(value?.trim()))
+      .map(slugSegment)
+      .filter(Boolean);
+    const slug = parts.join("-").slice(0, 100).replace(/-+$/g, "");
+    return slug || `place-${place.placeId.slice(-10).toLowerCase()}`;
+  }
+
+  function googleSourceLocale(languageCode: string): "DE" | "EN" | "FA" | null {
+    const language = languageCode.trim().toLowerCase().split("-", 1)[0];
+    if (language === "de") return "DE";
+    if (language === "en") return "EN";
+    if (language === "fa") return "FA";
+    return null;
   }
 
   function applyGooglePlace(place: GooglePlaceImportData) {
     const currentSlug = String((formRef.current?.elements.namedItem("slug") as HTMLInputElement | null)?.value ?? "").trim();
-    if (creating && !currentSlug) setFormField("slug", suggestedSlug(place.displayName, place.placeId));
+    if (creating && !currentSlug) setFormField("slug", suggestedSlug(place));
     setFormField("phone", place.phone);
     setFormField("website", place.website);
     setFormField("postalCode", place.postalCode);
     setFormField("googleRating", place.rating);
     setFormField("googleUserRatingCount", place.userRatingCount);
 
+    const detectedSourceLocale = googleSourceLocale(place.displayNameLanguageCode) ?? sourceLocaleDraft;
+    setSourceLocaleDraft(detectedSourceLocale);
     setTranslationValues((current) => ({
       ...current,
-      [sourceLocaleDraft]: {
-        ...current[sourceLocaleDraft],
+      [detectedSourceLocale]: {
+        ...current[detectedSourceLocale],
         businessName: place.displayName,
       },
     }));
@@ -456,7 +473,7 @@ export function AdminBusinessGrid({
         clearError("categoryId");
       }
     }
-    clearError(`businessName_${sourceLocaleDraft}`);
+    clearError(`businessName_${detectedSourceLocale}`);
     setImportVersion((version) => version + 1);
   }
 
