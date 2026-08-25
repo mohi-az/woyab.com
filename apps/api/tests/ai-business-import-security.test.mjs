@@ -105,7 +105,7 @@ test("AI keeps the canonical Google address out of all translated descriptions",
   assert.match(service, /آدرس\|نشانی/);
 });
 
-test("final creation locks the server draft and atomically applies taxonomy and a PENDING business", async () => {
+test("final creation locks the server draft and activates only reviewed AI-assisted businesses", async () => {
   const [actions, grid, page, createRoute, nextConfig] = await Promise.all([
     source("apps/frontend/lib/admin-actions.ts"),
     source("apps/frontend/components/admin/AdminBusinessGrid.tsx"),
@@ -117,8 +117,8 @@ test("final creation locks the server draft and atomically applies taxonomy and 
   assert.match(actions, /aiBusinessProposalSchema\.parse\(row\.proposal\)/);
   assert.match(actions, /FOR UPDATE/);
   assert.match(actions, /prisma\.\$transaction/);
-  assert.match(actions, /status: "PENDING"/);
-  assert.match(actions, /verified: false/);
+  assert.match(actions, /const initialStatus: BusinessStatus = aiDraft \? "ACTIVE" : "PENDING"/);
+  assert.match(actions, /const initiallyVerified = Boolean\(aiDraft\)/);
   assert.match(actions, /featured: false/);
   assert.match(actions, /status: "APPLIED"/);
   assert.match(actions, /tx\.category\.create/);
@@ -126,6 +126,8 @@ test("final creation locks the server draft and atomically applies taxonomy and 
   assert.match(actions, /tx\.specialty\.create/);
   assert.match(grid, /Apply selected data to form|AiBusinessImportModal/);
   assert.match(grid, /fetch\("\/api\/admin\/businesses", \{ method: "POST", body: formData \}\)/);
+  assert.match(grid, /openCreate\(\);\s*router\.refresh\(\)/);
+  assert.match(grid, /business-form-\$\{editing\?\.id \?\? "new"\}-\$\{formResetVersion\}/);
   assert.match(createRoute, /authorizeAiAdminRequest\(\)/);
   assert.match(createRoute, /createBusinessDetails\(await request\.formData\(\)\)/);
   assert.match(nextConfig, /deploymentId: process\.env\.RAILWAY_GIT_COMMIT_SHA/);

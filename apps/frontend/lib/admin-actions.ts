@@ -628,6 +628,8 @@ export async function createBusinessDetails(formData: FormData) {
   const source = translations.find((translation) => translation.locale === sourceLocale) ?? translations[0];
   if (!source) throw new Error("At least one translated business name is required.");
   if (aiDraft && translations.length !== 3) throw new Error("AI-assisted businesses require German, English, and Persian names.");
+  const initialStatus: BusinessStatus = aiDraft ? "ACTIVE" : "PENDING";
+  const initiallyVerified = Boolean(aiDraft);
 
   const business = await prisma.$transaction(async (tx) => {
     if (aiDraft) {
@@ -644,8 +646,8 @@ export async function createBusinessDetails(formData: FormData) {
       data: {
         slug,
         sourceLocale,
-        status: "PENDING",
-        verified: false,
+        status: initialStatus,
+        verified: initiallyVerified,
         featured: false,
         businessName: source.businessName,
         shortDescription: source.shortDescription,
@@ -712,7 +714,7 @@ export async function createBusinessDetails(formData: FormData) {
     return created;
   });
 
-  await audit(actor.id, "business.create", "Business", business.id, { status: "PENDING", sourceLocale, ownerId, aiImportId: aiDraft?.id ?? null });
+  await audit(actor.id, "business.create", "Business", business.id, { status: initialStatus, verified: initiallyVerified, sourceLocale, ownerId, aiImportId: aiDraft?.id ?? null });
   refreshAdmin();
 }
 

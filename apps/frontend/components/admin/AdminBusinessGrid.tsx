@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Alert, Button, Collapse, ConfigProvider, Modal } from "antd";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { FiAlertCircle, FiCheck, FiClock, FiCpu, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
@@ -270,6 +271,7 @@ export function AdminBusinessGrid({
 }: Props) {
   const t = useTranslations("Admin");
   const tHours = useTranslations("BusinessHours");
+  const router = useRouter();
   const locale = useLocale();
   const defaultSourceLocale = locale === "fa" ? "FA" : locale === "en" ? "EN" : "DE";
   const [editing, setEditing] = useState<AdminBusinessRow | null>(emptyBusiness());
@@ -298,6 +300,7 @@ export function AdminBusinessGrid({
   const [quickAttributeSaving, setQuickAttributeSaving] = useState(false);
   const [quickAttributeError, setQuickAttributeError] = useState("");
   const [quickSelectedAttributeIds, setQuickSelectedAttributeIds] = useState<number[]>([]);
+  const [formResetVersion, setFormResetVersion] = useState(0);
   const [importVersion, setImportVersion] = useState(0);
   const [rowUiStates, setRowUiStates] = useState<Record<string, RowUiState>>({});
   const formRef = useRef<HTMLFormElement>(null);
@@ -464,6 +467,7 @@ export function AdminBusinessGrid({
     setImportVersion(0);
     setAiApplication(null);
     resetQuickAttributeEditor();
+    setFormResetVersion((version) => version + 1);
   }
 
   function applyAiBusiness(application: AiBusinessImportApplication) {
@@ -697,10 +701,12 @@ export function AdminBusinessGrid({
         const response = await fetch("/api/admin/businesses", { method: "POST", body: formData });
         const payload = await response.json().catch(() => null) as { error?: string } | null;
         if (!response.ok) throw new Error(payload?.error || t("validation.saveFailed"));
+        openCreate();
+        router.refresh();
       } else {
         await updateBusinessDetails(formData);
+        closeModal();
       }
-      closeModal();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : t("validation.saveFailed"));
       setSaving(false);
@@ -896,7 +902,7 @@ export function AdminBusinessGrid({
           getContainer={false}
           className="admin-business-modal"
         >
-            <form ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
+            <form key={`business-form-${editing?.id ?? "new"}-${formResetVersion}`} ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {creating && aiApplication ? <input type="hidden" name="aiImportId" value={aiApplication.draftId} /> : null}
               {creating && googlePhotoReferenceDraft ? <input type="hidden" name="googlePhotoReference" value={googlePhotoReferenceDraft} /> : null}
