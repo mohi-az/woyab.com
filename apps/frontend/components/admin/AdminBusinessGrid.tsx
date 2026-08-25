@@ -26,6 +26,7 @@ type Option = {
   id: number;
   nameEn: string | null;
   nameFa: string | null;
+  slug?: string;
 };
 
 type SubCategoryOption = Option & { categoryId: number };
@@ -72,6 +73,8 @@ export type AdminBusinessRow = {
   phone: string | null;
   mobile: string | null;
   website: string | null;
+  googleRating: number | null;
+  googleUserRatingCount: number | null;
   status: (typeof statuses)[number];
   verified: boolean;
   featured: boolean;
@@ -116,6 +119,56 @@ type RowUiState = {
 
 function optionLabel(option: Option | SpecialtyOption) {
   return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
+}
+
+const googlePlaceTaxonomy: Record<string, { categorySlug: string; subCategorySlug?: string }> = {
+  persian_restaurant: { categorySlug: "restaurants-cafes", subCategorySlug: "persian-restaurant" },
+  cafe: { categorySlug: "restaurants-cafes", subCategorySlug: "cafe" },
+  coffee_shop: { categorySlug: "restaurants-cafes", subCategorySlug: "cafe" },
+  bakery: { categorySlug: "restaurants-cafes", subCategorySlug: "bakery" },
+  hair_salon: { categorySlug: "beauty-wellness", subCategorySlug: "hair-salon" },
+  beauty_salon: { categorySlug: "beauty-wellness", subCategorySlug: "hair-salon" },
+  spa: { categorySlug: "beauty-wellness", subCategorySlug: "spa-massage" },
+  massage: { categorySlug: "beauty-wellness", subCategorySlug: "spa-massage" },
+  lawyer: { categorySlug: "legal-financial", subCategorySlug: "law-office" },
+  accountant: { categorySlug: "legal-financial", subCategorySlug: "accounting" },
+  insurance_agency: { categorySlug: "legal-financial", subCategorySlug: "insurance" },
+  plumber: { categorySlug: "home-services", subCategorySlug: "plumbing" },
+  electrician: { categorySlug: "home-services", subCategorySlug: "electrical" },
+  house_cleaning_service: { categorySlug: "home-services", subCategorySlug: "cleaning" },
+  car_repair: { categorySlug: "automotive", subCategorySlug: "repair-shop" },
+  car_wash: { categorySlug: "automotive", subCategorySlug: "car-wash" },
+  car_dealer: { categorySlug: "automotive", subCategorySlug: "car-dealer" },
+  grocery_store: { categorySlug: "retail" },
+  clothing_store: { categorySlug: "retail", subCategorySlug: "clothing" },
+};
+
+function googlePlaceTaxonomyMatch(primaryType: string | null, primaryTypeLabel: string | null) {
+  if (primaryType) {
+    const exactMatch = googlePlaceTaxonomy[primaryType]
+      ?? (primaryType.endsWith("_restaurant") ? { categorySlug: "restaurants-cafes" } : null);
+    if (exactMatch) return exactMatch;
+  }
+
+  const label = primaryTypeLabel?.trim().toLocaleLowerCase();
+  if (!label) return null;
+  if (/(persisch|persian).*restaurant/.test(label)) return googlePlaceTaxonomy.persian_restaurant;
+  if (/(restaurant|café|cafe)/.test(label)) return { categorySlug: "restaurants-cafes" };
+  if (/(bäckerei|bakery)/.test(label)) return googlePlaceTaxonomy.bakery;
+  if (/(friseur|hair salon|beauty salon)/.test(label)) return googlePlaceTaxonomy.hair_salon;
+  if (/(spa|massage)/.test(label)) return googlePlaceTaxonomy.spa;
+  if (/(rechtsanwalt|lawyer|law office)/.test(label)) return googlePlaceTaxonomy.lawyer;
+  if (/(buchhalt|accountant)/.test(label)) return googlePlaceTaxonomy.accountant;
+  if (/(versicherung|insurance)/.test(label)) return googlePlaceTaxonomy.insurance_agency;
+  if (/(klempner|plumb)/.test(label)) return googlePlaceTaxonomy.plumber;
+  if (/(elektriker|electrician)/.test(label)) return googlePlaceTaxonomy.electrician;
+  if (/(reinigung|cleaning)/.test(label)) return googlePlaceTaxonomy.house_cleaning_service;
+  if (/(autowerkstatt|car repair)/.test(label)) return googlePlaceTaxonomy.car_repair;
+  if (/(autowäsche|car wash)/.test(label)) return googlePlaceTaxonomy.car_wash;
+  if (/(autohändler|car dealer)/.test(label)) return googlePlaceTaxonomy.car_dealer;
+  if (/(supermarkt|grocery)/.test(label)) return googlePlaceTaxonomy.grocery_store;
+  if (/(bekleidung|clothing)/.test(label)) return googlePlaceTaxonomy.clothing_store;
+  return null;
 }
 
 function translationMap(business: AdminBusinessRow | null) {
@@ -367,6 +420,8 @@ export function AdminBusinessGrid({
     setFormField("phone", place.phone);
     setFormField("website", place.website);
     setFormField("postalCode", place.postalCode);
+    setFormField("googleRating", place.rating);
+    setFormField("googleUserRatingCount", place.userRatingCount);
 
     setTranslationValues((current) => ({
       ...current,
@@ -389,6 +444,18 @@ export function AdminBusinessGrid({
       setDistrictIdDraft("");
     }
     if (place.hours.length) setHoursDraft(place.hours);
+    const taxonomyMatch = googlePlaceTaxonomyMatch(place.primaryType, place.primaryTypeLabel);
+    if (taxonomyMatch) {
+      const category = categories.find((item) => item.slug === taxonomyMatch.categorySlug);
+      const subCategory = category && taxonomyMatch.subCategorySlug
+        ? subCategories.find((item) => item.categoryId === category.id && item.slug === taxonomyMatch.subCategorySlug)
+        : null;
+      if (category) {
+        setCategoryIdDraft(String(category.id));
+        setSubCategoryIdDraft(subCategory ? String(subCategory.id) : "");
+        clearError("categoryId");
+      }
+    }
     clearError(`businessName_${sourceLocaleDraft}`);
     setImportVersion((version) => version + 1);
   }
@@ -631,7 +698,7 @@ export function AdminBusinessGrid({
       </AdminSection>
 
       <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
-        <Modal
+          <Modal
           open={modalOpen}
           onCancel={closeModal}
           footer={null}
@@ -647,7 +714,7 @@ export function AdminBusinessGrid({
           getContainer={false}
           className="admin-business-modal"
         >
-            <form ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] overflow-y-auto pt-4">
+            <form ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {!locationPickerMounted ? (
                 <>
@@ -728,6 +795,8 @@ export function AdminBusinessGrid({
                         <input type="hidden" name="status" value={editing?.status ?? "PENDING"} />
                         <input type="hidden" name="verified" value={String(editing?.verified ?? false)} />
                         <input type="hidden" name="featured" value={String(editing?.featured ?? false)} />
+                        <input type="hidden" name="googleRating" defaultValue={editing?.googleRating ?? ""} />
+                        <input type="hidden" name="googleUserRatingCount" defaultValue={editing?.googleUserRatingCount ?? ""} />
                         <FieldShell label={t("fields.owner")}>
                           <AdminSearchSelect
                             key={`owner-${editing?.id ?? (creating ? "new" : "none")}-${editing?.ownerId ?? "none"}`}

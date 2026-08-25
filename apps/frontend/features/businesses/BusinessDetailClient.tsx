@@ -411,9 +411,16 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-slate-200">
                 <div className="flex items-center gap-3">
                   <StaticStars rating={business.rating} />
-                  <span className="font-bold">{business.rating.toFixed(1)}</span>
+                  <span className="font-bold">{business.rating.toFixed(1)} {t("woyabRating")}</span>
                 </div>
-                <span>{t("reviewsCount", { count: business.reviewCount })}</span>
+                <span>{t("woyabReviewsCount", { count: business.reviewCount })}</span>
+                {business.googleRating !== null && business.googleRating !== undefined ? (
+                  <div className="flex items-center gap-3">
+                    <StaticStars rating={business.googleRating} />
+                    <span className="font-bold">{business.googleRating.toFixed(1)} {t("googleRating")}</span>
+                    <span>{t("googleReviewsCount", { count: business.googleUserRatingCount ?? 0 })}</span>
+                  </div>
+                ) : null}
                 {business.establishedYear ? (
                   <span className="inline-flex items-center gap-2">
                     <FiCalendar className="text-primary-light" />
@@ -493,12 +500,21 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           <section className="rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.rating")}</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabRating")}</p>
                 <p className="mt-2 text-2xl font-black text-slate-950">{business.rating.toFixed(1)}</p>
               </div>
               <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.reviews")}</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">{reviews.length}</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabReviews")}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{business.reviewCount}</p>
+              </div>
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.googleRating")}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">
+                  {business.googleRating !== null && business.googleRating !== undefined ? business.googleRating.toFixed(1) : "-"}
+                </p>
+                {business.googleRating !== null && business.googleRating !== undefined ? (
+                  <p className="mt-1 text-xs font-bold text-slate-500">{t("googleReviewsCount", { count: business.googleUserRatingCount ?? 0 })}</p>
+                ) : null}
               </div>
               <div className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.category")}</p>

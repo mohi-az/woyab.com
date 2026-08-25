@@ -77,6 +77,8 @@ type BusinessDetailApiResponse = {
     logoUrl?: string | null;
     coverImageUrl?: string | null;
     googlePlaceId?: string | null;
+    googleRating?: number | null;
+    googleUserRatingCount?: number | null;
     phone?: string | null;
     mobile?: string | null;
     whatsapp?: string | null;
@@ -284,6 +286,8 @@ export type LatestBusinessCardItem = {
   matchedLocationName?: string | null;
   featured?: boolean;
   googlePlaceId?: string | null;
+  googleRating?: number | null;
+  googleUserRatingCount?: number | null;
   hours: BusinessHourItem[];
 };
 
@@ -304,6 +308,8 @@ export type BusinessDetailData = {
     authorAttributions?: Array<{ displayName: string; uri: string | null }>;
   }>;
   googlePlaceId?: string | null;
+  googleRating?: number | null;
+  googleUserRatingCount?: number | null;
   categoryName?: string | null;
   categoryId?: number | null;
   categorySlug?: string | null;
@@ -466,6 +472,8 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       location: getLocalizedName(locale, business.city),
       featured: booleanFlag(business.featured),
       googlePlaceId: business.googlePlaceId,
+      googleRating: business.googleRating ?? null,
+      googleUserRatingCount: business.googleUserRatingCount ?? null,
       hours: business.businessHours ?? [],
     }));
   } catch {
@@ -747,6 +755,8 @@ export const fetchBusinessBySlug = cache(
       logoUrl: business.logoUrl,
       coverImageUrl: business.coverImageUrl,
       googlePlaceId: business.googlePlaceId,
+      googleRating: business.googleRating ?? null,
+      googleUserRatingCount: business.googleUserRatingCount ?? null,
       gallery,
       categoryName: localizedText(locale, business.category),
       categoryId: business.category?.id,

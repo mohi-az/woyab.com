@@ -573,6 +573,12 @@ body[data-admin-theme="light"],
   box-shadow: 0 24px 70px rgb(2 6 23 / 0.45);
 }
 
+.admin-business-modal .ant-modal,
+.admin-business-modal .ant-modal-body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .admin-business-modal .ant-modal-header {
   margin-bottom: 16px;
   border-bottom: 1px solid var(--admin-border);

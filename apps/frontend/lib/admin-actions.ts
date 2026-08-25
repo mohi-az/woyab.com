@@ -88,6 +88,20 @@ function businessContactData(formData: FormData) {
   return parsed.data;
 }
 
+function googleRatingData(formData: FormData) {
+  const googleRating = numberValue(formData, "googleRating");
+  const googleUserRatingCount = intValue(formData, "googleUserRatingCount");
+
+  if (googleRating !== null && (googleRating < 0 || googleRating > 5)) {
+    throw new Error("Google rating must be between 0 and 5.");
+  }
+  if (googleUserRatingCount !== null && googleUserRatingCount < 0) {
+    throw new Error("Google review count cannot be negative.");
+  }
+
+  return { googleRating, googleUserRatingCount };
+}
+
 async function validateBusinessTaxonomy(categoryId: number, subCategoryId: number | null, specialtyIds: number[]) {
   if (!subCategoryId) {
     if (specialtyIds.length) throw new Error("لطفاً قبل از انتخاب تخصص، زیردسته‌بندی را انتخاب کنید.");
@@ -339,6 +353,7 @@ export async function updateBusinessDetails(formData: FormData) {
   const ownerId = nullableValue(formData, "ownerId");
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const contact = businessContactData(formData);
+  const googleRatings = googleRatingData(formData);
 
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
     throw new Error("Please check the required business fields.");
@@ -401,6 +416,11 @@ export async function updateBusinessDetails(formData: FormData) {
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
         googlePlaceId,
+        googleRating: googlePlaceId ? googleRatings.googleRating : null,
+        googleUserRatingCount: googlePlaceId ? googleRatings.googleUserRatingCount : null,
+        googleRatingUpdatedAt: googlePlaceId && (googleRatings.googleRating !== null || googleRatings.googleUserRatingCount !== null)
+          ? new Date()
+          : null,
         coverImageUrl,
         email: contact.email,
         phone: contact.phone,
@@ -454,6 +474,7 @@ export async function createBusinessDetails(formData: FormData) {
   const ownerId = nullableValue(formData, "ownerId");
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const contact = businessContactData(formData);
+  const googleRatings = googleRatingData(formData);
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
@@ -511,6 +532,11 @@ export async function createBusinessDetails(formData: FormData) {
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
         googlePlaceId,
+        googleRating: googlePlaceId ? googleRatings.googleRating : null,
+        googleUserRatingCount: googlePlaceId ? googleRatings.googleUserRatingCount : null,
+        googleRatingUpdatedAt: googlePlaceId && (googleRatings.googleRating !== null || googleRatings.googleUserRatingCount !== null)
+          ? new Date()
+          : null,
         coverImageUrl,
         email: contact.email,
         phone: contact.phone,

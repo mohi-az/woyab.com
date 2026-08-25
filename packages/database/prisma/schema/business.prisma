@@ -8,6 +8,9 @@ model Business {
   logoUrl           String?
   coverImageUrl     String?
   googlePlaceId     String?
+  googleRating      Float?
+  googleUserRatingCount Int?
+  googleRatingUpdatedAt DateTime?
   categoryId        Int
   subCategoryId     Int?
   specialtyId       Int?

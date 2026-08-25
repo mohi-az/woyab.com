@@ -239,6 +239,10 @@
     "verified": "کسب‌وکار تاییدشده",
     "featured": "کسب‌وکار ویژه",
     "reviewsCount": "{count, plural, =0 {هنوز نظری ثبت نشده} one {# نظر} other {# نظر}}",
+    "woyabRating": "در وُیاب",
+    "googleRating": "در گوگل",
+    "woyabReviewsCount": "{count, plural, =0 {هنوز نظری در وُیاب ثبت نشده} one {# نظر وُیاب} other {# نظر وُیاب}}",
+    "googleReviewsCount": "{count, plural, one {# نظر گوگل} other {# نظر گوگل}}",
     "established": "از {year}",
     "directions": "مسیریابی",
     "overviewTitle": "معرفی",
@@ -246,6 +250,9 @@
     "stats": {
       "rating": "امتیاز",
       "reviews": "نظرها",
+      "woyabRating": "امتیاز وُیاب",
+      "woyabReviews": "نظرهای وُیاب",
+      "googleRating": "امتیاز گوگل",
       "category": "دسته‌بندی",
       "specialty": "تخصص"
     },

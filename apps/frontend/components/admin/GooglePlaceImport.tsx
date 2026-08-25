@@ -211,7 +211,7 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
   }
 
   return (
-    <div className="rounded-xl border border-sky-400/25 bg-sky-400/[0.06] p-4">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-sky-400/25 bg-sky-400/[0.06] p-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h3 className="text-base font-black text-white">{text.title}</h3>
@@ -265,8 +265,8 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
             </div>
           ) : null}
 
-          <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-lg border border-white/10 bg-black/10 p-4">
+          <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+            <div className="min-w-0 rounded-lg border border-white/10 bg-black/10 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h4 className="text-xl font-black text-white">{place.displayName}</h4>
@@ -290,7 +290,7 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
               </div>
             </div>
 
-            <div className="rounded-lg border border-white/10 bg-black/10 p-4">
+            <div className="min-w-0 rounded-lg border border-white/10 bg-black/10 p-4">
               <h4 className="font-black text-white">{text.hours}</h4>
               {place.weekdayDescriptions.length ? (
                 <ul className="mt-2 grid gap-1 text-xs leading-5 text-slate-300">
@@ -302,13 +302,13 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
           </div>
 
           {place.photos.length ? (
-            <section>
+            <section className="min-w-0 max-w-full">
               <h4 className="mb-2 flex items-center gap-2 font-black text-white"><FiImage />{text.photos}</h4>
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              <div className="flex max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2">
                 {place.photos.map((photo) => {
                   const sourceUri = photo.googleMapsUri ?? place.googleMapsUri;
                   return (
-                    <figure key={photo.photoReference} className="w-52 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20">
+                    <figure key={photo.photoReference} className="w-52 max-w-full shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20">
                       {/* Google photo media is short-lived and intentionally bypasses Next's persistent image optimizer cache. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
