@@ -815,6 +815,7 @@
       "retention": "Aufbewahrungsprüfung",
       "messages": "Nachrichten",
       "tickets": "Tickets",
+      "ai": "KI-Konfiguration",
       "settings": "Einstellungen",
       "audit": "Audit-Log"
     },
@@ -974,6 +975,78 @@
         "autoApproveReviews": "Neue Bewertungen automatisch freigeben",
         "adminEmail": "Admin-Benachrichtigungs-E-Mail",
         "moderationNote": "Interne Moderationsnotiz"
+      }
+    },
+    "ai": {
+      "title": "KI-Konfiguration",
+      "description": "Verbinden Sie WoYab mit OpenAI oder Gemini, wählen Sie das Standardmodell und legen Sie das Antwortverhalten für zukünftige KI-Funktionen fest.",
+      "providers": {
+        "OPENAI": { "name": "OpenAI" },
+        "GEMINI": { "name": "Google Gemini" }
+      },
+      "encryption": {
+        "title": "API-Key-Verschlüsselung ist nicht konfiguriert",
+        "description": "Setzen Sie AI_CONFIG_ENCRYPTION_KEY auf ein stabiles, zufälliges Geheimnis mit mindestens 32 Zeichen, bevor Sie einen Provider-Key speichern."
+      },
+      "credentials": {
+        "title": "Provider und Zugangsdaten",
+        "description": "Zugangsdaten für {provider} bleiben auf dem Server und werden verschlüsselt gespeichert."
+      },
+      "behavior": {
+        "title": "Standard-Antwortverhalten",
+        "description": "Diese Werte gelten für gemeinsame KI-Funktionen, sofern ein Feature sie nicht ausdrücklich überschreibt."
+      },
+      "fields": {
+        "apiKey": "API-Key",
+        "apiKeyPlaceholder": "Neuen API-Key einfügen",
+        "savedKey": "Gespeicherter Key: {hint} — leer lassen zum Beibehalten",
+        "apiKeyHint": "Der Key wird vor dem Speichern verschlüsselt und nie an den Browser zurückgesendet.",
+        "clearApiKey": "Gespeicherten API-Key beim Speichern entfernen",
+        "model": "Modell",
+        "modelPlaceholder": "Modelle laden oder Modell-ID eingeben",
+        "modelHint": "Die Liste wird vom Provider-Konto geladen; manuelle Modell-IDs sind ebenfalls möglich.",
+        "systemPrompt": "Systemanweisungen",
+        "systemPromptPlaceholder": "Ton, Sprache, Grenzen und globale Antwortregeln festlegen…",
+        "temperature": "Temperatur",
+        "providerDefault": "Provider-Standard",
+        "temperatureHint": "Leer lassen für den Provider-Standard. Niedrigere Werte sind berechenbarer.",
+        "maxOutputTokens": "Maximale Ausgabe-Tokens",
+        "maxOutputTokensHint": "Kosten- und Längenbegrenzung pro Anfrage.",
+        "timeoutMs": "Timeout (Millisekunden)",
+        "timeoutHint": "Anfragen werden nach dieser Dauer abgebrochen.",
+        "enabled": "Diesen Provider aktivieren",
+        "defaultProvider": "Als Standard-Provider verwenden",
+        "testPrompt": "Test-Prompt"
+      },
+      "status": {
+        "default": "Standard",
+        "enabled": "Aktiv",
+        "disabled": "Inaktiv",
+        "noModel": "Kein Modell gewählt",
+        "neverSaved": "Noch nie gespeichert",
+        "updated": "Letzte Aktualisierung: {date}"
+      },
+      "actions": {
+        "showKey": "API-Key anzeigen",
+        "hideKey": "API-Key verbergen",
+        "loadModels": "Modelle laden",
+        "loadingModels": "Wird geladen…",
+        "save": "Konfiguration speichern",
+        "saving": "Wird gespeichert…",
+        "test": "Test starten",
+        "testing": "Test läuft…"
+      },
+      "messages": {
+        "modelsLoaded": "{count} kompatible Modelle geladen; der API-Key wurde akzeptiert.",
+        "saved": "KI-Konfiguration wurde sicher gespeichert.",
+        "testSucceeded": "Der Provider hat eine gültige Antwort geliefert."
+      },
+      "errors": { "requestFailed": "Die Anfrage konnte nicht abgeschlossen werden." },
+      "test": {
+        "title": "Aktuelle Konfiguration testen",
+        "description": "Führen Sie vor dem Live-Einsatz eine kurze serverseitige Anfrage aus. Tests können Provider-Guthaben verbrauchen.",
+        "defaultPrompt": "Bestätige in einem kurzen Satz, dass die KI-Verbindung funktioniert.",
+        "tokens": "{count} Tokens gesamt"
       }
     },
     "audit": {

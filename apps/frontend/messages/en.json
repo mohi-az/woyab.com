@@ -907,6 +907,7 @@
       "retention": "Retention review",
       "messages": "Messages",
       "tickets": "Tickets",
+      "ai": "AI configuration",
       "settings": "Settings",
       "audit": "Audit log"
     },
@@ -1082,6 +1083,78 @@
         "autoApproveReviews": "Auto-approve new reviews",
         "adminEmail": "Admin notification email",
         "moderationNote": "Internal moderation note"
+      }
+    },
+    "ai": {
+      "title": "AI configuration",
+      "description": "Connect WoYab to OpenAI or Gemini, choose the default model, and define shared response behavior for future AI features.",
+      "providers": {
+        "OPENAI": { "name": "OpenAI" },
+        "GEMINI": { "name": "Google Gemini" }
+      },
+      "encryption": {
+        "title": "API-key encryption is not configured",
+        "description": "Set AI_CONFIG_ENCRYPTION_KEY to a stable random secret of at least 32 characters before saving a provider key."
+      },
+      "credentials": {
+        "title": "Provider and credentials",
+        "description": "Credentials for {provider} stay on the server and are stored encrypted."
+      },
+      "behavior": {
+        "title": "Default response behavior",
+        "description": "These defaults are used by shared AI functions unless a feature explicitly overrides them."
+      },
+      "fields": {
+        "apiKey": "API key",
+        "apiKeyPlaceholder": "Paste a new API key",
+        "savedKey": "Saved key: {hint} — leave blank to keep it",
+        "apiKeyHint": "The key is encrypted before storage and is never sent back to the browser.",
+        "clearApiKey": "Remove the stored API key when saving",
+        "model": "Model",
+        "modelPlaceholder": "Load models or enter a model ID",
+        "modelHint": "The list is loaded from your provider account; manual model IDs are also accepted.",
+        "systemPrompt": "System instructions",
+        "systemPromptPlaceholder": "Define tone, language, constraints, and other global response rules…",
+        "temperature": "Temperature",
+        "providerDefault": "Provider default",
+        "temperatureHint": "Leave empty for the provider default. Lower values are more predictable.",
+        "maxOutputTokens": "Maximum output tokens",
+        "maxOutputTokensHint": "A cost and response-length guardrail for each request.",
+        "timeoutMs": "Timeout (milliseconds)",
+        "timeoutHint": "Requests are cancelled after this duration.",
+        "enabled": "Enable this provider",
+        "defaultProvider": "Use as the default provider",
+        "testPrompt": "Test prompt"
+      },
+      "status": {
+        "default": "Default",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "noModel": "No model selected",
+        "neverSaved": "Never saved",
+        "updated": "Last update: {date}"
+      },
+      "actions": {
+        "showKey": "Show API key",
+        "hideKey": "Hide API key",
+        "loadModels": "Load models",
+        "loadingModels": "Loading…",
+        "save": "Save configuration",
+        "saving": "Saving…",
+        "test": "Run test",
+        "testing": "Testing…"
+      },
+      "messages": {
+        "modelsLoaded": "{count} compatible models loaded and the API key was accepted.",
+        "saved": "AI configuration saved securely.",
+        "testSucceeded": "The provider returned a valid response."
+      },
+      "errors": { "requestFailed": "The request could not be completed." },
+      "test": {
+        "title": "Test the current configuration",
+        "description": "Run a short server-side request before using this provider in a live feature. Tests can consume provider credits.",
+        "defaultPrompt": "Reply with one short sentence confirming that the AI connection works.",
+        "tokens": "{count} total tokens"
       }
     },
     "audit": {

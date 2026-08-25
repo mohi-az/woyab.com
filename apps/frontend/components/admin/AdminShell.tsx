@@ -9,6 +9,7 @@ import {
   FiBarChart2,
   FiBriefcase,
   FiCheckSquare,
+  FiCpu,
   FiFlag,
   FiGrid,
   FiInbox,
@@ -49,6 +50,7 @@ const navItems = [
   { href: "/admin/retention", key: "retention", icon: FiTrash2 },
   { href: "/admin/messages", key: "messages", icon: FiInbox },
   { href: "/admin/tickets", key: "tickets", icon: FiMessageSquare },
+  { href: "/admin/ai", key: "ai", icon: FiCpu },
   { href: "/admin/settings", key: "settings", icon: FiSettings },
   { href: "/admin/audit", key: "audit", icon: FiActivity },
 ] as const;
@@ -57,6 +59,7 @@ const superAdminOnlyPaths = new Set([
   "/admin/audit",
   "/admin/retention",
   "/admin/settings",
+  "/admin/ai",
 ]);
 
 function normalizePath(pathname: string) {

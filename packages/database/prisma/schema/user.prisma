@@ -17,6 +17,7 @@ model User {
   emailVerificationTokens  EmailVerificationToken[]
   adminAuditLogs           AdminAuditLog[]
   adminSettings            AdminSetting[]
+  aiProviderConfigs        AiProviderConfig[]
   businessClaims           BusinessClaim[]         @relation("BusinessClaimClaimant")
   reviewedBusinessClaims   BusinessClaim[]         @relation("BusinessClaimReviewer")
   businessChangeRequests   BusinessChangeRequest[] @relation("BusinessChangeRequestSubmitter")

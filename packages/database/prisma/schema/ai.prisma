@@ -1,0 +1,27 @@
+enum AiProvider {
+  OPENAI
+  GEMINI
+
+  @@map("ai_provider")
+}
+
+model AiProviderConfig {
+  provider        AiProvider @id
+  enabled         Boolean    @default(false)
+  isDefault       Boolean    @default(false)
+  apiKeyEncrypted String?
+  apiKeyHint      String?
+  model           String?
+  systemPrompt    String?    @db.Text
+  temperature     Float?
+  maxOutputTokens Int        @default(2048)
+  timeoutMs       Int        @default(30000)
+  updatedById     String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now()) @updatedAt
+  updatedBy       User?      @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@unique([isDefault], map: "ai_provider_configs_one_default", where: raw("\"isDefault\" = true"))
+  @@index([updatedById])
+  @@map("ai_provider_configs")
+}
