@@ -73,9 +73,11 @@ test("AI analysis uses native structured output, validates with Zod, and repairs
   assert.match(providers, /delete generationConfig\.responseJsonSchema/);
   assert.match(providers, /error instanceof AiProviderError/);
   assert.match(providers, /REQUIRED_JSON_SCHEMA/);
-  assert.match(service, /aiBusinessProposalSchema\.safeParse\(JSON\.parse\(text\)\)/);
+  assert.match(service, /aiBusinessProposalSchema\.safeParse\(JSON\.parse\(candidate\)\)/);
   assert.equal((service.match(/previous JSON was invalid/g) ?? []).length, 1);
   assert.match(service, /failed validation after one repair attempt/);
+  assert.match(service, /maxOutputTokens: Math\.max\(config\?\.maxOutputTokens \?\? 0, 16_384\)/);
+  assert.match(service, /firstCompleteJsonObject/);
   assert.match(proposal, /DE: translationSchema/);
   assert.match(proposal, /EN: translationSchema/);
   assert.match(proposal, /FA: translationSchema/);

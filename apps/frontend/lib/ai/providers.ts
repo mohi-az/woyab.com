@@ -235,9 +235,10 @@ export async function generateWithGemini(input: ProviderGenerationInput): Promis
     // native JSON mode, then rely on the mandatory Zod validation and single
     // repair pass in the business-import service.
     delete generationConfig.responseJsonSchema;
+    const fallbackSchema = geminiJsonSchema(input.structuredOutput.schema);
     body.contents = [{
       role: "user",
-      parts: [{ text: `${input.prompt}\n\nREQUIRED_JSON_SCHEMA:\n${JSON.stringify(input.structuredOutput.schema)}` }],
+      parts: [{ text: `${input.prompt}\n\nReturn one complete JSON object only. Do not use Markdown fences, comments, ellipses, or explanatory text. Include every required key and use null or [] when evidence is absent.\n\nREQUIRED_JSON_SCHEMA:\n${JSON.stringify(fallbackSchema)}` }],
     }];
     response = await request();
   }
