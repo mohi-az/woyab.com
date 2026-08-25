@@ -165,7 +165,6 @@ const geminiJsonSchemaKeywords = new Set([
   "$ref",
   "$anchor",
   "type",
-  "format",
   "title",
   "description",
   "enum",
@@ -185,8 +184,18 @@ const geminiJsonSchemaKeywords = new Set([
 function geminiJsonSchema(value: unknown, namedSchemas = false): unknown {
   if (Array.isArray(value)) return value.map((item) => geminiJsonSchema(item));
   if (!value || typeof value !== "object") return value;
+  const record = value as Record<string, unknown>;
+  const variants = Array.isArray(record.anyOf) ? record.anyOf : null;
+  if (variants?.length === 2) {
+    const nullVariant = variants.find((item) => item && typeof item === "object" && (item as Record<string, unknown>).type === "null");
+    const valueVariant = variants.find((item) => item !== nullVariant);
+    if (nullVariant && valueVariant && typeof valueVariant === "object" && !Array.isArray(valueVariant)) {
+      const simplified = geminiJsonSchema(valueVariant) as Record<string, unknown>;
+      if (typeof simplified.type === "string") return { ...simplified, type: [simplified.type, "null"] };
+    }
+  }
   const output: Record<string, unknown> = {};
-  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+  for (const [key, item] of Object.entries(record)) {
     if (namedSchemas || geminiJsonSchemaKeywords.has(key)) {
       output[key] = geminiJsonSchema(item, key === "properties" || key === "$defs");
     }
@@ -211,16 +220,27 @@ export async function generateWithGemini(input: ProviderGenerationInput): Promis
   if (input.systemPrompt) body.systemInstruction = { parts: [{ text: input.systemPrompt }] };
 
   const model = input.model.replace(/^models\//, "");
-  const response = await providerFetch(
-    "GEMINI",
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-    {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  const request = () => providerFetch("GEMINI", url, {
       method: "POST",
       headers: { "x-goog-api-key": input.apiKey, "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    },
-    input.timeoutMs,
-  );
+    }, input.timeoutMs);
+  let response: Response;
+  try {
+    response = await request();
+  } catch (error) {
+    if (!(error instanceof AiProviderError) || error.status !== 400 || !input.structuredOutput) throw error;
+    // Gemini can reject large/deep schemas with only INVALID_ARGUMENT. Keep
+    // native JSON mode, then rely on the mandatory Zod validation and single
+    // repair pass in the business-import service.
+    delete generationConfig.responseJsonSchema;
+    body.contents = [{
+      role: "user",
+      parts: [{ text: `${input.prompt}\n\nREQUIRED_JSON_SCHEMA:\n${JSON.stringify(input.structuredOutput.schema)}` }],
+    }];
+    response = await request();
+  }
   const payload = await response.json() as {
     modelVersion?: string;
     responseId?: string;

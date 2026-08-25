@@ -70,6 +70,9 @@ test("AI analysis uses native structured output, validates with Zod, and repairs
   assert.match(providers, /responseMimeType = "application\/json"/);
   assert.match(providers, /responseJsonSchema = geminiJsonSchema/);
   assert.doesNotMatch(providers, /generationConfig\.responseFormat\s*=/);
+  assert.match(providers, /delete generationConfig\.responseJsonSchema/);
+  assert.match(providers, /error instanceof AiProviderError/);
+  assert.match(providers, /REQUIRED_JSON_SCHEMA/);
   assert.match(service, /aiBusinessProposalSchema\.safeParse\(JSON\.parse\(text\)\)/);
   assert.equal((service.match(/previous JSON was invalid/g) ?? []).length, 1);
   assert.match(service, /failed validation after one repair attempt/);
@@ -109,4 +112,12 @@ test("final creation locks the server draft and atomically applies taxonomy and 
   assert.match(actions, /tx\.specialty\.create/);
   assert.match(grid, /Apply selected data to form|AiBusinessImportModal/);
   assert.match(page, /canCreate=\{admin\.role === "SUPER_ADMIN"\}/);
+});
+
+test("starting an existing failed draft automatically retries it before processing", async () => {
+  const modal = await source("apps/frontend/components/admin/AiBusinessImportModal.tsx");
+
+  assert.match(modal, /if \(draft\.status === "FAILED"\)/);
+  assert.match(modal, /body: JSON\.stringify\(\{ action: "retry" \}\)/);
+  assert.match(modal, /await runUntilTerminal\(draft\)/);
 });

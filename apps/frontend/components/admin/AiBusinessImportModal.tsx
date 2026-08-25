@@ -218,7 +218,15 @@ export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
     setError("");
     try {
       const payload = await api<{ draft: PublicAiBusinessImport }>("/api/admin/ai/business-imports", { method: "POST", body: JSON.stringify({ placeId }) });
-      await runUntilTerminal(payload.draft);
+      let draft = payload.draft;
+      if (draft.status === "FAILED") {
+        const retried = await api<{ draft: PublicAiBusinessImport }>(`/api/admin/ai/business-imports/${draft.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ action: "retry" }),
+        });
+        draft = retried.draft;
+      }
+      await runUntilTerminal(draft);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "AI analysis could not start.");
     } finally {
