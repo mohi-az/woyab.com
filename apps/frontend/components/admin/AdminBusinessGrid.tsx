@@ -831,7 +831,7 @@ export function AdminBusinessGrid({
                 {/* Step 2: Features / Tags */}
                 <section className={wizardStep === 2 ? "grid gap-6" : "hidden"}>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
-                    <h3 className="admin-wizard-card-title">{tagText}</h3>
+                    <h3 className="admin-wizard-card-title">{t("businessWizard.tags")}</h3>
                     <BusinessTagFields
                       variant="admin"
                       tags={tagOptions}
@@ -839,7 +839,7 @@ export function AdminBusinessGrid({
                     />
                   </div>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
-                    <h3 className="admin-wizard-card-title">{featureText}</h3>
+                    <h3 className="admin-wizard-card-title">{t("businessWizard.features")}</h3>
                     <BusinessAttributeFields
                       variant="admin"
                       definitions={attributeDefinitions}
