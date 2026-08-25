@@ -1,20 +1,26 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "next/og";
-import type { NextRequest } from "next/server";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
-// Edge runtime برای سرعت بیشتر در تولید تصویر
-export const runtime = "edge";
+// Keep the source image local. Building its URL from the incoming request can
+// resolve to Railway's internal origin (for example https://localhost:8080).
+export const runtime = "nodejs";
+
+const markData = readFile(
+  join(process.cwd(), "public", "brand", "woyab-mark.png"),
+).then((data) => Uint8Array.from(data).buffer);
 
 // آیکون برند WoYab به صورت داینامیک تولید می‌شود
 // مثال: GET /pwa-icons/192  →  PNG 192×192
 export async function GET(
-  req: NextRequest,
+  _request: Request,
   context: { params: Promise<{ size: string }> },
 ) {
   const { size: sizeStr } = await context.params;
   const size = Math.min(512, Math.max(16, parseInt(sizeStr, 10) || 192));
   const inner = Math.round(size * 0.82);
-  const markUrl = new URL("/brand/woyab-mark.png", req.url).toString();
+  const mark = await markData;
 
   return new ImageResponse(
     (
@@ -28,8 +34,10 @@ export async function GET(
           background: "#ffffff",
         }}
       >
+        {/* ImageResponse supports ArrayBuffer sources for local images, while
+            the DOM img typings only accept string URLs. */}
         <img
-          src={markUrl}
+          src={mark as unknown as string}
           alt=""
           width={inner}
           height={inner}
