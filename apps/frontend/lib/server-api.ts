@@ -2,7 +2,7 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 
-const API_BASE = process.env.API_URL ?? "http://localhost:4000";
+const API_BASE = (process.env.API_URL ?? "http://localhost:4000").replace(/\/+$/, "");
 
 export async function proxyApi(
   request: NextRequest,
