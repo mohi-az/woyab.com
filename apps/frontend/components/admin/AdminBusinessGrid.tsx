@@ -22,6 +22,7 @@ const statuses = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"] as con
 const locales = ["DE", "EN", "FA"] as const;
 const inputClassName = "admin-input h-10 rounded-lg px-3 text-sm outline-none focus:border-sky-400";
 const textAreaClassName = "admin-input min-h-24 rounded-lg px-3 py-2 text-sm outline-none focus:border-sky-400";
+type QuickAttributeType = "BOOLEAN" | "TEXT" | "NUMBER";
 
 type Option = {
   id: number;
@@ -289,6 +290,14 @@ export function AdminBusinessGrid({
   const [districtIdDraft, setDistrictIdDraft] = useState("");
   const [locationDraft, setLocationDraft] = useState<{ address: string; latitude: number | null; longitude: number | null }>({ address: "", latitude: null, longitude: null });
   const [hoursDraft, setHoursDraft] = useState<BusinessHourValue[]>([]);
+  const [googlePhotoReferenceDraft, setGooglePhotoReferenceDraft] = useState("");
+  const [attributeDefinitionDrafts, setAttributeDefinitionDrafts] = useState(attributeDefinitions);
+  const [quickAttributeOpen, setQuickAttributeOpen] = useState(false);
+  const [quickAttributeLabels, setQuickAttributeLabels] = useState({ labelFa: "", labelEn: "", labelDe: "" });
+  const [quickAttributeType, setQuickAttributeType] = useState<QuickAttributeType>("BOOLEAN");
+  const [quickAttributeSaving, setQuickAttributeSaving] = useState(false);
+  const [quickAttributeError, setQuickAttributeError] = useState("");
+  const [quickSelectedAttributeIds, setQuickSelectedAttributeIds] = useState<number[]>([]);
   const [importVersion, setImportVersion] = useState(0);
   const [rowUiStates, setRowUiStates] = useState<Record<string, RowUiState>>({});
   const formRef = useRef<HTMLFormElement>(null);
@@ -332,6 +341,51 @@ export function AdminBusinessGrid({
   const cardTaxonomy = t("businessWizard.cards.taxonomy");
   const cardContactInfo = t("businessWizard.cards.contactInfo");
   const cardTranslations = t("businessWizard.cards.translations");
+  const baseAttributeValues = editing?.attributes ?? (aiSelected("attributes") ? aiProposal?.attributes ?? [] : []);
+  const formAttributeValues = [
+    ...baseAttributeValues,
+    ...quickSelectedAttributeIds
+      .filter((attributeId) => !baseAttributeValues.some((item) => item.attributeId === attributeId))
+      .map((attributeId) => ({ attributeId, value: "true" })),
+  ];
+
+  function resetQuickAttributeEditor() {
+    setQuickAttributeOpen(false);
+    setQuickAttributeLabels({ labelFa: "", labelEn: "", labelDe: "" });
+    setQuickAttributeType("BOOLEAN");
+    setQuickAttributeSaving(false);
+    setQuickAttributeError("");
+    setQuickSelectedAttributeIds([]);
+  }
+
+  async function createQuickAttribute() {
+    if (!Object.values(quickAttributeLabels).some((label) => label.trim())) {
+      setQuickAttributeError(t("businessWizard.quickFeature.required"));
+      return;
+    }
+    setQuickAttributeSaving(true);
+    setQuickAttributeError("");
+    try {
+      const response = await fetch("/api/admin/attributes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...quickAttributeLabels, dataType: quickAttributeType }),
+      });
+      const payload = await response.json().catch(() => null) as { attribute?: BusinessAttributeDefinition; error?: string } | null;
+      if (!response.ok || !payload?.attribute) throw new Error(payload?.error || t("businessWizard.quickFeature.failed"));
+      setAttributeDefinitionDrafts((current) => [...current, payload.attribute as BusinessAttributeDefinition]);
+      if (payload.attribute.dataType === "BOOLEAN") {
+        setQuickSelectedAttributeIds((current) => [...current, payload.attribute!.id]);
+      }
+      setQuickAttributeLabels({ labelFa: "", labelEn: "", labelDe: "" });
+      setQuickAttributeType("BOOLEAN");
+      setQuickAttributeOpen(false);
+    } catch (error) {
+      setQuickAttributeError(error instanceof Error ? error.message : t("businessWizard.quickFeature.failed"));
+    } finally {
+      setQuickAttributeSaving(false);
+    }
+  }
 
   function changeWizardStep(step: number) {
     setWizardStep(step);
@@ -384,8 +438,10 @@ export function AdminBusinessGrid({
     setDistrictIdDraft("");
     setLocationDraft({ address: "", latitude: null, longitude: null });
     setHoursDraft([]);
+    setGooglePhotoReferenceDraft("");
     setImportVersion(0);
     setAiApplication(null);
+    resetQuickAttributeEditor();
   }
 
   function openCreate() {
@@ -404,8 +460,10 @@ export function AdminBusinessGrid({
     setDistrictIdDraft("");
     setLocationDraft({ address: "", latitude: null, longitude: null });
     setHoursDraft([]);
+    setGooglePhotoReferenceDraft("");
     setImportVersion(0);
     setAiApplication(null);
+    resetQuickAttributeEditor();
   }
 
   function applyAiBusiness(application: AiBusinessImportApplication) {
@@ -437,7 +495,14 @@ export function AdminBusinessGrid({
       longitude: proposal.location.longitude,
     } : { address: "", latitude: null, longitude: null });
     setHoursDraft(application.selected.includes("hours") ? proposal.hours : []);
+    const firstGooglePhoto = Array.isArray(application.googleSnapshot.photos) ? application.googleSnapshot.photos[0] : null;
+    setGooglePhotoReferenceDraft(
+      firstGooglePhoto && typeof firstGooglePhoto === "object" && typeof (firstGooglePhoto as Record<string, unknown>).photoReference === "string"
+        ? String((firstGooglePhoto as Record<string, unknown>).photoReference)
+        : "",
+    );
     setImportVersion((version) => version + 1);
+    resetQuickAttributeEditor();
   }
 
   function openEdit(business: AdminBusinessRow) {
@@ -460,8 +525,10 @@ export function AdminBusinessGrid({
       longitude: business.longitude,
     });
     setHoursDraft(business.businessHours);
+    setGooglePhotoReferenceDraft("");
     setImportVersion(0);
     setAiApplication(null);
+    resetQuickAttributeEditor();
   }
 
   function setFormField(name: string, nextValue: string | number | null) {
@@ -506,6 +573,7 @@ export function AdminBusinessGrid({
     setFormField("postalCode", place.postalCode);
     setFormField("googleRating", place.rating);
     setFormField("googleUserRatingCount", place.userRatingCount);
+    setGooglePhotoReferenceDraft(place.photos[0]?.photoReference ?? "");
 
     const detectedSourceLocale = googleSourceLocale(place.displayNameLanguageCode) ?? sourceLocaleDraft;
     setSourceLocaleDraft(detectedSourceLocale);
@@ -831,6 +899,7 @@ export function AdminBusinessGrid({
             <form ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {creating && aiApplication ? <input type="hidden" name="aiImportId" value={aiApplication.draftId} /> : null}
+              {creating && googlePhotoReferenceDraft ? <input type="hidden" name="googlePhotoReference" value={googlePhotoReferenceDraft} /> : null}
               {!locationPickerMounted ? (
                 <>
                   <input type="hidden" name="latitude" value={locationDraft.latitude ?? ""} />
@@ -1042,11 +1111,49 @@ export function AdminBusinessGrid({
                     />
                   </div>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
-                    <h3 className="admin-wizard-card-title">{t("businessWizard.features")}</h3>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h3 className="admin-wizard-card-title">{t("businessWizard.features")}</h3>
+                      <Button type="default" htmlType="button" onClick={() => { setQuickAttributeOpen((current) => !current); setQuickAttributeError(""); }}>
+                        <span className="inline-flex items-center gap-2"><FiPlus />{t("businessWizard.quickFeature.add")}</span>
+                      </Button>
+                    </div>
+                    {quickAttributeOpen ? (
+                      <div className="grid gap-3 rounded-xl border border-sky-400/25 bg-sky-400/[0.06] p-4">
+                        <p className="admin-muted text-xs">{t("businessWizard.quickFeature.hint")}</p>
+                        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                          {(["labelFa", "labelEn", "labelDe"] as const).map((field) => (
+                            <label key={field} className="grid gap-2">
+                              <span className="admin-muted text-xs font-black">{t(`businessWizard.quickFeature.${field}`)}</span>
+                              <input
+                                type="text"
+                                value={quickAttributeLabels[field]}
+                                onChange={(event) => setQuickAttributeLabels((current) => ({ ...current, [field]: event.target.value }))}
+                                className={inputClassName}
+                                dir={field === "labelFa" ? "rtl" : "ltr"}
+                              />
+                            </label>
+                          ))}
+                          <label className="grid gap-2">
+                            <span className="admin-muted text-xs font-black">{t("businessWizard.quickFeature.type")}</span>
+                            <select value={quickAttributeType} onChange={(event) => setQuickAttributeType(event.target.value as QuickAttributeType)} className={inputClassName}>
+                              <option value="BOOLEAN">Yes / No</option>
+                              <option value="TEXT">Text</option>
+                              <option value="NUMBER">Number</option>
+                            </select>
+                          </label>
+                        </div>
+                        {quickAttributeError ? <Alert type="error" showIcon message={quickAttributeError} /> : null}
+                        <div className="flex justify-end">
+                          <Button type="primary" htmlType="button" loading={quickAttributeSaving} onClick={() => void createQuickAttribute()} className="bg-emerald-500 font-bold">
+                            {t("actions.create")}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : null}
                     <BusinessAttributeFields
                       variant="admin"
-                      definitions={attributeDefinitions}
-                      values={editing?.attributes ?? (aiSelected("attributes") ? aiProposal?.attributes ?? [] : [])}
+                      definitions={attributeDefinitionDrafts}
+                      values={formAttributeValues}
                     />
                   </div>
                 </section>

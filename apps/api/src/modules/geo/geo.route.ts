@@ -6,7 +6,7 @@ import { prisma } from "../../lib/prisma.js";
 import { validateRequest } from "../../validation/validate-request.js";
 import { requireInternalApi } from "../../middlewares/internal-api.middleware.js";
 import { rateLimit } from "../../middlewares/rate-limit.middleware.js";
-import { getPhotoBuffer, getPlaceImportPreview, getPlacePhotos } from "../businesses/google-places.service.js";
+import { getPhotoBuffer, getPlaceImportPreview, getPlacePhotos, photoReferenceBelongsToPlace } from "../businesses/google-places.service.js";
 import { geoController } from "./geo.controller.js";
 import {
   locationSuggestionQuerySchema,
@@ -232,8 +232,9 @@ geoRouter.get("/place-photo", requireInternalApi, internalGoogleRateLimit, async
   const placeId = String(req.query.placeId ?? "").trim();
   const maxWidth = Math.min(4800, Math.max(100, Number(req.query.maxWidth) || 800));
   if (!ref || !placeId) { res.status(400).json({ success: false, error: "ref and placeId required" }); return; }
-  const allowedPhotos = await getPlacePhotos(placeId);
-  if (!allowedPhotos.some((photo) => photo.photoReference === ref)) {
+  // The resource name already contains the Place ID. Structural validation
+  // avoids a second billable/stale Place Details lookup for every image.
+  if (!photoReferenceBelongsToPlace(ref, placeId)) {
     res.status(404).json({ success: false, error: "Photo not found for this place" });
     return;
   }

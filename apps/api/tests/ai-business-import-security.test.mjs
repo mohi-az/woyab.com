@@ -95,6 +95,16 @@ test("Google is fetched before the optional official site and review bodies neve
   assert.match(service, /Do not search the web/);
 });
 
+test("AI keeps the canonical Google address out of all translated descriptions", async () => {
+  const service = await source("apps/frontend/lib/ai/business-import-service.ts");
+
+  assert.match(service, /location\.address must exactly equal GOOGLE_PLACE_SNAPSHOT\.formattedAddress/);
+  assert.match(service, /never translate, transliterate, localize, or rewrite an address/);
+  assert.match(service, /removeAddressFromDescription/);
+  assert.match(service, /address: google\.formattedAddress/);
+  assert.match(service, /آدرس\|نشانی/);
+});
+
 test("final creation locks the server draft and atomically applies taxonomy and a PENDING business", async () => {
   const [actions, grid, page, createRoute, nextConfig] = await Promise.all([
     source("apps/frontend/lib/admin-actions.ts"),
@@ -130,6 +140,21 @@ test("AI preview displays Google photos through the authenticated proxy with cov
   assert.match(modal, /\/api\/place-photo\?placeId=/);
   assert.match(modal, /authorAttributions\.map/);
   assert.match(modal, /index === 0/);
+});
+
+test("super admin can create a new amenity inline and use it immediately", async () => {
+  const [grid, route, actions] = await Promise.all([
+    source("apps/frontend/components/admin/AdminBusinessGrid.tsx"),
+    source("apps/frontend/app/api/admin/attributes/route.ts"),
+    source("apps/frontend/lib/admin-actions.ts"),
+  ]);
+
+  assert.match(route, /authorizeAiAdminRequest\(\)/);
+  assert.match(route, /createAttributeDefinition\(formData\)/);
+  assert.match(actions, /return attribute/);
+  assert.match(grid, /fetch\("\/api\/admin\/attributes"/);
+  assert.match(grid, /setAttributeDefinitionDrafts/);
+  assert.match(grid, /quickSelectedAttributeIds/);
 });
 
 test("starting an existing failed draft automatically retries it before processing", async () => {

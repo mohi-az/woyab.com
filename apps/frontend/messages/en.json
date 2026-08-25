@@ -1278,6 +1278,16 @@
       "tags": "Tags",
       "location": "Location",
       "hours": "Hours",
+      "quickFeature": {
+        "add": "Add a new feature",
+        "hint": "Create it here and use it immediately for this business.",
+        "labelFa": "Persian name",
+        "labelEn": "English name",
+        "labelDe": "German name",
+        "type": "Value type",
+        "required": "Enter at least one name.",
+        "failed": "The feature could not be created."
+      },
       "cards": {
         "basicInfo": "Basic information",
         "taxonomy": "Category and taxonomy",

@@ -614,6 +614,7 @@ export async function createBusinessDetails(formData: FormData) {
 
   const coverImageUrl = await resolvePermanentBusinessCover({
     googlePlaceId,
+    googlePhotoReference: nullableValue(formData, "googlePhotoReference"),
     requestedCoverImageUrl: nullableValue(formData, "coverImageUrl"),
   });
 
@@ -931,12 +932,10 @@ export async function createAttributeDefinition(formData: FormData) {
   const data = attributeDefinitionData(formData);
 
   try {
-    const attribute = await prisma.attributeDefinition.create({
-      data,
-      select: { id: true },
-    });
+    const attribute = await prisma.attributeDefinition.create({ data, select: businessAttributeDefinitionSelect });
     await audit(actor.id, "taxonomy.attribute.create", "AttributeDefinition", String(attribute.id));
     refreshAdmin();
+    return attribute;
   } catch (error) {
     throw taxonomyActionError(error, "feature");
   }

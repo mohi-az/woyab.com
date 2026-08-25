@@ -111,21 +111,26 @@ export function isStoredGoogleCoverUrl(imageUrl: string | null | undefined) {
   ));
 }
 
-export async function persistFirstGooglePlacePhoto(placeId: string) {
+export async function persistFirstGooglePlacePhoto(placeId: string, preferredPhotoReference?: string | null) {
   const normalizedPlaceId = placeId.trim();
   if (!normalizedPlaceId) return null;
 
   const headers = internalHeaders();
-  const photoListResponse = await fetch(
-    `${API_BASE}/v1/geo/place-photos/${encodeURIComponent(normalizedPlaceId)}`,
-    { headers, cache: "no-store" },
-  );
-  if (!photoListResponse.ok) {
-    throw new Error(`Could not load Google Places photos (${photoListResponse.status}).`);
+  let photoReference = preferredPhotoReference?.trim() || null;
+  if (photoReference && !photoReference.startsWith(`places/${normalizedPlaceId}/photos/`)) {
+    photoReference = null;
   }
-
-  const photoList = (await photoListResponse.json()) as GooglePhotoListResponse;
-  const photoReference = photoList.data?.photos?.[0]?.photoReference?.trim();
+  if (!photoReference) {
+    const photoListResponse = await fetch(
+      `${API_BASE}/v1/geo/place-photos/${encodeURIComponent(normalizedPlaceId)}`,
+      { headers, cache: "no-store" },
+    );
+    if (!photoListResponse.ok) {
+      throw new Error(`Could not load Google Places photos (${photoListResponse.status}).`);
+    }
+    const photoList = (await photoListResponse.json()) as GooglePhotoListResponse;
+    photoReference = photoList.data?.photos?.[0]?.photoReference?.trim() || null;
+  }
   if (!photoReference) return null;
 
   const photoResponse = await fetch(
@@ -152,6 +157,7 @@ export async function persistFirstGooglePlacePhoto(placeId: string) {
 
 export async function resolvePermanentBusinessCover(input: {
   googlePlaceId: string | null;
+  googlePhotoReference?: string | null;
   requestedCoverImageUrl?: string | null;
   existingCoverImageUrl?: string | null;
   refreshGoogleCover?: boolean;
@@ -174,5 +180,6 @@ export async function resolvePermanentBusinessCover(input: {
         : null;
   }
 
-  return persistFirstGooglePlacePhoto(input.googlePlaceId);
+  // An external image outage must not roll back an otherwise valid business.
+  return persistFirstGooglePlacePhoto(input.googlePlaceId, input.googlePhotoReference).catch(() => null);
 }

@@ -1168,6 +1168,16 @@
       "tags": "Tags",
       "location": "Standort",
       "hours": "Zeiten",
+      "quickFeature": {
+        "add": "Neues Merkmal hinzufügen",
+        "hint": "Hier erstellen und sofort für dieses Unternehmen verwenden.",
+        "labelFa": "Persischer Name",
+        "labelEn": "Englischer Name",
+        "labelDe": "Deutscher Name",
+        "type": "Werttyp",
+        "required": "Mindestens einen Namen eingeben.",
+        "failed": "Das Merkmal konnte nicht erstellt werden."
+      },
       "cards": {
         "basicInfo": "Grundinformationen",
         "taxonomy": "Kategorie und Zuordnung",

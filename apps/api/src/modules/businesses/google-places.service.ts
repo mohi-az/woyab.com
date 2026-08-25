@@ -119,6 +119,14 @@ export type GooglePhotoItem = {
   googleMapsUri: string | null;
 };
 
+/** Validate the opaque Places API (New) photo resource against its Place ID. */
+export function photoReferenceBelongsToPlace(photoReference: string, placeId: string) {
+  const prefix = `places/${placeId}/photos/`;
+  if (!photoReference.startsWith(prefix)) return false;
+  const opaqueReference = photoReference.slice(prefix.length);
+  return /^[A-Za-z0-9_-]{8,2048}$/.test(opaqueReference);
+}
+
 export type GooglePlaceImportHour = {
   dayOfWeek: "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
   openTime: string | null;

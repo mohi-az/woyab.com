@@ -7,6 +7,10 @@ async function frontendSource(relativePath) {
   return readFile(new URL(`../../frontend/${relativePath}`, import.meta.url), "utf8");
 }
 
+async function apiSource(relativePath) {
+  return readFile(new URL(`../src/${relativePath}`, import.meta.url), "utf8");
+}
+
 test("admin and owner writes resolve covers through one permanent-image service", async () => {
   const [storage, adminActions, ownerActions, changeRequests] = await Promise.all([
     frontendSource("lib/business-image-storage.ts"),
@@ -48,4 +52,20 @@ test("manual uploads and stored Google covers share the protected image storage"
   assert.match(mediaRoute, /businessImageStoragePath/);
   assert.match(mediaRoute, /max-age=31536000, immutable/);
   assert.match(imageManager, /name="imageMode" value=\{imageMode\}/);
+});
+
+test("Google cover creation reuses the reviewed photo reference and never blocks business creation", async () => {
+  const [storage, adminActions, geoRoute, placesService] = await Promise.all([
+    frontendSource("lib/business-image-storage.ts"),
+    frontendSource("lib/admin-actions.ts"),
+    apiSource("modules/geo/geo.route.ts"),
+    apiSource("modules/businesses/google-places.service.ts"),
+  ]);
+
+  assert.match(adminActions, /googlePhotoReference: nullableValue\(formData, "googlePhotoReference"\)/);
+  assert.match(storage, /preferredPhotoReference/);
+  assert.match(storage, /persistFirstGooglePlacePhoto\(input\.googlePlaceId, input\.googlePhotoReference\)\.catch\(\(\) => null\)/);
+  assert.match(placesService, /photoReferenceBelongsToPlace/);
+  assert.match(geoRoute, /photoReferenceBelongsToPlace\(ref, placeId\)/);
+  assert.doesNotMatch(geoRoute.match(/geoRouter\.get\("\/place-photo"[\s\S]*?\n\}\);/)?.[0] ?? "", /getPlacePhotos\(placeId\)/);
 });
