@@ -96,10 +96,12 @@ test("Google is fetched before the optional official site and review bodies neve
 });
 
 test("final creation locks the server draft and atomically applies taxonomy and a PENDING business", async () => {
-  const [actions, grid, page] = await Promise.all([
+  const [actions, grid, page, createRoute, nextConfig] = await Promise.all([
     source("apps/frontend/lib/admin-actions.ts"),
     source("apps/frontend/components/admin/AdminBusinessGrid.tsx"),
     source("apps/frontend/app/admin/businesses/page.tsx"),
+    source("apps/frontend/app/api/admin/businesses/route.ts"),
+    source("apps/frontend/next.config.ts"),
   ]);
 
   assert.match(actions, /aiBusinessProposalSchema\.parse\(row\.proposal\)/);
@@ -113,7 +115,21 @@ test("final creation locks the server draft and atomically applies taxonomy and 
   assert.match(actions, /tx\.subCategory\.create/);
   assert.match(actions, /tx\.specialty\.create/);
   assert.match(grid, /Apply selected data to form|AiBusinessImportModal/);
+  assert.match(grid, /fetch\("\/api\/admin\/businesses", \{ method: "POST", body: formData \}\)/);
+  assert.match(createRoute, /authorizeAiAdminRequest\(\)/);
+  assert.match(createRoute, /createBusinessDetails\(await request\.formData\(\)\)/);
+  assert.match(nextConfig, /deploymentId: process\.env\.RAILWAY_GIT_COMMIT_SHA/);
   assert.match(page, /canCreate=\{admin\.role === "SUPER_ADMIN"\}/);
+});
+
+test("AI preview displays Google photos through the authenticated proxy with cover and attribution", async () => {
+  const modal = await source("apps/frontend/components/admin/AiBusinessImportModal.tsx");
+
+  assert.match(modal, /photosFromGoogleSnapshot/);
+  assert.match(modal, /Google business photos/);
+  assert.match(modal, /\/api\/place-photo\?placeId=/);
+  assert.match(modal, /authorAttributions\.map/);
+  assert.match(modal, /index === 0/);
 });
 
 test("starting an existing failed draft automatically retries it before processing", async () => {

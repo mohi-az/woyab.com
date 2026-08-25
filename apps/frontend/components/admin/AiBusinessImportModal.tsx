@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Alert, Button, Collapse, Modal, Progress, Tag } from "antd";
 import { useLocale } from "next-intl";
-import { FiAlertTriangle, FiCheck, FiCpu, FiExternalLink, FiGlobe, FiLoader, FiPlay, FiRefreshCw, FiTrash2 } from "react-icons/fi";
+import { FiAlertTriangle, FiCheck, FiCpu, FiExternalLink, FiGlobe, FiImage, FiLoader, FiPlay, FiRefreshCw, FiTrash2 } from "react-icons/fi";
 import type { AiBusinessProposal, PublicAiBusinessImport, TaxonomyChoice } from "@/lib/ai/business-import-schema";
 
 const selectableGroups = [
@@ -52,6 +52,10 @@ const copy = {
     warnings: "Warnings and conflicts",
     newItem: "New proposal",
     officialSite: "Official website pages",
+    googlePhotos: "Google business photos",
+    photoHint: "These photos come directly from this Google Place. The first photo will be saved as the business cover when you create it.",
+    cover: "Cover",
+    googleMaps: "Google Maps",
     empty: "No recent draft is available.",
     groups: {
       translations: "Three-language names and descriptions", legalName: "Legal name", contact: "Contact and social profiles",
@@ -75,6 +79,10 @@ const copy = {
     warnings: "Warnungen und Konflikte",
     newItem: "Neuer Vorschlag",
     officialSite: "Seiten der offiziellen Website",
+    googlePhotos: "Google-Unternehmensfotos",
+    photoHint: "Diese Fotos stammen direkt von diesem Google Place. Das erste Foto wird beim Erstellen als Titelbild gespeichert.",
+    cover: "Titelbild",
+    googleMaps: "Google Maps",
     empty: "Keine aktuellen Entwürfe vorhanden.",
     groups: {
       translations: "Namen und Beschreibungen in drei Sprachen", legalName: "Rechtlicher Name", contact: "Kontakt und soziale Profile",
@@ -98,6 +106,10 @@ const copy = {
     warnings: "هشدارها و تعارض‌ها",
     newItem: "پیشنهاد جدید",
     officialSite: "صفحات بررسی‌شده سایت رسمی",
+    googlePhotos: "عکس‌های بیزینس در گوگل",
+    photoHint: "این عکس‌ها مستقیماً از همین Google Place می‌آیند. هنگام ساخت بیزینس، عکس اول به‌عنوان کاور ذخیره می‌شود.",
+    cover: "کاور",
+    googleMaps: "Google Maps",
     empty: "پیش‌نویس اخیری وجود ندارد.",
     groups: {
       translations: "نام و توضیحات سه‌زبانه", legalName: "نام حقوقی", contact: "اطلاعات تماس و شبکه‌های اجتماعی",
@@ -147,6 +159,37 @@ function valueList(proposal: AiBusinessProposal) {
   ].filter((entry) => entry[1] !== null && entry[1] !== "");
 }
 
+type GooglePhotoSnapshot = {
+  photoReference: string;
+  authorAttributions: Array<{ displayName: string; uri: string | null }>;
+  googleMapsUri: string | null;
+};
+
+function photosFromGoogleSnapshot(snapshot: Record<string, unknown> | null | undefined) {
+  if (!Array.isArray(snapshot?.photos)) return [];
+  return snapshot.photos.flatMap((entry): GooglePhotoSnapshot[] => {
+    if (!entry || typeof entry !== "object") return [];
+    const photo = entry as Record<string, unknown>;
+    if (typeof photo.photoReference !== "string" || !photo.photoReference.trim()) return [];
+    const authorAttributions = Array.isArray(photo.authorAttributions)
+      ? photo.authorAttributions.flatMap((entry): GooglePhotoSnapshot["authorAttributions"] => {
+        if (!entry || typeof entry !== "object") return [];
+        const author = entry as Record<string, unknown>;
+        if (typeof author.displayName !== "string" || !author.displayName.trim()) return [];
+        return [{
+          displayName: author.displayName,
+          uri: typeof author.uri === "string" && author.uri ? author.uri : null,
+        }];
+      })
+      : [];
+    return [{
+      photoReference: photo.photoReference,
+      authorAttributions,
+      googleMapsUri: typeof photo.googleMapsUri === "string" && photo.googleMapsUri ? photo.googleMapsUri : null,
+    }];
+  });
+}
+
 export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
   const locale = useLocale();
   const text = copy[locale === "fa" ? "fa" : locale === "de" ? "de" : "en"];
@@ -161,6 +204,8 @@ export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
     const pages = active?.websiteEvidence?.pages;
     return Array.isArray(pages) ? pages.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object") : [];
   }, [active]);
+  const googlePhotos = useMemo(() => photosFromGoogleSnapshot(active?.googleSnapshot), [active]);
+  const googleMapsUri = typeof active?.googleSnapshot?.googleMapsUri === "string" ? active.googleSnapshot.googleMapsUri : null;
 
   async function api<T>(url: string, init?: RequestInit) {
     const response = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) } });
@@ -327,6 +372,42 @@ export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
                 );
               })}
             </div>
+
+            {googlePhotos.length ? (
+              <section className="admin-wizard-card-group min-w-0 max-w-full">
+                <div className="mb-3">
+                  <h4 className="flex items-center gap-2 font-black text-white"><FiImage />{text.googlePhotos}</h4>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">{text.photoHint}</p>
+                </div>
+                <div className="flex max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2">
+                  {googlePhotos.map((photo, index) => {
+                    const sourceUri = photo.googleMapsUri ?? googleMapsUri;
+                    return (
+                      <figure key={photo.photoReference} className="relative w-56 max-w-full shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20">
+                        {index === 0 ? <Tag color="green" className="absolute start-2 top-2 z-10 font-bold">{text.cover}</Tag> : null}
+                        {/* Google photo media remains behind the authenticated proxy and is never sent to the AI provider. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/api/place-photo?placeId=${encodeURIComponent(active.placeId)}&ref=${encodeURIComponent(photo.photoReference)}&maxWidth=600`}
+                          alt=""
+                          className="h-36 w-full object-cover"
+                          loading="lazy"
+                        />
+                        <figcaption className="min-h-10 px-2 py-1.5 text-[10px] leading-4 text-slate-400">
+                          {photo.authorAttributions.map((author, authorIndex) => (
+                            <span key={`${author.displayName}-${authorIndex}`}>
+                              {author.uri ? <a href={author.uri} target="_blank" rel="noreferrer" className="hover:text-sky-300">{author.displayName}</a> : author.displayName}
+                              {authorIndex < photo.authorAttributions.length - 1 ? ", " : ""}
+                            </span>
+                          ))}
+                          {sourceUri ? <a href={sourceUri} target="_blank" rel="noreferrer" className="ms-2 text-sky-300">{text.googleMaps}</a> : null}
+                        </figcaption>
+                      </figure>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
 
             <Collapse items={[
               { key: "translations", label: text.groups.translations, children: <div className="grid gap-3 lg:grid-cols-3">{(["DE", "EN", "FA"] as const).map((language) => <div key={language} className="rounded-lg border border-white/10 p-3"><div className="font-black text-sky-300">{language} · {proposal.translations[language].businessName}</div><p className="mt-2 text-sm text-slate-300">{proposal.translations[language].shortDescription}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-400">{proposal.translations[language].description}</p></div>)}</div> },

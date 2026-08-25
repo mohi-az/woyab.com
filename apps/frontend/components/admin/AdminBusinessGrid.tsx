@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { FiAlertCircle, FiCheck, FiClock, FiCpu, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
-import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
+import { setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminMultiSelect, AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 import { GooglePlaceImport, type GooglePlaceImportData } from "@/components/admin/GooglePlaceImport";
@@ -623,8 +623,15 @@ export function AdminBusinessGrid({
     setSubmitError("");
     setSaving(true);
     try {
-      if (creating) await createBusinessDetails(formData);
-      else await updateBusinessDetails(formData);
+      if (creating) {
+        // Use a stable HTTP endpoint for creation. Server Action identifiers are
+        // build-specific and an admin may keep this long form open across a deploy.
+        const response = await fetch("/api/admin/businesses", { method: "POST", body: formData });
+        const payload = await response.json().catch(() => null) as { error?: string } | null;
+        if (!response.ok) throw new Error(payload?.error || t("validation.saveFailed"));
+      } else {
+        await updateBusinessDetails(formData);
+      }
       closeModal();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : t("validation.saveFailed"));
