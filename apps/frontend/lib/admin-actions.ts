@@ -13,6 +13,7 @@ import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib
 import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
+import { aiBusinessProposalSchema, type AiBusinessProposal } from "@/lib/ai/business-import-schema";
 
 const businessStatuses: BusinessStatus[] = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"];
 const reviewStatuses: ReviewStatus[] = ["PENDING", "APPROVED", "REJECTED"];
@@ -23,12 +24,19 @@ const attributeDataTypes: AttributeDataType[] = ["TEXT", "NUMBER", "BOOLEAN"];
 const phonePattern = /^\+?[0-9\s().-]{6,24}$/;
 const postalCodePattern = /^[A-Za-z0-9][A-Za-z0-9\s-]{2,12}$/;
 const websitePattern = /^https?:\/\/[^\s]+\.[^\s]+$/i;
+const priceRanges = ["BUDGET", "MODERATE", "EXPENSIVE", "LUXURY"] as const;
 
 const businessContactSchema = z.object({
   email: z.string().trim().max(254).refine((input) => !input || z.email().safeParse(input).success, "Enter a valid email address.").transform((input) => input || null),
   phone: z.string().trim().max(24).refine((input) => !input || phonePattern.test(input), "Enter a valid phone number.").transform((input) => input || null),
   mobile: z.string().trim().max(24).refine((input) => !input || phonePattern.test(input), "Enter a valid mobile number.").transform((input) => input || null),
+  whatsapp: z.string().trim().max(24).refine((input) => !input || phonePattern.test(input), "Enter a valid WhatsApp number.").transform((input) => input || null),
   website: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid website URL starting with http:// or https://.").transform((input) => input || null),
+  instagram: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid Instagram URL.").transform((input) => input || null),
+  telegram: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid Telegram URL.").transform((input) => input || null),
+  facebook: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid Facebook URL.").transform((input) => input || null),
+  youtube: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid YouTube URL.").transform((input) => input || null),
+  linkedin: z.string().trim().max(2048).refine((input) => !input || websitePattern.test(input), "Enter a valid LinkedIn URL.").transform((input) => input || null),
   postalCode: z.string().trim().max(16).refine((input) => !input || postalCodePattern.test(input), "Enter a valid postal code.").transform((input) => input || null),
 });
 
@@ -77,7 +85,13 @@ function businessContactData(formData: FormData) {
     email: value(formData, "email"),
     phone: value(formData, "phone"),
     mobile: value(formData, "mobile"),
+    whatsapp: value(formData, "whatsapp"),
     website: value(formData, "website"),
+    instagram: value(formData, "instagram"),
+    telegram: value(formData, "telegram"),
+    facebook: value(formData, "facebook"),
+    youtube: value(formData, "youtube"),
+    linkedin: value(formData, "linkedin"),
     postalCode: value(formData, "postalCode"),
   });
 
@@ -86,6 +100,18 @@ function businessContactData(formData: FormData) {
   }
 
   return parsed.data;
+}
+
+function businessProfileData(formData: FormData) {
+  const establishedYear = intValue(formData, "establishedYear");
+  const priceRange = value(formData, "priceRange");
+  if (establishedYear !== null && (establishedYear < 1800 || establishedYear > new Date().getFullYear())) {
+    throw new Error("Enter a valid established year.");
+  }
+  if (priceRange && !priceRanges.includes(priceRange as (typeof priceRanges)[number])) {
+    throw new Error("Enter a valid price range.");
+  }
+  return { establishedYear, priceRange: priceRange ? priceRange as (typeof priceRanges)[number] : null };
 }
 
 function googleRatingData(formData: FormData) {
@@ -125,6 +151,89 @@ async function validateBusinessTaxonomy(categoryId: number, subCategoryId: numbe
   }
 
   return { subCategoryId, specialtyIds, specialtyId: specialtyIds[0] ?? null };
+}
+
+const AI_CATEGORY_CHOICE = "ai:category";
+const AI_SUBCATEGORY_CHOICE = "ai:subcategory";
+const AI_SPECIALTY_PREFIX = "ai:specialty:";
+
+async function loadReadyAiBusinessProposal(formData: FormData, actorId: string) {
+  const aiImportId = nullableValue(formData, "aiImportId");
+  if (!aiImportId) return null;
+  const row = await prisma.aiBusinessImport.findFirst({
+    where: { id: aiImportId, createdById: actorId, status: "READY", expiresAt: { gt: new Date() } },
+    select: { id: true, placeId: true, proposal: true },
+  });
+  if (!row) throw new Error("The AI business draft is not ready or has expired.");
+  if (value(formData, "googlePlaceId") !== row.placeId) throw new Error("The AI draft does not match this Google Place ID.");
+  return { id: row.id, placeId: row.placeId, proposal: aiBusinessProposalSchema.parse(row.proposal) };
+}
+
+async function resolveCreateTaxonomy(
+  tx: Prisma.TransactionClient,
+  formData: FormData,
+  aiProposal: AiBusinessProposal | null,
+) {
+  const categoryChoice = value(formData, "categoryId");
+  const subCategoryChoice = value(formData, "subCategoryId");
+  const specialtyChoices = [...new Set(formData.getAll("specialtyIds").map(String))];
+
+  let categoryId = intValue(formData, "categoryId");
+  if (categoryChoice === AI_CATEGORY_CHOICE) {
+    const suggestion = aiProposal?.taxonomy.category.suggested;
+    if (!suggestion?.slug) throw new Error("The proposed AI category is unavailable.");
+    const existing = await tx.category.findUnique({ where: { slug: suggestion.slug }, select: { id: true } });
+    categoryId = existing?.id ?? (await tx.category.create({
+      data: { nameEn: suggestion.nameEn, nameFa: suggestion.nameFa, slug: suggestion.slug, active: true, sortOrder: 0 },
+      select: { id: true },
+    })).id;
+  }
+  if (!categoryId) throw new Error("Choose a business category.");
+
+  let subCategoryId = intValue(formData, "subCategoryId");
+  if (subCategoryChoice === AI_SUBCATEGORY_CHOICE) {
+    const suggestion = aiProposal?.taxonomy.subCategory?.suggested;
+    if (!suggestion?.slug) throw new Error("The proposed AI subcategory is unavailable.");
+    const existing = await tx.subCategory.findUnique({ where: { slug: suggestion.slug }, select: { id: true, categoryId: true } });
+    if (existing && existing.categoryId !== categoryId) throw new Error("The proposed subcategory slug belongs to another category.");
+    subCategoryId = existing?.id ?? (await tx.subCategory.create({
+      data: { nameEn: suggestion.nameEn, nameFa: suggestion.nameFa, slug: suggestion.slug, categoryId, active: true, sortOrder: 0 },
+      select: { id: true },
+    })).id;
+  }
+
+  const specialtyIds = specialtyChoices.flatMap((choice) => {
+    const parsed = Number(choice);
+    return Number.isInteger(parsed) && parsed > 0 ? [parsed] : [];
+  });
+  for (const choice of specialtyChoices.filter((item) => item.startsWith(AI_SPECIALTY_PREFIX))) {
+    if (!subCategoryId) throw new Error("A proposed specialty requires a subcategory.");
+    const index = Number(choice.slice(AI_SPECIALTY_PREFIX.length));
+    const suggestion = aiProposal?.taxonomy.specialties[index]?.suggested;
+    if (!Number.isInteger(index) || !suggestion) throw new Error("The proposed AI specialty is unavailable.");
+    const existing = await tx.specialty.findFirst({
+      where: { subCategoryId, nameEn: { equals: suggestion.nameEn, mode: "insensitive" } },
+      select: { id: true },
+    });
+    const specialtyId = existing?.id ?? (await tx.specialty.create({
+      data: { nameEn: suggestion.nameEn, nameFa: suggestion.nameFa, subCategoryId, active: true, sortOrder: 0 },
+      select: { id: true },
+    })).id;
+    specialtyIds.push(specialtyId);
+  }
+
+  if (subCategoryId) {
+    const validSubCategory = await tx.subCategory.findFirst({ where: { id: subCategoryId, categoryId }, select: { id: true } });
+    if (!validSubCategory) throw new Error("The selected subcategory does not belong to the category.");
+  } else if (specialtyIds.length) {
+    throw new Error("Choose a subcategory before selecting specialties.");
+  }
+  if (specialtyIds.length) {
+    const count = await tx.specialty.count({ where: { id: { in: specialtyIds }, subCategoryId: subCategoryId! } });
+    if (count !== specialtyIds.length) throw new Error("One or more specialties do not belong to the selected subcategory.");
+  }
+
+  return { categoryId, subCategoryId, specialtyIds: [...new Set(specialtyIds)], specialtyId: specialtyIds[0] ?? null };
 }
 
 function slugValue(formData: FormData, key: string) {
@@ -349,10 +458,10 @@ export async function updateBusinessDetails(formData: FormData) {
   const cityId = intValue(formData, "cityId");
   const subCategoryId = intValue(formData, "subCategoryId");
   const specialtyIds = intValues(formData, "specialtyIds");
-  const specialtyId = specialtyIds[0] ?? null;
   const ownerId = nullableValue(formData, "ownerId");
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const contact = businessContactData(formData);
+  const profile = businessProfileData(formData);
   const googleRatings = googleRatingData(formData);
 
   if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
@@ -425,7 +534,15 @@ export async function updateBusinessDetails(formData: FormData) {
         email: contact.email,
         phone: contact.phone,
         mobile: contact.mobile,
+        whatsapp: contact.whatsapp,
         website: contact.website,
+        instagram: contact.instagram,
+        telegram: contact.telegram,
+        facebook: contact.facebook,
+        youtube: contact.youtube,
+        linkedin: contact.linkedin,
+        establishedYear: profile.establishedYear,
+        priceRange: profile.priceRange,
         translations: {
           upsert: translations.map((translation) => ({
             where: { businessId_locale: { businessId, locale: translation.locale } },
@@ -466,21 +583,19 @@ export async function createBusinessDetails(formData: FormData) {
 
   const slug = value(formData, "slug");
   const sourceLocale = value(formData, "sourceLocale") as "DE" | "EN" | "FA";
-  const categoryId = intValue(formData, "categoryId");
+  const categoryChoice = value(formData, "categoryId");
   const cityId = intValue(formData, "cityId");
-  const subCategoryId = intValue(formData, "subCategoryId");
-  const specialtyIds = intValues(formData, "specialtyIds");
-  const specialtyId = specialtyIds[0] ?? null;
   const ownerId = nullableValue(formData, "ownerId");
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
   const contact = businessContactData(formData);
+  const profile = businessProfileData(formData);
   const googleRatings = googleRatingData(formData);
+  const aiDraft = await loadReadyAiBusinessProposal(formData, actor.id);
 
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) throw new Error("A valid slug is required.");
-  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryId || !cityId) {
+  if (!["DE", "EN", "FA"].includes(sourceLocale) || !categoryChoice || !cityId) {
     throw new Error("Please check the required business fields.");
   }
-  const taxonomy = await validateBusinessTaxonomy(categoryId, subCategoryId, specialtyIds);
 
   if (ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
@@ -511,17 +626,31 @@ export async function createBusinessDetails(formData: FormData) {
 
   const source = translations.find((translation) => translation.locale === sourceLocale) ?? translations[0];
   if (!source) throw new Error("At least one translated business name is required.");
+  if (aiDraft && translations.length !== 3) throw new Error("AI-assisted businesses require German, English, and Persian names.");
 
   const business = await prisma.$transaction(async (tx) => {
+    if (aiDraft) {
+      const locked = await tx.$queryRaw<Array<{ status: string }>>`
+        SELECT "status"::text AS "status"
+        FROM "ai_business_imports"
+        WHERE "id" = ${aiDraft.id} AND "createdById" = ${actor.id}
+        FOR UPDATE
+      `;
+      if (locked[0]?.status !== "READY") throw new Error("The AI draft has already been used or is no longer ready.");
+    }
+    const taxonomy = await resolveCreateTaxonomy(tx, formData, aiDraft?.proposal ?? null);
     const created = await tx.business.create({
       data: {
         slug,
         sourceLocale,
+        status: "PENDING",
+        verified: false,
+        featured: false,
         businessName: source.businessName,
         shortDescription: source.shortDescription,
         description: source.description,
         legalName: nullableValue(formData, "legalName"),
-        categoryId,
+        categoryId: taxonomy.categoryId,
         subCategoryId: taxonomy.subCategoryId,
         specialtyId: taxonomy.specialtyId,
         ownerId,
@@ -541,7 +670,15 @@ export async function createBusinessDetails(formData: FormData) {
         email: contact.email,
         phone: contact.phone,
         mobile: contact.mobile,
+        whatsapp: contact.whatsapp,
         website: contact.website,
+        instagram: contact.instagram,
+        telegram: contact.telegram,
+        facebook: contact.facebook,
+        youtube: contact.youtube,
+        linkedin: contact.linkedin,
+        establishedYear: profile.establishedYear,
+        priceRange: profile.priceRange,
         businessHours: {
           create: businessHoursCreateData(formData),
         },
@@ -563,12 +700,18 @@ export async function createBusinessDetails(formData: FormData) {
     });
     await syncBusinessAttributes(tx, created.id, attributeDefinitions, formData);
     await syncBusinessTags(tx, created.id, formData);
-    await syncBusinessSpecialties(tx, created.id, specialtyIds);
+    await syncBusinessSpecialties(tx, created.id, taxonomy.specialtyIds);
     if (ownerId) await promoteUserToOwner(tx, ownerId);
+    if (aiDraft) {
+      await tx.aiBusinessImport.update({
+        where: { id: aiDraft.id },
+        data: { status: "APPLIED", appliedBusinessId: created.id, appliedAt: new Date(), leaseExpiresAt: null },
+      });
+    }
     return created;
   });
 
-  await audit(actor.id, "business.create", "Business", business.id, { status: "PENDING", sourceLocale, ownerId });
+  await audit(actor.id, "business.create", "Business", business.id, { status: "PENDING", sourceLocale, ownerId, aiImportId: aiDraft?.id ?? null });
   refreshAdmin();
 }
 

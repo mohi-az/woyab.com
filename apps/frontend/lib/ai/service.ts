@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { decryptAiApiKey, isAiEncryptionConfigured } from "@/lib/ai/crypto";
 import { AiConfigurationError } from "@/lib/ai/errors";
 import { generateWithProvider, listProviderModels } from "@/lib/ai/providers";
-import { aiProviders, type AiGenerationRequest, type AiProvider } from "@/lib/ai/types";
+import { aiProviders, type AiGenerationRequest, type AiProvider, type AiStructuredGenerationRequest } from "@/lib/ai/types";
 
 const generationSchema = z.object({
   prompt: z.string().trim().min(1).max(100_000),
@@ -53,6 +53,37 @@ export async function generateAiText(request: AiGenerationRequest) {
     temperature: input.temperature === undefined ? config.temperature : input.temperature,
     maxOutputTokens: input.maxOutputTokens ?? config.maxOutputTokens,
     timeoutMs: input.timeoutMs ?? config.timeoutMs,
+  });
+}
+
+export async function generateAiStructured(request: AiStructuredGenerationRequest) {
+  const input = generationSchema.extend({
+    schemaName: z.string().trim().min(1).max(64).regex(/^[A-Za-z0-9_-]+$/),
+    jsonSchema: z.record(z.string(), z.unknown()),
+  }).parse(request);
+  const config = input.provider
+    ? await prisma.aiProviderConfig.findUnique({ where: { provider: databaseProvider(input.provider) } })
+    : await prisma.aiProviderConfig.findFirst({ where: { enabled: true, isDefault: true } });
+
+  if (!config || !config.enabled) {
+    throw new AiConfigurationError(input.provider
+      ? `${input.provider} is not enabled.`
+      : "No default AI provider is enabled.");
+  }
+  const provider = config.provider as AiProvider;
+  const model = input.model || config.model;
+  if (!model) throw new AiConfigurationError(`No model is configured for ${provider}.`);
+  if (!config.apiKeyEncrypted) throw new AiConfigurationError(`No API key is configured for ${provider}.`);
+
+  return generateWithProvider(provider, {
+    apiKey: decryptAiApiKey(config.apiKeyEncrypted),
+    model,
+    prompt: input.prompt,
+    systemPrompt: input.systemPrompt === undefined ? config.systemPrompt : input.systemPrompt,
+    temperature: input.temperature === undefined ? config.temperature : input.temperature,
+    maxOutputTokens: input.maxOutputTokens ?? config.maxOutputTokens,
+    timeoutMs: input.timeoutMs ?? config.timeoutMs,
+    structuredOutput: { name: input.schemaName, schema: input.jsonSchema },
   });
 }
 

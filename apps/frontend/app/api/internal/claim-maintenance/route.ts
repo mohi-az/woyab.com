@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   }
 
   const now = new Date();
-  const [expired, cleared, verificationTokens, rateLimits] = await prisma.$transaction([
+  const [expired, cleared, verificationTokens, rateLimits, aiBusinessImports] = await prisma.$transaction([
     prisma.businessClaim.updateMany({
       where: { status: "PENDING_VERIFICATION", otpExpiresAt: { lte: now } },
       data: { status: "EXPIRED", otpHash: null, otpExpiresAt: null, otpBlockedUntil: null, retentionReviewAt: claimRetentionDate(90) },
@@ -22,6 +22,9 @@ export async function GET(request: Request) {
       where: { OR: [{ expiresAt: { lte: now } }, { usedAt: { not: null } }] },
     }),
     prisma.securityRateLimit.deleteMany({ where: { expiresAt: { lte: now } } }),
+    prisma.aiBusinessImport.deleteMany({
+      where: { expiresAt: { lte: now }, status: { not: "APPLIED" } },
+    }),
   ]);
 
   return NextResponse.json({
@@ -31,6 +34,7 @@ export async function GET(request: Request) {
       cleared: cleared.count,
       verificationTokens: verificationTokens.count,
       rateLimits: rateLimits.count,
+      aiBusinessImports: aiBusinessImports.count,
     },
   });
 }

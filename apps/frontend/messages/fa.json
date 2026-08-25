@@ -1196,7 +1196,15 @@
       "email": "ایمیل",
       "phone": "تلفن",
       "mobile": "موبایل",
+      "whatsapp": "واتس‌اپ",
       "website": "وب‌سایت",
+      "instagram": "اینستاگرام",
+      "telegram": "تلگرام",
+      "facebook": "فیسبوک",
+      "youtube": "یوتیوب",
+      "linkedin": "لینکدین",
+      "establishedYear": "سال تأسیس",
+      "priceRange": "بازه قیمت",
       "address": "آدرس",
       "postalCode": "کد پستی",
       "businessName": "نام کسب‌وکار",
@@ -1246,6 +1254,7 @@
       "previous": "قبلی",
       "next": "بعدی",
       "addBusiness": "افزودن کسب‌وکار",
+      "addBusinessByAi": "افزودن بیزینس با هوش مصنوعی",
       "viewAll": "مشاهده همه",
       "viewPublic": "صفحه عمومی",
       "verify": "تایید",
@@ -1254,6 +1263,9 @@
       "unfeature": "لغو ویژه",
       "delete": "حذف",
       "clear": "پاک کردن"
+    },
+    "aiImport": {
+      "newItem": "جدید"
     },
     "businessWizard": {
       "identity": "مشخصات",

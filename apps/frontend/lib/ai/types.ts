@@ -23,6 +23,11 @@ export type AiGenerationRequest = AiGenerationOptions & {
   prompt: string;
 };
 
+export type AiStructuredGenerationRequest = AiGenerationRequest & {
+  schemaName: string;
+  jsonSchema: Record<string, unknown>;
+};
+
 export type AiGenerationResult = {
   provider: AiProvider;
   model: string;

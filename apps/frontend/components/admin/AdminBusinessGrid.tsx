@@ -3,13 +3,14 @@
 import { useRef, useState } from "react";
 import { Alert, Button, Collapse, ConfigProvider, Modal } from "antd";
 import { useLocale, useTranslations } from "next-intl";
-import { FiAlertCircle, FiCheck, FiClock, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
+import { FiAlertCircle, FiCheck, FiClock, FiCpu, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { createBusinessDetails, setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminMultiSelect, AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 import { GooglePlaceImport, type GooglePlaceImportData } from "@/components/admin/GooglePlaceImport";
+import { AiBusinessImportModal, type AiBusinessImportApplication, type AiImportSelection } from "@/components/admin/AiBusinessImportModal";
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
 import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor, type BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
@@ -72,7 +73,15 @@ export type AdminBusinessRow = {
   email: string | null;
   phone: string | null;
   mobile: string | null;
+  whatsapp: string | null;
   website: string | null;
+  instagram: string | null;
+  telegram: string | null;
+  facebook: string | null;
+  youtube: string | null;
+  linkedin: string | null;
+  establishedYear: number | null;
+  priceRange: "BUDGET" | "MODERATE" | "EXPENSIVE" | "LUXURY" | null;
   googleRating: number | null;
   googleUserRatingCount: number | null;
   status: (typeof statuses)[number];
@@ -264,6 +273,8 @@ export function AdminBusinessGrid({
   const defaultSourceLocale = locale === "fa" ? "FA" : locale === "en" ? "EN" : "DE";
   const [editing, setEditing] = useState<AdminBusinessRow | null>(emptyBusiness());
   const [creating, setCreating] = useState(initialCreateOpen);
+  const [aiImportOpen, setAiImportOpen] = useState(false);
+  const [aiApplication, setAiApplication] = useState<AiBusinessImportApplication | null>(null);
   const [wizardStep, setWizardStep] = useState(0);
   const [locationPickerMounted, setLocationPickerMounted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -287,6 +298,29 @@ export function AdminBusinessGrid({
   const visibleSubCategories = subCategories.filter((item) => String(item.categoryId) === categoryIdDraft);
   const visibleSpecialties = specialties.filter((item) => String(item.subCategoryId) === subCategoryIdDraft);
   const visibleDistricts = districts.filter((item) => String(item.cityId) === cityIdDraft);
+  const aiSelected = (group: AiImportSelection) => Boolean(aiApplication?.selected.includes(group));
+  const aiProposal = aiApplication?.proposal ?? null;
+  const aiGoogleRating = typeof aiApplication?.googleSnapshot.rating === "number" ? aiApplication.googleSnapshot.rating : null;
+  const aiGoogleRatingCount = typeof aiApplication?.googleSnapshot.userRatingCount === "number" ? aiApplication.googleSnapshot.userRatingCount : null;
+  const categorySelectOptions = [
+    ...categories.map((item) => ({ value: String(item.id), label: optionLabel(item) })),
+    ...(aiSelected("category") && aiProposal?.taxonomy.category.suggested
+      ? [{ value: "ai:category", label: `AI · ${aiProposal.taxonomy.category.suggested.nameEn} / ${aiProposal.taxonomy.category.suggested.nameFa} (${t("aiImport.newItem")})` }]
+      : []),
+  ];
+  const subCategorySelectOptions = [
+    ...visibleSubCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) })),
+    ...(aiSelected("subCategory") && aiProposal?.taxonomy.subCategory?.suggested
+      ? [{ value: "ai:subcategory", label: `AI · ${aiProposal.taxonomy.subCategory.suggested.nameEn} / ${aiProposal.taxonomy.subCategory.suggested.nameFa} (${t("aiImport.newItem")})` }]
+      : []),
+  ];
+  const specialtySelectOptions = [
+    ...visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) })),
+    ...(aiSelected("specialties") ? (aiProposal?.taxonomy.specialties ?? []).flatMap((item, index) => item.suggested
+      ? [{ value: `ai:specialty:${index}`, label: `AI · ${item.suggested.nameEn} / ${item.suggested.nameFa} (${t("aiImport.newItem")})` }]
+      : []) : []),
+  ];
+  const aiSpecialtyDefaults = aiSelected("specialties") ? (aiProposal?.taxonomy.specialties ?? []).map((item, index) => item.existingId ?? (item.suggested ? `ai:specialty:${index}` : null)).filter((item): item is string | number => item !== null) : [];
   const wizardSteps = [
     t("businessWizard.identity"),
     t("businessWizard.translations"),
@@ -351,6 +385,7 @@ export function AdminBusinessGrid({
     setLocationDraft({ address: "", latitude: null, longitude: null });
     setHoursDraft([]);
     setImportVersion(0);
+    setAiApplication(null);
   }
 
   function openCreate() {
@@ -370,6 +405,39 @@ export function AdminBusinessGrid({
     setLocationDraft({ address: "", latitude: null, longitude: null });
     setHoursDraft([]);
     setImportVersion(0);
+    setAiApplication(null);
+  }
+
+  function applyAiBusiness(application: AiBusinessImportApplication) {
+    const { proposal } = application;
+    setEditing(null);
+    setAiApplication(application);
+    setAiImportOpen(false);
+    setCreating(true);
+    setWizardStep(0);
+    setLocationPickerMounted(false);
+    setErrors({});
+    setSubmitError("");
+    setSaving(false);
+    setSourceLocaleDraft(proposal.sourceLocale);
+    setTranslationValues(application.selected.includes("translations") ? {
+      DE: { locale: "DE", ...proposal.translations.DE },
+      EN: { locale: "EN", ...proposal.translations.EN },
+      FA: { locale: "FA", ...proposal.translations.FA },
+    } : translationDrafts(null));
+    const category = application.selected.includes("category") ? proposal.taxonomy.category : null;
+    const subCategory = application.selected.includes("subCategory") ? proposal.taxonomy.subCategory : null;
+    setCategoryIdDraft(category?.existingId ? String(category.existingId) : category?.suggested ? "ai:category" : "");
+    setSubCategoryIdDraft(subCategory?.existingId ? String(subCategory.existingId) : subCategory?.suggested ? "ai:subcategory" : "");
+    setCityIdDraft(application.selected.includes("location") && proposal.location.cityId ? String(proposal.location.cityId) : "");
+    setDistrictIdDraft(application.selected.includes("location") && proposal.location.districtId ? String(proposal.location.districtId) : "");
+    setLocationDraft(application.selected.includes("location") ? {
+      address: proposal.location.address ?? "",
+      latitude: proposal.location.latitude,
+      longitude: proposal.location.longitude,
+    } : { address: "", latitude: null, longitude: null });
+    setHoursDraft(application.selected.includes("hours") ? proposal.hours : []);
+    setImportVersion((version) => version + 1);
   }
 
   function openEdit(business: AdminBusinessRow) {
@@ -393,6 +461,7 @@ export function AdminBusinessGrid({
     });
     setHoursDraft(business.businessHours);
     setImportVersion(0);
+    setAiApplication(null);
   }
 
   function setFormField(name: string, nextValue: string | number | null) {
@@ -520,14 +589,22 @@ export function AdminBusinessGrid({
     const email = String(formData.get("email") ?? "").trim();
     const phone = String(formData.get("phone") ?? "").trim();
     const mobile = String(formData.get("mobile") ?? "").trim();
+    const whatsapp = String(formData.get("whatsapp") ?? "").trim();
     const website = String(formData.get("website") ?? "").trim();
     const postalCode = String(formData.get("postalCode") ?? "").trim();
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextErrors.email = t("validation.email");
     if (phone && !/^\+?[0-9\s().-]{6,24}$/.test(phone)) nextErrors.phone = t("validation.phone");
     if (mobile && !/^\+?[0-9\s().-]{6,24}$/.test(mobile)) nextErrors.mobile = t("validation.phone");
+    if (whatsapp && !/^\+?[0-9\s().-]{6,24}$/.test(whatsapp)) nextErrors.whatsapp = t("validation.phone");
     if (website && !/^https?:\/\/[^\s]+\.[^\s]+$/i.test(website)) nextErrors.website = t("validation.website");
+    for (const field of ["instagram", "telegram", "facebook", "youtube", "linkedin"] as const) {
+      const url = String(formData.get(field) ?? "").trim();
+      if (url && !/^https?:\/\/[^\s]+\.[^\s]+$/i.test(url)) nextErrors[field] = t("validation.website");
+    }
     if (postalCode && !/^[A-Za-z0-9][A-Za-z0-9\s-]{2,12}$/.test(postalCode)) nextErrors.postalCode = t("validation.postalCode");
+    const establishedYear = Number(formData.get("establishedYear"));
+    if (formData.get("establishedYear") && (!Number.isInteger(establishedYear) || establishedYear < 1800 || establishedYear > new Date().getFullYear())) nextErrors.establishedYear = t("validation.required");
 
     return nextErrors;
   }
@@ -591,9 +668,14 @@ export function AdminBusinessGrid({
           <h1 className="text-3xl font-black text-white">{t("businesses.title")}</h1>
         </div>
         {canCreate ? (
-          <AdminButton type="button" className="min-h-11 px-5" onClick={openCreate}>
-            <span className="inline-flex items-center gap-2"><FiPlus />{t("actions.addBusiness")}</span>
-          </AdminButton>
+          <div className="flex flex-wrap gap-2">
+            <AdminButton type="button" className="min-h-11 px-5" onClick={() => setAiImportOpen(true)}>
+              <span className="inline-flex items-center gap-2"><FiCpu />{t("actions.addBusinessByAi")}</span>
+            </AdminButton>
+            <AdminButton type="button" className="min-h-11 px-5" onClick={openCreate}>
+              <span className="inline-flex items-center gap-2"><FiPlus />{t("actions.addBusiness")}</span>
+            </AdminButton>
+          </div>
         ) : null}
       </div>
 
@@ -714,6 +796,14 @@ export function AdminBusinessGrid({
         </div>
       </AdminSection>
 
+      {canCreate ? (
+        <AiBusinessImportModal
+          open={aiImportOpen}
+          onClose={() => setAiImportOpen(false)}
+          onApply={applyAiBusiness}
+        />
+      ) : null}
+
       <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
           <Modal
           open={modalOpen}
@@ -733,6 +823,7 @@ export function AdminBusinessGrid({
         >
             <form ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
+              {creating && aiApplication ? <input type="hidden" name="aiImportId" value={aiApplication.draftId} /> : null}
               {!locationPickerMounted ? (
                 <>
                   <input type="hidden" name="latitude" value={locationDraft.latitude ?? ""} />
@@ -788,8 +879,8 @@ export function AdminBusinessGrid({
                 {/* Step 0: Identity */}
                 <section className={wizardStep === 0 ? "grid gap-6" : "hidden"}>
                   <GooglePlaceImport
-                    key={`google-place-${editing?.id ?? "new"}`}
-                    initialPlaceId={editing?.googlePlaceId}
+                    key={`google-place-${editing?.id ?? aiApplication?.draftId ?? "new"}`}
+                    initialPlaceId={editing?.googlePlaceId ?? aiApplication?.placeId}
                     sourceLocale={sourceLocaleDraft}
                     editingBusinessId={editing?.id}
                     onApply={applyGooglePlace}
@@ -799,10 +890,10 @@ export function AdminBusinessGrid({
                       <h3 className="admin-wizard-card-title">{cardBasicInfo}</h3>
                       <div className="grid gap-4 md:grid-cols-2">
                         <FieldShell label={t("fields.slug")} required error={errors.slug}>
-                          <input name="slug" dir="ltr" defaultValue={editing?.slug ?? ""} className={`${inputClassName} text-left`} placeholder="example-business-name" />
+                          <input name="slug" dir="ltr" defaultValue={editing?.slug ?? aiProposal?.slug ?? ""} className={`${inputClassName} text-left`} placeholder="example-business-name" />
                         </FieldShell>
                         <FieldShell label={t("fields.legalName")}>
-                          <input name="legalName" defaultValue={editing?.legalName ?? ""} className={inputClassName} />
+                          <input name="legalName" defaultValue={editing?.legalName ?? (aiSelected("legalName") ? aiProposal?.legalName ?? "" : "")} className={inputClassName} />
                         </FieldShell>
                         <FieldShell label={t("fields.sourceLocale")} required error={errors.sourceLocale}>
                           <select name="sourceLocale" value={sourceLocaleDraft} onChange={(event) => setSourceLocaleDraft(event.target.value as "DE" | "EN" | "FA")} className={inputClassName}>
@@ -812,8 +903,8 @@ export function AdminBusinessGrid({
                         <input type="hidden" name="status" value={editing?.status ?? "PENDING"} />
                         <input type="hidden" name="verified" value={String(editing?.verified ?? false)} />
                         <input type="hidden" name="featured" value={String(editing?.featured ?? false)} />
-                        <input type="hidden" name="googleRating" defaultValue={editing?.googleRating ?? ""} />
-                        <input type="hidden" name="googleUserRatingCount" defaultValue={editing?.googleUserRatingCount ?? ""} />
+                        <input type="hidden" name="googleRating" defaultValue={editing?.googleRating ?? aiGoogleRating ?? ""} />
+                        <input type="hidden" name="googleUserRatingCount" defaultValue={editing?.googleUserRatingCount ?? aiGoogleRatingCount ?? ""} />
                         <FieldShell label={t("fields.owner")}>
                           <AdminSearchSelect
                             key={`owner-${editing?.id ?? (creating ? "new" : "none")}-${editing?.ownerId ?? "none"}`}
@@ -831,17 +922,17 @@ export function AdminBusinessGrid({
                       <h3 className="admin-wizard-card-title">{cardTaxonomy}</h3>
                       <div className="grid content-start gap-4">
                         <FieldShell label={t("fields.category")} required error={errors.categoryId}>
-                          <AdminSearchSelect key={`category-${editing?.id ?? (creating ? "new" : "none")}-${categoryIdDraft}`} name="categoryId" defaultValue={categoryIdDraft} options={categories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {
+                          <AdminSearchSelect key={`category-${editing?.id ?? aiApplication?.draftId ?? (creating ? "new" : "none")}-${categoryIdDraft}`} name="categoryId" defaultValue={categoryIdDraft} options={categorySelectOptions} onValueChange={(name, value) => {
                             clearError(name);
                             setCategoryIdDraft(value);
                             setSubCategoryIdDraft("");
                           }} />
                         </FieldShell>
                         <FieldShell label={t("fields.subCategory")}>
-                          <AdminSearchSelect key={`subcategory-${editing?.id ?? (creating ? "new" : "none")}-${categoryIdDraft}-${subCategoryIdDraft}`} name="subCategoryId" defaultValue={subCategoryIdDraft} allowClear options={visibleSubCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(_, value) => setSubCategoryIdDraft(value)} />
+                          <AdminSearchSelect key={`subcategory-${editing?.id ?? aiApplication?.draftId ?? (creating ? "new" : "none")}-${categoryIdDraft}-${subCategoryIdDraft}`} name="subCategoryId" defaultValue={subCategoryIdDraft} allowClear options={subCategorySelectOptions} onValueChange={(_, value) => setSubCategoryIdDraft(value)} />
                         </FieldShell>
                         <FieldShell label={t("fields.specialty")}>
-                          <AdminMultiSelect key={`specialty-${editing?.id ?? (creating ? "new" : "none")}-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={subCategoryIdDraft && String(editing?.subCategoryId ?? "") === subCategoryIdDraft ? (editing?.specialtyIds?.length ? editing.specialtyIds : (editing?.specialtyId ? [editing.specialtyId] : [])) : []} options={visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} />
+                          <AdminMultiSelect key={`specialty-${editing?.id ?? aiApplication?.draftId ?? (creating ? "new" : "none")}-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={editing && subCategoryIdDraft && String(editing.subCategoryId ?? "") === subCategoryIdDraft ? (editing.specialtyIds?.length ? editing.specialtyIds : (editing.specialtyId ? [editing.specialtyId] : [])) : aiSpecialtyDefaults} options={specialtySelectOptions} />
                         </FieldShell>
                         <FieldShell label={t("fields.city")} required error={errors.cityId}>
                           <AdminSearchSelect key={`city-${editing?.id ?? (creating ? "new" : "none")}-${cityIdDraft}`} name="cityId" defaultValue={cityIdDraft} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {
@@ -859,22 +950,41 @@ export function AdminBusinessGrid({
 
                   <div className="admin-wizard-card-group flex flex-col gap-4">
                     <h3 className="admin-wizard-card-title">{cardContactInfo}</h3>
-                    <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                       <FieldShell label={t("fields.email")} error={errors.email}>
-                        <input name="email" type="email" dir="ltr" defaultValue={editing?.email ?? ""} className={`${inputClassName} text-left`} />
+                        <input name="email" type="email" dir="ltr" defaultValue={editing?.email ?? (aiSelected("contact") ? aiProposal?.contact.email ?? "" : "")} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.phone")} error={errors.phone}>
-                        <input name="phone" type="tel" dir="ltr" defaultValue={editing?.phone ?? ""} className={`${inputClassName} text-left`} />
+                        <input name="phone" type="tel" dir="ltr" defaultValue={editing?.phone ?? (aiSelected("contact") ? aiProposal?.contact.phone ?? "" : "")} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.mobile")} error={errors.mobile}>
-                        <input name="mobile" type="tel" dir="ltr" defaultValue={editing?.mobile ?? ""} className={`${inputClassName} text-left`} />
+                        <input name="mobile" type="tel" dir="ltr" defaultValue={editing?.mobile ?? (aiSelected("contact") ? aiProposal?.contact.mobile ?? "" : "")} className={`${inputClassName} text-left`} />
+                      </FieldShell>
+                      <FieldShell label={t("fields.whatsapp")} error={errors.whatsapp}>
+                        <input name="whatsapp" type="tel" dir="ltr" defaultValue={editing?.whatsapp ?? (aiSelected("contact") ? aiProposal?.contact.whatsapp ?? "" : "")} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.website")} error={errors.website}>
-                        <input name="website" type="url" dir="ltr" defaultValue={editing?.website ?? ""} className={`${inputClassName} text-left`} />
+                        <input name="website" type="url" dir="ltr" defaultValue={editing?.website ?? (aiSelected("contact") ? aiProposal?.contact.website ?? "" : "")} className={`${inputClassName} text-left`} />
                       </FieldShell>
                       <FieldShell label={t("fields.postalCode")} error={errors.postalCode}>
-                        <input name="postalCode" dir="ltr" defaultValue={editing?.postalCode ?? ""} className={`${inputClassName} text-left`} />
+                        <input name="postalCode" dir="ltr" defaultValue={editing?.postalCode ?? (aiSelected("location") ? aiProposal?.location.postalCode ?? "" : "")} className={`${inputClassName} text-left`} />
                       </FieldShell>
+                      <FieldShell label={t("fields.establishedYear")} error={errors.establishedYear}>
+                        <input name="establishedYear" type="number" min="1800" max={new Date().getFullYear()} defaultValue={editing?.establishedYear ?? (aiSelected("details") ? aiProposal?.details.establishedYear ?? "" : "")} className={inputClassName} />
+                      </FieldShell>
+                      <FieldShell label={t("fields.priceRange")} error={errors.priceRange}>
+                        <select name="priceRange" defaultValue={editing?.priceRange ?? (aiSelected("details") ? aiProposal?.details.priceRange ?? "" : "")} className={inputClassName}>
+                          <option value="">—</option>
+                          {(["BUDGET", "MODERATE", "EXPENSIVE", "LUXURY"] as const).map((item) => <option key={item} value={item}>{item}</option>)}
+                        </select>
+                      </FieldShell>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                      {(["instagram", "telegram", "facebook", "youtube", "linkedin"] as const).map((field) => (
+                        <FieldShell key={field} label={t(`fields.${field}`)} error={errors[field]}>
+                          <input name={field} type="url" dir="ltr" defaultValue={editing?.[field] ?? (aiSelected("contact") ? aiProposal?.contact[field] ?? "" : "")} className={`${inputClassName} text-left`} />
+                        </FieldShell>
+                      ))}
                     </div>
                   </div>
                 </section>
@@ -921,7 +1031,7 @@ export function AdminBusinessGrid({
                     <BusinessTagFields
                       variant="admin"
                       tags={tagOptions}
-                      values={editing?.tags ?? []}
+                      values={editing?.tags ?? (aiSelected("tags") ? (aiProposal?.tagIds ?? []).map((tagId) => ({ tagId })) : [])}
                     />
                   </div>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
@@ -929,7 +1039,7 @@ export function AdminBusinessGrid({
                     <BusinessAttributeFields
                       variant="admin"
                       definitions={attributeDefinitions}
-                      values={editing?.attributes ?? []}
+                      values={editing?.attributes ?? (aiSelected("attributes") ? aiProposal?.attributes ?? [] : [])}
                     />
                   </div>
                 </section>

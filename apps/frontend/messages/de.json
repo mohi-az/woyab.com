@@ -1090,7 +1090,15 @@
       "email": "E-Mail",
       "phone": "Telefon",
       "mobile": "Mobil",
+      "whatsapp": "WhatsApp",
       "website": "Website",
+      "instagram": "Instagram",
+      "telegram": "Telegram",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "linkedin": "LinkedIn",
+      "establishedYear": "Gründungsjahr",
+      "priceRange": "Preisklasse",
       "address": "Adresse",
       "postalCode": "Postleitzahl",
       "businessName": "Unternehmensname",
@@ -1139,6 +1147,7 @@
       "previous": "Zurueck",
       "next": "Weiter",
       "addBusiness": "Business hinzufuegen",
+      "addBusinessByAi": "Business mit KI hinzufügen",
       "viewAll": "Alle anzeigen",
       "viewPublic": "Oeffentliche Seite",
       "verify": "Verifizieren",
@@ -1147,6 +1156,9 @@
       "unfeature": "Nicht hervorheben",
       "delete": "Loeschen",
       "clear": "Zuruecksetzen"
+    },
+    "aiImport": {
+      "newItem": "neu"
     },
     "businessWizard": {
       "identity": "Basis",

@@ -5,6 +5,19 @@ enum AiProvider {
   @@map("ai_provider")
 }
 
+enum AiBusinessImportStatus {
+  QUEUED
+  FETCHING_GOOGLE
+  FETCHING_WEBSITE
+  ANALYZING
+  READY
+  FAILED
+  APPLIED
+  DISCARDED
+
+  @@map("ai_business_import_status")
+}
+
 model AiProviderConfig {
   provider        AiProvider @id
   enabled         Boolean    @default(false)
@@ -24,4 +37,40 @@ model AiProviderConfig {
   @@unique([isDefault], map: "ai_provider_configs_one_default", where: raw("\"isDefault\" = true"))
   @@index([updatedById])
   @@map("ai_provider_configs")
+}
+
+model AiBusinessImport {
+  id                String                 @id @default(cuid())
+  placeId           String
+  status            AiBusinessImportStatus @default(QUEUED)
+  provider          AiProvider
+  model             String
+  createdById       String
+  appliedBusinessId String?                @unique
+  googleSnapshot    Json?
+  websiteEvidence   Json?
+  proposal           Json?
+  reviewState        Json?
+  warnings           Json?
+  errorCode          String?
+  errorMessage       String?
+  requestId          String?
+  inputTokens        Int?
+  outputTokens       Int?
+  totalTokens        Int?
+  attemptCount       Int                    @default(0)
+  leaseExpiresAt     DateTime?
+  completedAt        DateTime?
+  appliedAt          DateTime?
+  expiresAt          DateTime
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @default(now()) @updatedAt
+  createdBy          User                   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  appliedBusiness    Business?              @relation(fields: [appliedBusinessId], references: [id], onDelete: SetNull)
+
+  @@index([createdById, createdAt])
+  @@index([placeId, status])
+  @@index([status, leaseExpiresAt])
+  @@index([expiresAt])
+  @@map("ai_business_imports")
 }

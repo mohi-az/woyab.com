@@ -18,6 +18,7 @@ model User {
   adminAuditLogs           AdminAuditLog[]
   adminSettings            AdminSetting[]
   aiProviderConfigs        AiProviderConfig[]
+  aiBusinessImports        AiBusinessImport[]
   businessClaims           BusinessClaim[]         @relation("BusinessClaimClaimant")
   reviewedBusinessClaims   BusinessClaim[]         @relation("BusinessClaimReviewer")
   businessChangeRequests   BusinessChangeRequest[] @relation("BusinessChangeRequestSubmitter")

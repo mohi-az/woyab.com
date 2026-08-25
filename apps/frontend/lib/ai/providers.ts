@@ -11,6 +11,10 @@ type ProviderGenerationInput = {
   temperature?: number | null;
   maxOutputTokens: number;
   timeoutMs: number;
+  structuredOutput?: {
+    name: string;
+    schema: Record<string, unknown>;
+  };
 };
 
 type ErrorPayload = {
@@ -119,6 +123,16 @@ export async function generateWithOpenAi(input: ProviderGenerationInput): Promis
   };
   if (input.systemPrompt) body.instructions = input.systemPrompt;
   if (input.temperature !== null && input.temperature !== undefined) body.temperature = input.temperature;
+  if (input.structuredOutput) {
+    body.text = {
+      format: {
+        type: "json_schema",
+        name: input.structuredOutput.name,
+        strict: true,
+        schema: input.structuredOutput.schema,
+      },
+    };
+  }
 
   const response = await providerFetch("OPENAI", "https://api.openai.com/v1/responses", {
     method: "POST",
@@ -148,6 +162,14 @@ export async function generateWithOpenAi(input: ProviderGenerationInput): Promis
 export async function generateWithGemini(input: ProviderGenerationInput): Promise<AiGenerationResult> {
   const generationConfig: Record<string, unknown> = { maxOutputTokens: input.maxOutputTokens };
   if (input.temperature !== null && input.temperature !== undefined) generationConfig.temperature = input.temperature;
+  if (input.structuredOutput) {
+    generationConfig.responseFormat = {
+      text: {
+        mimeType: "application/json",
+        schema: input.structuredOutput.schema,
+      },
+    };
+  }
   const body: Record<string, unknown> = {
     contents: [{ role: "user", parts: [{ text: input.prompt }] }],
     generationConfig,

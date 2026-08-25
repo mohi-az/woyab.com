@@ -1199,7 +1199,15 @@
       "email": "Email",
       "phone": "Phone",
       "mobile": "Mobile",
+      "whatsapp": "WhatsApp",
       "website": "Website",
+      "instagram": "Instagram",
+      "telegram": "Telegram",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "linkedin": "LinkedIn",
+      "establishedYear": "Established year",
+      "priceRange": "Price range",
       "address": "Address",
       "postalCode": "Postal code",
       "businessName": "Business name",
@@ -1249,6 +1257,7 @@
       "previous": "Previous",
       "next": "Next",
       "addBusiness": "Add business",
+      "addBusinessByAi": "Add business by AI",
       "viewAll": "View all",
       "viewPublic": "Public page",
       "verify": "Verify",
@@ -1257,6 +1266,9 @@
       "unfeature": "Unfeature",
       "delete": "Delete",
       "clear": "Clear"
+    },
+    "aiImport": {
+      "newItem": "new"
     },
     "businessWizard": {
       "identity": "Identity",
