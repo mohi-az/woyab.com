@@ -23,6 +23,7 @@ test("admin and owner writes resolve covers through one permanent-image service"
   assert.match(storage, /resolvePermanentBusinessCover/);
   assert.match(storage, /GOOGLE_COVER_WIDTH = 1_600/);
   assert.match(storage, /\/media\/businesses\//);
+  assert.match(storage, /shouldRefreshRequestedGoogleCover/);
   assert.match(adminActions, /createBusinessDetails[\s\S]*resolvePermanentBusinessCover/);
   assert.match(adminActions, /updateBusinessDetails[\s\S]*resolvePermanentBusinessCover/);
   assert.match(ownerActions, /createOwnerBusiness[\s\S]*resolvePermanentBusinessCover/);

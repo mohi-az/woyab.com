@@ -166,7 +166,11 @@ export async function resolvePermanentBusinessCover(input: {
   const requestedCover = input.requestedCoverImageUrl?.trim() || null;
   const existingCover = input.existingCoverImageUrl?.trim() || null;
 
-  if (requestedCover && !isGoogleProxyImageUrl(requestedCover)) return requestedCover;
+  if (requestedCover && !isGoogleProxyImageUrl(requestedCover)) {
+    const shouldRefreshRequestedGoogleCover = input.refreshGoogleCover
+      && isStoredGoogleCoverUrl(requestedCover);
+    if (!shouldRefreshRequestedGoogleCover) return requestedCover;
+  }
   if (existingCover && !isGoogleProxyImageUrl(existingCover)) {
     const shouldRefreshStoredGoogleCover = input.refreshGoogleCover && isStoredGoogleCoverUrl(existingCover);
     if (!shouldRefreshStoredGoogleCover) return existingCover;
