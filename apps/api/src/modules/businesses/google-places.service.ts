@@ -166,11 +166,13 @@ function normalizedAttributions(attributions: GoogleAuthorAttribution[] = []) {
   return attributions.flatMap((attribution) => {
     const displayName = attribution.displayName?.trim();
     if (!displayName) return [];
-    return [{
-      displayName,
-      uri: attribution.uri ?? null,
-      photoUri: attribution.photoUri ?? null,
-    }];
+    return [
+      {
+        displayName,
+        uri: attribution.uri ?? null,
+        photoUri: attribution.photoUri ?? null,
+      },
+    ];
   });
 }
 
@@ -194,14 +196,18 @@ function timeValue(input?: { hour?: number; minute?: number }) {
 }
 
 function normalizedHours(place: GooglePlaceResponse): GooglePlaceImportHour[] {
-  const periodsByDay = new Map<(typeof APP_DAYS)[number], Array<{ openTime: string; closeTime: string }>>();
+  const periodsByDay = new Map<
+    (typeof APP_DAYS)[number],
+    Array<{ openTime: string; closeTime: string }>
+  >();
   if (!place.regularOpeningHours?.periods?.length) return [];
 
   const [onlyPeriod] = place.regularOpeningHours.periods;
-  const isAlwaysOpen = place.regularOpeningHours.periods.length === 1
-    && onlyPeriod.open?.day === 0
-    && timeValue(onlyPeriod.open) === "00:00"
-    && !onlyPeriod.close;
+  const isAlwaysOpen =
+    place.regularOpeningHours.periods.length === 1 &&
+    onlyPeriod.open?.day === 0 &&
+    timeValue(onlyPeriod.open) === "00:00" &&
+    !onlyPeriod.close;
   if (isAlwaysOpen) {
     return APP_DAYS.map((dayOfWeek) => ({
       dayOfWeek,
@@ -231,9 +237,10 @@ function normalizedHours(place: GooglePlaceResponse): GooglePlaceImportHour[] {
 
     const first = periods[0];
     const last = periods[periods.length - 1];
-    const note = periods.length > 1
-      ? periods.map((period) => `${period.openTime}-${period.closeTime}`).join(", ")
-      : null;
+    const note =
+      periods.length > 1
+        ? periods.map((period) => `${period.openTime}-${period.closeTime}`).join(", ")
+        : null;
     return {
       dayOfWeek,
       openTime: first.openTime,
@@ -245,7 +252,9 @@ function normalizedHours(place: GooglePlaceResponse): GooglePlaceImportHour[] {
 }
 
 function addressComponent(place: GooglePlaceResponse, types: string[], useShortText = false) {
-  const component = place.addressComponents?.find((item) => item.types?.some((type) => types.includes(type)));
+  const component = place.addressComponents?.find((item) =>
+    item.types?.some((type) => types.includes(type)),
+  );
   return (useShortText ? component?.shortText : component?.longText) ?? null;
 }
 
@@ -265,14 +274,22 @@ async function fetchPlace(placeId: string, fieldMask: string, languageCode = "de
   if (response.status === 404) throw ApiError.notFound("Google place not found");
   if (!response.ok) {
     const responseText = await response.text();
-    logger.warn({ status: response.status, placeId, responseText: responseText.slice(0, 500) }, "Google Places API error");
+    logger.warn(
+      { status: response.status, placeId, responseText: responseText.slice(0, 500) },
+      "Google Places API error",
+    );
     if (response.status === 401 || response.status === 403) {
-      throw ApiError.serviceUnavailable("Google Places access was denied. Check that Places API (New), billing, and this server's API key restrictions are configured.");
+      throw ApiError.serviceUnavailable(
+        "Google Places access was denied. Check that Places API (New), billing, and this server's API key restrictions are configured.",
+      );
     }
     if (response.status === 429) {
-      throw ApiError.serviceUnavailable("Google Places quota was exceeded. Please try again later.");
+      throw ApiError.serviceUnavailable(
+        "Google Places quota was exceeded. Please try again later.",
+      );
     }
-    if (response.status >= 400 && response.status < 500) throw ApiError.badRequest("Google rejected this Place ID");
+    if (response.status >= 400 && response.status < 500)
+      throw ApiError.badRequest("Google rejected this Place ID");
     throw ApiError.serviceUnavailable("Google Places is temporarily unavailable");
   }
 
@@ -281,7 +298,11 @@ async function fetchPlace(placeId: string, fieldMask: string, languageCode = "de
 
 export async function getPlaceImportPreview(placeId: string, languageCode: "de" | "en" | "fa") {
   const place = await fetchPlace(placeId, PLACE_IMPORT_FIELD_MASK, languageCode);
-  const locality = addressComponent(place, ["locality", "postal_town", "administrative_area_level_3"]);
+  const locality = addressComponent(place, [
+    "locality",
+    "postal_town",
+    "administrative_area_level_3",
+  ]);
   const district = addressComponent(place, ["sublocality_level_1", "sublocality", "neighborhood"]);
 
   return {
@@ -305,11 +326,14 @@ export async function getPlaceImportPreview(placeId: string, languageCode: "de" 
     userRatingCount: place.userRatingCount ?? 0,
     hours: normalizedHours(place),
     weekdayDescriptions: place.regularOpeningHours?.weekdayDescriptions ?? [],
-    hasSplitHours: [...new Set(
-      (place.regularOpeningHours?.periods ?? [])
-        .map((period) => period.open?.day)
-        .filter((day): day is number => day !== undefined),
-    )].length < (place.regularOpeningHours?.periods?.length ?? 0),
+    hasSplitHours:
+      [
+        ...new Set(
+          (place.regularOpeningHours?.periods ?? [])
+            .map((period) => period.open?.day)
+            .filter((day): day is number => day !== undefined),
+        ),
+      ].length < (place.regularOpeningHours?.periods?.length ?? 0),
     photos: normalizedPhotos(place.photos),
     reviews: (place.reviews ?? []).map((review) => ({
       name: review.name ?? null,
@@ -339,15 +363,18 @@ function placePhotoListCachePath(placeId: string) {
 function isCachedPlacePhotoList(value: unknown): value is CachedPlacePhotoList {
   if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<CachedPlacePhotoList>;
-  return typeof candidate.fetchedAt === "number"
-    && Array.isArray(candidate.photos)
-    && candidate.photos.every((photo) => (
-      photo
-      && typeof photo === "object"
-      && typeof photo.photoReference === "string"
-      && typeof photo.width === "number"
-      && typeof photo.height === "number"
-    ));
+  return (
+    typeof candidate.fetchedAt === "number" &&
+    Array.isArray(candidate.photos) &&
+    candidate.photos.every(
+      (photo) =>
+        photo &&
+        typeof photo === "object" &&
+        typeof photo.photoReference === "string" &&
+        typeof photo.width === "number" &&
+        typeof photo.height === "number",
+    )
+  );
 }
 
 async function readCachedPlacePhotoList(placeId: string) {
@@ -367,9 +394,10 @@ async function readCachedPlacePhotoList(placeId: string) {
     placePhotoListMemoryCache.set(placeId, entry);
     return entry.photos;
   } catch (error) {
-    const code = error instanceof Error && "code" in error
-      ? String((error as NodeJS.ErrnoException).code)
-      : null;
+    const code =
+      error instanceof Error && "code" in error
+        ? String((error as NodeJS.ErrnoException).code)
+        : null;
     await rm(cachePath, { force: true }).catch(() => undefined);
     if (code !== "ENOENT") {
       logger.warn({ error, placeId }, "Failed to read Google Places photo-list cache");
@@ -392,9 +420,14 @@ async function writeCachedPlacePhotoList(placeId: string, entry: CachedPlacePhot
   }
 }
 
-async function fetchAndCachePlacePhotos(placeId: string): Promise<GooglePhotoItem[]> {
-  const cached = await readCachedPlacePhotoList(placeId);
-  if (cached) return cached;
+async function fetchAndCachePlacePhotos(
+  placeId: string,
+  forceRefresh = false,
+): Promise<GooglePhotoItem[]> {
+  if (!forceRefresh) {
+    const cached = await readCachedPlacePhotoList(placeId);
+    if (cached) return cached;
+  }
   if (!env.GOOGLE_PLACES_API_KEY) return [];
 
   try {
@@ -413,18 +446,85 @@ async function fetchAndCachePlacePhotos(placeId: string): Promise<GooglePhotoIte
 }
 
 /** Cache the Google Places photo list on the server for 31 days. */
-export function getPlacePhotos(placeId: string): Promise<GooglePhotoItem[]> {
-  const inFlightRequest = placePhotoListsInFlight.get(placeId);
+export function getPlacePhotos(
+  placeId: string,
+  options: { forceRefresh?: boolean } = {},
+): Promise<GooglePhotoItem[]> {
+  const requestKey = options.forceRefresh ? `${placeId}:refresh` : placeId;
+  const inFlightRequest = placePhotoListsInFlight.get(requestKey);
   if (inFlightRequest) return inFlightRequest;
 
-  const request = fetchAndCachePlacePhotos(placeId)
-    .finally(() => {
-      if (placePhotoListsInFlight.get(placeId) === request) {
-        placePhotoListsInFlight.delete(placeId);
-      }
-    });
-  placePhotoListsInFlight.set(placeId, request);
+  const request = fetchAndCachePlacePhotos(placeId, options.forceRefresh).finally(() => {
+    if (placePhotoListsInFlight.get(requestKey) === request) {
+      placePhotoListsInFlight.delete(requestKey);
+    }
+  });
+  placePhotoListsInFlight.set(requestKey, request);
   return request;
+}
+
+async function getFirstWorkingPhoto(
+  photos: GooglePhotoItem[],
+  maxWidth: number,
+  attemptedReferences = new Set<string>(),
+) {
+  for (const photo of photos) {
+    if (attemptedReferences.has(photo.photoReference)) continue;
+    attemptedReferences.add(photo.photoReference);
+
+    const result = await getPhotoBuffer(photo.photoReference, maxWidth);
+    if (result) return result;
+  }
+
+  return null;
+}
+
+/**
+ * Return the first working photo while retaining the normal 31-day caches.
+ * A fresh Place Details request is made only when every cached reference fails.
+ */
+export async function getFirstPlacePhotoBuffer(placeId: string, maxWidth = 800) {
+  const attemptedReferences = new Set<string>();
+  const cachedPhotos = await getPlacePhotos(placeId);
+  const cachedResult = await getFirstWorkingPhoto(
+    cachedPhotos.slice(0, 1),
+    maxWidth,
+    attemptedReferences,
+  );
+  if (cachedResult) return cachedResult;
+
+  const refreshedPhotos = await getPlacePhotos(placeId, { forceRefresh: true });
+  const refreshedResult = await getFirstWorkingPhoto(
+    refreshedPhotos,
+    maxWidth,
+    attemptedReferences,
+  );
+  if (refreshedResult) return refreshedResult;
+
+  // If refreshing Place Details itself failed, older secondary cached photos may
+  // still be usable and are safer than returning a false 404.
+  return getFirstWorkingPhoto(cachedPhotos.slice(1), maxWidth, attemptedReferences);
+}
+
+/**
+ * Resolve a requested photo and self-heal an expired Google photo reference.
+ * The refreshed list replaces the cached list, so following requests remain cached.
+ */
+export async function getPlacePhotoBuffer(placeId: string, photoReference: string, maxWidth = 800) {
+  const cachedPhotos = await getPlacePhotos(placeId);
+  const cachedIndex = cachedPhotos.findIndex((photo) => photo.photoReference === photoReference);
+  if (cachedIndex < 0 && !photoReferenceBelongsToPlace(photoReference, placeId)) return null;
+
+  const requestedResult = await getPhotoBuffer(photoReference, maxWidth);
+  if (requestedResult) return requestedResult;
+
+  const refreshedPhotos = await getPlacePhotos(placeId, { forceRefresh: true });
+  const preferredReplacement = cachedIndex >= 0 ? refreshedPhotos[cachedIndex] : undefined;
+  const candidates = preferredReplacement
+    ? [preferredReplacement, ...refreshedPhotos.filter((photo) => photo !== preferredReplacement)]
+    : refreshedPhotos;
+
+  return getFirstWorkingPhoto(candidates, maxWidth, new Set([photoReference]));
 }
 
 function photoCacheKey(photoReference: string, maxWidth: number) {
@@ -443,10 +543,7 @@ function photoCachePaths(cacheKey: string) {
 }
 
 async function removePhotoCacheEntry(paths: ReturnType<typeof photoCachePaths>) {
-  await Promise.all([
-    rm(paths.image, { force: true }),
-    rm(paths.metadata, { force: true }),
-  ]);
+  await Promise.all([rm(paths.image, { force: true }), rm(paths.metadata, { force: true })]);
 }
 
 async function readCachedPhoto(cacheKey: string): Promise<PhotoBufferResult | null> {
@@ -471,9 +568,10 @@ async function readCachedPhoto(cacheKey: string): Promise<PhotoBufferResult | nu
 
     return { buffer, contentType: metadata.contentType };
   } catch (error) {
-    const code = error instanceof Error && "code" in error
-      ? String((error as NodeJS.ErrnoException).code)
-      : null;
+    const code =
+      error instanceof Error && "code" in error
+        ? String((error as NodeJS.ErrnoException).code)
+        : null;
     await removePhotoCacheEntry(paths).catch(() => undefined);
     if (code !== "ENOENT") {
       logger.warn({ error, cacheKey }, "Failed to read Google Places photo cache");
@@ -552,12 +650,11 @@ export function getPhotoBuffer(
   const inFlightRequest = photoRequestsInFlight.get(cacheKey);
   if (inFlightRequest) return inFlightRequest;
 
-  const request = fetchAndCachePhoto(photoReference, maxWidth, cacheKey)
-    .finally(() => {
-      if (photoRequestsInFlight.get(cacheKey) === request) {
-        photoRequestsInFlight.delete(cacheKey);
-      }
-    });
+  const request = fetchAndCachePhoto(photoReference, maxWidth, cacheKey).finally(() => {
+    if (photoRequestsInFlight.get(cacheKey) === request) {
+      photoRequestsInFlight.delete(cacheKey);
+    }
+  });
   photoRequestsInFlight.set(cacheKey, request);
   return request;
 }

@@ -24,6 +24,19 @@ test("concurrent requests for the same photo share one Google request", async ()
   assert.match(service, /photoRequestsInFlight\.get\(cacheKey\)/);
   assert.match(service, /photoRequestsInFlight\.set\(cacheKey, request\)/);
   assert.match(service, /photoRequestsInFlight\.delete\(cacheKey\)/);
-  assert.match(service, /placePhotoListsInFlight\.get\(placeId\)/);
-  assert.match(service, /placePhotoListsInFlight\.set\(placeId, request\)/);
+  assert.match(service, /placePhotoListsInFlight\.get\(requestKey\)/);
+  assert.match(service, /placePhotoListsInFlight\.set\(requestKey, request\)/);
+});
+
+test("failed cached photo references refresh once without removing the 31-day cache", async () => {
+  const service = await readFile(serviceUrl, "utf8");
+
+  assert.match(
+    service,
+    /fetchAndCachePlacePhotos\([\s\S]*placeId: string,[\s\S]*forceRefresh = false,[\s\S]*\)/,
+  );
+  assert.match(service, /if \(!forceRefresh\) \{[\s\S]*readCachedPlacePhotoList\(placeId\)/);
+  assert.match(service, /getPlacePhotos\(placeId, \{ forceRefresh: true \}\)/);
+  assert.match(service, /export async function getFirstPlacePhotoBuffer/);
+  assert.match(service, /export async function getPlacePhotoBuffer/);
 });
