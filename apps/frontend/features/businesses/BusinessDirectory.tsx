@@ -74,7 +74,9 @@ export function BusinessDirectory({
   const [directory, setDirectory] = useState(initialDirectory);
   const [location, setLocation] = useState<LocationValue | null>(null);
   const [radiusKm, setRadiusKm] = useState<RadiusKm | null>(5);
-  const [loading, setLoading] = useState(false);
+  // The directory refreshes once after hydration. Start in a loading state so
+  // an empty SSR fallback is never presented as a confirmed empty result.
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [resetVersion, setResetVersion] = useState(0);
@@ -229,7 +231,12 @@ export function BusinessDirectory({
               {mapOpen ? labels.map.hide : labels.map.show}
             </button>
             <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end">
-              {directory.total > 0 ? (
+              {loading && directory.total === 0 ? (
+                <span className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500">
+                  <FiLoader className="animate-spin text-primary" />
+                  {labels.loading}
+                </span>
+              ) : directory.total > 0 ? (
                 <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500">
                   <span>
                     {(directory.total === 1 ? labels.resultCountOne : labels.resultCount)
@@ -271,7 +278,10 @@ export function BusinessDirectory({
             </div>
           ) : null}
 
-          <div className="relative min-h-80" aria-busy={loading}>
+          <div
+            className={`relative ${error && directory.items.length === 0 ? "" : "min-h-80"}`}
+            aria-busy={loading}
+          >
             {directory.items.length > 0 ? (
               <div className={`grid grid-cols-1 gap-6 transition-opacity sm:grid-cols-2 xl:grid-cols-3 ${loading ? "opacity-50" : "opacity-100"}`}>
                 {directory.items.map((business, index) => {
@@ -306,14 +316,22 @@ export function BusinessDirectory({
                   );
                 })}
               </div>
-            ) : (
+            ) : loading ? (
+              <div
+                role="status"
+                className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm"
+              >
+                <FiLoader className="mb-4 animate-spin text-5xl text-primary" />
+                <p className="text-sm font-bold text-gray-600">{labels.loading}</p>
+              </div>
+            ) : !error ? (
               <div className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
                 <FiInbox className="mb-4 text-5xl text-primary/70" />
                 <h2 className="text-xl font-extrabold text-gray-900">{labels.empty.title}</h2>
                 <p className="mt-2 max-w-md text-sm leading-6 text-gray-500">{labels.empty.description}</p>
               </div>
-            )}
-            {loading ? (
+            ) : null}
+            {loading && directory.items.length > 0 ? (
               <div className="pointer-events-none absolute inset-x-0 top-5 flex justify-center">
                 <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-gray-700 shadow-lg">
                   <FiLoader className="animate-spin text-primary" /> {labels.loading}

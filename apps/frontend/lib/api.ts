@@ -394,6 +394,29 @@ export type CurrentUser = {
 };
 
 const API_BASE = process.env.API_URL ?? "http://localhost:4000";
+const API_RETRY_DELAYS_MS = [400, 1_000];
+
+async function fetchApiWithRetry(url: string, init?: RequestInit) {
+  let lastResponse: Response | undefined;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= API_RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      lastResponse = await fetch(url, init);
+      if (lastResponse.ok || lastResponse.status < 500) return lastResponse;
+    } catch (error) {
+      lastError = error;
+    }
+
+    const delay = API_RETRY_DELAYS_MS[attempt];
+    if (delay !== undefined) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  if (lastResponse) return lastResponse;
+  throw lastError instanceof Error ? lastError : new Error("API request failed");
+}
 
 function businessCardImageProps(business: Pick<BusinessApiItem, "id" | "coverImageUrl" | "googlePlaceId">) {
   if (business.coverImageUrl || !business.googlePlaceId) {
@@ -430,7 +453,7 @@ function getLocalizedName(
 
 export async function fetchCategoryCounts(): Promise<Record<number, number>> {
   try {
-    const res = await fetch(`${API_BASE}/v1/categories?limit=20&active=true`, {
+    const res = await fetchApiWithRetry(`${API_BASE}/v1/categories?limit=20&active=true`, {
       next: { revalidate: 300 },
     });
     if (!res.ok) return {};
@@ -446,7 +469,7 @@ export async function fetchCategoryCounts(): Promise<Record<number, number>> {
 
 export async function fetchLatestBusinesses(locale: string): Promise<LatestBusinessCardItem[]> {
   try {
-    const res = await fetch(`${API_BASE}/v1/businesses?limit=8&status=ACTIVE&sortBy=latest&locale=${encodeURIComponent(locale)}`, {
+    const res = await fetchApiWithRetry(`${API_BASE}/v1/businesses?limit=8&status=ACTIVE&sortBy=latest&locale=${encodeURIComponent(locale)}`, {
       next: { revalidate: 300 },
     });
     if (!res.ok) return [];
@@ -509,7 +532,7 @@ export async function fetchBusinessDirectory(
   try {
     const params = directoryParams(filters);
     params.set("locale", locale);
-    const res = await fetch(`${API_BASE}/v1/businesses?${params}`, {
+    const res = await fetchApiWithRetry(`${API_BASE}/v1/businesses?${params}`, {
       cache: "no-store",
     });
     if (!res.ok) return fallback;
@@ -618,7 +641,7 @@ async function fetchDirectoryOptions(
   path: string,
 ): Promise<DirectoryFilterOption[]> {
   try {
-    const res = await fetch(`${API_BASE}${path}`, { next: { revalidate: 300 } });
+    const res = await fetchApiWithRetry(`${API_BASE}${path}`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
     const json = (await res.json()) as PaginatedResponse<DirectoryOptionApiItem>;
     return (json.data?.items ?? []).map((item) => ({
