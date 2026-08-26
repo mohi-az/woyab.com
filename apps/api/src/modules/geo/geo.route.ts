@@ -6,7 +6,7 @@ import { prisma } from "../../lib/prisma.js";
 import { validateRequest } from "../../validation/validate-request.js";
 import { requireInternalApi } from "../../middlewares/internal-api.middleware.js";
 import { rateLimit } from "../../middlewares/rate-limit.middleware.js";
-import { getPhotoBuffer, getPlaceImportPreview, getPlacePhotos, photoReferenceBelongsToPlace } from "../businesses/google-places.service.js";
+import { getPlaceImportPreview, getPlacePhotoBuffer, getPlacePhotos } from "../businesses/google-places.service.js";
 import { geoController } from "./geo.controller.js";
 import {
   locationSuggestionQuerySchema,
@@ -232,13 +232,7 @@ geoRouter.get("/place-photo", requireInternalApi, internalGoogleRateLimit, async
   const placeId = String(req.query.placeId ?? "").trim();
   const maxWidth = Math.min(4800, Math.max(100, Number(req.query.maxWidth) || 800));
   if (!ref || !placeId) { res.status(400).json({ success: false, error: "ref and placeId required" }); return; }
-  // The resource name already contains the Place ID. Structural validation
-  // avoids a second billable/stale Place Details lookup for every image.
-  if (!photoReferenceBelongsToPlace(ref, placeId)) {
-    res.status(404).json({ success: false, error: "Photo not found for this place" });
-    return;
-  }
-  const result = await getPhotoBuffer(ref, maxWidth);
+  const result = await getPlacePhotoBuffer(placeId, ref, maxWidth);
   if (!result) { res.status(404).json({ success: false, error: "Not found" }); return; }
   res.set({ "Content-Type": result.contentType, "Cache-Control": "private, no-store", "Content-Length": String(result.buffer.length) });
   res.send(result.buffer);

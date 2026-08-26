@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 import { FiAlertTriangle, FiCheck, FiCpu, FiExternalLink, FiGlobe, FiImage, FiLoader, FiPlay, FiRefreshCw, FiTrash2 } from "react-icons/fi";
 import type { AiBusinessProposal, PublicAiBusinessImport, TaxonomyChoice } from "@/lib/ai/business-import-schema";
 
+const MAX_GOOGLE_PHOTO_PREVIEWS = 4;
 const selectableGroups = [
   "translations",
   "legalName",
@@ -380,7 +381,7 @@ export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
                   <p className="mt-1 text-xs leading-5 text-slate-400">{text.photoHint}</p>
                 </div>
                 <div className="flex max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2">
-                  {googlePhotos.map((photo, index) => {
+                  {googlePhotos.slice(0, MAX_GOOGLE_PHOTO_PREVIEWS).map((photo, index) => {
                     const sourceUri = photo.googleMapsUri ?? googleMapsUri;
                     return (
                       <figure key={photo.photoReference} className="relative w-56 max-w-full shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20">

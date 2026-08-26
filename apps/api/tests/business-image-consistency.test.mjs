@@ -67,7 +67,7 @@ test("Google cover creation reuses the reviewed photo reference and never blocks
   assert.match(storage, /preferredPhotoReference/);
   assert.match(storage, /persistFirstGooglePlacePhoto\(input\.googlePlaceId, input\.googlePhotoReference\)[\s\S]*\.catch\(\(\) => existingCover/);
   assert.match(placesService, /photoReferenceBelongsToPlace/);
-  assert.match(geoRoute, /photoReferenceBelongsToPlace\(ref, placeId\)/);
+  assert.match(geoRoute, /getPlacePhotoBuffer\(placeId, ref, maxWidth\)/);
   assert.doesNotMatch(geoRoute.match(/geoRouter\.get\("\/place-photo"[\s\S]*?\n\}\);/)?.[0] ?? "", /getPlacePhotos\(placeId\)/);
 });
 

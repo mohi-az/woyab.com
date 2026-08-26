@@ -6,6 +6,8 @@ import { FiAlertTriangle, FiCheck, FiExternalLink, FiImage, FiLoader, FiMapPin, 
 
 import type { BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
 
+const MAX_GOOGLE_PHOTO_PREVIEWS = 4;
+
 type Attribution = {
   displayName: string;
   uri: string | null;
@@ -305,7 +307,7 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
             <section className="min-w-0 max-w-full">
               <h4 className="mb-2 flex items-center gap-2 font-black text-white"><FiImage />{text.photos}</h4>
               <div className="flex max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2">
-                {place.photos.map((photo) => {
+                {place.photos.slice(0, MAX_GOOGLE_PHOTO_PREVIEWS).map((photo) => {
                   const sourceUri = photo.googleMapsUri ?? place.googleMapsUri;
                   return (
                     <figure key={photo.photoReference} className="w-52 max-w-full shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20">

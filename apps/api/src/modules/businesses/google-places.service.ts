@@ -626,7 +626,20 @@ async function fetchAndCachePhoto(
       cache: "no-store",
     });
     if (!response.ok) {
-      logger.warn({ status: response.status, photoReference }, "Google Places Photo API error");
+      const responseText = await response.text();
+      const quotaExceeded = response.status === 429
+        || (response.status === 403 && /quota|RESOURCE_EXHAUSTED/i.test(responseText));
+      logger.warn(
+        { status: response.status, photoReference, responseText: responseText.slice(0, 500) },
+        "Google Places Photo API error",
+      );
+      if (quotaExceeded) {
+        throw new ApiError("Google Places photo quota is exhausted. Increase the GetPhotoMedia quota or try again after it resets.", {
+          code: "SERVICE_UNAVAILABLE",
+          expose: true,
+          statusCode: 503,
+        });
+      }
       return null;
     }
     const result = {
@@ -636,6 +649,7 @@ async function fetchAndCachePhoto(
     await writeCachedPhoto(cacheKey, result);
     return result;
   } catch (error) {
+    if (error instanceof ApiError) throw error;
     logger.error({ error, photoReference }, "Failed to fetch Google Places photo");
     return null;
   }
