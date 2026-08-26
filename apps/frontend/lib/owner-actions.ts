@@ -2,6 +2,7 @@
 
 import type { DayOfWeek, Prisma } from "@woyab/database";
 import { revalidatePath } from "next/cache";
+import { getLocale } from "next-intl/server";
 import { redirectWithLocale } from "@/i18n/server";
 import { requireUserId } from "@/lib/auth-user";
 import { businessAttributeDefinitionSelect, extractBusinessAttributeValues, syncBusinessAttributes } from "@/lib/business-attributes";
@@ -10,6 +11,7 @@ import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { selectedTagIds, syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 import { ownerBusinessWizardSchema } from "@/lib/owner-business-validation";
+import { processOwnerReplyTranslation, queueOwnerReplyTranslation } from "@/lib/review-translations";
 
 export async function openOwnerContactMessage(formData: FormData) {
   const userId = await requireUserId();
@@ -329,6 +331,7 @@ export async function createOwnerBusiness(formData: FormData) {
 
 export async function upsertReviewOwnerReply(formData: FormData) {
   const userId = await requireUserId();
+  const locale = await getLocale();
   const reviewId = value(formData, "reviewId");
   const content = value(formData, "content");
   if (!reviewId) throw new Error("Review is required.");
@@ -337,6 +340,7 @@ export async function upsertReviewOwnerReply(formData: FormData) {
     where: { id: reviewId },
     select: {
       id: true,
+      status: true,
       businessId: true,
       business: { select: { ownerId: true, slug: true } },
     },
@@ -348,12 +352,17 @@ export async function upsertReviewOwnerReply(formData: FormData) {
     await prisma.reviewOwnerReply.deleteMany({ where: { reviewId } });
     await ownerAudit(userId, "owner.review_reply.delete", "Review", reviewId, { businessId: review.businessId });
   } else {
-    await prisma.reviewOwnerReply.upsert({
-      where: { reviewId },
-      update: { content, ownerId: userId },
-      create: { reviewId, ownerId: userId, content },
+    const reply = await prisma.$transaction(async (tx) => {
+      const saved = await tx.reviewOwnerReply.upsert({
+        where: { reviewId },
+        update: { content, ownerId: userId, sourceLanguageCode: locale },
+        create: { reviewId, ownerId: userId, content, sourceLanguageCode: locale },
+      });
+      await queueOwnerReplyTranslation(tx, saved.id, review.status === "APPROVED" ? "PENDING" : "NOT_REQUESTED");
+      return saved;
     });
     await ownerAudit(userId, "owner.review_reply.upsert", "Review", reviewId, { businessId: review.businessId });
+    if (review.status === "APPROVED") await processOwnerReplyTranslation(reply.id).catch(() => false);
   }
 
   revalidatePath("/dashboard/owner");

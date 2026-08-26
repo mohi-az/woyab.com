@@ -3,6 +3,7 @@ import { getPublicLegalConfig } from "@/lib/privacy-config";
 
 const policy = {
   en: {
+    translationNotice: ["Review translations", "After a review is approved, its text and any public owner reply may be sent to Google Cloud Translation to detect the source language and create German, English and Persian versions. WoYab stores those translations with the original text; the original remains available to readers. Google acts as a service provider for this processing."],
     title: "WoYab Privacy Policy",
     intro: "This policy explains how WoYab processes personal data across the public directory, user accounts, reviews, reports, business tools and support services.",
     updated: "Effective date: 20 July 2026",
@@ -24,6 +25,7 @@ const policy = {
     ],
   },
   de: {
+    translationNotice: ["Übersetzung von Bewertungen", "Nach der Freigabe können der Bewertungstext und eine öffentliche Inhaberantwort an Google Cloud Translation übermittelt werden, um die Ausgangssprache zu erkennen und deutsche, englische und persische Fassungen zu erstellen. WoYab speichert diese Übersetzungen zusammen mit dem Original; das Original bleibt für Leser abrufbar. Google wird dabei als Dienstleister eingesetzt."],
     title: "Datenschutzerklärung von WoYab",
     intro: "Diese Erklärung beschreibt die Verarbeitung personenbezogener Daten im öffentlichen Verzeichnis, in Nutzerkonten, Bewertungen, Meldungen, Unternehmenswerkzeugen und Supportdiensten.",
     updated: "Gültig ab: 20. Juli 2026",
@@ -45,6 +47,7 @@ const policy = {
     ],
   },
   fa: {
+    translationNotice: ["ترجمه نظرها", "پس از تأیید یک نظر، متن آن و پاسخ عمومی صاحب کسب‌وکار ممکن است برای تشخیص زبان و ساخت نسخه‌های آلمانی، انگلیسی و فارسی به Google Cloud Translation ارسال شود. WoYab ترجمه‌ها را همراه متن اصلی نگهداری می‌کند و متن اصلی همیشه برای خواننده قابل مشاهده است. Google در این پردازش ارائه‌دهنده خدمات است."],
     title: "سیاست حریم خصوصی WoYab",
     intro: "این سند توضیح می‌دهد WoYab در دایرکتوری عمومی، حساب کاربران، نظرات، گزارش‌ها، ابزارهای صاحبان کسب‌وکار و پشتیبانی چگونه اطلاعات شخصی را پردازش می‌کند.",
     updated: "تاریخ اجرا: ۲۰ ژوئیهٔ ۲۰۲۶",
@@ -92,6 +95,10 @@ export default async function PrivacyPolicyPage() {
           </section>
         ))}
       </div>
+      <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-black">{copy.translationNotice[0]}</h2>
+        <p className="mt-3 leading-7 text-slate-600">{copy.translationNotice[1]}</p>
+      </section>
       <section className="mt-8 rounded-2xl border border-sky-200 bg-sky-50 p-6">
         <h2 className="font-black">Privacy contact</h2>
         {config.controllerName ? <p className="mt-2">{config.controllerName}</p> : null}

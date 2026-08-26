@@ -4,6 +4,7 @@ import { currentUserId } from "@/lib/auth-user";
 import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
 import { prisma } from "@/lib/prisma";
 import { recalculatePublicBusinessRating } from "@/lib/review-rating";
+import { queueReviewTranslation } from "@/lib/review-translations";
 
 type RouteContext = {
   params: Promise<{ reviewId: string }>;
@@ -46,6 +47,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         helpfulCount: 0,
       },
     });
+    await queueReviewTranslation(tx, reviewId, "NOT_REQUESTED");
     await recalculatePublicBusinessRating(tx, existing.businessId);
     return updated;
   });

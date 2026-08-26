@@ -370,6 +370,10 @@ export type BusinessReviewItem = {
   rating: number;
   title?: string | null;
   comment?: string | null;
+  originalTitle?: string | null;
+  originalComment?: string | null;
+  isTranslated?: boolean;
+  sourceLanguageCode?: string | null;
   createdAt: string;
   visitDate?: string | null;
   helpfulCount: number;
@@ -382,6 +386,9 @@ export type BusinessReviewItem = {
   ownerReply?: {
     id: string;
     content: string;
+    originalContent?: string;
+    isTranslated?: boolean;
+    sourceLanguageCode?: string | null;
     createdAt: string;
     ownerName: string;
     ownerAvatarUrl?: string | null;
@@ -861,6 +868,9 @@ export async function fetchBusinessReviews(businessId: string): Promise<Business
       rating: review.rating,
       title: review.title,
       comment: review.comment,
+      originalTitle: review.title,
+      originalComment: review.comment,
+      isTranslated: false,
       createdAt: review.createdAt,
       visitDate: review.visitDate,
       helpfulCount: review.helpfulCount ?? 0,
@@ -874,6 +884,8 @@ export async function fetchBusinessReviews(businessId: string): Promise<Business
         ? {
             id: review.ownerReply.id,
             content: review.ownerReply.content,
+            originalContent: review.ownerReply.content,
+            isTranslated: false,
             createdAt: review.ownerReply.createdAt,
             ownerName: "Business owner",
             ownerAvatarUrl: null,

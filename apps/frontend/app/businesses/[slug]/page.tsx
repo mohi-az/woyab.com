@@ -51,7 +51,7 @@ export default async function BusinessDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const reviews = await fetchBusinessReviewsFromDatabase(business.id);
+  const reviews = await fetchBusinessReviewsFromDatabase(business.id, locale);
 
   return (
     <>

@@ -249,6 +249,20 @@
     "directions": "Route planen",
     "overviewTitle": "Uberblick",
     "descriptionFallback": "Dieses Unternehmen hat noch keine ausfuhrliche Beschreibung hinzugefugt.",
+    "gallery": {
+      "showAll": "Alle {count} Fotos anzeigen",
+      "title": "Alle {count} Fotos",
+      "close": "Galerie schließen",
+      "previous": "Vorheriges Foto",
+      "next": "Nächstes Foto",
+      "back": "Zurück zur Galerie"
+    },
+    "map": {
+      "title": "Standort",
+      "loading": "Karte wird geladen...",
+      "error": "Die Karte ist derzeit nicht verfügbar.",
+      "directions": "Route planen"
+    },
     "stats": {
       "rating": "Bewertung",
       "reviews": "Bewertungen",
@@ -259,6 +273,8 @@
       "specialty": "Schwerpunkt"
     },
     "reviewsSection": {
+      "showOriginal": "Original anzeigen",
+      "showTranslation": "Übersetzung anzeigen",
       "eyebrow": "Feedback der Community",
       "title": "Kundenbewertungen",
       "verified": "Verifiziert",

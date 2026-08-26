@@ -249,6 +249,20 @@
     "directions": "Get directions",
     "overviewTitle": "Overview",
     "descriptionFallback": "This business has not added a full description yet.",
+    "gallery": {
+      "showAll": "Show all {count} photos",
+      "title": "All {count} photos",
+      "close": "Close gallery",
+      "previous": "Previous photo",
+      "next": "Next photo",
+      "back": "Back to gallery"
+    },
+    "map": {
+      "title": "Location",
+      "loading": "Loading map...",
+      "error": "The map is unavailable right now.",
+      "directions": "Get directions"
+    },
     "stats": {
       "rating": "Rating",
       "reviews": "Reviews",
@@ -259,6 +273,8 @@
       "specialty": "Specialty"
     },
     "reviewsSection": {
+      "showOriginal": "Show original",
+      "showTranslation": "Show translation",
       "eyebrow": "Community feedback",
       "title": "Customer reviews",
       "verified": "Verified",

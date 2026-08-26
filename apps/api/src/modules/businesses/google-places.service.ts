@@ -30,7 +30,6 @@ const PLACE_IMPORT_FIELD_MASK = [
   "userRatingCount",
   "regularOpeningHours",
   "photos",
-  "reviews",
 ].join(",");
 
 type GoogleAuthorAttribution = {

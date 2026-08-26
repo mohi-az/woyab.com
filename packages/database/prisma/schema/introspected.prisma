@@ -271,16 +271,25 @@ model Favorite {
 }
 
 model ReviewOwnerReply {
-  id        String   @id @default(cuid())
-  reviewId  String   @unique
-  ownerId   String?
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  owner     User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  id                        String                   @id @default(cuid())
+  reviewId                  String                   @unique
+  ownerId                   String?
+  content                   String
+  sourceLanguageCode        String?
+  translationStatus         ContentTranslationStatus @default(NOT_REQUESTED)
+  translationSourceHash     String?
+  translationAttemptCount   Int                      @default(0)
+  translationError          String?
+  translationNextRetryAt    DateTime?
+  translationLeaseExpiresAt DateTime?
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @default(now()) @updatedAt
+  owner                     User?                    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  review                    Review                   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  translations              ReviewOwnerReplyTranslation[]
 
   @@index([ownerId])
+  @@index([translationStatus, translationNextRetryAt])
   @@map("review_owner_replies")
 }
 

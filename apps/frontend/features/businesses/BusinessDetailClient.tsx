@@ -10,6 +10,7 @@ import {
   FiCheckCircle,
   FiExternalLink,
   FiGlobe,
+  FiGrid,
   FiMail,
   FiMapPin,
   FiMessageSquare,
@@ -30,6 +31,8 @@ import { DirectoryReportButton } from "@/features/businesses/DirectoryReportButt
 import { BusinessEditButton } from "@/features/businesses/BusinessEditButton";
 import { getCookieConsent, onCookieConsentChange } from "@/lib/cookie-consent";
 import { getBusinessOpenStatus } from "@/lib/business-hours";
+import { BusinessLocationMap } from "@/components/business/BusinessLocationMap";
+import { BusinessPhotoGallery } from "@/components/business/BusinessPhotoGallery";
 
 type Props = {
   business: BusinessDetailData;
@@ -116,7 +119,18 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   });
   const categoryHref = business.categoryId ? `/businesses?categoryId=${business.categoryId}` : null;
   const cityHref = business.cityId ? `/businesses?cityId=${business.cityId}` : null;
+  const hasValidCoordinates = typeof business.latitude === "number"
+    && typeof business.longitude === "number"
+    && Number.isFinite(business.latitude)
+    && Number.isFinite(business.longitude)
+    && business.latitude >= -90
+    && business.latitude <= 90
+    && business.longitude >= -180
+    && business.longitude <= 180;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [originalReviewIds, setOriginalReviewIds] = useState<Set<string>>(new Set());
+  const [originalReplyIds, setOriginalReplyIds] = useState<Set<string>>(new Set());
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [reviews, setReviews] = useState(() => initialReviews.filter((review) => review.status === "APPROVED"));
   const [reviewForm, setReviewForm] = useState<ReviewFormState>({ rating: 0, title: "", comment: "" });
@@ -255,6 +269,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           rating: reviewForm.rating,
           title: reviewForm.title.trim() || undefined,
           comment: reviewForm.comment.trim(),
+          sourceLocale: locale,
         }),
       });
 
@@ -409,11 +424,15 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               ) : null}
 
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-slate-200">
-                <div className="flex items-center gap-3">
-                  <StaticStars rating={business.rating} />
-                  <span className="font-bold">{business.rating.toFixed(1)} {t("woyabRating")}</span>
-                </div>
-                <span>{t("woyabReviewsCount", { count: business.reviewCount })}</span>
+                {business.reviewCount > 0 ? (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <StaticStars rating={business.rating} />
+                      <span className="font-bold">{business.rating.toFixed(1)} {t("woyabRating")}</span>
+                    </div>
+                    <span>{t("woyabReviewsCount", { count: business.reviewCount })}</span>
+                  </>
+                ) : null}
                 {business.googleRating !== null && business.googleRating !== undefined ? (
                   <div className="flex items-center gap-3">
                     <StaticStars rating={business.googleRating} />
@@ -463,6 +482,16 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               ) : (
                 <div className="flex h-full items-center justify-center text-sm font-bold text-slate-500">{business.title}</div>
               )}
+              {business.gallery.length ? (
+                <button
+                  type="button"
+                  onClick={() => setGalleryOpen(true)}
+                  className="absolute bottom-3 end-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-950/80 px-4 text-sm font-black text-white shadow-lg backdrop-blur transition hover:bg-slate-950 sm:bottom-5 sm:end-5"
+                >
+                  <FiGrid />
+                  {t("gallery.showAll", { count: business.gallery.length })}
+                </button>
+              ) : null}
             </div>
 
             {activeImage?.sourceUri || activeImage?.authorAttributions?.length ? (
@@ -480,7 +509,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             ) : null}
 
             {business.gallery.length > 1 ? (
-              <div className="grid grid-cols-4 gap-3 p-4 sm:grid-cols-6">
+              <div className="hidden grid-cols-4 gap-3 p-4 sm:grid sm:grid-cols-6">
                 {business.gallery.map((image, index) => (
                   <button
                     key={image.id}
@@ -499,14 +528,18 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
           <section className="rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabRating")}</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">{business.rating.toFixed(1)}</p>
-              </div>
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabReviews")}</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">{business.reviewCount}</p>
-              </div>
+              {business.reviewCount > 0 ? (
+                <>
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabRating")}</p>
+                    <p className="mt-2 text-2xl font-black text-slate-950">{business.rating.toFixed(1)}</p>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabReviews")}</p>
+                    <p className="mt-2 text-2xl font-black text-slate-950">{business.reviewCount}</p>
+                  </div>
+                </>
+              ) : null}
               <div className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.googleRating")}</p>
                 <p className="mt-2 text-2xl font-black text-slate-950">
@@ -559,6 +592,22 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             ) : null}
           </section>
 
+          {hasValidCoordinates && directionsHref ? (
+            <BusinessLocationMap
+              latitude={business.latitude as number}
+              longitude={business.longitude as number}
+              title={business.title}
+              address={business.address}
+              directionsHref={directionsHref}
+              labels={{
+                title: t("map.title"),
+                loading: t("map.loading"),
+                error: t("map.error"),
+                directions: t("map.directions"),
+              }}
+            />
+          ) : null}
+
           <section id="reviews" className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] sm:p-8">
             <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
@@ -571,7 +620,13 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             </div>
 
             <div className="mt-6 space-y-5">
-              {reviews.length ? reviews.map((review) => (
+              {reviews.length ? reviews.map((review) => {
+                const showOriginalReview = Boolean(review.isTranslated && originalReviewIds.has(review.id));
+                const reviewTitle = showOriginalReview ? review.originalTitle : review.title;
+                const reviewComment = showOriginalReview ? review.originalComment : review.comment;
+                const showOriginalReply = Boolean(review.ownerReply?.isTranslated && originalReplyIds.has(review.id));
+                const replyContent = showOriginalReply ? review.ownerReply?.originalContent : review.ownerReply?.content;
+                return (
                 <article key={review.id} className="rounded-3xl border border-slate-100 bg-slate-50 p-5">
                   <div className="flex items-start gap-4">
                     <ReviewAvatar user={review.user} />
@@ -586,14 +641,27 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                           <DirectoryReportButton
                             targetType="review"
                             targetId={review.id}
-                            targetLabel={review.title || review.comment || review.user.name}
+                            targetLabel={reviewTitle || reviewComment || review.user.name}
                             currentUser={currentUser}
                           />
                         </div>
                       </div>
 
-                      {review.title ? <p className="mt-4 text-sm font-black text-slate-900">{review.title}</p> : null}
-                      {review.comment ? <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{review.comment}</p> : null}
+                      {reviewTitle ? <p dir="auto" className="mt-4 text-sm font-black text-slate-900">{reviewTitle}</p> : null}
+                      {reviewComment ? <p dir="auto" className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{reviewComment}</p> : null}
+                      {review.isTranslated ? (
+                        <button
+                          type="button"
+                          onClick={() => setOriginalReviewIds((current) => {
+                            const next = new Set(current);
+                            if (next.has(review.id)) next.delete(review.id); else next.add(review.id);
+                            return next;
+                          })}
+                          className="mt-3 min-h-11 text-xs font-black text-primary hover:underline"
+                        >
+                          {showOriginalReview ? t("reviewsSection.showTranslation") : t("reviewsSection.showOriginal")}
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         disabled={!currentUser || currentUser.id === review.user.id || helpfulPendingIds.has(review.id)}
@@ -619,14 +687,28 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                             <FiMessageSquare />
                             <span>{t("reviewsSection.ownerReply")}</span>
                           </div>
-                          <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{review.ownerReply.content}</p>
+                          <p dir="auto" className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{replyContent}</p>
+                          {review.ownerReply.isTranslated ? (
+                            <button
+                              type="button"
+                              onClick={() => setOriginalReplyIds((current) => {
+                                const next = new Set(current);
+                                if (next.has(review.id)) next.delete(review.id); else next.add(review.id);
+                                return next;
+                              })}
+                              className="mt-2 min-h-11 text-xs font-black text-primary hover:underline"
+                            >
+                              {showOriginalReply ? t("reviewsSection.showTranslation") : t("reviewsSection.showOriginal")}
+                            </button>
+                          ) : null}
                           <p className="mt-2 text-xs font-bold text-slate-400">{review.ownerReply.ownerName}</p>
                         </div>
                       ) : null}
                     </div>
                   </div>
                 </article>
-              )) : (
+                );
+              }) : (
                 <div className="rounded-3xl border border-dashed border-slate-200 px-5 py-8 text-center text-slate-500">
                   {t("reviewsSection.empty")}
                 </div>
@@ -876,6 +958,20 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           </section>
         </aside>
       </div>
+      <BusinessPhotoGallery
+        images={business.gallery}
+        businessTitle={business.title}
+        open={galleryOpen}
+        rtl={locale === "fa"}
+        onClose={() => setGalleryOpen(false)}
+        labels={{
+          title: t("gallery.title", { count: business.gallery.length }),
+          close: t("gallery.close"),
+          previous: t("gallery.previous"),
+          next: t("gallery.next"),
+          back: t("gallery.back"),
+        }}
+      />
     </div>
   );
 }

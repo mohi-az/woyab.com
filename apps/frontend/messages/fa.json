@@ -247,6 +247,20 @@
     "directions": "مسیریابی",
     "overviewTitle": "معرفی",
     "descriptionFallback": "هنوز توضیح کاملی برای این کسب‌وکار ثبت نشده است.",
+    "gallery": {
+      "showAll": "نمایش همه {count} تصویر",
+      "title": "همه {count} تصویر",
+      "close": "بستن گالری",
+      "previous": "تصویر قبلی",
+      "next": "تصویر بعدی",
+      "back": "بازگشت به گالری"
+    },
+    "map": {
+      "title": "موقعیت روی نقشه",
+      "loading": "در حال بارگذاری نقشه...",
+      "error": "در حال حاضر نقشه در دسترس نیست.",
+      "directions": "مسیریابی"
+    },
     "stats": {
       "rating": "امتیاز",
       "reviews": "نظرها",
@@ -257,6 +271,8 @@
       "specialty": "تخصص"
     },
     "reviewsSection": {
+      "showOriginal": "نمایش متن اصلی",
+      "showTranslation": "نمایش ترجمه",
       "eyebrow": "نظر کاربران",
       "title": "دیدگاه مشتریان",
       "verified": "تاییدشده",

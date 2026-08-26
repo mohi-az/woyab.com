@@ -12,6 +12,7 @@ const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
   title: z.string().trim().max(200).optional(),
   comment: z.string().trim().min(3).max(2000),
+  sourceLocale: z.enum(["de", "en", "fa"]).optional(),
 });
 
 export async function POST(request: Request, context: RouteContext) {
@@ -32,7 +33,16 @@ export async function POST(request: Request, context: RouteContext) {
   const existing = await prisma.review.findUnique({ where: { businessId_userId: { businessId, userId } } });
   if (existing) return NextResponse.json({ error: "You have already reviewed this business." }, { status: 409 });
 
-  const review = await prisma.review.create({ data: { businessId, userId, status: "PENDING", ...parsed.data } });
+  const { sourceLocale, ...reviewData } = parsed.data;
+  const review = await prisma.review.create({
+    data: {
+      businessId,
+      userId,
+      status: "PENDING",
+      sourceLanguageCode: sourceLocale ?? null,
+      ...reviewData,
+    },
+  });
   return NextResponse.json(
     { success: true, message: "Thank you. Your review will be published after review and approval.", data: review },
     { status: 201 },

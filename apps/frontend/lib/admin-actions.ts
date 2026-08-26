@@ -14,6 +14,14 @@ import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 import { aiBusinessProposalSchema, type AiBusinessProposal } from "@/lib/ai/business-import-schema";
+import {
+  processOwnerReplyTranslation,
+  processReviewTranslation,
+  queueOwnerReplyTranslation,
+  queueReviewTranslation,
+  retryReviewTranslation,
+  retryOwnerReplyTranslation,
+} from "@/lib/review-translations";
 
 const businessStatuses: BusinessStatus[] = ["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"];
 const reviewStatuses: ReviewStatus[] = ["PENDING", "APPROVED", "REJECTED"];
@@ -757,16 +765,24 @@ export async function setReviewStatus(formData: FormData) {
     const existing = await tx.review.findUniqueOrThrow({
       where: { id: reviewId },
       select: {
+        id: true,
         status: true,
         rating: true,
         title: true,
         user: { select: { email: true, name: true } },
         business: { select: { businessName: true, sourceLocale: true } },
+        ownerReply: { select: { id: true } },
       },
     });
     const updated = await tx.review.update({ where: { id: reviewId }, data: { status } });
+    if (existing.status !== status) {
+      await queueReviewTranslation(tx, reviewId, status === "APPROVED" ? "PENDING" : "NOT_REQUESTED");
+      if (existing.ownerReply) {
+        await queueOwnerReplyTranslation(tx, existing.ownerReply.id, status === "APPROVED" ? "PENDING" : "NOT_REQUESTED");
+      }
+    }
     await recalculateBusinessRating(tx, updated.businessId);
-    return { ...updated, previousStatus: existing.status, user: existing.user, business: existing.business, rating: existing.rating, title: existing.title };
+    return { ...updated, previousStatus: existing.status, user: existing.user, business: existing.business, rating: existing.rating, title: existing.title, ownerReplyId: existing.ownerReply?.id ?? null };
   });
 
   await audit(actor.id, "review.status", "Review", reviewId, { status, businessId: review.businessId });
@@ -787,6 +803,29 @@ export async function setReviewStatus(formData: FormData) {
       html: emailData.html,
     }).catch(() => undefined);
   }
+  if (review.previousStatus !== status && status === "APPROVED") {
+    await Promise.allSettled([
+      processReviewTranslation(reviewId),
+      review.ownerReplyId ? processOwnerReplyTranslation(review.ownerReplyId) : Promise.resolve(false),
+    ]);
+  }
+  refreshAdmin();
+}
+
+export async function retryReviewTranslationAction(formData: FormData) {
+  const actor = await requireAdmin();
+  const reviewId = value(formData, "reviewId");
+  if (!reviewId) throw new Error("Review is required.");
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+    select: { status: true, businessId: true, ownerReply: { select: { id: true } } },
+  });
+  if (!review || review.status !== "APPROVED") throw new Error("Only approved reviews can be translated.");
+  const [translated, replyTranslated] = await Promise.all([
+    retryReviewTranslation(reviewId),
+    review.ownerReply ? retryOwnerReplyTranslation(review.ownerReply.id) : Promise.resolve(null),
+  ]);
+  await audit(actor.id, "review.translation.retry", "Review", reviewId, { translated, replyTranslated, businessId: review.businessId });
   refreshAdmin();
 }
 

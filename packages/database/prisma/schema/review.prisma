@@ -10,17 +10,59 @@ model Review {
   status           ReviewStatus      @default(PENDING)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+  sourceLanguageCode String?
+  translationStatus ContentTranslationStatus @default(NOT_REQUESTED)
+  translationSourceHash String?
+  translationAttemptCount Int        @default(0)
+  translationError String?
+  translationNextRetryAt DateTime?
+  translationLeaseExpiresAt DateTime?
   directoryReports DirectoryReport[]
   helpfulVotes     ReviewHelpfulVote[]
   images           ReviewImage[]
   ownerReply       ReviewOwnerReply?
+  translations     ReviewTranslation[]
   business         Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
   user             User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([businessId, userId])
   @@index([businessId])
   @@index([status])
+  @@index([translationStatus, translationNextRetryAt])
   @@map("reviews")
+}
+
+model ReviewTranslation {
+  id         String        @id @default(cuid())
+  reviewId   String
+  locale     ContentLocale
+  title      String?
+  comment    String?
+  provider   String        @default("GOOGLE_NMT")
+  sourceHash String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  review     Review        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, locale])
+  @@index([locale])
+  @@map("review_translations")
+}
+
+model ReviewOwnerReplyTranslation {
+  id           String           @id @default(cuid())
+  ownerReplyId String
+  locale       ContentLocale
+  content      String
+  provider     String           @default("GOOGLE_NMT")
+  sourceHash   String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  ownerReply   ReviewOwnerReply @relation(fields: [ownerReplyId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerReplyId, locale])
+  @@index([locale])
+  @@map("review_owner_reply_translations")
 }
 
 model ReviewHelpfulVote {
@@ -52,4 +94,15 @@ enum ReviewStatus {
   REJECTED
 
   @@map("review_status")
+}
+
+enum ContentTranslationStatus {
+  NOT_REQUESTED
+  PENDING
+  PROCESSING
+  PARTIAL
+  READY
+  FAILED
+
+  @@map("content_translation_status")
 }

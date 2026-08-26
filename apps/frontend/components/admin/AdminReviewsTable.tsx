@@ -5,11 +5,12 @@ import type { TableProps } from "antd";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
-import { FiLoader, FiSearch, FiTrash2, FiX } from "react-icons/fi";
-import { deleteReview, setReviewStatus } from "@/lib/admin-actions";
+import { FiLoader, FiRefreshCw, FiSearch, FiTrash2, FiX } from "react-icons/fi";
+import { deleteReview, retryReviewTranslationAction, setReviewStatus } from "@/lib/admin-actions";
 import { StatusBadge } from "@/components/admin/AdminPrimitives";
 
 const statuses = ["PENDING", "APPROVED", "REJECTED"] as const;
+type TranslationStatus = "NOT_REQUESTED" | "PENDING" | "PROCESSING" | "PARTIAL" | "READY" | "FAILED";
 
 export type AdminReviewRow = {
   id: string;
@@ -17,6 +18,11 @@ export type AdminReviewRow = {
   title: string | null;
   comment: string | null;
   status: (typeof statuses)[number];
+  translationStatus: TranslationStatus;
+  translationAttemptCount: number;
+  translationError: string | null;
+  ownerReplyTranslationStatus: TranslationStatus | null;
+  ownerReplyTranslationError: string | null;
   createdAt: string;
   businessName: string;
   businessSlug: string;
@@ -127,6 +133,17 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
           </div>
           {review.title ? <p className="admin-title mt-1 font-black">{review.title}</p> : null}
           <p className="admin-muted mt-1 line-clamp-2 text-sm leading-6">{review.comment || "-"}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <span className={`rounded-full px-2 py-1 font-black ${review.translationStatus === "READY" ? "bg-emerald-500/15 text-emerald-400" : review.translationStatus === "FAILED" || review.translationStatus === "PARTIAL" ? "bg-rose-500/15 text-rose-400" : "bg-slate-500/15 text-slate-400"}`}>
+              Translation: {review.translationStatus}
+            </span>
+            {review.translationAttemptCount ? <span className="admin-muted">Attempts: {review.translationAttemptCount}/5</span> : null}
+          </div>
+          {review.translationError ? <p title={review.translationError} className="mt-1 line-clamp-1 text-xs text-rose-400">{review.translationError}</p> : null}
+          {review.ownerReplyTranslationStatus ? (
+            <p className="admin-muted mt-1 text-xs">Owner reply: {review.ownerReplyTranslationStatus}</p>
+          ) : null}
+          {review.ownerReplyTranslationError ? <p title={review.ownerReplyTranslationError} className="mt-1 line-clamp-1 text-xs text-rose-400">{review.ownerReplyTranslationError}</p> : null}
         </div>
       ),
     },
@@ -191,7 +208,7 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
     {
       title: t("fields.actions"),
       key: "actions",
-      width: 180,
+      width: 230,
       render: (_, review) => {
         const isRowPending = isPending && pendingReviewId === review.id;
         return (
@@ -219,6 +236,27 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
                 popupClassName="admin-ant-select-dropdown"
               />
             </div>
+
+            {review.status === "APPROVED" && (review.translationStatus !== "READY" || (review.ownerReplyTranslationStatus && review.ownerReplyTranslationStatus !== "READY")) ? (
+              <button
+                type="button"
+                disabled={isRowPending}
+                onClick={() => {
+                  setPendingReviewId(review.id);
+                  startTransition(async () => {
+                    const formData = new FormData();
+                    formData.append("reviewId", review.id);
+                    await retryReviewTranslationAction(formData);
+                    router.refresh();
+                  });
+                }}
+                className="admin-icon-button grid h-9 w-9 place-items-center rounded-lg border text-sky-400 disabled:opacity-50"
+                title="Retry translation"
+                aria-label="Retry translation"
+              >
+                {isRowPending ? <FiLoader className="animate-spin" /> : <FiRefreshCw />}
+              </button>
+            ) : null}
 
             <form action={deleteReview}>
               <input type="hidden" name="reviewId" value={review.id} />
@@ -259,4 +297,3 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
     </ConfigProvider>
   );
 }
-

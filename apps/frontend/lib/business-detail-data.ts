@@ -14,6 +14,11 @@ type GooglePhotoList = {
     photos?: Array<{
       photoReference: string;
       htmlAttributions?: string[];
+      googleMapsUri?: string | null;
+      authorAttributions?: Array<{
+        displayName: string;
+        uri: string | null;
+      }>;
     }>;
   };
 };
@@ -88,6 +93,11 @@ export const fetchBusinessDetailFromDatabase = cache(
             id: `${business.id}-google-${index}`,
             imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`,
             caption: photo.htmlAttributions?.[0] ?? localized.businessName,
+            sourceUri: photo.googleMapsUri ?? null,
+            authorAttributions: photo.authorAttributions?.map((author) => ({
+              displayName: author.displayName,
+              uri: author.uri,
+            })),
           })));
         }
       } catch {
@@ -189,23 +199,35 @@ export const fetchBusinessDetailFromDatabase = cache(
 );
 
 export const fetchBusinessReviewsFromDatabase = cache(
-  async (businessId: string): Promise<BusinessReviewItem[]> => {
+  async (businessId: string, locale: string): Promise<BusinessReviewItem[]> => {
+    const contentLocale = appLocale(locale).toUpperCase() as "DE" | "EN" | "FA";
     const reviews = await prisma.review.findMany({
       where: { businessId, status: "APPROVED" },
       orderBy: { createdAt: "desc" },
       include: {
         user: { select: { id: true, name: true, avatarUrl: true } },
+        translations: { where: { locale: contentLocale } },
         ownerReply: {
-          include: { owner: { select: { name: true, avatarUrl: true } } },
+          include: {
+            owner: { select: { name: true, avatarUrl: true } },
+            translations: { where: { locale: contentLocale } },
+          },
         },
       },
     });
 
-    return reviews.map((review) => ({
+    return reviews.map((review) => {
+      const translation = review.translations[0];
+      const replyTranslation = review.ownerReply?.translations[0];
+      return {
       id: review.id,
       rating: review.rating,
-      title: review.title,
-      comment: review.comment,
+      title: translation?.title ?? review.title,
+      comment: translation?.comment ?? review.comment,
+      originalTitle: review.title,
+      originalComment: review.comment,
+      isTranslated: Boolean(translation),
+      sourceLanguageCode: review.sourceLanguageCode,
       createdAt: review.createdAt.toISOString(),
       visitDate: review.visitDate?.toISOString() ?? null,
       helpfulCount: review.helpfulCount,
@@ -218,12 +240,16 @@ export const fetchBusinessReviewsFromDatabase = cache(
       ownerReply: review.ownerReply
         ? {
             id: review.ownerReply.id,
-            content: review.ownerReply.content,
+            content: replyTranslation?.content ?? review.ownerReply.content,
+            originalContent: review.ownerReply.content,
+            isTranslated: Boolean(replyTranslation),
+            sourceLanguageCode: review.ownerReply.sourceLanguageCode,
             createdAt: review.ownerReply.createdAt.toISOString(),
             ownerName: review.ownerReply.owner?.name?.trim() || "Business owner",
             ownerAvatarUrl: review.ownerReply.owner?.avatarUrl,
           }
         : null,
-    }));
+      };
+    });
   },
 );
