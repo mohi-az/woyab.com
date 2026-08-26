@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { FiMapPin, FiPhone, FiGlobe, FiStar, FiClock, FiTag, FiSliders } from "react-icons/fi";
+import { FiMapPin, FiPhone, FiGlobe, FiClock, FiTag, FiSliders } from "react-icons/fi";
+import { CircularRatingStars } from "@/components/ui/CircularRatingStars";
 
 export type BusinessDraft = {
   locale?: string;
@@ -35,19 +36,6 @@ function PriceRangeDots({ range }: { range: string }) {
         <span
           key={n}
           className={`h-1.5 w-1.5 rounded-full ${n <= level ? "bg-primary" : "bg-slate-200"}`}
-        />
-      ))}
-    </span>
-  );
-}
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <span className="flex items-center gap-0.5 text-amber-400">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <FiStar
-          key={n}
-          className={`h-3.5 w-3.5 ${n <= Math.round(rating) ? "fill-current" : "opacity-30"}`}
         />
       ))}
     </span>
@@ -109,7 +97,7 @@ export function BusinessListingPreview({ draft }: { draft: BusinessDraft }) {
 
       {/* Stats row */}
       <div className="flex items-center gap-3 px-5 py-2">
-        {draft.averageRating ? <StarRating rating={draft.averageRating} /> : null}
+        {draft.averageRating ? <CircularRatingStars rating={draft.averageRating} size="xs" /> : null}
         {draft.reviewCount ? (
           <span className="text-xs font-bold text-slate-500">{draft.reviewCount} reviews</span>
         ) : null}

@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { getLocale } from "next-intl/server";
 import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 import { upsertReviewOwnerReply } from "@/lib/owner-actions";
+import { CircularRatingStars } from "@/components/ui/CircularRatingStars";
 import type { Metadata } from "next";
 
 type Props = { params: Promise<{ businessId: string }> };
@@ -11,10 +11,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { businessId } = await params;
   const b = await prisma.business.findFirst({ where: { id: businessId }, select: { businessName: true } });
   return { title: `Reviews — ${b?.businessName ?? "Business"} | Business Portal | WoYab` };
-}
-
-function Stars({ rating }: { rating: number }) {
-  return <span className="text-amber-500">{"★".repeat(rating)}{"☆".repeat(5 - rating)}</span>;
 }
 
 function formatDate(value: Date) {
@@ -59,7 +55,7 @@ export default async function BusinessReviewsPage({ params }: Props) {
               <div>
                 <h3 className="font-black text-slate-950">{review.title || "Customer review"}</h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  {review.user?.name || review.user?.email || "Anonymous"} · {formatDate(review.createdAt)} · <Stars rating={review.rating} />
+                  {review.user?.name || review.user?.email || "Anonymous"} · {formatDate(review.createdAt)} · <CircularRatingStars rating={review.rating} size="xs" />
                 </p>
               </div>
               <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500 ring-1 ring-slate-200">

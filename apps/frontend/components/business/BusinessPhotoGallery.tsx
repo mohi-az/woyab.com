@@ -103,8 +103,8 @@ export function BusinessPhotoGallery({ images, businessTitle, open, rtl, onClose
 
       {image ? (
         <div className="absolute inset-0 z-10 flex flex-col bg-slate-950 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]">
-          <div className="flex min-h-16 items-center justify-between px-3 sm:px-6">
-            <button type="button" onClick={() => setLightboxIndex(null)} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-black text-white hover:bg-white/20"><PreviousIcon /> {labels.back}</button>
+          <div className="relative z-20 flex min-h-16 items-center justify-between gap-2 bg-gradient-to-b from-black/75 to-transparent px-3 sm:px-6">
+            <button type="button" onClick={() => setLightboxIndex(null)} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-white px-4 text-sm font-black text-slate-950 shadow-xl ring-1 ring-white/40 transition hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-primary/40"><PreviousIcon className="text-lg" /> <span>{labels.back}</span></button>
             <span className="text-sm font-bold text-white">{(lightboxIndex ?? 0) + 1} / {images.length}</span>
             <button type="button" onClick={() => { setLightboxIndex(null); onClose(); }} aria-label={labels.close} className="grid min-h-11 min-w-11 place-items-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20"><FiX /></button>
           </div>

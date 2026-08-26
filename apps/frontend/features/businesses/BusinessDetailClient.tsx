@@ -22,7 +22,6 @@ import {
   FiThumbsUp,
 } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTelegramPlane, FaYoutube } from "react-icons/fa";
-import { MdStar, MdStarBorder } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { CategoryIcon } from "@/lib/business-categories";
 import type { BusinessDetailData, BusinessReviewItem, CurrentUser } from "@/lib/api";
@@ -33,6 +32,7 @@ import { getCookieConsent, onCookieConsentChange } from "@/lib/cookie-consent";
 import { getBusinessOpenStatus } from "@/lib/business-hours";
 import { BusinessLocationMap } from "@/components/business/BusinessLocationMap";
 import { BusinessPhotoGallery } from "@/components/business/BusinessPhotoGallery";
+import { CircularRatingInput, CircularRatingStars } from "@/components/ui/CircularRatingStars";
 
 type Props = {
   business: BusinessDetailData;
@@ -59,17 +59,6 @@ const socialIcons = {
   youtube: FaYoutube,
   linkedin: FaLinkedinIn,
 } as const;
-
-function StaticStars({ rating }: { rating: number }) {
-  const rounded = Math.max(0, Math.min(5, Math.round(rating)));
-  return (
-    <div className="flex items-center gap-0.5 text-amber-400">
-      {Array.from({ length: 5 }, (_, index) =>
-        index < rounded ? <MdStar key={index} /> : <MdStarBorder key={index} className="text-amber-300" />,
-      )}
-    </div>
-  );
-}
 
 function normalizeUrl(url: string) {
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
@@ -427,7 +416,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 {business.reviewCount > 0 ? (
                   <>
                     <div className="flex items-center gap-3">
-                      <StaticStars rating={business.rating} />
+                      <CircularRatingStars rating={business.rating} size="sm" />
                       <span className="font-bold">{business.rating.toFixed(1)} {t("woyabRating")}</span>
                     </div>
                     <span>{t("woyabReviewsCount", { count: business.reviewCount })}</span>
@@ -435,7 +424,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 ) : null}
                 {business.googleRating !== null && business.googleRating !== undefined ? (
                   <div className="flex items-center gap-3">
-                    <StaticStars rating={business.googleRating} />
+                    <CircularRatingStars rating={business.googleRating} size="sm" />
                     <span className="font-bold">{business.googleRating.toFixed(1)} {t("googleRating")}</span>
                     <span>{t("googleReviewsCount", { count: business.googleUserRatingCount ?? 0 })}</span>
                   </div>
@@ -486,10 +475,10 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 <button
                   type="button"
                   onClick={() => setGalleryOpen(true)}
-                  className="absolute bottom-3 end-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-950/80 px-4 text-sm font-black text-white shadow-lg backdrop-blur transition hover:bg-slate-950 sm:bottom-5 sm:end-5"
+                  className="absolute bottom-3 end-3 z-10 inline-flex min-h-11 max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-xl bg-white px-4 text-sm font-black text-slate-950 shadow-[0_10px_30px_rgba(15,23,42,.35)] ring-1 ring-black/10 transition hover:bg-slate-100 sm:bottom-5 sm:end-5"
                 >
-                  <FiGrid />
-                  {t("gallery.showAll", { count: business.gallery.length })}
+                  <FiGrid className="shrink-0 text-primary" />
+                  <span className="truncate">{t("gallery.showAll", { count: business.gallery.length })}</span>
                 </button>
               ) : null}
             </div>
@@ -637,7 +626,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                           <p className="text-sm text-slate-500">{formatReviewDate(review.createdAt, locale)}</p>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
-                          <StaticStars rating={review.rating} />
+                          <CircularRatingStars rating={review.rating} size="sm" />
                           <DirectoryReportButton
                             targetType="review"
                             targetId={review.id}
@@ -725,26 +714,11 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 <form className="mt-5 space-y-4" onSubmit={submitReview}>
                   <div>
                     <label className="mb-2 block text-sm font-bold text-slate-700">{t("reviewsForm.ratingLabel")}</label>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: 5 }, (_, index) => {
-                        const value = index + 1;
-                        return (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => setReviewForm((current) => ({ ...current, rating: value }))}
-                            className="inline-flex h-8 w-8 items-center justify-center text-amber-400 transition hover:scale-110 sm:h-9 sm:w-9"
-                            aria-label={t("reviewsForm.chooseStars", { count: value })}
-                          >
-                            {value <= reviewForm.rating ? (
-                              <MdStar className="h-7 w-7 text-amber-400 drop-shadow-[0_4px_10px_rgba(251,191,36,.28)] sm:h-8 sm:w-8" />
-                            ) : (
-                              <MdStarBorder className="h-7 w-7 text-amber-300 sm:h-8 sm:w-8" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <CircularRatingInput
+                      value={reviewForm.rating}
+                      onChange={(rating) => setReviewForm((current) => ({ ...current, rating }))}
+                      getLabel={(rating) => t("reviewsForm.chooseStars", { count: rating })}
+                    />
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">

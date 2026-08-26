@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FiEdit2, FiTrash2, FiX } from "react-icons/fi";
-import { MdStar, MdStarBorder } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
+import { CircularRatingInput, CircularRatingStars } from "@/components/ui/CircularRatingStars";
 
 type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -99,11 +99,12 @@ export function ReviewManagementCard({ review: initialReview }: Props) {
           <Link href={`/businesses/${review.businessSlug}`} className="font-black hover:text-primary">
             {review.businessName}
           </Link>
-          <div className="mt-2 flex text-xl text-amber-400" aria-label={t("ratingValue", { count: review.rating })}>
-            {Array.from({ length: 5 }, (_, index) => index < review.rating
-              ? <MdStar key={index} />
-              : <MdStarBorder key={index} className="text-amber-200" />)}
-          </div>
+          <CircularRatingStars
+            rating={review.rating}
+            size="sm"
+            label={t("ratingValue", { count: review.rating })}
+            className="mt-2"
+          />
         </div>
         <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusStyle[review.status]}`}>
           {t(`status.${review.status}`)}
@@ -114,22 +115,11 @@ export function ReviewManagementCard({ review: initialReview }: Props) {
         <form onSubmit={save} className="mt-5 space-y-4 border-t border-slate-100 pt-5">
           <div>
             <label className="mb-2 block text-sm font-bold text-slate-700">{t("rating")}</label>
-            <div className="flex gap-1">
-              {Array.from({ length: 5 }, (_, index) => {
-                const value = index + 1;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setRating(value)}
-                    aria-label={t("ratingValue", { count: value })}
-                    className="text-2xl text-amber-400"
-                  >
-                    {value <= rating ? <MdStar /> : <MdStarBorder className="text-amber-200" />}
-                  </button>
-                );
-              })}
-            </div>
+            <CircularRatingInput
+              value={rating}
+              onChange={setRating}
+              getLabel={(option) => t("ratingValue", { count: option })}
+            />
           </div>
           <input
             value={title}

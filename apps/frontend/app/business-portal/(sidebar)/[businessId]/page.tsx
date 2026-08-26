@@ -4,6 +4,7 @@ import { FiBarChart2, FiEdit, FiExternalLink, FiMessageSquare, FiStar } from "re
 import { Link } from "@/i18n/navigation";
 import { requireUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
+import { CircularRatingStars } from "@/components/ui/CircularRatingStars";
 import type { Metadata } from "next";
 
 type Props = { params: Promise<{ businessId: string }> };
@@ -112,7 +113,11 @@ export default async function BusinessPortalBusinessPage({ params }: Props) {
 
       {/* Meta info */}
       <div className="rounded-[28px] border border-slate-100 bg-slate-50 p-5 text-sm text-slate-500">
-        <p>Average rating: <strong className="text-slate-800">{business.averageRating.toFixed(1)}</strong> / 5.0</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <span>Average rating:</span>
+          <CircularRatingStars rating={business.averageRating} size="xs" />
+          <strong className="text-slate-800">{business.averageRating.toFixed(1)}</strong>
+        </div>
         <p className="mt-1">Created: <strong className="text-slate-800">{business.createdAt.toLocaleDateString()}</strong></p>
         <p className="mt-1">Last updated: <strong className="text-slate-800">{business.updatedAt.toLocaleDateString()}</strong></p>
       </div>

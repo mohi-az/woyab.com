@@ -2,9 +2,10 @@
 
 import { useLocale } from "next-intl";
 import { useState } from "react";
-import { FiAlertTriangle, FiCheck, FiExternalLink, FiImage, FiLoader, FiMapPin, FiSearch, FiStar } from "react-icons/fi";
+import { FiAlertTriangle, FiCheck, FiExternalLink, FiImage, FiLoader, FiMapPin, FiSearch } from "react-icons/fi";
 
 import type { BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
+import { CircularRatingStars } from "@/components/ui/CircularRatingStars";
 
 const MAX_GOOGLE_PHOTO_PREVIEWS = 4;
 
@@ -276,7 +277,7 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
                 </div>
                 {place.rating !== null ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-3 py-1 text-sm font-black text-amber-300">
-                    <FiStar className="fill-current" /> {place.rating.toFixed(1)} ({place.userRatingCount})
+                    <CircularRatingStars rating={place.rating} size="xs" /> {place.rating.toFixed(1)} ({place.userRatingCount})
                   </span>
                 ) : null}
               </div>
@@ -354,7 +355,10 @@ export function GooglePlaceImport({ initialPlaceId, sourceLocale, editingBusines
                         <p className="truncate text-sm font-black text-white">
                           {review.authorAttribution?.uri ? <a href={review.authorAttribution.uri} target="_blank" rel="noreferrer">{review.authorAttribution.displayName}</a> : review.authorAttribution?.displayName ?? "Google user"}
                         </p>
-                        <p className="text-xs text-amber-300">{review.rating !== null ? `${"★".repeat(Math.round(review.rating))} ${review.rating}` : ""} <span className="text-slate-500">{review.relativePublishTimeDescription}</span></p>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                          {review.rating !== null ? <><CircularRatingStars rating={review.rating} size="xs" /><span>{review.rating}</span></> : null}
+                          <span className="text-slate-500">{review.relativePublishTimeDescription}</span>
+                        </div>
                       </div>
                       {review.googleMapsUri ? <a href={review.googleMapsUri} target="_blank" rel="noreferrer" aria-label={text.source} className="text-sky-300"><FiExternalLink /></a> : null}
                     </div>

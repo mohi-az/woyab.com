@@ -71,7 +71,7 @@ test("Google cover creation reuses the reviewed photo reference and never blocks
   assert.doesNotMatch(geoRoute.match(/geoRouter\.get\("\/place-photo"[\s\S]*?\n\}\);/)?.[0] ?? "", /getPlacePhotos\(placeId\)/);
 });
 
-test("admin editing persists galleries and business details recover Google photos without local files", async () => {
+test("admin editing persists galleries and business details merge Google photos with local covers", async () => {
   const [adminPage, adminGrid, adminActions, detailData] = await Promise.all([
     frontendSource("app/admin/businesses/page.tsx"),
     frontendSource("components/admin/AdminBusinessGrid.tsx"),
@@ -87,4 +87,7 @@ test("admin editing persists galleries and business details recover Google photo
   assert.match(detailData, /isStoredGoogleCoverUrl/);
   assert.match(detailData, /google-photo-thumbnail\?maxWidth=1600/);
   assert.match(detailData, /\/google-photos\/\$\{photo\.photoReference/);
+  assert.match(detailData, /if \(business\.googlePlaceId\)/);
+  assert.doesNotMatch(detailData, /gallery\.length === 0 && business\.googlePlaceId/);
+  assert.match(detailData, /storedGoogleCover && index === 0/);
 });

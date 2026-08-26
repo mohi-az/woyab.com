@@ -3,9 +3,9 @@
 
 import { useState } from "react";
 import { FiMapPin, FiNavigation, FiStar } from "react-icons/fi";
-import { MdStar, MdStarBorder } from "react-icons/md";
 import { CategoryIcon } from "@/lib/business-categories";
 import { FavoriteButton } from "@/components/business/FavoriteButton";
+import { CircularRatingStars } from "@/components/ui/CircularRatingStars";
 import { Link } from "@/i18n/navigation";
 import { getBusinessOpenStatus, type BusinessHour } from "@/lib/business-hours";
 
@@ -35,19 +35,6 @@ export type BusinessCardProps = {
   now?: Date;
   openStatusLabels?: Record<"OPEN" | "CLOSED" | "OPEN_SOON" | "CLOSE_SOON", string>;
 };
-
-function RatingStars({ rating = 0 }: { rating?: number | null }) {
-  const safeRating = rating ?? 0;
-  const rounded = Math.max(0, Math.min(5, Math.round(safeRating)));
-
-  return (
-    <div className="flex items-center gap-0.5 text-base text-amber-400 sm:text-[1.05rem]">
-      {Array.from({ length: 5 }, (_, index) =>
-        index < rounded ? <MdStar key={index} /> : <MdStarBorder key={index} className="text-amber-300" />,
-      )}
-    </div>
-  );
-}
 
 export function BusinessCard({
   businessId,
@@ -145,7 +132,7 @@ export function BusinessCard({
 
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-slate-500">
             <div className="flex items-center gap-2">
-              <RatingStars rating={rating} />
+              <CircularRatingStars rating={rating ?? 0} size="xs" />
               <span className="font-bold text-slate-700">({(rating ?? 0).toFixed(1)})</span>
             </div>
             <span>{reviewsLabel.replace("{count}", String(reviewCount ?? 0))}</span>

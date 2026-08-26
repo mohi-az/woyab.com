@@ -8,6 +8,7 @@ import { useOptimistic, useState, useTransition } from "react";
 import { FiLoader, FiRefreshCw, FiSearch, FiTrash2, FiX } from "react-icons/fi";
 import { deleteReview, retryReviewTranslationAction, setReviewStatus } from "@/lib/admin-actions";
 import { StatusBadge } from "@/components/admin/AdminPrimitives";
+import { CircularRatingStars } from "@/components/ui/CircularRatingStars";
 
 const statuses = ["PENDING", "APPROVED", "REJECTED"] as const;
 type TranslationStatus = "NOT_REQUESTED" | "PENDING" | "PROCESSING" | "PARTIAL" | "READY" | "FAILED";
@@ -89,10 +90,6 @@ function FilterBox({ param, value, placeholder, options, onApply }: FilterBoxPro
   );
 }
 
-function Stars({ rating }: { rating: number }) {
-  return <span className="text-xs font-black text-amber-400">{"★".repeat(rating)}{"☆".repeat(5 - rating)}</span>;
-}
-
 export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: Props) {
   const t = useTranslations("Admin");
   const locale = useLocale();
@@ -129,7 +126,7 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
       render: (_, review) => (
         <div className="max-w-2xl">
           <div className="flex items-center gap-2">
-            <Stars rating={review.rating} />
+            <CircularRatingStars rating={review.rating} size="xs" />
           </div>
           {review.title ? <p className="admin-title mt-1 font-black">{review.title}</p> : null}
           <p className="admin-muted mt-1 line-clamp-2 text-sm leading-6">{review.comment || "-"}</p>
@@ -203,7 +200,7 @@ export function AdminReviewsTable({ reviews, total, page, pageSize, filters }: P
           options={[1, 2, 3, 4, 5].map((rating) => ({ value: String(rating), label: `${rating}` }))}
         />
       ),
-      render: (rating) => <Stars rating={rating} />,
+      render: (rating) => <CircularRatingStars rating={rating} size="xs" />,
     },
     {
       title: t("fields.actions"),

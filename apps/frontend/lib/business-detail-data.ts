@@ -76,12 +76,24 @@ export const fetchBusinessDetailFromDatabase = cache(
       if (!item) return null;
       return activeLocale === "fa" ? item.nameFa : item.nameEn || item.nameFa;
     };
-    const gallery = business.images.map((image) => ({
+    const gallery: BusinessDetailData["gallery"] = business.images.map((image) => ({
       id: image.id,
       imageUrl: image.imageUrl,
       caption: image.caption,
     }));
-    if (gallery.length === 0 && business.googlePlaceId && (!business.coverImageUrl || isStoredGoogleCoverUrl(business.coverImageUrl))) {
+
+    const storedGoogleCover = Boolean(business.coverImageUrl && isStoredGoogleCoverUrl(business.coverImageUrl));
+    if (business.coverImageUrl && !gallery.some((image) => image.imageUrl === business.coverImageUrl)) {
+      gallery.unshift({
+        id: `${business.id}-cover`,
+        imageUrl: business.coverImageUrl,
+        caption: localized.businessName,
+      });
+    }
+
+    // A persisted cover or a manually uploaded image must not suppress the rest
+    // of the Google gallery. Merge both sources and keep the stored cover first.
+    if (business.googlePlaceId) {
       try {
         const response = await fetch(
           `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
@@ -89,16 +101,24 @@ export const fetchBusinessDetailFromDatabase = cache(
         );
         if (response.ok) {
           const result = (await response.json()) as GooglePhotoList;
-          gallery.push(...(result.data?.photos ?? []).map((photo, index) => ({
-            id: `${business.id}-google-${index}`,
-            imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`,
-            caption: photo.htmlAttributions?.[0] ?? localized.businessName,
-            sourceUri: photo.googleMapsUri ?? null,
-            authorAttributions: photo.authorAttributions?.map((author) => ({
-              displayName: author.displayName,
-              uri: author.uri,
-            })),
-          })));
+          const existingUrls = new Set(gallery.map((image) => image.imageUrl));
+          for (const [index, photo] of (result.data?.photos ?? []).entries()) {
+            // The permanent Google cover is created from the first Places photo.
+            if (storedGoogleCover && index === 0) continue;
+            const imageUrl = `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`;
+            if (existingUrls.has(imageUrl)) continue;
+            existingUrls.add(imageUrl);
+            gallery.push({
+              id: `${business.id}-google-${index}`,
+              imageUrl,
+              caption: photo.htmlAttributions?.[0] ?? localized.businessName,
+              sourceUri: photo.googleMapsUri ?? null,
+              authorAttributions: photo.authorAttributions?.map((author) => ({
+                displayName: author.displayName,
+                uri: author.uri,
+              })),
+            });
+          }
         }
       } catch {
         // The image list is optional; the first-photo proxy below remains available.
@@ -110,12 +130,6 @@ export const fetchBusinessDetailFromDatabase = cache(
           caption: localized.businessName,
         });
       }
-    } else if (gallery.length === 0 && business.coverImageUrl) {
-      gallery.push({
-        id: `${business.id}-cover`,
-        imageUrl: business.coverImageUrl,
-        caption: localized.businessName,
-      });
     }
 
     return {

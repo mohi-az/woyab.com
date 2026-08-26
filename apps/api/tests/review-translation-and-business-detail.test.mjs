@@ -124,12 +124,13 @@ test("translation maintenance is secret-protected and processes at most twenty j
   assert.match(service, /translationLeaseExpiresAt: \{ lte: now \}/);
 });
 
-test("business detail hides empty WoYab stats and provides map, gallery, and original-text controls", async () => {
-  const [detail, gallery, map, data] = await Promise.all([
+test("business detail hides empty WoYab stats and provides resilient map, gallery, ratings, and original-text controls", async () => {
+  const [detail, gallery, map, data, ratings] = await Promise.all([
     source("apps/frontend/features/businesses/BusinessDetailClient.tsx"),
     source("apps/frontend/components/business/BusinessPhotoGallery.tsx"),
     source("apps/frontend/components/business/BusinessLocationMap.tsx"),
     source("apps/frontend/lib/business-detail-data.ts"),
+    source("apps/frontend/components/ui/CircularRatingStars.tsx"),
   ]);
 
   assert.match(detail, /business\.reviewCount > 0/);
@@ -144,8 +145,13 @@ test("business detail hides empty WoYab stats and provides map, gallery, and ori
   assert.match(gallery, /grid-cols-2/);
   assert.match(map, /map\.scrollZoom\.disable\(\)/);
   assert.match(map, /h-\[220px\].*sm:h-\[280px\]/);
+  assert.match(map, /openstreetmap\.org\/export\/embed\.html/);
+  assert.match(map, /window\.setTimeout\(showFallback, 10_000\)/);
   assert.match(data, /authorAttributions/);
   assert.match(data, /sourceUri: photo\.googleMapsUri/);
+  assert.match(ratings, /precision = 0\.5/);
+  assert.match(ratings, /safeFill \* 100/);
+  assert.match(ratings, /fill=\{filled \? "#ff9f0a" : "#a3a3a3"\}/);
 });
 
 test("initial Google Place import no longer requests review bodies", async () => {
