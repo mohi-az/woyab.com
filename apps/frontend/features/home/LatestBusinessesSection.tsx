@@ -1,14 +1,12 @@
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import LatestBusinessesCarousel from "@/features/home/LatestBusinessesCarousel";
 import { Link } from "@/i18n/navigation";
-import { fetchLatestBusinesses } from "@/lib/api";
+import type { LatestBusinessCardItem } from "@/lib/api";
 
-export default async function LatestBusinessesSection() {
-  const [locale, t] = await Promise.all([
-    getLocale(),
-    getTranslations("Home.latestBusinessesSection"),
-  ]);
-  const items = await fetchLatestBusinesses(locale);
+type Props = { items: LatestBusinessCardItem[] };
+
+export default async function LatestBusinessesSection({ items }: Props) {
+  const t = await getTranslations("Home.latestBusinessesSection");
 
   if (items.length === 0) {
     return null;

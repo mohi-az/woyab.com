@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { fetchCategoryCounts } from "@/lib/api";
 import { FEATURED_CATEGORIES } from "@/lib/business-categories";
 
-export default async function CategoriesSection() {
-  const counts = await fetchCategoryCounts();
+type Props = { counts: Record<number, number> };
+
+export default async function CategoriesSection({ counts }: Props) {
   const t = await getTranslations("Home.categoriesSection");
 
   return (
