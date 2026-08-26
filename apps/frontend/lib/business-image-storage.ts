@@ -181,5 +181,6 @@ export async function resolvePermanentBusinessCover(input: {
   }
 
   // An external image outage must not roll back an otherwise valid business.
-  return persistFirstGooglePlacePhoto(input.googlePlaceId, input.googlePhotoReference).catch(() => null);
+  return persistFirstGooglePlacePhoto(input.googlePlaceId, input.googlePhotoReference)
+    .catch(() => existingCover && !isGoogleProxyImageUrl(existingCover) ? existingCover : null);
 }

@@ -64,8 +64,26 @@ test("Google cover creation reuses the reviewed photo reference and never blocks
 
   assert.match(adminActions, /googlePhotoReference: nullableValue\(formData, "googlePhotoReference"\)/);
   assert.match(storage, /preferredPhotoReference/);
-  assert.match(storage, /persistFirstGooglePlacePhoto\(input\.googlePlaceId, input\.googlePhotoReference\)\.catch\(\(\) => null\)/);
+  assert.match(storage, /persistFirstGooglePlacePhoto\(input\.googlePlaceId, input\.googlePhotoReference\)[\s\S]*\.catch\(\(\) => existingCover/);
   assert.match(placesService, /photoReferenceBelongsToPlace/);
   assert.match(geoRoute, /photoReferenceBelongsToPlace\(ref, placeId\)/);
   assert.doesNotMatch(geoRoute.match(/geoRouter\.get\("\/place-photo"[\s\S]*?\n\}\);/)?.[0] ?? "", /getPlacePhotos\(placeId\)/);
+});
+
+test("admin editing persists galleries and business details recover Google photos without local files", async () => {
+  const [adminPage, adminGrid, adminActions, detailData] = await Promise.all([
+    frontendSource("app/admin/businesses/page.tsx"),
+    frontendSource("components/admin/AdminBusinessGrid.tsx"),
+    frontendSource("lib/admin-actions.ts"),
+    frontendSource("lib/business-detail-data.ts"),
+  ]);
+
+  assert.match(adminPage, /images:\s*\{[\s\S]*orderBy:\s*\{ sortOrder: "asc" \}/);
+  assert.match(adminGrid, /<BusinessImageManager/);
+  assert.match(adminGrid, /businessWizard\.media/);
+  assert.match(adminActions, /updateBusinessDetails[\s\S]*businessImage\.deleteMany/);
+  assert.match(adminActions, /businessImage\.createMany/);
+  assert.match(detailData, /isStoredGoogleCoverUrl/);
+  assert.match(detailData, /google-photo-thumbnail\?maxWidth=1600/);
+  assert.match(detailData, /\/google-photos\/\$\{photo\.photoReference/);
 });

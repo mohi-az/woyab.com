@@ -21,6 +21,8 @@ type Props = {
   googlePhotos: GooglePlacePhoto[];
   googlePhotosStatus: "idle" | "loading" | "ready" | "empty" | "error";
   imageMode: ImageMode;
+  initialImages?: string[];
+  initialCoverUrl?: string;
   onImageModeChange: (mode: ImageMode) => void;
   onManualImagesChange: (urls: string[], coverUrl?: string) => void;
 };
@@ -89,14 +91,18 @@ export function BusinessImageManager({
   googlePhotos,
   googlePhotosStatus,
   imageMode,
+  initialImages = [],
+  initialCoverUrl,
   onImageModeChange,
   onManualImagesChange,
 }: Props) {
   const t = copy(locale);
   const inputRef = useRef<HTMLInputElement>(null);
   const draggedIndexRef = useRef<number | null>(null);
-  const [images, setImages] = useState<string[]>([]);
-  const [coverUrl, setCoverUrl] = useState<string>();
+  const [images, setImages] = useState<string[]>(initialImages);
+  const [coverUrl, setCoverUrl] = useState<string | undefined>(
+    initialCoverUrl && initialImages.includes(initialCoverUrl) ? initialCoverUrl : initialImages[0],
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
 
@@ -144,6 +150,9 @@ export function BusinessImageManager({
   return (
     <div className="grid gap-5">
       <input type="hidden" name="imageMode" value={imageMode} />
+      {imageMode === "google" && googlePhotos[0] ? (
+        <input type="hidden" name="googlePhotoReference" value={googlePhotos[0].photoReference} />
+      ) : null}
       <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 sm:grid-cols-2">
         <button
           type="button"

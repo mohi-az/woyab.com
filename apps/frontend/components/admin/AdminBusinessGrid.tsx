@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Collapse, ConfigProvider, Modal } from "antd";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { FiAlertCircle, FiCheck, FiClock, FiCpu, FiEdit3, FiEye, FiGlobe, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
+import { FiAlertCircle, FiCheck, FiClock, FiCpu, FiEdit3, FiEye, FiGlobe, FiImage, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
 import { setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
@@ -15,6 +15,7 @@ import { AiBusinessImportModal, type AiBusinessImportApplication, type AiImportS
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
 import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor, type BusinessHourValue } from "@/components/dashboard/BusinessHoursEditor";
+import { BusinessImageManager, type GooglePlacePhoto } from "@/components/dashboard/BusinessImageManager";
 import { BusinessLocationPicker } from "@/components/location/BusinessLocationPicker";
 import type { BusinessAttributeDefinition, BusinessAttributeValue } from "@/lib/business-attributes";
 import type { BusinessTagOption, BusinessTagValue } from "@/lib/business-tags";
@@ -98,6 +99,8 @@ export type AdminBusinessRow = {
   attributes: BusinessAttributeValue[];
   tags: BusinessTagValue[];
   googlePlaceId: string | null;
+  coverImageUrl: string | null;
+  images: Array<{ imageUrl: string }>;
 };
 
 type Props = {
@@ -216,8 +219,16 @@ function stepForField(field: string) {
   if (["slug", "sourceLocale", "status", "categoryId", "cityId"].includes(field)) return 0;
   if (field.startsWith("businessName_")) return 1;
   if (field.startsWith("attribute_") || field === "tagIds") return 2;
-  if (field.startsWith("hours_")) return 4;
+  if (field === "coverImageUrl" || field === "imageUrl") return 3;
+  if (field.startsWith("hours_")) return 5;
   return 0;
+}
+
+function isStoredGoogleCover(imageUrl: string | null | undefined) {
+  return Boolean(imageUrl && (
+    imageUrl.startsWith("/media/businesses/google-place-")
+    || imageUrl.startsWith("/uploads/businesses/google-place-")
+  ));
 }
 
 function requiredLabel(label: string) {
@@ -293,6 +304,10 @@ export function AdminBusinessGrid({
   const [locationDraft, setLocationDraft] = useState<{ address: string; latitude: number | null; longitude: number | null }>({ address: "", latitude: null, longitude: null });
   const [hoursDraft, setHoursDraft] = useState<BusinessHourValue[]>([]);
   const [googlePhotoReferenceDraft, setGooglePhotoReferenceDraft] = useState("");
+  const [googlePlaceIdDraft, setGooglePlaceIdDraft] = useState("");
+  const [googlePhotos, setGooglePhotos] = useState<GooglePlacePhoto[]>([]);
+  const [googlePhotosStatus, setGooglePhotosStatus] = useState<"idle" | "loading" | "ready" | "empty" | "error">("idle");
+  const [imageMode, setImageMode] = useState<"google" | "manual">("google");
   const [attributeDefinitionDrafts, setAttributeDefinitionDrafts] = useState(attributeDefinitions);
   const [quickAttributeOpen, setQuickAttributeOpen] = useState(false);
   const [quickAttributeLabels, setQuickAttributeLabels] = useState({ labelFa: "", labelEn: "", labelDe: "" });
@@ -337,6 +352,7 @@ export function AdminBusinessGrid({
     t("businessWizard.identity"),
     t("businessWizard.translations"),
     `${t("businessWizard.features")} / ${t("businessWizard.tags")}`,
+    t("businessWizard.media"),
     t("businessWizard.location"),
     t("businessWizard.hours"),
   ];
@@ -351,6 +367,36 @@ export function AdminBusinessGrid({
       .filter((attributeId) => !baseAttributeValues.some((item) => item.attributeId === attributeId))
       .map((attributeId) => ({ attributeId, value: "true" })),
   ];
+
+  useEffect(() => {
+    const placeId = googlePlaceIdDraft.trim();
+    if (placeId.length < 6) return;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      setGooglePhotosStatus("loading");
+      try {
+        const response = await fetch(`/api/place-photos/${encodeURIComponent(placeId)}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("place-photos");
+        const result = (await response.json()) as { data?: { photos?: GooglePlacePhoto[] } };
+        const photos = result.data?.photos ?? [];
+        setGooglePhotos(photos);
+        setGooglePhotosStatus(photos.length ? "ready" : "empty");
+      } catch (error) {
+        if ((error as Error).name === "AbortError") return;
+        setGooglePhotos([]);
+        setGooglePhotosStatus("error");
+      }
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [googlePlaceIdDraft]);
 
   function resetQuickAttributeEditor() {
     setQuickAttributeOpen(false);
@@ -392,7 +438,7 @@ export function AdminBusinessGrid({
 
   function changeWizardStep(step: number) {
     setWizardStep(step);
-    if (step === 3) setLocationPickerMounted(true);
+    if (step === 4) setLocationPickerMounted(true);
   }
 
   function stepHasError(step: number) {
@@ -442,6 +488,10 @@ export function AdminBusinessGrid({
     setLocationDraft({ address: "", latitude: null, longitude: null });
     setHoursDraft([]);
     setGooglePhotoReferenceDraft("");
+    setGooglePlaceIdDraft("");
+    setGooglePhotos([]);
+    setGooglePhotosStatus("idle");
+    setImageMode("google");
     setImportVersion(0);
     setAiApplication(null);
     resetQuickAttributeEditor();
@@ -464,6 +514,10 @@ export function AdminBusinessGrid({
     setLocationDraft({ address: "", latitude: null, longitude: null });
     setHoursDraft([]);
     setGooglePhotoReferenceDraft("");
+    setGooglePlaceIdDraft("");
+    setGooglePhotos([]);
+    setGooglePhotosStatus("idle");
+    setImageMode("google");
     setImportVersion(0);
     setAiApplication(null);
     resetQuickAttributeEditor();
@@ -505,6 +559,8 @@ export function AdminBusinessGrid({
         ? String((firstGooglePhoto as Record<string, unknown>).photoReference)
         : "",
     );
+    setGooglePlaceIdDraft(application.placeId);
+    setImageMode("google");
     setImportVersion((version) => version + 1);
     resetQuickAttributeEditor();
   }
@@ -530,6 +586,12 @@ export function AdminBusinessGrid({
     });
     setHoursDraft(business.businessHours);
     setGooglePhotoReferenceDraft("");
+    setGooglePlaceIdDraft(business.googlePlaceId ?? "");
+    setImageMode(
+      business.images.length > 0 || (business.coverImageUrl && !isStoredGoogleCover(business.coverImageUrl))
+        ? "manual"
+        : "google",
+    );
     setImportVersion(0);
     setAiApplication(null);
     resetQuickAttributeEditor();
@@ -578,6 +640,7 @@ export function AdminBusinessGrid({
     setFormField("googleRating", place.rating);
     setFormField("googleUserRatingCount", place.userRatingCount);
     setGooglePhotoReferenceDraft(place.photos[0]?.photoReference ?? "");
+    setGooglePlaceIdDraft(place.placeId);
 
     const detectedSourceLocale = googleSourceLocale(place.displayNameLanguageCode) ?? sourceLocaleDraft;
     setSourceLocaleDraft(detectedSourceLocale);
@@ -905,7 +968,7 @@ export function AdminBusinessGrid({
             <form key={`business-form-${editing?.id ?? "new"}-${formResetVersion}`} ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {creating && aiApplication ? <input type="hidden" name="aiImportId" value={aiApplication.draftId} /> : null}
-              {creating && googlePhotoReferenceDraft ? <input type="hidden" name="googlePhotoReference" value={googlePhotoReferenceDraft} /> : null}
+              {googlePhotoReferenceDraft ? <input type="hidden" name="googlePhotoReference" value={googlePhotoReferenceDraft} /> : null}
               {!locationPickerMounted ? (
                 <>
                   <input type="hidden" name="latitude" value={locationDraft.latitude ?? ""} />
@@ -925,6 +988,7 @@ export function AdminBusinessGrid({
                       FiInfo,
                       FiGlobe,
                       FiTag,
+                      FiImage,
                       FiMapPin,
                       FiClock,
                     ][index] || FiInfo;
@@ -1164,8 +1228,30 @@ export function AdminBusinessGrid({
                   </div>
                 </section>
 
-                {/* Step 3: Location */}
+                {/* Step 3: Media */}
                 <section className={wizardStep === 3 ? "grid gap-4" : "hidden"}>
+                  <div className="admin-wizard-card-group flex flex-col gap-4">
+                    <h3 className="admin-wizard-card-title">{t("businessWizard.media")}</h3>
+                    <BusinessImageManager
+                      key={`business-images-${editing?.id ?? aiApplication?.draftId ?? "new"}-${formResetVersion}`}
+                      locale={locale}
+                      googlePlaceId={googlePlaceIdDraft}
+                      googlePhotos={googlePhotos}
+                      googlePhotosStatus={googlePhotosStatus}
+                      imageMode={imageMode}
+                      initialImages={editing ? [...new Set([
+                        ...editing.images.map((image) => image.imageUrl),
+                        ...(editing.coverImageUrl ? [editing.coverImageUrl] : []),
+                      ])] : []}
+                      initialCoverUrl={editing?.coverImageUrl ?? undefined}
+                      onImageModeChange={setImageMode}
+                      onManualImagesChange={() => undefined}
+                    />
+                  </div>
+                </section>
+
+                {/* Step 4: Location */}
+                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
                     <h3 className="admin-wizard-card-title">{t("location.title")}</h3>
                     {locationPickerMounted ? (
@@ -1179,8 +1265,8 @@ export function AdminBusinessGrid({
                   </div>
                 </section>
 
-                {/* Step 4: Hours */}
-                <section className={wizardStep === 4 ? "grid gap-4" : "hidden"}>
+                {/* Step 5: Hours */}
+                <section className={wizardStep === 5 ? "grid gap-4" : "hidden"}>
                   <div className="admin-wizard-card-group flex flex-col gap-4">
                     <h3 className="admin-wizard-card-title">{tHours("title")}</h3>
                     <BusinessHoursEditor key={`hours-${editing?.id ?? "new"}-${importVersion}`} variant="admin" defaultHours={hoursDraft} />

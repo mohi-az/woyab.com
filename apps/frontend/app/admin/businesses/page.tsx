@@ -74,6 +74,10 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
           orderBy: { dayOfWeek: "asc" },
           select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true },
         },
+        images: {
+          orderBy: { sortOrder: "asc" },
+          select: { imageUrl: true },
+        },
         translations: { select: { locale: true, businessName: true, shortDescription: true, description: true } },
         attributes: {
           select: businessAttributeValueSelect,
@@ -173,6 +177,8 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     attributes: business.attributes,
     tags: business.tags,
     googlePlaceId: business.googlePlaceId,
+    coverImageUrl: business.coverImageUrl,
+    images: business.images,
   }));
 
   const ownerMap = new Map<string, { id: string; name: string | null; email: string | null; role: string }>();

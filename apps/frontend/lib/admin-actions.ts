@@ -102,6 +102,13 @@ function businessContactData(formData: FormData) {
   return parsed.data;
 }
 
+function stringValues(formData: FormData, key: string) {
+  return [...new Set(formData.getAll(key)
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.trim())
+    .filter(Boolean))];
+}
+
 function businessProfileData(formData: FormData) {
   const establishedYear = intValue(formData, "establishedYear");
   const priceRange = value(formData, "priceRange");
@@ -460,6 +467,8 @@ export async function updateBusinessDetails(formData: FormData) {
   const specialtyIds = intValues(formData, "specialtyIds");
   const ownerId = nullableValue(formData, "ownerId");
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
+  const imageMode = value(formData, "imageMode");
+  const imageUrls = stringValues(formData, "imageUrl");
   const contact = businessContactData(formData);
   const profile = businessProfileData(formData);
   const googleRatings = googleRatingData(formData);
@@ -487,12 +496,17 @@ export async function updateBusinessDetails(formData: FormData) {
     select: { coverImageUrl: true, googlePlaceId: true },
   });
   if (!currentBusiness) throw new Error("Business not found.");
-  const coverImageUrl = await resolvePermanentBusinessCover({
-    googlePlaceId,
-    requestedCoverImageUrl: nullableValue(formData, "coverImageUrl"),
-    existingCoverImageUrl: currentBusiness.coverImageUrl,
-    refreshGoogleCover: currentBusiness.googlePlaceId !== googlePlaceId,
-  });
+  const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
+  const coverImageUrl = imageMode === "manual"
+    ? requestedCoverImageUrl
+    : await resolvePermanentBusinessCover({
+        googlePlaceId,
+        googlePhotoReference: nullableValue(formData, "googlePhotoReference"),
+        requestedCoverImageUrl,
+        existingCoverImageUrl: currentBusiness.coverImageUrl,
+        refreshGoogleCover: imageMode === "google" || currentBusiness.googlePlaceId !== googlePlaceId,
+        useGoogleWhenMissing: true,
+      });
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
     locale,
@@ -570,6 +584,12 @@ export async function updateBusinessDetails(formData: FormData) {
     await syncBusinessTags(tx, businessId, formData);
     await syncBusinessSpecialties(tx, businessId, specialtyIds);
     await syncBusinessHours(tx, businessId, formData);
+    await tx.businessImage.deleteMany({ where: { businessId } });
+    if (imageMode === "manual" && imageUrls.length > 0) {
+      await tx.businessImage.createMany({
+        data: imageUrls.map((imageUrl, sortOrder) => ({ businessId, imageUrl, sortOrder })),
+      });
+    }
     if (ownerId) await promoteUserToOwner(tx, ownerId);
   });
 
@@ -587,6 +607,8 @@ export async function createBusinessDetails(formData: FormData) {
   const cityId = intValue(formData, "cityId");
   const ownerId = nullableValue(formData, "ownerId");
   const googlePlaceId = nullableValue(formData, "googlePlaceId");
+  const imageMode = value(formData, "imageMode");
+  const imageUrls = stringValues(formData, "imageUrl");
   const contact = businessContactData(formData);
   const profile = businessProfileData(formData);
   const googleRatings = googleRatingData(formData);
@@ -612,11 +634,15 @@ export async function createBusinessDetails(formData: FormData) {
     if (duplicatePlace) throw new Error(`This Google Place ID already belongs to ${duplicatePlace.businessName}.`);
   }
 
-  const coverImageUrl = await resolvePermanentBusinessCover({
-    googlePlaceId,
-    googlePhotoReference: nullableValue(formData, "googlePhotoReference"),
-    requestedCoverImageUrl: nullableValue(formData, "coverImageUrl"),
-  });
+  const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
+  const coverImageUrl = imageMode === "manual"
+    ? requestedCoverImageUrl
+    : await resolvePermanentBusinessCover({
+        googlePlaceId,
+        googlePhotoReference: nullableValue(formData, "googlePhotoReference"),
+        requestedCoverImageUrl,
+        useGoogleWhenMissing: true,
+      });
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
     locale,
@@ -685,6 +711,9 @@ export async function createBusinessDetails(formData: FormData) {
         businessHours: {
           create: businessHoursCreateData(formData),
         },
+        images: imageMode === "manual" && imageUrls.length > 0 ? {
+          create: imageUrls.map((imageUrl, sortOrder) => ({ imageUrl, sortOrder })),
+        } : undefined,
         translations: {
           create: translations.map((translation) => ({
             locale: translation.locale,

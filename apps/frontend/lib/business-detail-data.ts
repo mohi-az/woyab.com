@@ -3,8 +3,20 @@ import "server-only";
 import { cache } from "react";
 import type { AppLocale } from "@/i18n/config";
 import type { BusinessDetailData, BusinessReviewItem } from "@/lib/api";
+import { isStoredGoogleCoverUrl } from "@/lib/business-image-storage";
 import { localizeBusinessContent } from "@/lib/business-localization";
 import { prisma } from "@/lib/prisma";
+
+const API_BASE = process.env.API_URL ?? "http://localhost:4000";
+
+type GooglePhotoList = {
+  data?: {
+    photos?: Array<{
+      photoReference: string;
+      htmlAttributions?: string[];
+    }>;
+  };
+};
 
 function appLocale(locale: string): AppLocale {
   return locale === "fa" || locale === "en" ? locale : "de";
@@ -64,7 +76,31 @@ export const fetchBusinessDetailFromDatabase = cache(
       imageUrl: image.imageUrl,
       caption: image.caption,
     }));
-    if (gallery.length === 0 && business.coverImageUrl) {
+    if (gallery.length === 0 && business.googlePlaceId && (!business.coverImageUrl || isStoredGoogleCoverUrl(business.coverImageUrl))) {
+      try {
+        const response = await fetch(
+          `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
+          { cache: "no-store" },
+        );
+        if (response.ok) {
+          const result = (await response.json()) as GooglePhotoList;
+          gallery.push(...(result.data?.photos ?? []).map((photo, index) => ({
+            id: `${business.id}-google-${index}`,
+            imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`,
+            caption: photo.htmlAttributions?.[0] ?? localized.businessName,
+          })));
+        }
+      } catch {
+        // The image list is optional; the first-photo proxy below remains available.
+      }
+      if (gallery.length === 0) {
+        gallery.push({
+          id: `${business.id}-google-cover`,
+          imageUrl: `/api/businesses/${encodeURIComponent(business.id)}/google-photo-thumbnail?maxWidth=1600`,
+          caption: localized.businessName,
+        });
+      }
+    } else if (gallery.length === 0 && business.coverImageUrl) {
       gallery.push({
         id: `${business.id}-cover`,
         imageUrl: business.coverImageUrl,
