@@ -71,6 +71,8 @@ const businessCardSelect = {
   featured: true,
   averageRating: true,
   reviewCount: true,
+  googleRating: true,
+  googleUserRatingCount: true,
   priceRange: true,
   createdAt: true,
   updatedAt: true,

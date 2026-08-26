@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import BusinessDetailClient from "@/features/businesses/BusinessDetailClient";
-import { fetchBusinessBySlug, fetchBusinessReviews } from "@/lib/api";
+import {
+  fetchBusinessDetailFromDatabase,
+  fetchBusinessReviewsFromDatabase,
+} from "@/lib/business-detail-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 type PageProps = {
@@ -12,7 +15,7 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
-  const business = await fetchBusinessBySlug(locale, slug);
+  const business = await fetchBusinessDetailFromDatabase(locale, slug);
 
   if (!business) {
     return {};
@@ -42,13 +45,13 @@ export default async function BusinessDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const locale = await getLocale();
   const t = await getTranslations("BusinessDetail");
-  const business = await fetchBusinessBySlug(locale, slug);
+  const business = await fetchBusinessDetailFromDatabase(locale, slug);
 
   if (!business) {
     notFound();
   }
 
-  const reviews = await fetchBusinessReviews(business.id);
+  const reviews = await fetchBusinessReviewsFromDatabase(business.id);
 
   return (
     <>

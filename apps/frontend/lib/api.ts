@@ -34,6 +34,8 @@ type BusinessApiItem = {
   isFallback?: boolean;
   averageRating?: number | null;
   reviewCount?: number | null;
+  googleRating?: number | null;
+  googleUserRatingCount?: number | null;
   featured?: boolean;
   businessHours?: BusinessHourItem[];
   category?: {
@@ -488,8 +490,8 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       categoryName: getLocalizedName(locale, business.category),
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
-      rating: business.averageRating ?? 0,
-      reviewCount: business.reviewCount ?? 0,
+      rating: business.googleRating ?? business.averageRating ?? 0,
+      reviewCount: business.googleUserRatingCount ?? business.reviewCount ?? 0,
       location: getLocalizedName(locale, business.city),
       featured: booleanFlag(business.featured),
       googlePlaceId: business.googlePlaceId,
@@ -551,8 +553,8 @@ export async function fetchBusinessDirectory(
         categoryName: getLocalizedName(locale, business.category),
         categorySlug: business.category?.slug,
         categoryIconKey: business.category?.icon,
-        rating: business.averageRating ?? 0,
-        reviewCount: business.reviewCount ?? 0,
+        rating: business.googleRating ?? business.averageRating ?? 0,
+        reviewCount: business.googleUserRatingCount ?? business.reviewCount ?? 0,
         location: localizedBusinessLocation(locale, business),
         distanceMeters: business.distanceMeters,
         matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
@@ -624,8 +626,8 @@ export async function searchBusinessDirectory(
       categoryName: getLocalizedName(locale, business.category),
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
-      rating: business.averageRating ?? 0,
-      reviewCount: business.reviewCount ?? 0,
+      rating: business.googleRating ?? business.averageRating ?? 0,
+      reviewCount: business.googleUserRatingCount ?? business.reviewCount ?? 0,
       location: localizedBusinessLocation(locale, business),
       distanceMeters: business.distanceMeters,
       matchedLocationName: business.matchedLocation?.type === "BRANCH" ? business.matchedLocation.name : null,
