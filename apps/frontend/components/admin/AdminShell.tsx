@@ -108,8 +108,8 @@ export function AdminShell({ user, children, initialTheme }: {
         )}
       >
         <div className="admin-sidebar-border flex h-[70px] items-center justify-between border-b px-5">
-          <Link href="/admin" className="rounded-lg bg-white px-2 py-1" aria-label="WoYab">
-            <BrandLogo className="h-9 max-w-[7.5rem]" priority />
+          <Link href="/admin" aria-label="WoYab">
+            <BrandLogo variant={dark ? "white" : "black"} className="h-9 max-w-[7.5rem]" priority />
           </Link>
           <button type="button" className="admin-icon-button rounded-lg p-2 lg:hidden" onClick={() => setSidebarOpen(false)} aria-label={t("shell.closeMenu")}>
             <FiX className="h-5 w-5" />

@@ -19,8 +19,8 @@ export default async function Footer() {
 
       <div className="relative mx-auto grid max-w-7xl gap-x-12 gap-y-10 px-5 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.45fr_.8fr_1fr_1fr] lg:py-16">
         <div>
-          <Link href={href("/")} className="inline-flex rounded-xl bg-white px-3 py-2" aria-label="WoYab">
-            <BrandLogo className="h-11 max-w-[8.5rem]" />
+          <Link href={href("/")} className="inline-flex" aria-label="WoYab">
+            <BrandLogo variant="white" className="h-11 max-w-[8.5rem]" />
           </Link>
           <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">{t("description")}</p>
         </div>

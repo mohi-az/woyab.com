@@ -138,9 +138,11 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between lg:h-[4.75rem]">
           <Link href="/" className="flex flex-shrink-0 items-center" aria-label="WoYab">
-            <span className={cn("rounded-xl transition-colors", isOverlay && "bg-white/95 px-2 py-1 shadow-sm")}>
-              <BrandLogo className="h-9 max-w-[7.5rem] sm:h-10 sm:max-w-[8.5rem]" priority />
-            </span>
+            <BrandLogo
+              variant={isOverlay ? "white" : "black"}
+              className="h-9 max-w-[7.5rem] transition-opacity sm:h-10 sm:max-w-[8.5rem]"
+              priority
+            />
           </Link>
 
           <nav className="hidden items-center gap-7 lg:flex" aria-label={t("navigationLabel")}>

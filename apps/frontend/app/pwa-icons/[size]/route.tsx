@@ -31,7 +31,7 @@ export async function GET(
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#ffffff",
+          background: "transparent",
         }}
       >
         {/* ImageResponse supports ArrayBuffer sources for local images, while
