@@ -26,6 +26,7 @@ const PLACE_IMPORT_FIELD_MASK = [
   "businessStatus",
   "primaryType",
   "primaryTypeDisplayName",
+  "editorialSummary",
   "rating",
   "userRatingCount",
   "regularOpeningHours",
@@ -68,6 +69,7 @@ type GooglePlaceResponse = {
   businessStatus?: string;
   primaryType?: string;
   primaryTypeDisplayName?: GoogleLocalizedText;
+  editorialSummary?: GoogleLocalizedText;
   rating?: number;
   userRatingCount?: number;
   regularOpeningHours?: {
@@ -321,6 +323,12 @@ export async function getPlaceImportPreview(placeId: string, languageCode: "de" 
     businessStatus: place.businessStatus ?? null,
     primaryType: place.primaryType ?? null,
     primaryTypeLabel: place.primaryTypeDisplayName?.text ?? null,
+    editorialSummary: place.editorialSummary?.text?.trim()
+      ? {
+          text: place.editorialSummary.text.trim(),
+          languageCode: place.editorialSummary.languageCode ?? null,
+        }
+      : null,
     rating: place.rating ?? null,
     userRatingCount: place.userRatingCount ?? 0,
     hours: normalizedHours(place),

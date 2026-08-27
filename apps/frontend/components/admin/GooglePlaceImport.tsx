@@ -32,6 +32,7 @@ export type GooglePlaceImportData = {
   businessStatus: string | null;
   primaryType: string | null;
   primaryTypeLabel: string | null;
+  editorialSummary: { text: string; languageCode: string | null } | null;
   rating: number | null;
   userRatingCount: number;
   hours: BusinessHourValue[];

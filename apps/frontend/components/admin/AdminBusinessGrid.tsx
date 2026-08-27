@@ -1146,6 +1146,7 @@ export function AdminBusinessGrid({
                         const translation = translationValues[locale];
                         return {
                           key: locale,
+                          forceRender: true,
                           label: (
                             <span className={errors[`businessName_${locale}`] ? "text-rose-400 font-bold" : ""}>
                               {locale === "FA" ? "Farsi / فارسی" : locale === "DE" ? "German / آلمانی" : "English / انگلیسی"}

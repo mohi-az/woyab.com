@@ -166,4 +166,5 @@ test("initial Google Place import no longer requests review bodies", async () =>
   const places = await source("apps/api/src/modules/businesses/google-places.service.ts");
   const mask = places.match(/const PLACE_IMPORT_FIELD_MASK = \[([\s\S]*?)\];/)?.[1] ?? "";
   assert.doesNotMatch(mask, /"reviews"/);
+  assert.match(mask, /"editorialSummary"/);
 });
