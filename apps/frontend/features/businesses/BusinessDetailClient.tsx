@@ -533,20 +533,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               ) : null}
             </div>
 
-            {activeImage?.sourceUri || activeImage?.authorAttributions?.length ? (
-              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 px-4 py-2 text-xs text-slate-500">
-                <span>
-                  {activeImage.authorAttributions?.map((author, index) => (
-                    <span key={`${author.displayName}-${index}`}>
-                      {author.uri ? <a href={author.uri} target="_blank" rel="noreferrer" className="font-bold hover:text-primary">{author.displayName}</a> : author.displayName}
-                      {index < (activeImage.authorAttributions?.length ?? 0) - 1 ? ", " : ""}
-                    </span>
-                  ))}
-                </span>
-                {activeImage.sourceUri ? <a href={activeImage.sourceUri} target="_blank" rel="noreferrer" className="font-black text-primary hover:underline">Google Maps</a> : null}
-              </div>
-            ) : null}
-
           </section>
 
           <section className="rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5">
@@ -919,7 +905,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                   <FiSliders className="text-lg" />
                 </span>
-                <h2 className="leading-none text-2xl font-black text-slate-950">{locale === "fa" ? "امکانات" : locale === "de" ? "Ausstattung" : "Amenities"}</h2>
+                <h2 className="leading-none text-2xl font-black text-slate-950">{locale === "fa" ? "امکانات و موارد بیشتر" : locale === "de" ? "Ausstattung und mehr" : "Amenities and More"}</h2>
               </div>
 
               <div className="mt-5 grid gap-3">

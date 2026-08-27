@@ -144,8 +144,11 @@ test("business detail hides empty WoYab stats and provides resilient map, galler
   assert.match(gallery, /document\.body\.style\.overflow = "hidden"/);
   assert.match(gallery, /event\.key === "Escape"/);
   assert.match(gallery, /grid-cols-2/);
+  assert.match(gallery, /authorAttributions/);
+  assert.match(gallery, /Google Maps/);
   assert.match(map, /map\.scrollZoom\.disable\(\)/);
   assert.match(map, /h-\[220px\].*sm:h-\[280px\]/);
+  assert.match(map, /ref=\{containerRef\} className="h-full w-full"/);
   assert.match(map, /openstreetmap\.org\/export\/embed\.html/);
   assert.match(map, /window\.setTimeout\(showFallback, 10_000\)/);
   assert.doesNotMatch(map, /map\.once\("error"/);
@@ -155,6 +158,8 @@ test("business detail hides empty WoYab stats and provides resilient map, galler
   assert.match(ratings, /safeFill \* 100/);
   assert.match(ratings, /fill=\{filled \? "#ff9f0a" : "#a3a3a3"\}/);
   assert.match(detail, /stats\.googleRating[\s\S]*CircularRatingStars rating=\{business\.googleRating\}/);
+  assert.match(detail, /Amenities and More/);
+  assert.doesNotMatch(detail, /activeImage\.authorAttributions|activeImage\.sourceUri/);
 });
 
 test("initial Google Place import no longer requests review bodies", async () => {

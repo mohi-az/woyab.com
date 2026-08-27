@@ -105,7 +105,7 @@ export function BusinessLocationMap({ latitude, longitude, title, address, direc
         </a>
       </div>
       <div className="relative h-[220px] bg-slate-100 sm:h-[280px]">
-        <div ref={containerRef} className="absolute inset-0" aria-label={`${labels.title}: ${title}`} />
+        <div ref={containerRef} className="h-full w-full" aria-label={`${labels.title}: ${title}`} />
         {state === "loading" ? <div className="absolute inset-0 grid place-items-center bg-slate-100 text-sm font-bold text-slate-500">{labels.loading}</div> : null}
         {state === "fallback" ? (
           <div className="absolute inset-0 bg-slate-100">
