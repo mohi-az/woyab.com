@@ -22,23 +22,29 @@ export const viewport: Viewport = {
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
 
+
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: "WoYab — Persischsprachige Unternehmen in Deutschland",
+    default: "WoYab — Alles in deiner Nähe. Für deine Community",
     template: "%s | WoYab",
   },
   description:
-    "WoYab ist das umfassende Verzeichnis persischsprachiger Unternehmen in Deutschland. Finden Sie Restaurants, Ärzte, Anwälte, Supermärkte und viele weitere persische Dienstleistungen in Ihrer Nähe.",
+    "WoYab: Alles in deiner Nähe. Für deine Community. Das umfassende Verzeichnis persischsprachiger (iranischer & afghanischer) Unternehmen, Ärzte, Restaurants und Dienstleistungen in Deutschland.",
   keywords: [
-    "Persian-speaking businesses Germany",
-    "persischsprachige Unternehmen Deutschland",
-    "کسب‌وکار فارسی‌زبان آلمان",
-    "Persian directory",
     "WoYab",
-    "persischsprachige Restaurants",
-    "persischsprachige Ärzte",
-    "persische Dienstleistungen",
+    "WoYab App",
+    "persischsprachige Unternehmen Deutschland",
+    "iranische Unternehmen Deutschland",
+    "afghanische Unternehmen Deutschland",
+    "persische Ärzte Deutschland",
+    "کسب‌وکار فارسی‌زبان آلمان",
+    "کسب و کار افغانستانی در آلمان",
+    "کسب و کار ایرانی در آلمان",
+    "نیازمندی های آلمان",
+    "Persian-speaking businesses Germany",
+    "Afghan directory Germany",
+    "Iranian directory Germany",
   ],
   authors: [{ name: "WoYab" }],
   creator: "WoYab",
@@ -57,18 +63,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "WoYab",
-    title: "WoYab — Iranische Unternehmen in Deutschland",
+    title: "WoYab — Persischsprachige Unternehmen in Deutschland",
     description:
-      "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland. Restaurants, Ärzte, Anwälte und mehr.",
+      "Das umfassende Verzeichnis persischsprachiger (iranischer & afghanischer) Unternehmen in Deutschland. Restaurants, Ärzte, Anwälte und mehr.",
     locale: "de_DE",
     alternateLocale: ["en_US", "fa_IR"],
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "WoYab — Iranische Unternehmen in Deutschland",
+    title: "WoYab — Persischsprachige Unternehmen in Deutschland",
     description:
-      "Das umfassende Verzeichnis iranischer Unternehmen in Deutschland.",
+      "Das umfassende Verzeichnis persischsprachiger (iranischer & afghanischer) Unternehmen in Deutschland.",
   },
   alternates: {
     canonical: "/",
@@ -86,12 +92,12 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false },
   icons: {
     icon: [
-      { url: "/pwa-icons/32", sizes: "32x32", type: "image/png" },
-      { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
+      { url: "/pwa-icons/32.png", sizes: "32x32", type: "image/png" },
+      { url: "/pwa-icons/192.png", sizes: "192x192", type: "image/png" },
     ],
     apple: [
-      { url: "/pwa-icons/152", sizes: "152x152", type: "image/png" },
-      { url: "/pwa-icons/180", sizes: "180x180", type: "image/png" },
+      { url: "/pwa-icons/152.png", sizes: "152x152", type: "image/png" },
+      { url: "/pwa-icons/180.png", sizes: "180x180", type: "image/png" },
     ],
   },
 };
