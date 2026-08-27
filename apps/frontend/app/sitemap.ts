@@ -1,25 +1,37 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { appLocales } from "@/i18n/config";
+import { localizedUrl } from "@/lib/seo";
+
+// Keep business URLs current instead of freezing the sitemap at build time.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
-
   // Static pages with alternates for each locale
-  const staticPaths = ["/", "/businesses", "/legal/terms", "/privacy", "/privacy/business-claims"];
+  const staticPaths = [
+    "/",
+    "/businesses",
+    "/for-businesses",
+    "/contact",
+    "/legal/terms",
+    "/privacy",
+    "/privacy/business-claims",
+  ];
 
   const staticEntries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
-    url: `${baseUrl}${path === "/" ? "" : path}`,
-    lastModified: new Date(),
+    url: localizedUrl("de", path),
     changeFrequency: path === "/" ? "daily" : "weekly",
     priority: path === "/" ? 1.0 : 0.8,
     alternates: {
-      languages: Object.fromEntries(
-        appLocales.map((locale) => [
-          locale,
-          `${baseUrl}/${locale}${path === "/" ? "" : path}`,
-        ]),
-      ),
+      languages: {
+        ...Object.fromEntries(
+          appLocales.map((locale) => [
+            locale,
+            localizedUrl(locale, path),
+          ]),
+        ),
+        "x-default": localizedUrl("de", path),
+      },
     },
   }));
 
@@ -33,17 +45,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     businessEntries = businesses.map((business) => ({
-      url: `${baseUrl}/businesses/${business.slug}`,
+      url: localizedUrl("de", `/businesses/${business.slug}`),
       lastModified: business.updatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.7,
       alternates: {
-        languages: Object.fromEntries(
-          appLocales.map((locale) => [
-            locale,
-            `${baseUrl}/${locale}/businesses/${business.slug}`,
-          ]),
-        ),
+        languages: {
+          ...Object.fromEntries(
+            appLocales.map((locale) => [
+              locale,
+              localizedUrl(locale, `/businesses/${business.slug}`),
+            ]),
+          ),
+          "x-default": localizedUrl("de", `/businesses/${business.slug}`),
+        },
       },
     }));
   } catch {

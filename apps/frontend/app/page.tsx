@@ -1,12 +1,23 @@
+import type { Metadata } from "next";
 import HeroSection from "@/features/home/HeroSection";
 import CategoriesSection from "@/features/home/CategoriesSection";
 import LatestBusinessesSection from "@/features/home/LatestBusinessesSection";
 import CitiesSection from "@/features/home/CitiesSection";
 import Footer from "@/components/layout/Footer";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { isAppLocale } from "@/i18n/config";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { fetchHomeData } from "@/lib/home-data";
+import { appLocale as toAppLocale, localizedUrl, publicMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Home")]);
+  return publicMetadata({
+    locale: toAppLocale(locale),
+    title: t("hero.title"),
+    description: t("hero.description"),
+  });
+}
 
 export default async function HomePage() {
   const requestedLocale = await getLocale();
@@ -23,10 +34,10 @@ export default async function HomePage() {
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "WoYab",
-          url: process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de",
+          url: localizedUrl(locale),
           potentialAction: {
             "@type": "SearchAction",
-            target: `${process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de"}/businesses?search={search_term_string}`,
+            target: `${localizedUrl(locale, "/businesses")}?search={search_term_string}`,
             "query-input": "required name=search_term_string",
           },
         }}

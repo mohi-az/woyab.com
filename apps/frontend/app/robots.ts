@@ -1,7 +1,22 @@
 import type { MetadataRoute } from "next";
+import { appLocales } from "@/i18n/config";
+import { appUrl } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
+  const privatePaths = [
+    "/admin",
+    "/dashboard",
+    "/business-portal",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/verify-2fa",
+    "/offline",
+  ];
+  const localizedPrivatePaths = appLocales.flatMap((locale) =>
+    privatePaths.map((path) => `/${locale}${path}`),
+  );
 
   return {
     rules: [
@@ -9,20 +24,13 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         disallow: [
-          "/dashboard",
-          "/dashboard/",
-          "/admin",
-          "/admin/",
           "/api/",
-          "/login",
-          "/register",
-          "/forgot-password",
-          "/reset-password",
-          "/offline",
           "/monitoring",
+          ...privatePaths,
+          ...localizedPrivatePaths,
         ],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${appUrl()}/sitemap.xml`,
   };
 }

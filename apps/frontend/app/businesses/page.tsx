@@ -8,6 +8,7 @@ import {
   fetchDirectorySubCategories,
   type BusinessDirectoryFilters,
 } from "@/lib/api";
+import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 
 const PAGE_SIZE = 9;
 
@@ -25,15 +26,13 @@ function positiveInt(value: string | undefined) {
 }
 
 export async function generateMetadata() {
-  const t = await getTranslations("Businesses");
-  return {
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Businesses")]);
+  return publicMetadata({
+    locale: toAppLocale(locale),
+    pathname: "/businesses",
     title: t("title"),
     description: t("description"),
-    openGraph: {
-      title: t("title"),
-      description: t("description"),
-    },
-  };
+  });
 }
 
 export default async function BusinessesPage({ searchParams }: PageProps) {

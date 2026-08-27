@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { FiMail, FiShield } from "react-icons/fi";
 import { ContactForm } from "@/components/contact/ContactForm";
 import Footer from "@/components/layout/Footer";
 import { privacyEmail, supportEmail } from "@/lib/mail";
+import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Contact");
-  return { title: t("metaTitle"), description: t("metaDescription") };
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Contact")]);
+  return publicMetadata({
+    locale: toAppLocale(locale),
+    pathname: "/contact",
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  });
 }
 
 export default async function ContactPage() {

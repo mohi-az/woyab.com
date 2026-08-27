@@ -1,14 +1,17 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { FiBarChart2, FiBriefcase, FiCheckCircle, FiEdit, FiLayers, FiMessageSquare, FiStar } from "react-icons/fi";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
+import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("ForBusinesses");
-  return {
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("ForBusinesses")]);
+  return publicMetadata({
+    locale: toAppLocale(locale),
+    pathname: "/for-businesses",
     title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function ForBusinessesPage() {

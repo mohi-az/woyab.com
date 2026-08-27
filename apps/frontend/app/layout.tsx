@@ -60,30 +60,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  openGraph: {
-    type: "website",
-    siteName: "WoYab",
-    title: "WoYab — Persischsprachige Unternehmen in Deutschland",
-    description:
-      "Das umfassende Verzeichnis persischsprachiger (iranischer & afghanischer) Unternehmen in Deutschland. Restaurants, Ärzte, Anwälte und mehr.",
-    locale: "de_DE",
-    alternateLocale: ["en_US", "fa_IR"],
-    url: "/",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "WoYab — Persischsprachige Unternehmen in Deutschland",
-    description:
-      "Das umfassende Verzeichnis persischsprachiger (iranischer & afghanischer) Unternehmen in Deutschland.",
-  },
-  alternates: {
-    canonical: "/",
-    languages: {
-      de: "/de",
-      en: "/en",
-      fa: "/fa",
-    },
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

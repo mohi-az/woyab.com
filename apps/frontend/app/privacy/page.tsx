@@ -1,5 +1,6 @@
 import { getLocale } from "next-intl/server";
 import { getPublicLegalConfig } from "@/lib/privacy-config";
+import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 
 const policy = {
   en: {
@@ -72,8 +73,14 @@ const policy = {
 
 export async function generateMetadata() {
   const locale = await getLocale();
-  const copy = policy[locale === "fa" ? "fa" : locale === "en" ? "en" : "de"];
-  return { title: copy.title, description: copy.intro };
+  const currentLocale = toAppLocale(locale);
+  const copy = policy[currentLocale];
+  return publicMetadata({
+    locale: currentLocale,
+    pathname: "/privacy",
+    title: copy.title,
+    description: copy.intro,
+  });
 }
 
 export default async function PrivacyPolicyPage() {

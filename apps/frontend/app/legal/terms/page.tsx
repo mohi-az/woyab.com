@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { getPublicLegalConfig } from "@/lib/privacy-config";
+import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 
 const copy = {
   en: {
@@ -92,16 +93,14 @@ const copy = {
 
 export async function generateMetadata() {
   const locale = await getLocale();
-  const appLocale = locale === "fa" ? "fa" : locale === "en" ? "en" : "de";
-  const c = copy[appLocale];
-  return {
+  const currentLocale = toAppLocale(locale);
+  const c = copy[currentLocale];
+  return publicMetadata({
+    locale: currentLocale,
+    pathname: "/legal/terms",
     title: c.title,
     description: c.intro,
-    openGraph: {
-      title: c.title,
-      description: c.intro,
-    },
-  };
+  });
 }
 
 export default async function TermsAndLegalPage() {
