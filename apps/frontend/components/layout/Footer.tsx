@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { FiArrowRight, FiClock, FiMail, FiMapPin } from "react-icons/fi";
+import { FiArrowRight, FiMail } from "react-icons/fi";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { CookiePreferencesButton } from "@/components/privacy/CookiePreferencesButton";
+import { supportEmail } from "@/lib/mail";
 
 export default async function Footer() {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("Footer")]);
   const appLocale = isAppLocale(locale) ? locale : "de";
   const href = (pathname: string) => localizePathname(pathname, appLocale);
+  const support = supportEmail();
 
   return (
     <footer className="relative overflow-hidden bg-[#111827] text-white">
@@ -28,15 +30,15 @@ export default async function Footer() {
           <nav className="mt-5 flex flex-col items-start gap-3 text-sm text-slate-300">
             <Link href={href("/")} className="transition hover:text-white">{t("home")}</Link>
             <Link href={href("/businesses")} className="transition hover:text-white">{t("businesses")}</Link>
+            <Link href={href("/contact")} className="transition hover:text-white">{t("contact")}</Link>
           </nav>
         </div>
 
         <div>
           <h2 className="text-lg font-extrabold">{t("contactTitle")}</h2>
           <div className="mt-5 space-y-4 text-sm text-slate-300">
-            <p className="flex items-start gap-3"><FiMapPin className="mt-1 shrink-0 text-primary" />{t("contactPending")}</p>
-            <p className="flex items-center gap-3"><FiMail className="shrink-0 text-primary" />{t("emailPending")}</p>
-            <p className="flex items-center gap-3"><FiClock className="shrink-0 text-primary" />{t("soon")}</p>
+            <a href={`mailto:${support}`} className="flex items-center gap-3 transition hover:text-white"><FiMail className="shrink-0 text-primary" />{support}</a>
+            <Link href={href("/contact")} className="inline-flex font-bold text-primary-light transition hover:text-white">{t("contactAction")}</Link>
           </div>
         </div>
 

@@ -93,7 +93,7 @@ This document describes the implemented business ownership claiming, edit sugges
 
 - Privacy Notice مخصوص Claim به فارسی، انگلیسی و آلمانی اضافه شده است.
 - نام حقوقی controller، نشانی، ایمیل حریم خصوصی، مرجع نظارتی و نسخهٔ notice از تنظیمات deployment دریافت می‌شوند.
-- production در صورت خالی‌بودن تنظیمات حقوقی یا SMTP ضروری اجرا نمی‌شود.
+- production در صورت خالی‌بودن تنظیمات حقوقی یا Resend ضروری اجرا نمی‌شود.
 - Claimهای منقضی یا لغوشده برای بازبینی نگهداری و پس از ۹۰ روز آمادهٔ anonymization می‌شوند.
 - Claimهای ردشده و Change Requestهای بسته‌شده پس از ۱۸۰ روز وارد صف بازبینی retention می‌شوند.
 - Claim تأییدشده تا پایان مالکیت نگهداری می‌شود و پس از آن دورهٔ استاندارد سه‌سالهٔ دعاوی آلمان در محاسبهٔ retention لحاظ می‌شود.
@@ -133,7 +133,7 @@ This document describes the implemented business ownership claiming, edit sugges
 
 ### ۱۳. الزامات پیش از انتشار
 
-- مقادیر واقعی SMTP باید در environment مربوط به production تنظیم شوند.
+- کلید API و آدرس‌های فرستندهٔ Resend باید در environment مربوط به production تنظیم شوند.
 - اطلاعات controller، نشانی، ایمیل privacy، مرجع نظارتی و نسخهٔ Privacy Notice باید تکمیل شوند.
 - یک `CRON_SECRET` امن باید تعریف و maintenance job مربوط به Claimها زمان‌بندی شود.
 - متن Privacy Notice و برنامهٔ retention باید پیش از انتشار توسط مشاور حقوقی آلمان بازبینی شوند.
@@ -227,7 +227,7 @@ The business management system allows owners, employees, and customers to intera
 
 - A claim-specific Privacy Notice is available in English, German, and Persian.
 - The legal controller name, address, privacy email, supervisory authority, and notice version come from deployment configuration.
-- Production fails fast when mandatory legal or SMTP configuration is missing.
+- Production fails fast when mandatory legal or Resend configuration is missing.
 - Expired or cancelled claims become eligible for retention review and anonymization after 90 days.
 - Rejected claims and closed change requests become eligible after 180 days.
 - Approved claims are retained for the duration of ownership. After ownership ends, the standard three-year German limitation schedule is considered.
@@ -267,7 +267,7 @@ The business management system allows owners, employees, and customers to intera
 
 ### 13. Requirements before production release
 
-- Configure real SMTP values in the production environment.
+- Configure the Resend API key and verified sender addresses in the production environment.
 - Complete the controller name, address, privacy email, supervisory authority, and Privacy Notice version.
 - Define a secure `CRON_SECRET` and schedule the claim maintenance job.
 - Have German legal counsel review the Privacy Notice and retention schedule before release.

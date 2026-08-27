@@ -14,10 +14,10 @@ const policy = {
       ["4. Email verification and account security", "Password registrations require email verification before login. Administrator access additionally requires a TOTP authenticator code. Verification tokens are single-use, expire automatically and are stored only as hashes. Privileged authenticator secrets are encrypted at rest."],
       ["5. Public content", "Approved business information and reviews may be visible publicly. Public responses do not expose a business owner's private account email or internal user identifier. If an account is anonymized, retained reviews no longer identify the account."],
       ["6. Reports and moderation", "Reports may contain contact details, the reported target, reasons, evidence and technical anti-abuse information. Signed-in reporters can view status in their dashboard. Final report and moderation decisions may be sent by email. Internal moderator notes are not included in public notifications."],
-      ["7. Recipients and service providers", "Access is limited to authorized WoYab personnel and providers needed for hosting, database operation, authentication, email delivery, error monitoring, maps and location services. Data is disclosed to public authorities only when legally required or necessary for legal claims."],
+      ["7. Recipients and service providers", "Access is limited to authorized WoYab personnel and providers needed for hosting, database operation, authentication, email delivery through Resend, error monitoring, maps and location services. Data is disclosed to public authorities only when legally required or necessary for legal claims."],
       ["8. International transfers", "Where a provider processes data outside the EEA, WoYab relies on an adequacy decision or appropriate safeguards such as Standard Contractual Clauses, together with supplementary measures where required."],
       ["9. Retention", "Account data is kept while the account is active. Expired verification and anti-abuse records are deleted after their operational period. Closed reports and moderation records are retained only as long as needed for safety, disputes and legal obligations. Business-claim retention periods are described in the supplemental claim notice. Backups expire under the infrastructure backup cycle."],
-      ["10. Account deletion and anonymization", "Users may permanently erase their account and contributed reviews, or delete the account while retaining reviews without an author identity. Private profile data, credentials, saved locations, favorites, support tickets and local avatar files are removed. Claims, reports and audit evidence that must remain are detached and personal fields are redacted. Administrator accounts require a controlled removal process."],
+      ["10. Account deletion and anonymization", "Users may permanently erase their account and contributed reviews, or delete the account while retaining reviews without an author identity. Private profile data, credentials, saved locations, favorites, support tickets, linked contact requests and local avatar files are removed. Claims, reports and audit evidence that must remain are detached and personal fields are redacted. Administrator accounts require a controlled removal process."],
       ["11. Cookies and local storage", "Strictly necessary cookies and storage support sessions, security, language and privacy choices. Optional analytics or similar technologies are activated only according to the cookie choices available on the platform."],
       ["12. Your rights", "Subject to the GDPR conditions, you may request access, rectification, erasure, restriction, portability or object to processing based on legitimate interests. You may withdraw consent for the future and lodge a complaint with the competent supervisory authority."],
       ["13. Automated safeguards and abuse prevention", "WoYab uses rate limits, verification status and security signals to block automated or excessive requests. These controls protect users and infrastructure; significant moderation decisions remain reviewable by authorized staff."],
@@ -80,6 +80,11 @@ export default async function PrivacyPolicyPage() {
   const locale = await getLocale();
   const copy = policy[locale === "fa" ? "fa" : locale === "en" ? "en" : "de"];
   const config = getPublicLegalConfig();
+  const contactProcessing = locale === "fa"
+    ? ["فرم تماس", "پیام‌های فرم تماس شامل نام، ایمیل، تلفن اختیاری، موضوع و متن پیام هستند. این داده‌ها برای رسیدگی به درخواست ذخیره می‌شوند و اعلان داخلی و رسید دریافت از طریق Resend ارسال می‌گردد."]
+    : locale === "en"
+      ? ["Contact form", "Contact-form submissions include name, email, optional phone number, subject and message. We store this data to handle the request and send an internal notification and acknowledgement through Resend."]
+      : ["Kontaktformular", "Nachrichten aus dem Kontaktformular enthalten Name, E-Mail-Adresse, optionale Telefonnummer, Thema und Nachricht. Wir speichern diese Daten zur Bearbeitung der Anfrage und versenden interne Benachrichtigungen sowie Empfangsbestätigungen über Resend."];
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       <header className="rounded-3xl bg-slate-950 p-7 text-white sm:p-10">
@@ -98,6 +103,10 @@ export default async function PrivacyPolicyPage() {
       <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-black">{copy.translationNotice[0]}</h2>
         <p className="mt-3 leading-7 text-slate-600">{copy.translationNotice[1]}</p>
+      </section>
+      <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-lg font-black">{contactProcessing[0]}</h2>
+        <p className="mt-3 leading-7 text-slate-600">{contactProcessing[1]}</p>
       </section>
       <section className="mt-8 rounded-2xl border border-sky-200 bg-sky-50 p-6">
         <h2 className="font-black">Privacy contact</h2>

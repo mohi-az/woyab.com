@@ -56,6 +56,27 @@
       "logout": "Abmelden"
     }
   },
+  "Contact": {
+    "metaTitle": "WoYab kontaktieren",
+    "metaDescription": "Kontaktieren Sie das WoYab-Team für Support, Inhaberschaft, Partnerschaften und Datenschutzanfragen.",
+    "title": "Kontakt",
+    "description": "Senden Sie uns Ihre Anfrage. Das zuständige WoYab-Team meldet sich so bald wie möglich bei Ihnen.",
+    "formTitle": "Nachricht senden",
+    "formDescription": "Die Pflichtfelder werden benötigt, um Ihre Anfrage zu bearbeiten.",
+    "supportTitle": "Support",
+    "supportDescription": "Für allgemeine Hilfe, Kontofragen, Unternehmenseinträge und Partnerschaften.",
+    "privacyTitle": "Datenschutz",
+    "privacyDescription": "Für Datenschutz- und Betroffenenanfragen.",
+    "fields": { "name": "Ihr Name", "email": "E-Mail-Adresse", "phone": "Telefonnummer (optional)", "subject": "Thema", "message": "Nachricht" },
+    "placeholders": { "name": "Ihr Name", "email": "sie@beispiel.de", "phone": "+49 …", "message": "Wie können wir helfen?" },
+    "subjects": { "GENERAL": "Allgemeine Anfrage", "ACCOUNT": "Konto und Anmeldung", "BUSINESS_OWNERSHIP": "Unternehmen und Inhaberschaft", "PARTNERSHIP": "Partnerschaft", "PRIVACY": "Datenschutz", "OTHER": "Sonstiges" },
+    "privacyAcknowledgement": "Ich habe die <privacy>Datenschutzerklärung</privacy> gelesen.",
+    "website": "Website",
+    "submit": "Nachricht senden",
+    "sending": "Wird gesendet…",
+    "success": "Vielen Dank — Ihre Nachricht wurde empfangen. Wir haben Ihnen eine Bestätigung gesendet.",
+    "errors": { "submit": "Ihre Nachricht konnte gerade nicht gesendet werden. Bitte versuchen Sie es erneut." }
+  },
   "AddBusinessPage": {
     "metaTitle": "Unternehmen hinzufügen oder übernehmen | WoYab",
     "metaDescription": "Suchen Sie Ihr Unternehmen bei WoYab, übernehmen Sie einen verfügbaren Eintrag oder legen Sie ein neues Unternehmen an.",
@@ -442,10 +463,9 @@
     "linksTitle": "Nützliche Links",
     "home": "Startseite",
     "businesses": "Alle Unternehmen",
+    "contact": "Kontakt",
     "contactTitle": "Kontakt",
-    "contactPending": "Offizielle Kontaktdaten folgen in Kürze.",
-    "emailPending": "E-Mail-Adresse folgt in Kürze",
-    "soon": "Weitere Kontaktmöglichkeiten folgen",
+    "contactAction": "Nachricht senden",
     "newsletterTitle": "Bleiben Sie informiert",
     "newsletterDescription": "Der Newsletter wird mit einem zukünftigen Update verfügbar sein.",
     "emailPlaceholder": "Ihre E-Mail-Adresse",
@@ -977,6 +997,11 @@
       "description": "Nachrichten aus den Kontaktformularen der Eintraege.",
       "list": "Nachrichten"
     },
+    "publicContact": {
+      "list": "Website-Kontaktanfragen",
+      "subject": "Thema",
+      "subjects": { "GENERAL": "Allgemeine Anfrage", "ACCOUNT": "Konto und Anmeldung", "BUSINESS_OWNERSHIP": "Unternehmen und Inhaberschaft", "PARTNERSHIP": "Partnerschaft", "PRIVACY": "Datenschutz", "OTHER": "Sonstiges" }
+    },
     "tickets": {
       "title": "Support-Tickets",
       "description": "Supportanfragen verfolgen und priorisieren.",
@@ -1224,6 +1249,7 @@
       "noReports": "Noch keine Meldungen.",
       "noClaims": "Noch keine Claims.",
       "noMessages": "Noch keine Kontakt-Nachrichten.",
+      "noPublicContact": "Noch keine Website-Kontaktanfragen.",
       "noTickets": "Noch keine Support-Tickets."
     },
     "common": {

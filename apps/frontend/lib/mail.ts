@@ -1,147 +1,58 @@
 import "server-only";
 
-import net from "node:net";
-import tls from "node:tls";
+import { Resend } from "resend";
 
-type Mail = {
-  to: string;
+export type MailSender = "transactional" | "support";
+
+export type Mail = {
+  to: string | string[];
   subject: string;
   text: string;
   html: string;
+  from?: MailSender;
+  replyTo?: string;
+  idempotencyKey?: string;
 };
 
-type SmtpSocket = net.Socket | tls.TLSSocket;
+function value(name: string, fallback: string) {
+  return process.env[name]?.trim() || fallback;
+}
 
 export function mailConfigured() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_FROM);
+  return Boolean(process.env.RESEND_API_KEY?.trim());
+}
+
+export function mailAddress(kind: MailSender) {
+  if (kind === "support") return value("EMAIL_FROM_SUPPORT", "WoYab Support <support@woyab.com>");
+  return value("EMAIL_FROM_NO_REPLY", "WoYab <no-reply@woyab.com>");
+}
+
+export function supportEmail() {
+  return value("SUPPORT_EMAIL", "support@woyab.com");
+}
+
+export function privacyEmail() {
+  return value("PRIVACY_EMAIL", "privacy@woyab.com");
 }
 
 export async function sendMail(mail: Mail) {
   if (!mailConfigured()) {
-    if (process.env.NODE_ENV === "production") throw new Error("SMTP is not configured.");
-    console.info("SMTP is not configured. Email preview:", mail);
-    return;
+    if (process.env.NODE_ENV === "production") throw new Error("RESEND_API_KEY is not configured.");
+    console.info("Resend is not configured. Email preview:", mail);
+    return undefined;
   }
 
-  const host = process.env.SMTP_HOST!;
-  const port = Number(process.env.SMTP_PORT);
-  const secure = process.env.SMTP_SECURE === "true";
-  const from = process.env.SMTP_FROM!;
-
-  let socket: SmtpSocket = secure
-    ? tls.connect({ host, port, servername: host })
-    : net.connect({ host, port });
-
-  await onceConnected(socket);
-  await readResponse(socket, 220);
-  await command(socket, `EHLO ${host}`, 250);
-
-  if (!secure && process.env.SMTP_STARTTLS !== "false") {
-    await command(socket, "STARTTLS", 220);
-    socket = tls.connect({ socket, servername: host });
-    await onceConnected(socket);
-    await command(socket, `EHLO ${host}`, 250);
-  }
-
-  if (process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
-    await command(socket, "AUTH LOGIN", 334);
-    await command(socket, Buffer.from(process.env.SMTP_USER).toString("base64"), 334);
-    await command(socket, Buffer.from(process.env.SMTP_PASSWORD).toString("base64"), 235);
-  }
-
-  await command(socket, `MAIL FROM:<${extractEmail(from)}>`, 250);
-  await command(socket, `RCPT TO:<${mail.to}>`, 250);
-  await command(socket, "DATA", 354);
-  await command(socket, buildMessage(from, mail), 250);
-  await command(socket, "QUIT", 221);
-  socket.end();
-}
-
-function onceConnected(socket: SmtpSocket) {
-  return new Promise<void>((resolve, reject) => {
-    if (!socket.connecting) return resolve();
-    socket.once("secureConnect", resolve);
-    socket.once("connect", resolve);
-    socket.once("error", reject);
+  const resend = new Resend(process.env.RESEND_API_KEY!);
+  const { data, error } = await resend.emails.send({
+    from: mailAddress(mail.from ?? "transactional"),
+    to: mail.to,
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+    replyTo: mail.replyTo ?? supportEmail(),
+    headers: mail.idempotencyKey ? { "Idempotency-Key": mail.idempotencyKey } : undefined,
   });
-}
 
-function command(socket: SmtpSocket, value: string, expectedCode: number) {
-  const response = readResponse(socket, expectedCode);
-  socket.write(`${value}\r\n`);
-  return response;
-}
-
-function readResponse(socket: SmtpSocket, expectedCode: number) {
-  return new Promise<string>((resolve, reject) => {
-    let buffer = "";
-
-    function cleanup() {
-      socket.off("data", onData);
-      socket.off("error", onError);
-    }
-
-    function onError(error: Error) {
-      cleanup();
-      reject(error);
-    }
-
-    function onData(chunk: Buffer) {
-      buffer += chunk.toString("utf8");
-      const lines = buffer.split(/\r?\n/).filter(Boolean);
-      const lastLine = lines.at(-1);
-      if (!lastLine || !/^\d{3} /.test(lastLine)) return;
-
-      cleanup();
-      const code = Number(lastLine.slice(0, 3));
-      if (code !== expectedCode) reject(new Error(`SMTP error: ${buffer.trim()}`));
-      else resolve(buffer);
-    }
-
-    socket.on("data", onData);
-    socket.on("error", onError);
-  });
-}
-
-function buildMessage(from: string, mail: Mail) {
-  const boundary = `woyab-${Date.now()}`;
-  const safeFrom = safeHeader(from);
-  const safeTo = safeHeader(mail.to);
-  const safeSubject = safeHeader(mail.subject);
-  const text = dotStuff(mail.text);
-  const html = dotStuff(mail.html);
-  return [
-    `From: ${safeFrom}`,
-    `To: ${safeTo}`,
-    `Subject: ${safeSubject}`,
-    "MIME-Version: 1.0",
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
-    "",
-    `--${boundary}`,
-    "Content-Type: text/plain; charset=utf-8",
-    "Content-Transfer-Encoding: 8bit",
-    "",
-    text,
-    "",
-    `--${boundary}`,
-    "Content-Type: text/html; charset=utf-8",
-    "Content-Transfer-Encoding: 8bit",
-    "",
-    html,
-    "",
-    `--${boundary}--`,
-    ".",
-  ].join("\r\n");
-}
-
-function safeHeader(value: string) {
-  return value.replace(/[\r\n]+/g, " ").trim();
-}
-
-function dotStuff(value: string) {
-  return value.replace(/(^|\r?\n)\./g, "$1..");
-}
-
-function extractEmail(value: string) {
-  return value.match(/<([^>]+)>/)?.[1] ?? value;
+  if (error) throw new Error(`Resend email failed: ${error.message}`);
+  return data?.id;
 }

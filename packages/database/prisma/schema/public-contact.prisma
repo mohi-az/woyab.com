@@ -1,0 +1,49 @@
+model PublicContactMessage {
+  id                    String                 @id @default(cuid())
+  userId                String?
+  name                  String
+  email                 String
+  phone                 String?
+  subject               PublicContactSubject
+  message               String
+  status                PublicContactStatus    @default(NEW)
+  notificationStatus    EmailDeliveryStatus    @default(PENDING)
+  notificationError     String?
+  acknowledgementStatus EmailDeliveryStatus    @default(PENDING)
+  acknowledgementError  String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  user                  User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status, createdAt])
+  @@index([subject, createdAt])
+  @@map("public_contact_messages")
+}
+
+enum PublicContactSubject {
+  GENERAL
+  ACCOUNT
+  BUSINESS_OWNERSHIP
+  PARTNERSHIP
+  PRIVACY
+  OTHER
+
+  @@map("public_contact_subject")
+}
+
+enum PublicContactStatus {
+  NEW
+  ARCHIVED
+
+  @@map("public_contact_status")
+}
+
+enum EmailDeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  NOT_CONFIGURED
+
+  @@map("email_delivery_status")
+}

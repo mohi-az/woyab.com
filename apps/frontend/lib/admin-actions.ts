@@ -1305,6 +1305,15 @@ export async function updateContactMessageStatus(formData: FormData) {
   refreshAdmin();
 }
 
+export async function archivePublicContactMessage(formData: FormData) {
+  const actor = await requireAdmin();
+  const id = value(formData, "id");
+  if (!id) throw new Error("Invalid public contact message.");
+  await prisma.publicContactMessage.update({ where: { id }, data: { status: "ARCHIVED" } });
+  await audit(actor.id, "public_contact.archive", "PublicContactMessage", id, { status: "ARCHIVED" });
+  refreshAdmin();
+}
+
 export async function updateTicketStatus(formData: FormData) {
   const actor = await requireAdmin();
   const id = value(formData, "id");

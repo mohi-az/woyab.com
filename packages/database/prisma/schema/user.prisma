@@ -34,6 +34,7 @@ model User {
   assignedSupportTickets   SupportTicket[]         @relation("SupportTicketAssignee")
   supportTickets           SupportTicket[]         @relation("SupportTicketUser")
   supportTicketReplies     SupportTicketReply[]
+  publicContactMessages    PublicContactMessage[]
   savedLocations           UserSavedLocation[]
   claimNotes               ClaimNote[]             @relation("ClaimNoteAuthor")
 

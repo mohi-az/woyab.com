@@ -88,6 +88,7 @@ export async function DELETE(request: Request) {
     });
     await tx.supportTicket.deleteMany({ where: { userId } });
     await tx.supportTicketReply.deleteMany({ where: { authorId: userId } });
+    await tx.publicContactMessage.deleteMany({ where: { userId } });
     await tx.adminAuditLog.updateMany({ where: { actorId: userId }, data: { actorId: null } });
     await tx.$executeRaw`
       UPDATE "admin_audit_logs"

@@ -56,6 +56,27 @@
       "logout": "Logout"
     }
   },
+  "Contact": {
+    "metaTitle": "Contact WoYab",
+    "metaDescription": "Contact the WoYab team for support, ownership, partnership, and privacy requests.",
+    "title": "Contact us",
+    "description": "Send us your question and the right WoYab team will get back to you as soon as possible.",
+    "formTitle": "Send a message",
+    "formDescription": "Fields marked by your browser as required are necessary to handle your request.",
+    "supportTitle": "Support",
+    "supportDescription": "For general help, account questions, business listings, and partnerships.",
+    "privacyTitle": "Privacy",
+    "privacyDescription": "For privacy and data-subject requests.",
+    "fields": { "name": "Your name", "email": "Email address", "phone": "Phone number (optional)", "subject": "Subject", "message": "Message" },
+    "placeholders": { "name": "Your name", "email": "you@example.com", "phone": "+49 …", "message": "How can we help?" },
+    "subjects": { "GENERAL": "General inquiry", "ACCOUNT": "Account and sign-in", "BUSINESS_OWNERSHIP": "Business and ownership", "PARTNERSHIP": "Partnership", "PRIVACY": "Privacy", "OTHER": "Other" },
+    "privacyAcknowledgement": "I have read the <privacy>Privacy Policy</privacy>.",
+    "website": "Website",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "success": "Thanks — your message was received. We have sent a confirmation email.",
+    "errors": { "submit": "We could not send your message right now. Please try again." }
+  },
   "AddBusinessPage": {
     "metaTitle": "Add or claim your business | WoYab",
     "metaDescription": "Search WoYab for your business, claim an available listing, or add a new business.",
@@ -514,10 +535,9 @@
     "linksTitle": "Useful links",
     "home": "Home",
     "businesses": "All businesses",
+    "contact": "Contact us",
     "contactTitle": "Contact",
-    "contactPending": "Official contact details will be available soon.",
-    "emailPending": "Email address coming soon",
-    "soon": "More ways to reach us are coming soon",
+    "contactAction": "Send us a message",
     "newsletterTitle": "Stay in the loop",
     "newsletterDescription": "Newsletter subscriptions will be available in a future update.",
     "emailPlaceholder": "Your email address",
@@ -1085,6 +1105,11 @@
       "description": "Messages submitted through business contact forms.",
       "list": "Messages"
     },
+    "publicContact": {
+      "list": "Website contact requests",
+      "subject": "Subject",
+      "subjects": { "GENERAL": "General inquiry", "ACCOUNT": "Account and sign-in", "BUSINESS_OWNERSHIP": "Business and ownership", "PARTNERSHIP": "Partnership", "PRIVACY": "Privacy", "OTHER": "Other" }
+    },
     "tickets": {
       "title": "Support tickets",
       "description": "Track support requests and assign operational priority.",
@@ -1334,6 +1359,7 @@
       "noReports": "No reports yet.",
       "noClaims": "No claims yet.",
       "noMessages": "No contact messages yet.",
+      "noPublicContact": "No website contact requests yet.",
       "noTickets": "No support tickets yet."
     },
     "common": {

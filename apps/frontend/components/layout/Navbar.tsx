@@ -149,6 +149,11 @@ export default function Navbar() {
               <ActiveLine active={internalPathname === "/"} />
             </Link>
 
+            <Link href="/contact" aria-current={internalPathname === "/contact" ? "page" : undefined} className={navItemClassName(internalPathname === "/contact")}>
+              {t("nav.contact")}
+              <ActiveLine active={internalPathname === "/contact"} />
+            </Link>
+
             <div
               className="relative"
               onMouseEnter={() => setDirectoryMenuOpen(true)}
@@ -287,6 +292,9 @@ export default function Navbar() {
             <div className="flex flex-col gap-1.5">
               <Link href="/" className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
                 {t("nav.home")}
+              </Link>
+              <Link href="/contact" className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
+                {t("nav.contact")}
               </Link>
 
               <button type="button" aria-expanded={mobileDirectoryOpen} onClick={() => setMobileDirectoryOpen((value) => !value)} className="flex w-full items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary">
