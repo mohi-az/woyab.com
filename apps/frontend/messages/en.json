@@ -75,7 +75,10 @@
     "submit": "Send message",
     "sending": "Sending…",
     "success": "Thanks — your message was received. We have sent a confirmation email.",
-    "errors": { "submit": "We could not send your message right now. Please try again." }
+    "errors": {
+      "submit": "We could not send your message right now. Please try again.",
+      "rateLimited": "Too many messages were sent from this connection. Please wait a while and try again."
+    }
   },
   "AddBusinessPage": {
     "metaTitle": "Add or claim your business | WoYab",
@@ -532,16 +535,13 @@
   },
   "Footer": {
     "description": "Discover trusted Persian-speaking businesses and services across Germany in one practical directory.",
-    "linksTitle": "Useful links",
+    "linksTitle": "Explore",
     "home": "Home",
     "businesses": "All businesses",
-    "contact": "Contact us",
-    "contactTitle": "Contact",
-    "contactAction": "Send us a message",
-    "newsletterTitle": "Stay in the loop",
-    "newsletterDescription": "Newsletter subscriptions will be available in a future update.",
-    "emailPlaceholder": "Your email address",
-    "comingSoon": "Coming soon",
+    "businessOwners": "For business owners",
+    "supportTitle": "Support",
+    "contactForm": "Contact form",
+    "legalTitle": "Legal",
     "copyright": "© {year} WoYab. All rights reserved.",
     "madeFor": "Persian-speaking businesses in Germany",
     "legal": "Terms of Use & Legal Notice",

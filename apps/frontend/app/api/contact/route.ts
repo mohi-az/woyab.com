@@ -30,13 +30,22 @@ function result(error: PromiseSettledResult<unknown>) {
 }
 
 export async function POST(request: NextRequest) {
+  try {
+    return await handleContactRequest(request);
+  } catch (error) {
+    console.error("Public contact request failed:", error);
+    return NextResponse.json({ success: false, code: "CONTACT_FAILED" }, { status: 500 });
+  }
+}
+
+async function handleContactRequest(request: NextRequest) {
   const raw = await request.json().catch(() => null);
   const parsed = contactSchema.safeParse(raw);
-  if (!parsed.success) return NextResponse.json({ success: false, error: "Please check the contact form fields." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ success: false, code: "INVALID_FIELDS" }, { status: 400 });
   if (parsed.data.website) return NextResponse.json({ success: true, accepted: true }, { status: 202 });
 
   if (await isPersistentlyRateLimited("public-contact", requestIp(request), 5, 60 * 60_000)) {
-    return NextResponse.json({ success: false, error: "Too many contact requests. Please try again later." }, { status: 429 });
+    return NextResponse.json({ success: false, code: "RATE_LIMITED" }, { status: 429 });
   }
 
   const localeHeader = request.headers.get("x-woyab-locale");

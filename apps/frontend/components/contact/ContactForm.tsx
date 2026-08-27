@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const subjects = ["GENERAL", "ACCOUNT", "BUSINESS_OWNERSHIP", "PARTNERSHIP", "PRIVACY", "OTHER"] as const;
 
 export function ContactForm() {
   const t = useTranslations("Contact");
+  const locale = useLocale();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -20,7 +21,7 @@ export function ContactForm() {
 
     const response = await fetch("/api/contact", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-woyab-locale": locale },
       body: JSON.stringify({
         name: values.get("name"),
         email: values.get("email"),
@@ -34,7 +35,7 @@ export function ContactForm() {
 
     if (!response?.ok) {
       const payload = await response?.json().catch(() => null);
-      setError(payload?.error || t("errors.submit"));
+      setError(payload?.code === "RATE_LIMITED" ? t("errors.rateLimited") : t("errors.submit"));
       setStatus("error");
       return;
     }

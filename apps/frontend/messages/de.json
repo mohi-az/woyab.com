@@ -75,7 +75,10 @@
     "submit": "Nachricht senden",
     "sending": "Wird gesendet…",
     "success": "Vielen Dank — Ihre Nachricht wurde empfangen. Wir haben Ihnen eine Bestätigung gesendet.",
-    "errors": { "submit": "Ihre Nachricht konnte gerade nicht gesendet werden. Bitte versuchen Sie es erneut." }
+    "errors": {
+      "submit": "Ihre Nachricht konnte gerade nicht gesendet werden. Bitte versuchen Sie es erneut.",
+      "rateLimited": "Über diese Verbindung wurden zu viele Nachrichten gesendet. Bitte warten Sie etwas und versuchen Sie es erneut."
+    }
   },
   "AddBusinessPage": {
     "metaTitle": "Unternehmen hinzufügen oder übernehmen | WoYab",
@@ -460,16 +463,13 @@
   },
   "Footer": {
     "description": "Entdecken Sie vertrauenswürdige persischsprachige Unternehmen und Dienstleistungen in ganz Deutschland.",
-    "linksTitle": "Nützliche Links",
+    "linksTitle": "Entdecken",
     "home": "Startseite",
     "businesses": "Alle Unternehmen",
-    "contact": "Kontakt",
-    "contactTitle": "Kontakt",
-    "contactAction": "Nachricht senden",
-    "newsletterTitle": "Bleiben Sie informiert",
-    "newsletterDescription": "Der Newsletter wird mit einem zukünftigen Update verfügbar sein.",
-    "emailPlaceholder": "Ihre E-Mail-Adresse",
-    "comingSoon": "Demnächst",
+    "businessOwners": "Für Unternehmer",
+    "supportTitle": "Support",
+    "contactForm": "Kontaktformular",
+    "legalTitle": "Rechtliches",
     "copyright": "© {year} WoYab. Alle Rechte vorbehalten.",
     "madeFor": "Persischsprachige Unternehmen in Deutschland",
     "legal": "Nutzungsbedingungen & Impressum",

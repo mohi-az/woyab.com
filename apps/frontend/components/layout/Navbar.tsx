@@ -66,7 +66,7 @@ export default function Navbar() {
   );
   const navItemClassName = (active: boolean) =>
     cn(
-      "relative py-2.5 text-sm font-bold transition-colors",
+      "relative inline-flex h-10 items-center py-0 !text-sm !font-bold !leading-5 transition-colors",
       active
         ? isOverlay
           ? "text-white"
@@ -290,10 +290,10 @@ export default function Navbar() {
         {mobileOpen ? (
           <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-200/70 py-4 lg:hidden" aria-label={t("navigationLabel")}>
             <div className="flex flex-col gap-1.5">
-              <Link href="/" className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
+              <Link href="/" className="flex items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
                 {t("nav.home")}
               </Link>
-              <Link href="/contact" className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
+              <Link href="/contact" className="flex items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
                 {t("nav.contact")}
               </Link>
 
@@ -319,7 +319,7 @@ export default function Navbar() {
               ) : null}
 
               <button type="button" aria-expanded={mobileBusinessMenuOpen} onClick={() => setMobileBusinessMenuOpen((value) => !value)} className="flex w-full items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary">
-                <span className="inline-flex items-center gap-3 font-medium"><FiBriefcase />{t("businessMenu.label")}</span>
+                <span className="inline-flex items-center gap-3 font-bold"><FiBriefcase />{t("businessMenu.label")}</span>
                 <FiChevronDown className={cn("transition-transform", mobileBusinessMenuOpen && "rotate-180")} />
               </button>
               {mobileBusinessMenuOpen ? (

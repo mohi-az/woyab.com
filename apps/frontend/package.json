@@ -6,7 +6,7 @@
     "admin:upsert": "dotenv -e ../../packages/database/.env.development -- node scripts/upsert-admin.mjs",
     "dev": "dotenv -e ../../packages/database/.env.development -- next dev",
     "build": "pnpm --dir ../.. --filter @woyab/shared build && pnpm --dir ../.. --filter @woyab/database generate && next build",
-    "start": "next start",
+    "start": "pnpm --dir ../.. --filter @woyab/database db:migrate:deploy && next start",
     "lint": "eslint"
   },
   "dependencies": {
