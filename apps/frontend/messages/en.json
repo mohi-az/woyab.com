@@ -1101,13 +1101,22 @@
       "empty": "No change requests found matching criteria."
     },
     "messages": {
-      "title": "Contact messages",
-      "description": "Messages submitted through business contact forms.",
-      "list": "Messages"
+      "title": "Contact requests",
+      "description": "Manage messages from business listing forms and the main website contact form.",
+      "list": "Business contact requests"
     },
     "publicContact": {
       "list": "Website contact requests",
       "subject": "Subject",
+      "details": "Contact request details",
+      "emailDelivery": "Email delivery",
+      "notification": "Support notification",
+      "receipt": "Sender receipt",
+      "receivedAt": "Received",
+      "requestId": "Request ID",
+      "reply": "Reply by email",
+      "archive": "Archive",
+      "close": "Close",
       "subjects": { "GENERAL": "General inquiry", "ACCOUNT": "Account and sign-in", "BUSINESS_OWNERSHIP": "Business and ownership", "PARTNERSHIP": "Partnership", "PRIVACY": "Privacy", "OTHER": "Other" }
     },
     "tickets": {

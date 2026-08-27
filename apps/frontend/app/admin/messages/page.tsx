@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
-import { archivePublicContactMessage, updateContactMessageStatus } from "@/lib/admin-actions";
+import { AdminPublicContactTable } from "@/components/admin/AdminPublicContactTable";
+import { updateContactMessageStatus } from "@/lib/admin-actions";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminMessagesPage() {
@@ -47,26 +48,11 @@ export default async function AdminMessagesPage() {
         {!messages.length ? <p className="mt-4 rounded-lg border border-dashed border-white/10 p-8 text-center text-slate-400">{t("empty.noMessages")}</p> : null}
       </AdminSection>
       <AdminSection title={t("publicContact.list")}>
-        <AdminTable>
-          <table className={tableClassName}>
-            <thead><tr><th className={thClassName}>{t("fields.from")}</th><th className={thClassName}>{t("publicContact.subject")}</th><th className={thClassName}>{t("fields.message")}</th><th className={thClassName}>{t("fields.status")}</th><th className={thClassName}>Email delivery</th><th className={thClassName}>{t("fields.actions")}</th></tr></thead>
-            <tbody className="divide-y divide-white/8">
-              {publicMessages.map((message) => (
-                <tr key={message.id}>
-                  <td className={tdClassName}><strong className="text-white">{message.name}</strong><p className="mt-1 text-xs text-slate-400">{message.email}<br />{message.phone || ""}</p></td>
-                  <td className={tdClassName}>{t(`publicContact.subjects.${message.subject}`)}</td>
-                  <td className={tdClassName}><p className="max-w-xl whitespace-pre-line text-sm text-slate-400">{message.message}</p></td>
-                  <td className={tdClassName}><StatusBadge status={message.status} /></td>
-                  <td className={tdClassName}><StatusBadge status={message.notificationStatus} />{message.notificationError ? <p className="mt-2 max-w-xs text-xs text-rose-300">{message.notificationError}</p> : null}<p className="mt-2 text-xs text-slate-500">Receipt: {message.acknowledgementStatus}</p></td>
-                  <td className={tdClassName}>
-                    {message.status !== "ARCHIVED" ? <form action={archivePublicContactMessage}><input type="hidden" name="id" value={message.id} /><AdminButton tone="success">Archive</AdminButton></form> : null}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </AdminTable>
-        {!publicMessages.length ? <p className="mt-4 rounded-lg border border-dashed border-white/10 p-8 text-center text-slate-400">{t("empty.noPublicContact")}</p> : null}
+        <AdminPublicContactTable messages={publicMessages.map((message) => ({
+          ...message,
+          createdAt: message.createdAt.toISOString(),
+          updatedAt: message.updatedAt.toISOString(),
+        }))} />
       </AdminSection>
     </div>
   );

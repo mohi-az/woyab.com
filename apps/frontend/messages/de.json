@@ -993,13 +993,22 @@
       "empty": "Keine Änderungsanträge gefunden."
     },
     "messages": {
-      "title": "Kontakt-Nachrichten",
-      "description": "Nachrichten aus den Kontaktformularen der Eintraege.",
-      "list": "Nachrichten"
+      "title": "Kontaktanfragen",
+      "description": "Nachrichten aus den Kontaktformularen der Unternehmenseinträge und dem allgemeinen Website-Kontaktformular verwalten.",
+      "list": "Kontaktanfragen an Unternehmen"
     },
     "publicContact": {
       "list": "Website-Kontaktanfragen",
       "subject": "Thema",
+      "details": "Details der Kontaktanfrage",
+      "emailDelivery": "E-Mail-Zustellung",
+      "notification": "Support-Benachrichtigung",
+      "receipt": "Bestätigung an Absender",
+      "receivedAt": "Eingegangen",
+      "requestId": "Anfrage-ID",
+      "reply": "Per E-Mail antworten",
+      "archive": "Archivieren",
+      "close": "Schließen",
       "subjects": { "GENERAL": "Allgemeine Anfrage", "ACCOUNT": "Konto und Anmeldung", "BUSINESS_OWNERSHIP": "Unternehmen und Inhaberschaft", "PARTNERSHIP": "Partnerschaft", "PRIVACY": "Datenschutz", "OTHER": "Sonstiges" }
     },
     "tickets": {
