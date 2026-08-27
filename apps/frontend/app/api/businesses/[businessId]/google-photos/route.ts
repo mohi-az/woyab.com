@@ -7,5 +7,5 @@ type RouteContext = {
 
 export async function GET(request: NextRequest, context: RouteContext) {
   const { businessId } = await context.params;
-  return proxyApi(request, `/v1/businesses/${encodeURIComponent(businessId)}/google-photos`);
+  return proxyApi(request, `/v1/businesses/${encodeURIComponent(businessId)}/google-photos`, { internal: true });
 }

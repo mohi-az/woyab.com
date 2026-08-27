@@ -6,8 +6,7 @@ import type { BusinessDetailData, BusinessReviewItem } from "@/lib/api";
 import { isStoredGoogleCoverUrl } from "@/lib/business-image-storage";
 import { localizeBusinessContent } from "@/lib/business-localization";
 import { prisma } from "@/lib/prisma";
-
-const API_BASE = process.env.API_URL ?? "http://localhost:4000";
+import { fetchInternalApiJson } from "@/lib/server-api";
 
 type GooglePhotoList = {
   data?: {
@@ -95,30 +94,26 @@ export const fetchBusinessDetailFromDatabase = cache(
     // of the Google gallery. Merge both sources and keep the stored cover first.
     if (business.googlePlaceId) {
       try {
-        const response = await fetch(
-          `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
-          { cache: "no-store" },
+        const result = await fetchInternalApiJson<GooglePhotoList>(
+          `/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
         );
-        if (response.ok) {
-          const result = (await response.json()) as GooglePhotoList;
-          const existingUrls = new Set(gallery.map((image) => image.imageUrl));
-          for (const [index, photo] of (result.data?.photos ?? []).entries()) {
-            // The permanent Google cover is created from the first Places photo.
-            if (storedGoogleCover && index === 0) continue;
-            const imageUrl = `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`;
-            if (existingUrls.has(imageUrl)) continue;
-            existingUrls.add(imageUrl);
-            gallery.push({
-              id: `${business.id}-google-${index}`,
-              imageUrl,
-              caption: photo.htmlAttributions?.[0] ?? localized.businessName,
-              sourceUri: photo.googleMapsUri ?? null,
-              authorAttributions: photo.authorAttributions?.map((author) => ({
-                displayName: author.displayName,
-                uri: author.uri,
-              })),
-            });
-          }
+        const existingUrls = new Set(gallery.map((image) => image.imageUrl));
+        for (const [index, photo] of (result.data?.photos ?? []).entries()) {
+          // The permanent Google cover is created from the first Places photo.
+          if (storedGoogleCover && index === 0) continue;
+          const imageUrl = `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`;
+          if (existingUrls.has(imageUrl)) continue;
+          existingUrls.add(imageUrl);
+          gallery.push({
+            id: `${business.id}-google-${index}`,
+            imageUrl,
+            caption: photo.htmlAttributions?.[0] ?? localized.businessName,
+            sourceUri: photo.googleMapsUri ?? null,
+            authorAttributions: photo.authorAttributions?.map((author) => ({
+              displayName: author.displayName,
+              uri: author.uri,
+            })),
+          });
         }
       } catch {
         // The image list is optional; the first-photo proxy below remains available.

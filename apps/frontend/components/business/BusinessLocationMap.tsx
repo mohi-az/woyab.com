@@ -33,9 +33,10 @@ export function BusinessLocationMap({ latitude, longitude, title, address, direc
 
   useEffect(() => {
     let cancelled = false;
+    let loaded = false;
 
     const showFallback = () => {
-      if (cancelled) return;
+      if (cancelled || loaded) return;
       mapRef.current?.remove();
       mapRef.current = null;
       setState("fallback");
@@ -73,12 +74,12 @@ export function BusinessLocationMap({ latitude, longitude, title, address, direc
         .addTo(map);
       map.once("load", () => {
         if (!cancelled) {
+          loaded = true;
           window.clearTimeout(loadTimer);
           window.requestAnimationFrame(() => map.resize());
           setState("ready");
         }
       });
-      map.once("error", showFallback);
     }).catch(() => {
       showFallback();
     });

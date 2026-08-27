@@ -1,9 +1,10 @@
 import { Router } from "express";
-import type { Request, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import { z } from "zod";
 
 import { prisma } from "../../lib/prisma.js";
 import { rateLimit } from "../../middlewares/rate-limit.middleware.js";
+import { isInternalApiRequest } from "../../middlewares/internal-api.middleware.js";
 import {
   getFirstPlacePhotoBuffer,
   getPlacePhotoBuffer,
@@ -11,11 +12,19 @@ import {
 } from "./google-places.service.js";
 
 export const googlePlacesRouter = Router();
-const googlePlacesRateLimit = rateLimit({
+const publicGooglePlacesRateLimit = rateLimit({
   keyPrefix: "public-google",
   limit: 90,
   windowMs: 60_000,
 });
+const googlePlacesRateLimit: RequestHandler = (req, res, next) => {
+  // Do not count every trusted frontend proxy request under one Railway service IP.
+  if (isInternalApiRequest(req)) {
+    next();
+    return;
+  }
+  publicGooglePlacesRateLimit(req, res, next);
+};
 
 const businessIdSchema = z.object({
   id: z.string().min(1),

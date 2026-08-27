@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
 
 import { env } from "../config/env.js";
 
@@ -12,13 +12,18 @@ function secretsMatch(provided: string, expected: string) {
     && timingSafeEqual(providedBuffer, expectedBuffer);
 }
 
+export function isInternalApiRequest(req: Request) {
+  const expected = env.INTERNAL_API_SECRET;
+  if (!expected) return false;
+  return secretsMatch(req.get(INTERNAL_SECRET_HEADER) ?? "", expected);
+}
+
 /**
  * Protects endpoints that may spend third-party API quota. These endpoints may
  * only be reached through the authenticated frontend proxy.
  */
 export const requireInternalApi: RequestHandler = (req, res, next) => {
-  const expected = env.INTERNAL_API_SECRET;
-  if (!expected) {
+  if (!env.INTERNAL_API_SECRET) {
     res.status(503).json({
       success: false,
       error: "Costly integration is not configured",
@@ -26,8 +31,7 @@ export const requireInternalApi: RequestHandler = (req, res, next) => {
     return;
   }
 
-  const provided = req.get(INTERNAL_SECRET_HEADER) ?? "";
-  if (!secretsMatch(provided, expected)) {
+  if (!isInternalApiRequest(req)) {
     res.status(401).json({ success: false, error: "Unauthorized" });
     return;
   }

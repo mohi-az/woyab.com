@@ -118,6 +118,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     && business.longitude <= 180;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [gallery, setGallery] = useState<BusinessDetailData["gallery"]>(() => business.gallery);
   const [originalReviewIds, setOriginalReviewIds] = useState<Set<string>>(new Set());
   const [originalReplyIds, setOriginalReplyIds] = useState<Set<string>>(new Set());
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -141,6 +142,56 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     ? null
     : t(`openStatus.${openStatus.kind}`, { time: openStatus.transitionTime ?? "" });
   const reviewIdsKey = reviews.map((review) => review.id).join(",");
+
+  useEffect(() => {
+    if (!business.googlePlaceId) return;
+    const controller = new AbortController();
+
+    void fetch(`/api/businesses/${encodeURIComponent(business.id)}/google-photos`, {
+      cache: "no-store",
+      signal: controller.signal,
+    }).then(async (response) => {
+      if (!response.ok) return;
+      const result = await response.json() as {
+        data?: {
+          photos?: Array<{
+            photoReference: string;
+            htmlAttributions?: string[];
+            googleMapsUri?: string | null;
+            authorAttributions?: Array<{ displayName: string; uri: string | null }>;
+          }>;
+        };
+      };
+      const photos = result.data?.photos ?? [];
+      if (!photos.length || controller.signal.aborted) return;
+      const storedGoogleCover = business.coverImageUrl?.startsWith("/media/businesses/google-place-") === true
+        || business.coverImageUrl?.startsWith("/uploads/businesses/google-place-") === true;
+
+      setGallery((current) => {
+        const next = [...current];
+        const existingUrls = new Set(next.map((image) => image.imageUrl));
+        let changed = false;
+        for (const [index, photo] of photos.entries()) {
+          if (storedGoogleCover && index === 0) continue;
+          const encodedReference = photo.photoReference.split("/").map(encodeURIComponent).join("/");
+          const imageUrl = `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${encodedReference}?maxWidth=1200`;
+          if (existingUrls.has(imageUrl)) continue;
+          existingUrls.add(imageUrl);
+          changed = true;
+          next.push({
+            id: `${business.id}-google-client-${index}`,
+            imageUrl,
+            caption: photo.htmlAttributions?.[0] ?? business.title,
+            sourceUri: photo.googleMapsUri ?? null,
+            authorAttributions: photo.authorAttributions,
+          });
+        }
+        return changed ? next : current;
+      });
+    }).catch(() => undefined);
+
+    return () => controller.abort();
+  }, [business.coverImageUrl, business.googlePlaceId, business.id, business.title]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
@@ -230,7 +281,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     });
   }, [business.id]);
 
-  const activeImage = business.gallery[activeImageIndex] ?? business.gallery[0];
+  const activeImage = gallery[activeImageIndex] ?? gallery[0];
 
   async function submitReview(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -471,14 +522,14 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               ) : (
                 <div className="flex h-full items-center justify-center text-sm font-bold text-slate-500">{business.title}</div>
               )}
-              {business.gallery.length ? (
+              {gallery.length ? (
                 <button
                   type="button"
                   onClick={() => setGalleryOpen(true)}
                   className="absolute bottom-3 end-3 z-10 inline-flex min-h-11 max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-xl bg-white px-4 text-sm font-black text-slate-950 shadow-[0_10px_30px_rgba(15,23,42,.35)] ring-1 ring-black/10 transition hover:bg-slate-100 sm:bottom-5 sm:end-5"
                 >
                   <FiGrid className="shrink-0 text-primary" />
-                  <span className="truncate">{t("gallery.showAll", { count: business.gallery.length })}</span>
+                  <span className="truncate">{t("gallery.showAll", { count: gallery.length })}</span>
                 </button>
               ) : null}
             </div>
@@ -497,9 +548,9 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               </div>
             ) : null}
 
-            {business.gallery.length > 1 ? (
+            {gallery.length > 1 ? (
               <div className="hidden grid-cols-4 gap-3 p-4 sm:grid sm:grid-cols-6">
-                {business.gallery.map((image, index) => (
+                {gallery.map((image, index) => (
                   <button
                     key={image.id}
                     type="button"
@@ -535,7 +586,10 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   {business.googleRating !== null && business.googleRating !== undefined ? business.googleRating.toFixed(1) : "-"}
                 </p>
                 {business.googleRating !== null && business.googleRating !== undefined ? (
-                  <p className="mt-1 text-xs font-bold text-slate-500">{t("googleReviewsCount", { count: business.googleUserRatingCount ?? 0 })}</p>
+                  <>
+                    <CircularRatingStars rating={business.googleRating} size="sm" className="mt-2" />
+                    <p className="mt-2 text-xs font-bold text-slate-500">{t("googleReviewsCount", { count: business.googleUserRatingCount ?? 0 })}</p>
+                  </>
                 ) : null}
               </div>
               <div className="rounded-2xl bg-slate-50 p-4">
@@ -933,13 +987,13 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
         </aside>
       </div>
       <BusinessPhotoGallery
-        images={business.gallery}
+        images={gallery}
         businessTitle={business.title}
         open={galleryOpen}
         rtl={locale === "fa"}
         onClose={() => setGalleryOpen(false)}
         labels={{
-          title: t("gallery.title", { count: business.gallery.length }),
+          title: t("gallery.title", { count: gallery.length }),
           close: t("gallery.close"),
           previous: t("gallery.previous"),
           next: t("gallery.next"),

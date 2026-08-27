@@ -72,11 +72,12 @@ test("Google cover creation reuses the reviewed photo reference and never blocks
 });
 
 test("admin editing persists galleries and business details merge Google photos with local covers", async () => {
-  const [adminPage, adminGrid, adminActions, detailData] = await Promise.all([
+  const [adminPage, adminGrid, adminActions, detailData, detailClient] = await Promise.all([
     frontendSource("app/admin/businesses/page.tsx"),
     frontendSource("components/admin/AdminBusinessGrid.tsx"),
     frontendSource("lib/admin-actions.ts"),
     frontendSource("lib/business-detail-data.ts"),
+    frontendSource("features/businesses/BusinessDetailClient.tsx"),
   ]);
 
   assert.match(adminPage, /images:\s*\{[\s\S]*orderBy:\s*\{ sortOrder: "asc" \}/);
@@ -90,4 +91,7 @@ test("admin editing persists galleries and business details merge Google photos 
   assert.match(detailData, /if \(business\.googlePlaceId\)/);
   assert.doesNotMatch(detailData, /gallery\.length === 0 && business\.googlePlaceId/);
   assert.match(detailData, /storedGoogleCover && index === 0/);
+  assert.match(detailData, /fetchInternalApiJson<GooglePhotoList>/);
+  assert.match(detailClient, /fetch\(`\/api\/businesses\/\$\{encodeURIComponent\(business\.id\)\}\/google-photos`/);
+  assert.match(detailClient, /setGallery\(\(current\)/);
 });

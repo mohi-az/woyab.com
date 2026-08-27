@@ -11,5 +11,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
   return proxyApi(
     request,
     `/v1/businesses/${encodeURIComponent(businessId)}/google-photo-thumbnail${request.nextUrl.search}`,
+    { internal: true },
   );
 }

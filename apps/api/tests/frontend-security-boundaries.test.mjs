@@ -60,6 +60,15 @@ test("authenticated Google proxy routes send the server-only internal credential
   assert.doesNotMatch(proxy, /NEXT_PUBLIC_INTERNAL/);
 });
 
+test("public business photo proxies authenticate the trusted frontend hop", async () => {
+  const routes = await Promise.all([
+    frontendSource("app/api/businesses/[businessId]/google-photos/route.ts"),
+    frontendSource("app/api/businesses/[businessId]/google-photos/[...photoReference]/route.ts"),
+    frontendSource("app/api/businesses/[businessId]/google-photo-thumbnail/route.ts"),
+  ]);
+  for (const route of routes) assert.match(route, /\{ internal: true \}/);
+});
+
 test("public Next.js surfaces use ACTIVE businesses and APPROVED reviews", async () => {
   const [sitemap, reviews, reports] = await Promise.all([
     frontendSource("app/sitemap.ts"),

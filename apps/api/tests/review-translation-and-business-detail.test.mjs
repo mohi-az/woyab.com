@@ -147,11 +147,13 @@ test("business detail hides empty WoYab stats and provides resilient map, galler
   assert.match(map, /h-\[220px\].*sm:h-\[280px\]/);
   assert.match(map, /openstreetmap\.org\/export\/embed\.html/);
   assert.match(map, /window\.setTimeout\(showFallback, 10_000\)/);
+  assert.doesNotMatch(map, /map\.once\("error"/);
   assert.match(data, /authorAttributions/);
   assert.match(data, /sourceUri: photo\.googleMapsUri/);
   assert.match(ratings, /precision = 0\.5/);
   assert.match(ratings, /safeFill \* 100/);
   assert.match(ratings, /fill=\{filled \? "#ff9f0a" : "#a3a3a3"\}/);
+  assert.match(detail, /stats\.googleRating[\s\S]*CircularRatingStars rating=\{business\.googleRating\}/);
 });
 
 test("initial Google Place import no longer requests review bodies", async () => {
