@@ -116,7 +116,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     && business.latitude <= 90
     && business.longitude >= -180
     && business.longitude <= 180;
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [gallery, setGallery] = useState<BusinessDetailData["gallery"]>(() => business.gallery);
   const [originalReviewIds, setOriginalReviewIds] = useState<Set<string>>(new Set());
@@ -281,7 +280,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     });
   }, [business.id]);
 
-  const activeImage = gallery[activeImageIndex] ?? gallery[0];
+  const activeImage = gallery[0];
 
   async function submitReview(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -548,22 +547,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               </div>
             ) : null}
 
-            {gallery.length > 1 ? (
-              <div className="hidden grid-cols-4 gap-3 p-4 sm:grid sm:grid-cols-6">
-                {gallery.map((image, index) => (
-                  <button
-                    key={image.id}
-                    type="button"
-                    onClick={() => setActiveImageIndex(index)}
-                    className={`overflow-hidden rounded-2xl border-2 transition ${
-                      index === activeImageIndex ? "border-primary shadow-lg" : "border-transparent hover:border-primary/35"
-                    }`}
-                  >
-                    <img src={image.imageUrl} alt={image.caption || business.title} className="aspect-square h-full w-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            ) : null}
           </section>
 
           <section className="rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5">

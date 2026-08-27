@@ -138,6 +138,7 @@ test("business detail hides empty WoYab stats and provides resilient map, galler
   assert.match(detail, /reviewsSection\.showTranslation/);
   assert.match(detail, /BusinessLocationMap/);
   assert.match(detail, /gallery\.showAll/);
+  assert.doesNotMatch(detail, /activeImageIndex|setActiveImageIndex/);
   assert.match(gallery, /role="dialog"/);
   assert.match(gallery, /aria-modal="true"/);
   assert.match(gallery, /document\.body\.style\.overflow = "hidden"/);
