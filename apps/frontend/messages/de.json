@@ -470,6 +470,7 @@
   },
   "Footer": {
     "description": "Entdecken Sie vertrauenswürdige persischsprachige Unternehmen und Dienstleistungen in ganz Deutschland.",
+    "mobilePwa": "Installieren Sie die WoYab-PWA auf Ihrem iPhone oder Android-Gerät – für ein besseres mobiles Erlebnis.",
     "linksTitle": "Entdecken",
     "home": "Startseite",
     "businesses": "Alle Unternehmen",

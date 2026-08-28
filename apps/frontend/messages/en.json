@@ -542,6 +542,7 @@
   },
   "Footer": {
     "description": "Discover trusted Persian-speaking businesses and services across Germany in one practical directory.",
+    "mobilePwa": "For a better mobile experience, install the WoYab PWA on your iPhone or Android device.",
     "linksTitle": "Explore",
     "home": "Home",
     "businesses": "All businesses",

@@ -9,7 +9,7 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-const DISMISSED_KEY = "woyab-pwa-install-dismissed";
+const PROMPT_STATE_KEY = "woyab-pwa-install-prompt-state";
 
 function isStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -22,6 +22,32 @@ function isIosSafari() {
     || (userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1);
   const isSafari = /Safari/.test(userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(userAgent);
   return isIos && isSafari;
+}
+
+function isMobileOrTablet() {
+  const navigatorWithClientHints = navigator as Navigator & {
+    userAgentData?: { mobile?: boolean };
+  };
+  const userAgent = navigator.userAgent;
+  return navigatorWithClientHints.userAgentData?.mobile === true
+    || /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(userAgent)
+    || (userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1);
+}
+
+function getPromptState() {
+  try {
+    return window.localStorage.getItem(PROMPT_STATE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setPromptState(state: "shown" | "dismissed" | "installed") {
+  try {
+    window.localStorage.setItem(PROMPT_STATE_KEY, state);
+  } catch {
+    // Storage may be unavailable in restrictive private-browsing modes.
+  }
 }
 
 export function ServiceWorkerRegistration() {
@@ -56,10 +82,15 @@ export function ServiceWorkerRegistration() {
   }, []);
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production" || isStandalone() || sessionStorage.getItem(DISMISSED_KEY) === "1") return;
+    if (process.env.NODE_ENV !== "production" || isStandalone()) return;
+
+    const eligibleDevice = isMobileOrTablet();
+    const alreadyShown = getPromptState() !== null;
 
     const handleInstallPrompt = (event: Event) => {
       event.preventDefault();
+      if (!eligibleDevice || alreadyShown) return;
+      setPromptState("shown");
       setInstallPrompt(event as BeforeInstallPromptEvent);
       setIosInstructions(false);
       setVisible(true);
@@ -67,14 +98,16 @@ export function ServiceWorkerRegistration() {
     const handleInstalled = () => {
       setVisible(false);
       setInstallPrompt(null);
+      setPromptState("installed");
     };
 
     window.addEventListener("beforeinstallprompt", handleInstallPrompt);
     window.addEventListener("appinstalled", handleInstalled);
 
     let iosTimer: number | undefined;
-    if (isIosSafari()) {
+    if (eligibleDevice && !alreadyShown && isIosSafari()) {
       iosTimer = window.setTimeout(() => {
+        setPromptState("shown");
         setIosInstructions(true);
         setVisible(true);
       }, 1800);
@@ -93,11 +126,11 @@ export function ServiceWorkerRegistration() {
     const choice = await installPrompt.userChoice;
     setInstallPrompt(null);
     setVisible(false);
-    if (choice.outcome === "dismissed") sessionStorage.setItem(DISMISSED_KEY, "1");
+    setPromptState(choice.outcome === "accepted" ? "installed" : "dismissed");
   }
 
   function dismiss() {
-    sessionStorage.setItem(DISMISSED_KEY, "1");
+    setPromptState("dismissed");
     setVisible(false);
   }
 

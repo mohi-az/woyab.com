@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { FiMail, FiMessageSquare } from "react-icons/fi";
+import { FaAndroid, FaApple } from "react-icons/fa";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { CookiePreferencesButton } from "@/components/privacy/CookiePreferencesButton";
@@ -23,6 +24,13 @@ export default async function Footer() {
             <BrandLogo variant="white" className="h-11 max-w-[8.5rem]" />
           </Link>
           <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">{t("description")}</p>
+          <div className="mt-5 flex max-w-sm items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3.5">
+            <span className="flex shrink-0 items-center gap-1.5 text-xl text-white" dir="ltr" aria-hidden="true">
+              <FaApple />
+              <FaAndroid />
+            </span>
+            <p className="text-sm leading-6 text-slate-300">{t("mobilePwa")}</p>
+          </div>
         </div>
 
         <div>
