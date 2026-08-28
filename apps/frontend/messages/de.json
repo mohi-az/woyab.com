@@ -58,7 +58,7 @@
   },
   "PwaInstall": {
     "title": "WoYab installieren",
-    "description": "Fügen Sie WoYab zum Startbildschirm hinzu – für schnelleren Zugriff wie bei einer App.",
+    "description": "Installieren Sie die WoYab-PWA auf Ihrem iPhone oder Android-Gerät – für ein besseres mobiles Erlebnis.",
     "iosInstructions": "Tippen Sie in Safari auf „Teilen“ und dann auf „Zum Home-Bildschirm“.",
     "action": "App installieren",
     "dismiss": "Nicht jetzt"

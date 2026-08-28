@@ -58,7 +58,7 @@
   },
   "PwaInstall": {
     "title": "Install WoYab",
-    "description": "Add WoYab to your home screen for faster access and an app-like experience.",
+    "description": "For a better mobile experience, install the WoYab PWA on your iPhone or Android device.",
     "iosInstructions": "Tap Share in Safari, then choose Add to Home Screen.",
     "action": "Install app",
     "dismiss": "Not now"

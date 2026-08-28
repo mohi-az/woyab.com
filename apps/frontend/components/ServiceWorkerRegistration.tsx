@@ -156,9 +156,7 @@ export function ServiceWorkerRegistration() {
         </span>
         <div>
           <p className="font-black">{t("title")}</p>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
-            {iosInstructions ? t("iosInstructions") : t("description")}
-          </p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">{t("description")}</p>
         </div>
       </div>
       {installPrompt ? (

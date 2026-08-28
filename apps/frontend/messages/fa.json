@@ -58,7 +58,7 @@
   },
   "PwaInstall": {
     "title": "نصب WoYab",
-    "description": "برای دسترسی سریع‌تر و تجربه‌ای شبیه اپلیکیشن، WoYab را به صفحه اصلی گوشی اضافه کنید.",
+    "description": "برای تجربه کاربری بهتر در موبایل، نسخه PWA وویاب را روی iPhone یا Android نصب کنید.",
     "iosInstructions": "در Safari روی دکمه اشتراک‌گذاری بزنید و سپس «Add to Home Screen» را انتخاب کنید.",
     "action": "نصب اپلیکیشن",
     "dismiss": "فعلاً نه"

@@ -24,10 +24,10 @@ export default async function Footer() {
             <BrandLogo variant="white" className="h-11 max-w-[8.5rem]" />
           </Link>
           <p className="mt-5 max-w-sm text-sm leading-7 text-slate-300">{t("description")}</p>
-          <div className="mt-5 flex max-w-sm items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3.5">
-            <span className="flex shrink-0 items-center gap-1.5 text-xl text-white" dir="ltr" aria-hidden="true">
-              <FaApple />
-              <FaAndroid />
+          <div className="mt-5 flex max-w-sm items-center gap-3.5">
+            <span className="flex shrink-0 items-center gap-2 text-3xl" dir="ltr" aria-hidden="true">
+              <FaApple className="text-[#f5f5f7]" />
+              <FaAndroid className="text-[#3ddc84]" />
             </span>
             <p className="text-sm leading-6 text-slate-300">{t("mobilePwa")}</p>
           </div>
