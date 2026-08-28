@@ -5,6 +5,7 @@ import { FaAndroid, FaApple } from "react-icons/fa";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { CookiePreferencesButton } from "@/components/privacy/CookiePreferencesButton";
+import { PwaInstallButton } from "@/components/pwa/PwaInstallButton";
 import { supportEmail } from "@/lib/mail";
 
 export default async function Footer() {
@@ -31,6 +32,7 @@ export default async function Footer() {
             </span>
             <p className="text-sm leading-6 text-slate-300">{t("mobilePwa")}</p>
           </div>
+          <PwaInstallButton />
         </div>
 
         <div>

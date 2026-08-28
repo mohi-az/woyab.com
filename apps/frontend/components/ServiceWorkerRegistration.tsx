@@ -9,6 +9,12 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
+declare global {
+  interface Window {
+    __woyabPwaInstallPrompt?: BeforeInstallPromptEvent;
+  }
+}
+
 const PROMPT_STATE_KEY = "woyab-pwa-install-prompt-state";
 
 function isStandalone() {
@@ -89,6 +95,8 @@ export function ServiceWorkerRegistration() {
 
     const handleInstallPrompt = (event: Event) => {
       event.preventDefault();
+      window.__woyabPwaInstallPrompt = event as BeforeInstallPromptEvent;
+      window.dispatchEvent(new Event("woyab:pwa-install-available"));
       if (!eligibleDevice || alreadyShown) return;
       setPromptState("shown");
       setInstallPrompt(event as BeforeInstallPromptEvent);
@@ -98,11 +106,17 @@ export function ServiceWorkerRegistration() {
     const handleInstalled = () => {
       setVisible(false);
       setInstallPrompt(null);
+      delete window.__woyabPwaInstallPrompt;
       setPromptState("installed");
+    };
+    const handleExternalInstall = () => {
+      setVisible(false);
+      setInstallPrompt(null);
     };
 
     window.addEventListener("beforeinstallprompt", handleInstallPrompt);
     window.addEventListener("appinstalled", handleInstalled);
+    window.addEventListener("woyab:pwa-install-finished", handleExternalInstall);
 
     let iosTimer: number | undefined;
     if (eligibleDevice && !alreadyShown && isIosSafari()) {
@@ -116,6 +130,7 @@ export function ServiceWorkerRegistration() {
     return () => {
       window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
       window.removeEventListener("appinstalled", handleInstalled);
+      window.removeEventListener("woyab:pwa-install-finished", handleExternalInstall);
       if (iosTimer !== undefined) window.clearTimeout(iosTimer);
     };
   }, []);
@@ -124,6 +139,8 @@ export function ServiceWorkerRegistration() {
     if (!installPrompt) return;
     await installPrompt.prompt();
     const choice = await installPrompt.userChoice;
+    delete window.__woyabPwaInstallPrompt;
+    window.dispatchEvent(new Event("woyab:pwa-install-finished"));
     setInstallPrompt(null);
     setVisible(false);
     setPromptState(choice.outcome === "accepted" ? "installed" : "dismissed");

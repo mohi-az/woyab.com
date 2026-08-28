@@ -61,6 +61,10 @@
     "description": "برای تجربه کاربری بهتر در موبایل، نسخه PWA وویاب را روی iPhone یا Android نصب کنید.",
     "iosInstructions": "در Safari روی دکمه اشتراک‌گذاری بزنید و سپس «Add to Home Screen» را انتخاب کنید.",
     "action": "نصب اپلیکیشن",
+    "mobileLabel": "نسخه PWA موبایل",
+    "installing": "در حال نصب…",
+    "installed": "نصب شده",
+    "unavailable": "از منوی مرورگر گزینه Install app یا Add to Home Screen را انتخاب کنید.",
     "dismiss": "فعلاً نه"
   },
   "Contact": {
