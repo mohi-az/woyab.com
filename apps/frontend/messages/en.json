@@ -200,25 +200,29 @@
     "error": "Failed to fetch results. Please try again.",
     "retry": "Try again",
     "filters": {
+      "all": "All",
       "title": "Filters",
+      "close": "Close filters",
       "search": "Business name",
       "searchPlaceholder": "What are you looking for?",
       "categories": "Categories",
       "allCategories": "All categories",
       "subCategories": "Subcategories",
       "allSubCategories": "All subcategories",
+      "showAll": "Show all",
+      "showLess": "Show less",
       "city": "City",
       "allCities": "All cities",
       "location": "Location",
-      "reset": "Reset",
+      "reset": "Clear filters",
       "favoritesOnly": "Show only my favorites",
       "openNow": "Open now"
     },
     "sort": {
       "label": "Sort by:",
-      "recommended": "Recommended",
-      "latest": "Date: Newest on top",
-      "nearest": "Nearest first"
+      "latest": "Newest",
+      "oldest": "Oldest",
+      "popular": "Most popular"
     },
     "card": {
       "favorite": "Add to favorites",

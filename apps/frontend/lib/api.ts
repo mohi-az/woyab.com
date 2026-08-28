@@ -245,7 +245,7 @@ export type BusinessDirectoryFilters = {
   categoryId?: number;
   subCategoryId?: number;
   cityId?: number;
-  sortBy?: "latest" | "distance";
+  sortBy?: "latest" | "oldest" | "popular";
   favoritesOnly?: boolean;
   openNow?: boolean;
 };
@@ -597,7 +597,7 @@ export async function searchBusinessDirectory(
     subCategoryId: filters.subCategoryId,
     cityId: filters.cityId,
     search: filters.search,
-    sortBy: filters.sortBy ?? "recommended",
+    sortBy: filters.sortBy ?? "popular",
     favoritesOnly: filters.favoritesOnly,
     openNow: filters.openNow,
     origin,

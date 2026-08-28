@@ -51,6 +51,9 @@ type Props = {
   favoriteBusinessIds: Set<string>;
   savedLocations: Array<SavedLocationOption & { isDefault?: boolean }>;
   refreshKey?: number;
+  highlightedBusinessId?: string | null;
+  className?: string;
+  mapClassName?: string;
 };
 
 type MapData = FeatureCollection<Point, MapProperties> & { truncated?: boolean };
@@ -126,12 +129,27 @@ function savedLocationIcon(icon: SavedLocationOption["icon"]) {
   return '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
 }
 
-export function BusinessMap({ filters, location, radiusKm, locale, labels, favoriteBusinessIds, savedLocations, refreshKey = 0 }: Props) {
+export function BusinessMap({
+  filters,
+  location,
+  radiusKm,
+  locale,
+  labels,
+  favoriteBusinessIds,
+  savedLocations,
+  refreshKey = 0,
+  highlightedBusinessId = null,
+  className = "",
+  mapClassName = "h-[360px] sm:h-[440px] lg:h-[500px]",
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapboxRef = useRef<typeof mapboxgl | null>(null);
   const popupRef = useRef<mapboxgl.Popup | null>(null);
   const savedMarkersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
+  const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const businessFeaturesRef = useRef<Array<Feature<Point, MapProperties>>>([]);
+  const highlightedBusinessIdRef = useRef<string | null>(highlightedBusinessId);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -322,6 +340,38 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
           },
         });
 
+        // Keep the hovered result in a separate, unclustered source. This lets
+        // the corresponding pin stay visible even when its regular point is
+        // currently represented by a cluster.
+        map.addSource("highlighted-business", {
+          type: "geojson",
+          data: { type: "FeatureCollection", features: [] },
+        });
+
+        map.addLayer({
+          id: "highlighted-business-point",
+          type: "circle",
+          source: "highlighted-business",
+          paint: {
+            "circle-color": "#172033",
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 15.5, 9, 17.5, 13, 19, 16, 21],
+            "circle-stroke-width": 4,
+            "circle-stroke-color": "#ffffff",
+          },
+        });
+
+        map.addLayer({
+          id: "highlighted-business-icon",
+          type: "symbol",
+          source: "highlighted-business",
+          layout: {
+            "icon-image": ["get", "mapIcon"],
+            "icon-size": ["interpolate", ["linear"], ["zoom"], 4, 1.25, 9, 1.45, 13, 1.55, 16, 1.65],
+            "icon-allow-overlap": true,
+          },
+          paint: { "icon-color": "#ffffff" },
+        });
+
         map.on("click", "business-clusters", (event) => {
           const feature = map.queryRenderedFeatures(event.point, { layers: ["business-clusters"] })[0] as unknown as
             | Feature<Point, { cluster_id: number; point_count: number }>
@@ -411,12 +461,28 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
     return () => {
       cancelled = true;
       popupRef.current?.remove();
+      originMarkerRef.current?.remove();
+      originMarkerRef.current = null;
       savedMarkers.forEach((marker) => marker.remove());
       savedMarkers.clear();
       mapRef.current?.remove();
       mapRef.current = null;
     };
   }, [labels, locale]);
+
+  useEffect(() => {
+    highlightedBusinessIdRef.current = highlightedBusinessId;
+    if (!ready || !mapRef.current) return;
+
+    const feature = highlightedBusinessId
+      ? businessFeaturesRef.current.find((item) => item.properties.businessId === highlightedBusinessId)
+      : undefined;
+    const source = mapRef.current.getSource("highlighted-business") as mapboxgl.GeoJSONSource | undefined;
+    source?.setData({
+      type: "FeatureCollection",
+      features: feature ? [feature] : [],
+    });
+  }, [highlightedBusinessId, ready]);
 
   useEffect(() => {
     if (!ready || !mapRef.current) return;
@@ -468,6 +534,36 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
   }, [ready, savedLocations]);
 
   useEffect(() => {
+    originMarkerRef.current?.remove();
+    originMarkerRef.current = null;
+
+    if (!ready || !mapRef.current || !mapboxRef.current || !location) return;
+
+    const element = document.createElement("button");
+    element.type = "button";
+    element.className = "directory-origin-marker";
+    element.setAttribute("aria-label", location.label);
+    element.title = location.label;
+    element.innerHTML = '<span aria-hidden="true"></span>';
+
+    originMarkerRef.current = new mapboxRef.current.Marker({ element, anchor: "center" })
+      .setLngLat([location.longitude, location.latitude])
+      .setPopup(new mapboxRef.current.Popup({ offset: 18 }).setText(location.label))
+      .addTo(mapRef.current);
+
+    mapRef.current.easeTo({
+      center: [location.longitude, location.latitude],
+      zoom: Math.max(mapRef.current.getZoom(), 11),
+      duration: 650,
+    });
+
+    return () => {
+      originMarkerRef.current?.remove();
+      originMarkerRef.current = null;
+    };
+  }, [location, ready]);
+
+  useEffect(() => {
     if (!ready || !mapRef.current || !mapboxRef.current) return;
 
     const controller = new AbortController();
@@ -508,15 +604,27 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
         type: "FeatureCollection",
         features: data.features,
       });
+      businessFeaturesRef.current = data.features;
+
+      const highlightedFeature = highlightedBusinessIdRef.current
+        ? data.features.find((item) => item.properties.businessId === highlightedBusinessIdRef.current)
+        : undefined;
+      (map.getSource("highlighted-business") as mapboxgl.GeoJSONSource).setData({
+        type: "FeatureCollection",
+        features: highlightedFeature ? [highlightedFeature] : [],
+      });
 
       setTruncated(Boolean(data.truncated));
 
-      if (data.features.length === 1 && savedLocations.length === 0) {
+      if (data.features.length === 0 && savedLocations.length === 0 && location) {
+        map.easeTo({ center: [location.longitude, location.latitude], zoom: 13, duration: 700 });
+      } else if (data.features.length === 1 && savedLocations.length === 0 && !location) {
         map.easeTo({ center: data.features[0].geometry.coordinates as [number, number], zoom: 13 });
-      } else if (data.features.length > 0 || savedLocations.length > 0) {
+      } else if (data.features.length > 0 || savedLocations.length > 0 || location) {
         const bounds = new mapbox.LngLatBounds();
         data.features.forEach((feature) => bounds.extend(feature.geometry.coordinates as [number, number]));
         savedLocations.forEach((item) => bounds.extend([item.longitude, item.latitude]));
+        if (location) bounds.extend([location.longitude, location.latitude]);
         map.fitBounds(bounds, { padding: 55, maxZoom: 14, duration: 700 });
       }
     }).catch((requestError) => {
@@ -543,8 +651,8 @@ export function BusinessMap({ filters, location, radiusKm, locale, labels, favor
   ]);
 
   return (
-    <div className="relative overflow-hidden rounded-[22px] border border-gray-200 bg-[#eef1f2] shadow-[0_14px_35px_rgba(17,24,39,0.08)]">
-      <div ref={containerRef} role="region" aria-label={labels.title} className="h-[360px] w-full sm:h-[440px] lg:h-[500px]" />
+    <div className={`relative overflow-hidden rounded-[22px] border border-gray-200 bg-[#eef1f2] shadow-[0_14px_35px_rgba(17,24,39,0.08)] ${className}`}>
+      <div ref={containerRef} role="region" aria-label={labels.title} className={`w-full ${mapClassName}`} />
       {loading ? (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/35 backdrop-blur-[1px]">
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-lg">

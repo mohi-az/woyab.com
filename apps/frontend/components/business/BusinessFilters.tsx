@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FiChevronDown, FiSearch, FiX } from "react-icons/fi";
+import { FiChevronDown, FiGrid, FiSearch } from "react-icons/fi";
 import {
   LocationPicker,
   type LocationPickerLabels,
@@ -20,6 +20,8 @@ export type BusinessFilterLabels = {
   allCategories: string;
   subCategories: string;
   allSubCategories: string;
+  showAll: string;
+  showLess: string;
   city: string;
   allCities: string;
   location: string;
@@ -42,8 +44,9 @@ type Props = {
   onLocationChange: (location: LocationValue | null) => void;
   onRadiusChange: (radius: RadiusKm | null) => void;
   onReset: () => void;
-  resetVersion: number;
+  showReset?: boolean;
   savedLocations?: SavedLocationOption[];
+  variant?: "sidebar" | "popover" | "drawer";
 };
 
 export function BusinessFilters({
@@ -59,8 +62,9 @@ export function BusinessFilters({
   onLocationChange,
   onRadiusChange,
   onReset,
-  resetVersion,
+  showReset = true,
   savedLocations = [],
+  variant = "sidebar",
 }: Props) {
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +75,8 @@ export function BusinessFilters({
   const proximity = selectedCity?.latitude != null && selectedCity.longitude != null
     ? { latitude: selectedCity.latitude, longitude: selectedCity.longitude }
     : undefined;
+  const categoryCount = optionCount(categories);
+  const subCategoryCount = optionCount(visibleSubCategories);
 
   function reset() {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
@@ -79,158 +85,182 @@ export function BusinessFilters({
   }
 
   return (
-    <aside className="lg:sticky lg:top-26 lg:self-start">
-      <div className="space-y-4 rounded-2xl border border-white bg-white p-4 shadow-[0_12px_36px_rgba(15,23,42,.06)]">
-        <FilterSection title={labels.categories} defaultOpen>
-          <fieldset>
-            <legend className="sr-only">{labels.categories}</legend>
-            <div className="max-h-80 space-y-1 overflow-y-auto overflow-x-hidden pe-4 [scrollbar-gutter:stable]">
-              <FilterRadio
-                name="categoryId"
-                label={labels.allCategories}
-                checked={!filters.categoryId}
-                onChange={() => onFiltersChange({ categoryId: undefined, subCategoryId: undefined })}
+    <aside className={variant === "sidebar" ? "lg:sticky lg:top-26 lg:self-start" : "w-full"}>
+      <div className={`bg-white p-5 ${variant === "popover" ? "max-h-[min(72dvh,46rem)] overflow-y-auto overscroll-contain rounded-2xl" : variant === "drawer" ? "min-h-full" : "rounded-2xl border border-white shadow-[0_12px_36px_rgba(15,23,42,.06)]"}`}>
+        <div className="space-y-6">
+          <FilterGroup title={labels.search}>
+            <div className="relative">
+              <FiSearch className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400" />
+              <input
+                ref={searchInputRef}
+                id="business-search"
+                defaultValue={filters.search}
+                onChange={(event) => {
+                  if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+                  const search = event.target.value.trim() || undefined;
+                  searchTimerRef.current = setTimeout(() => onFiltersChange({ search }), 350);
+                }}
+                placeholder={labels.searchPlaceholder}
+                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/70 ps-10 pe-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
               />
-              {categories.map((category) => (
-                <FilterRadio
-                  key={category.id}
-                  name="categoryId"
-                  value={category.id}
-                  label={category.name}
-                  iconKey={category.iconKey}
-                  count={category.count}
-                  checked={filters.categoryId === category.id}
-                  onChange={() => onFiltersChange({ categoryId: category.id, subCategoryId: undefined })}
-                />
-              ))}
             </div>
-          </fieldset>
-        </FilterSection>
+          </FilterGroup>
 
-        {visibleSubCategories.length > 0 ? (
-          <FilterSection title={labels.subCategories} defaultOpen>
-            <fieldset>
-              <legend className="sr-only">{labels.subCategories}</legend>
-              <div className="max-h-64 space-y-1 overflow-y-auto overflow-x-hidden pe-4 [scrollbar-gutter:stable]">
-                <FilterRadio
-                  name="subCategoryId"
-                  label={labels.allSubCategories}
-                  checked={!filters.subCategoryId}
-                  onChange={() => onFiltersChange({ subCategoryId: undefined })}
-                />
-                {visibleSubCategories.map((subCategory) => (
-                  <FilterRadio
-                    key={subCategory.id}
-                    name="subCategoryId"
-                    value={subCategory.id}
-                    label={subCategory.name}
-                    iconKey={subCategory.iconKey}
-                    count={subCategory.count}
-                    checked={filters.subCategoryId === subCategory.id}
-                    onChange={() => onFiltersChange({ subCategoryId: subCategory.id })}
-                  />
-                ))}
-              </div>
-            </fieldset>
-          </FilterSection>
-        ) : null}
-
-        <FilterSection title={labels.location} defaultOpen>
-          <LocationPicker
-            key={resetVersion}
-            value={location}
-            radiusKm={radiusKm}
-            language={locale}
-            labels={labels.locationPicker}
-            onChange={onLocationChange}
-            onRadiusChange={onRadiusChange}
-            savedLocations={savedLocations}
-            proximity={proximity}
+          <FilterGroup title={labels.categories}>
+          <FilterChoiceList
+            legend={labels.categories}
+            allLabel={labels.allCategories}
+            allCount={categoryCount}
+            options={categories}
+            selectedId={filters.categoryId}
+            showAllLabel={labels.showAll}
+            showLessLabel={labels.showLess}
+            onSelect={(categoryId) => onFiltersChange({ categoryId, subCategoryId: undefined })}
           />
-        </FilterSection>
+          </FilterGroup>
 
-        <FilterSection title={labels.title} defaultOpen>
-          <div className="space-y-5">
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-primary/15 bg-white p-3 text-sm font-bold text-slate-700">
-              <input
-                type="checkbox"
-                checked={Boolean(filters.favoritesOnly)}
-                onChange={(event) => onFiltersChange({ favoritesOnly: event.target.checked || undefined })}
-                className="h-4 w-4 accent-primary"
-              />
-              {labels.favoritesOnly}
-            </label>
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-sm font-bold text-emerald-800">
-              <input
-                type="checkbox"
-                checked={Boolean(filters.openNow)}
-                onChange={(event) => onFiltersChange({ openNow: event.target.checked || undefined })}
-                className="h-4 w-4 accent-emerald-600"
-              />
-              {labels.openNow}
-            </label>
-            <div>
-              <label htmlFor="business-search" className="mb-2 block text-sm font-bold text-gray-800">{labels.search}</label>
-              <div className="relative">
-                <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 rtl:left-auto rtl:right-4" />
-                <input
-                  ref={searchInputRef}
-                  id="business-search"
-                  defaultValue={filters.search}
-                  onChange={(event) => {
-                    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-                    const search = event.target.value.trim() || undefined;
-                    searchTimerRef.current = setTimeout(() => onFiltersChange({ search }), 350);
-                  }}
-                  placeholder={labels.searchPlaceholder}
-                  className="h-12 w-full rounded-xl border border-gray-200 bg-white px-11 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
-                />
-              </div>
-            </div>
+          {visibleSubCategories.length > 0 ? (
+            <FilterGroup title={labels.subCategories}>
+            <FilterChoiceList
+              key={filters.categoryId}
+              legend={labels.subCategories}
+              allLabel={labels.allSubCategories}
+              allCount={subCategoryCount}
+              options={visibleSubCategories}
+              selectedId={filters.subCategoryId}
+              showAllLabel={labels.showAll}
+              showLessLabel={labels.showLess}
+              onSelect={(subCategoryId) => onFiltersChange({ subCategoryId })}
+            />
+            </FilterGroup>
+          ) : null}
 
-            <div>
-              <label htmlFor="business-city" className="mb-2 block text-sm font-bold text-gray-800">{labels.city}</label>
-              <select
-                id="business-city"
-                value={filters.cityId ?? ""}
-                onChange={(event) => onFiltersChange({ cityId: event.target.value ? Number(event.target.value) : undefined })}
-                className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
-              >
-                <option value="">{labels.allCities}</option>
-                {cities.map((city) => <option key={city.id} value={city.id}>{city.name}</option>)}
-              </select>
-            </div>
-          </div>
-        </FilterSection>
+          <FilterGroup title={labels.location}>
+            <LocationPicker
+              value={location}
+              radiusKm={radiusKm}
+              language={locale}
+              labels={labels.locationPicker}
+              onChange={onLocationChange}
+              onRadiusChange={onRadiusChange}
+              savedLocations={savedLocations}
+              proximity={proximity}
+              compact
+            />
+          </FilterGroup>
+        </div>
 
-        <button type="button" onClick={reset} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 transition hover:border-primary hover:bg-primary/5 hover:text-primary">
-          <FiX /> {labels.reset}
-        </button>
+        {showReset ? (
+          <button
+            type="button"
+            onClick={reset}
+            className="mt-6 text-sm font-semibold text-slate-500 underline-offset-4 transition hover:text-primary hover:underline focus-visible:outline-none focus-visible:text-primary focus-visible:underline"
+          >
+            {labels.reset}
+          </button>
+        ) : null}
       </div>
     </aside>
   );
 }
 
-function FilterSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <details open={isOpen} onToggle={(event) => setIsOpen(event.currentTarget.open)} className="group overflow-hidden rounded-xl bg-[#f8f5f1]">
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-4 text-base font-extrabold text-slate-950 marker:content-none sm:text-lg">
-        {title}
-        <FiChevronDown className="shrink-0 text-base transition-transform duration-200 group-open:rotate-180" />
-      </summary>
-      <div className="px-4 pb-5">{children}</div>
-    </details>
+    <section className="border-b border-slate-200/70 pb-6">
+      <h3 className="mb-3 text-[13px] font-semibold leading-5 text-slate-800">{title}</h3>
+      {children}
+    </section>
   );
 }
 
-function FilterRadio({ name, value, label, count, iconKey, checked, onChange }: { name: string; value?: number; label: string; count?: number; iconKey?: string | null; checked: boolean; onChange: () => void }) {
+const INITIAL_VISIBLE_OPTIONS = 5;
+
+function optionCount(options: DirectoryFilterOption[]) {
+  return options.some((option) => option.count !== undefined)
+    ? options.reduce((total, option) => total + (option.count ?? 0), 0)
+    : undefined;
+}
+
+function FilterChoiceList({
+  legend,
+  allLabel,
+  allCount,
+  options,
+  selectedId,
+  showAllLabel,
+  showLessLabel,
+  onSelect,
+}: {
+  legend: string;
+  allLabel: string;
+  allCount?: number;
+  options: DirectoryFilterOption[];
+  selectedId?: number;
+  showAllLabel: string;
+  showLessLabel: string;
+  onSelect: (id: number | undefined) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const initialOptions = options.slice(0, INITIAL_VISIBLE_OPTIONS);
+  const selectedOption = selectedId ? options.find((option) => option.id === selectedId) : undefined;
+  const collapsedOptions = selectedOption && !initialOptions.some((option) => option.id === selectedOption.id)
+    ? [...initialOptions, selectedOption]
+    : initialOptions;
+  const shownOptions = expanded ? options : collapsedOptions;
+  const canExpand = options.length > INITIAL_VISIBLE_OPTIONS;
+
   return (
-    <label className="grid min-h-10 w-full min-w-0 cursor-pointer grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 text-sm text-slate-600 transition hover:bg-white hover:text-slate-950">
-      <input type="radio" name={name} value={value ?? ""} checked={checked} onChange={onChange} className="radio radio-xs border-gray-300 text-primary [--chkbg:var(--color-primary)]" />
-      {iconKey ? <CategoryIcon iconKey={iconKey} className="shrink-0 text-base text-primary" /> : <span aria-hidden="true" />}
+    <fieldset>
+      <legend className="sr-only">{legend}</legend>
+      <div className="flex flex-wrap gap-2">
+        <FilterChoiceButton
+          label={allLabel}
+          count={allCount}
+          checked={!selectedId}
+          iconKey={null}
+          onClick={() => onSelect(undefined)}
+        />
+        {shownOptions.map((option) => (
+          <FilterChoiceButton
+            key={option.id}
+            label={option.name}
+            count={option.count}
+            iconKey={option.iconKey}
+            checked={selectedId === option.id}
+            onClick={() => onSelect(option.id)}
+          />
+        ))}
+      </div>
+      {canExpand ? (
+        <div className="pt-4">
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+            aria-expanded={expanded}
+            className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white !text-[13px] font-medium leading-5 text-slate-600 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+          >
+            {expanded ? showLessLabel : showAllLabel}
+            <FiChevronDown aria-hidden="true" className={`text-xs transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+      ) : null}
+    </fieldset>
+  );
+}
+
+function FilterChoiceButton({ label, count, iconKey, checked, onClick }: { label: string; count?: number; iconKey?: string | null; checked: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={checked}
+      onClick={onClick}
+      className={`inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-start !text-[13px] leading-5 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10 ${checked ? "border-primary/35 bg-primary/10 font-medium text-primary" : "border-slate-200 bg-white font-normal text-slate-600 hover:border-primary/40 hover:bg-primary/5 hover:text-slate-900"}`}
+    >
+      {iconKey ? <CategoryIcon iconKey={iconKey} className="shrink-0 text-sm text-primary" /> : <FiGrid aria-hidden="true" className="shrink-0 text-sm text-primary" />}
       <span className="min-w-0 truncate">{label}</span>
-      {count !== undefined ? <span className="justify-self-end whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-gray-400">{count}</span> : null}
-    </label>
+      {count !== undefined ? (
+        <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${checked ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-400"}`}>{count}</span>
+      ) : null}
+    </button>
   );
 }

@@ -36,7 +36,7 @@ export const businessRouter = Router();
  *         schema: { type: string }
  *       - in: query
  *         name: sortBy
- *         schema: { type: string, enum: [latest] }
+ *         schema: { type: string, enum: [latest, oldest, popular] }
  *     responses:
  *       200:
  *         description: Paginated list of businesses

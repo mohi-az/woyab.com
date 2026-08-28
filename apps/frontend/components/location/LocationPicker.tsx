@@ -62,6 +62,7 @@ type Props = {
   savedLocations?: SavedLocationOption[];
   proximity?: { latitude: number; longitude: number };
   storageKey?: string;
+  compact?: boolean;
 };
 
 const RADIUS_OPTIONS: RadiusKm[] = [1, 3, 5, 10, 25, 50];
@@ -83,6 +84,7 @@ export function LocationPicker({
   savedLocations = [],
   proximity,
   storageKey = "woyab:business-search-location",
+  compact = false,
 }: Props) {
   const listboxId = useId();
   const [query, setQuery] = useState(value?.label ?? "");
@@ -303,9 +305,9 @@ export function LocationPicker({
   const showSaved = open && query.length === 0 && savedLocations.length > 0;
 
   return (
-    <div className="space-y-4">
+    <div className={compact ? "space-y-3" : "space-y-4"}>
       <div className="relative">
-        <label htmlFor={`${listboxId}-input`} className="mb-2 block text-sm font-bold text-gray-800">
+        <label htmlFor={`${listboxId}-input`} className={compact ? "mb-1.5 block text-[13px] font-medium leading-5 text-slate-700" : "mb-2 block text-sm font-bold text-gray-800"}>
           {labels.inputLabel}
         </label>
         <div className="relative flex items-center">
@@ -335,7 +337,7 @@ export function LocationPicker({
             onFocus={() => setOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder={labels.placeholder}
-            className="h-12 w-full rounded-xl border border-gray-200 bg-white px-11 pe-20 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+            className={`${compact ? "h-11 text-[14px]" : "h-12 text-sm"} w-full rounded-xl border border-gray-200 bg-white px-11 pe-20 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10`}
           />
           <div className="absolute right-2 flex items-center gap-1 rtl:left-2 rtl:right-auto">
             {value ? (
@@ -396,18 +398,18 @@ export function LocationPicker({
       {error ? <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">{error}</p> : null}
 
       <div>
-        <label htmlFor={`${listboxId}-radius`} className="mb-2 block text-sm font-bold text-gray-800">{labels.radius}</label>
+        <label htmlFor={`${listboxId}-radius`} className={compact ? "mb-1.5 block text-[13px] font-medium leading-5 text-slate-700" : "mb-2 block text-sm font-bold text-gray-800"}>{labels.radius}</label>
         <select
           id={`${listboxId}-radius`}
           value={radiusKm ?? ""}
           disabled={!value}
           onChange={(event) => onRadiusChange(event.target.value ? Number(event.target.value) as RadiusKm : null)}
-          className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10"
+          className={`${compact ? "h-11 text-[14px]" : "h-12 text-sm"} w-full rounded-xl border border-gray-200 bg-white px-4 outline-none transition disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10`}
         >
           <option value="">{labels.anyDistance}</option>
           {RADIUS_OPTIONS.map((radius) => <option key={radius} value={radius}>{radius} km</option>)}
         </select>
-        {!value ? <p className="mt-2 text-xs leading-5 text-gray-500">{labels.radiusHint}</p> : null}
+        {!value ? <p className={`${compact ? "mt-1.5 text-[12px] leading-4" : "mt-2 text-xs leading-5"} text-gray-500`}>{labels.radiusHint}</p> : null}
       </div>
     </div>
   );

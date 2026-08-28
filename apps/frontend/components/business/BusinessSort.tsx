@@ -1,36 +1,41 @@
 "use client";
 
+import { FiBarChart2, FiChevronDown } from "react-icons/fi";
+
+export type BusinessSortValue = "latest" | "oldest" | "popular";
+
 type Props = {
-  value?: "latest" | "distance";
-  locationActive: boolean;
+  value: BusinessSortValue;
   label: string;
-  recommendedLabel: string;
   latestLabel: string;
-  nearestLabel: string;
-  onChange: (value: "recommended" | "latest" | "distance") => void;
+  oldestLabel: string;
+  popularLabel: string;
+  onChange: (value: BusinessSortValue) => void;
 };
 
 export function BusinessSort({
   value,
-  locationActive,
   label,
-  recommendedLabel,
   latestLabel,
-  nearestLabel,
+  oldestLabel,
+  popularLabel,
   onChange,
 }: Props) {
   return (
-    <label className="flex items-center gap-3 text-sm font-semibold text-gray-700 sm:text-base">
-      <span className="whitespace-nowrap">{label}</span>
+    <label className="relative inline-flex h-11 min-w-44 items-center rounded-full border border-slate-300 bg-white text-sm font-bold text-slate-800 transition hover:border-primary hover:text-primary focus-within:border-primary focus-within:text-primary focus-within:ring-4 focus-within:ring-primary/15">
+      <span className="sr-only">{label}</span>
+      <FiBarChart2 aria-hidden="true" className="pointer-events-none absolute start-4 text-base text-primary" />
       <select
-        value={value ?? "recommended"}
-        onChange={(event) => onChange(event.target.value as "recommended" | "latest" | "distance")}
-        className="h-11 min-w-44 rounded-xl border border-gray-200 bg-[#f8f7f6] px-4 text-sm font-semibold text-gray-800 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10 sm:min-w-52"
+        value={value}
+        onChange={(event) => onChange(event.target.value as BusinessSortValue)}
+        aria-label={label}
+        className="h-full w-full cursor-pointer appearance-none rounded-full bg-transparent ps-11 pe-10 font-bold outline-none"
       >
-        <option value="recommended">{recommendedLabel}</option>
         <option value="latest">{latestLabel}</option>
-        {locationActive ? <option value="distance">{nearestLabel}</option> : null}
+        <option value="oldest">{oldestLabel}</option>
+        <option value="popular">{popularLabel}</option>
       </select>
+      <FiChevronDown aria-hidden="true" className="pointer-events-none absolute end-4 text-sm text-slate-500" />
     </label>
   );
 }

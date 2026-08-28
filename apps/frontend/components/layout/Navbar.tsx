@@ -40,9 +40,8 @@ export default function Navbar() {
   const registerHref = `/register?callbackUrl=${encodeURIComponent(callbackPath)}`;
   const hasHeroOverlay =
     internalPathname === "/" ||
-    internalPathname === "/businesses" ||
     internalPathname.startsWith("/businesses/");
-  const isSolid = scrolled || mobileOpen;
+  const isSolid = scrolled || mobileOpen || internalPathname === "/businesses";
   const isOverlay = hasHeroOverlay && !isSolid;
   const userName = profileOverride.name || session?.user?.name || session?.user?.email || t("accountMenu.fallbackName");
   const userEmail = profileOverride.email || session?.user?.email || "";

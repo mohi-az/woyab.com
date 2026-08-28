@@ -25,6 +25,10 @@ function positiveInt(value: string | undefined) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function directorySort(value: string | undefined): BusinessDirectoryFilters["sortBy"] {
+  return value === "latest" || value === "oldest" || value === "popular" ? value : "popular";
+}
+
 export async function generateMetadata() {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("Businesses")]);
   return publicMetadata({
@@ -49,7 +53,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
     categoryId: positiveInt(first(params.categoryId)),
     subCategoryId: positiveInt(first(params.subCategoryId)),
     cityId: positiveInt(first(params.cityId)),
-    sortBy: first(params.sortBy) === "latest" ? "latest" : undefined,
+    sortBy: directorySort(first(params.sortBy)),
     favoritesOnly: first(params.favoritesOnly) === "true" || undefined,
     openNow: first(params.openNow) === "true" || undefined,
   };
@@ -62,17 +66,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#f8f5f1]">
-      <section className="hero-theme relative isolate -mt-16 overflow-hidden px-4 pb-14 pt-28 text-white sm:px-6 sm:pb-18 sm:pt-32 lg:-mt-[4.75rem] lg:pt-36">
-        <div className="absolute inset-0 bg-slate-950/88" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(241,91,63,.2),transparent_30%)]" />
-        <div className="relative mx-auto max-w-[1480px]">
-          <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.22em] text-primary-light">{t("eyebrow")}</p>
-          <h1 className="max-w-3xl text-3xl font-black tracking-tight sm:text-5xl">{t("title")}</h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">{t("description")}</p>
-        </div>
-      </section>
-
+    <div className="min-h-screen bg-white">
       <BusinessDirectory
         locale={locale}
         initialFilters={filters}
@@ -81,6 +75,8 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
         subCategories={subCategories}
         cities={cities}
         labels={{
+          eyebrow: t("eyebrow"),
+          title: t("title"),
           resultCount: t("resultCountTemplate", { count: "{count}" }),
           resultCountOne: t("resultCount", { count: 1 }),
           resultCountEmpty: t("resultCount", { count: 0 }),
@@ -90,9 +86,9 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
           retry: t("retry"),
           sort: {
             label: t("sort.label"),
-            recommended: t("sort.recommended"),
             latest: t("sort.latest"),
-            nearest: t("sort.nearest"),
+            oldest: t("sort.oldest"),
+            popular: t("sort.popular"),
           },
           card: {
             favorite: t("card.favorite"),
@@ -123,6 +119,8 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             reviews: t("map.reviews"),
             directions: t("map.directions"),
           },
+          allFilters: t("filters.all"),
+          closeFilters: t("filters.close"),
           filters: {
             title: t("filters.title"),
             search: t("filters.search"),
@@ -131,6 +129,8 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             allCategories: t("filters.allCategories"),
             subCategories: t("filters.subCategories"),
             allSubCategories: t("filters.allSubCategories"),
+            showAll: t("filters.showAll"),
+            showLess: t("filters.showLess"),
             city: t("filters.city"),
             allCities: t("filters.allCities"),
             location: t("filters.location"),

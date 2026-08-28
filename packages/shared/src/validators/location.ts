@@ -22,7 +22,7 @@ export const businessSearchBodySchema = paginationQuerySchema.extend({
   subCategoryId: z.number().int().positive().optional(),
   cityId: z.number().int().positive().optional(),
   search: z.string().trim().min(1).max(120).optional(),
-  sortBy: z.enum(["recommended", "latest", "distance"]).default("recommended"),
+  sortBy: z.enum(["recommended", "latest", "oldest", "popular", "distance"]).default("recommended"),
   origin: locationOriginSchema.optional(),
   locale: appLocaleSchema,
   favoriteBusinessIds: z.array(z.string().min(1)).max(500).optional(),

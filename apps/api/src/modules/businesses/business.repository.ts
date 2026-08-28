@@ -6,7 +6,7 @@ type BusinessFilter = BusinessFindManyArgs["where"];
 type BusinessCreateData = NonNullable<Parameters<typeof prisma.business.create>[0]>["data"];
 type BusinessUpdateData = NonNullable<Parameters<typeof prisma.business.update>[0]>["data"];
 
-type BusinessSort = "latest";
+type BusinessSort = "latest" | "oldest" | "popular";
 
 const businessDetailInclude = {
   category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
@@ -87,7 +87,16 @@ export const businessRepository = {
       take,
       orderBy: sortBy === "latest"
         ? [{ createdAt: "desc" }]
-        : [{ featured: "desc" }, { averageRating: "desc" }, { createdAt: "desc" }],
+        : sortBy === "oldest"
+          ? [{ createdAt: "asc" }]
+          : sortBy === "popular"
+            ? [
+                { googleUserRatingCount: { sort: "desc", nulls: "last" } },
+                { reviewCount: "desc" },
+                { averageRating: "desc" },
+                { createdAt: "desc" },
+              ]
+            : [{ featured: "desc" }, { averageRating: "desc" }, { createdAt: "desc" }],
       select: businessCardSelect,
     }),
 

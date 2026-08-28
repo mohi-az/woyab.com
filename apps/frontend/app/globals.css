@@ -1471,6 +1471,48 @@ html[dir="rtl"] .mapboxgl-popup-content {
   vector-effect: non-scaling-stroke;
 }
 
+.directory-origin-marker {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  height: 34px;
+  width: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(37 99 235 / 18%);
+  cursor: pointer;
+  filter: drop-shadow(0 5px 9px rgb(15 23 42 / 24%));
+}
+
+.directory-origin-marker::before {
+  position: absolute;
+  inset: 3px;
+  border: 2px solid rgb(37 99 235 / 42%);
+  border-radius: inherit;
+  content: "";
+  animation: directory-origin-pulse 1.9s ease-out infinite;
+}
+
+.directory-origin-marker span {
+  position: relative;
+  height: 14px;
+  width: 14px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: #2563eb;
+  box-shadow: 0 0 0 1px rgb(30 64 175 / 45%);
+}
+
+@keyframes directory-origin-pulse {
+  0% { opacity: 0.9; transform: scale(0.62); }
+  70%, 100% { opacity: 0; transform: scale(1.55); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .directory-origin-marker::before { animation: none; }
+}
+
 .address-map-popup {
   display: grid;
   min-width: 170px;

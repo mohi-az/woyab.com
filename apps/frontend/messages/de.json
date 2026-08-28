@@ -200,25 +200,29 @@
     "error": "Fehler beim Abrufen der Ergebnisse. Bitte versuchen Sie es erneut.",
     "retry": "Erneut versuchen",
     "filters": {
+      "all": "Alle",
       "title": "Filter",
+      "close": "Filter schließen",
       "search": "Unternehmensname",
       "searchPlaceholder": "Wonach suchen Sie?",
       "categories": "Kategorien",
       "allCategories": "Alle Kategorien",
       "subCategories": "Unterkategorien",
       "allSubCategories": "Alle Unterkategorien",
+      "showAll": "Alle anzeigen",
+      "showLess": "Weniger anzeigen",
       "city": "Stadt",
       "allCities": "Alle Städte",
       "location": "Standort",
-        "reset": "Zurücksetzen",
+        "reset": "Alle Filter löschen",
         "favoritesOnly": "Nur meine Favoriten anzeigen",
         "openNow": "Jetzt geöffnet"
     },
     "sort": {
       "label": "Sortieren nach:",
-      "recommended": "Empfohlen",
-      "latest": "Datum: Neueste zuerst",
-      "nearest": "Nächste zuerst"
+      "latest": "Neueste",
+      "oldest": "Älteste",
+      "popular": "Beliebteste"
     },
     "card": {
       "favorite": "Zu Favoriten hinzufügen",

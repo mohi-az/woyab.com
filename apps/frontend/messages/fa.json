@@ -198,25 +198,29 @@
     "error": "خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.",
     "retry": "تلاش مجدد",
     "filters": {
+      "all": "همه",
       "title": "فیلترها",
+      "close": "بستن فیلترها",
       "search": "نام کسب‌وکار",
       "searchPlaceholder": "دنبال چه چیزی هستید؟",
       "categories": "دسته‌بندی‌ها",
       "allCategories": "همه دسته‌بندی‌ها",
       "subCategories": "زیردسته‌ها",
       "allSubCategories": "همه زیردسته‌ها",
+      "showAll": "نمایش همه",
+      "showLess": "نمایش کمتر",
       "city": "شهر",
       "allCities": "همه شهرها",
       "location": "لوکیشن",
-      "reset": "پاک کردن",
+      "reset": "حذف همه فیلترها",
       "favoritesOnly": "فقط علاقه‌مندی‌های من",
       "openNow": "الان باز است"
     },
     "sort": {
       "label": "مرتب‌سازی:",
-      "recommended": "پیشنهادی",
-      "latest": "تاریخ: جدیدترین‌ها",
-      "nearest": "نزدیک‌ترین‌ها"
+      "latest": "جدیدترین",
+      "oldest": "قدیمی‌ترین",
+      "popular": "محبوب‌ترین"
     },
     "card": {
       "favorite": "افزودن به علاقه‌مندی‌ها",

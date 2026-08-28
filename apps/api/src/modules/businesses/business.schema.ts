@@ -78,7 +78,7 @@ export const listBusinessesQuerySchema = paginationQuerySchema.extend({
   featured: z.enum(["true", "false"]).optional(),
   verified: z.enum(["true", "false"]).optional(),
   search: z.string().optional(),
-  sortBy: z.enum(["latest"]).optional(),
+  sortBy: z.enum(["latest", "oldest", "popular"]).optional(),
   openNow: z.enum(["true", "false"]).optional(),
 });
 

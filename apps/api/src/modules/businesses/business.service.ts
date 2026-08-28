@@ -308,7 +308,9 @@ export const businessService = {
         subCategoryId: input.subCategoryId,
         cityId: input.cityId,
         search: input.search,
-        sortBy: input.sortBy === "latest" ? "latest" : undefined,
+        sortBy: input.sortBy === "latest" || input.sortBy === "oldest" || input.sortBy === "popular"
+          ? input.sortBy
+          : undefined,
         favoriteBusinessIds: input.favoriteBusinessIds,
         openBusinessIds,
       });

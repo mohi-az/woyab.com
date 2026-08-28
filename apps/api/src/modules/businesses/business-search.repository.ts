@@ -89,9 +89,13 @@ export async function findNearbyBusinesses(input: InternalBusinessSearchBody) {
   const skip = (input.page - 1) * input.limit;
   const orderBy = input.sortBy === "latest"
     ? Prisma.sql`"createdAt" DESC, "businessId" ASC`
-    : input.sortBy === "distance"
-      ? Prisma.sql`"distanceMeters" ASC, "businessId" ASC`
-      : Prisma.sql`"featured" DESC, "averageRating" DESC, "createdAt" DESC, "businessId" ASC`;
+    : input.sortBy === "oldest"
+      ? Prisma.sql`"createdAt" ASC, "businessId" ASC`
+      : input.sortBy === "popular"
+        ? Prisma.sql`"popularityCount" DESC, "popularityRating" DESC, "createdAt" DESC, "businessId" ASC`
+        : input.sortBy === "distance"
+          ? Prisma.sql`"distanceMeters" ASC, "businessId" ASC`
+          : Prisma.sql`"featured" DESC, "averageRating" DESC, "createdAt" DESC, "businessId" ASC`;
 
   const candidates = Prisma.sql`
     SELECT
@@ -105,6 +109,8 @@ export async function findNearbyBusinesses(input: InternalBusinessSearchBody) {
       COALESCE(bt_requested."shortDescription", bt_de."shortDescription", bt_en."shortDescription", bt_fa."shortDescription", bt_source."shortDescription", b."shortDescription") AS "shortDescription",
       b."featured" AS "featured",
       b."averageRating" AS "averageRating",
+      COALESCE(b."googleUserRatingCount", b."reviewCount", 0) AS "popularityCount",
+      COALESCE(b."googleRating", b."averageRating", 0) AS "popularityRating",
       b."createdAt" AS "createdAt",
       ST_Distance(bl."geo_point", ${point})::double precision AS "distanceMeters",
       ROW_NUMBER() OVER (
