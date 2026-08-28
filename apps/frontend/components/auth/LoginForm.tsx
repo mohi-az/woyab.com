@@ -94,7 +94,7 @@ export function LoginForm({ googleEnabled, callbackUrl, verification, authError 
     <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-xl sm:p-9">
       <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
         <Link
-          href="/login"
+          href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
           aria-current="page"
           className="rounded-[calc(1rem-4px)] bg-white px-4 py-3 text-center text-sm font-bold text-slate-950 shadow-sm"
         >

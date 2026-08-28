@@ -56,6 +56,13 @@
       "logout": "خروج"
     }
   },
+  "PwaInstall": {
+    "title": "نصب WoYab",
+    "description": "برای دسترسی سریع‌تر و تجربه‌ای شبیه اپلیکیشن، WoYab را به صفحه اصلی گوشی اضافه کنید.",
+    "iosInstructions": "در Safari روی دکمه اشتراک‌گذاری بزنید و سپس «Add to Home Screen» را انتخاب کنید.",
+    "action": "نصب اپلیکیشن",
+    "dismiss": "فعلاً نه"
+  },
   "Contact": {
     "metaTitle": "تماس با WoYab",
     "metaDescription": "برای پشتیبانی، مالکیت، همکاری و درخواست‌های حریم خصوصی با تیم WoYab تماس بگیرید.",

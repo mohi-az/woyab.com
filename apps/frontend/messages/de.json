@@ -56,6 +56,13 @@
       "logout": "Abmelden"
     }
   },
+  "PwaInstall": {
+    "title": "WoYab installieren",
+    "description": "Fügen Sie WoYab zum Startbildschirm hinzu – für schnelleren Zugriff wie bei einer App.",
+    "iosInstructions": "Tippen Sie in Safari auf „Teilen“ und dann auf „Zum Home-Bildschirm“.",
+    "action": "App installieren",
+    "dismiss": "Nicht jetzt"
+  },
   "Contact": {
     "metaTitle": "WoYab kontaktieren",
     "metaDescription": "Kontaktieren Sie das WoYab-Team für Support, Inhaberschaft, Partnerschaften und Datenschutzanfragen.",
@@ -598,7 +605,7 @@
     },
     "sidebar": {
       "fallbackName": "WoYab-Nutzer",
-      "overview": "?bersicht",
+      "overview": "Übersicht",
       "profile": "Profil",
       "favorites": "Favoriten",
       "addresses": "Meine Adressen",

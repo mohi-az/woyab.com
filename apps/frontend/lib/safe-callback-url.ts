@@ -1,4 +1,4 @@
-export function safeCallbackPath(value: string | string[] | undefined, fallback = "/dashboard") {
+export function safeCallbackPath(value: string | string[] | undefined, fallback = "/") {
   const candidate = Array.isArray(value) ? value[0] : value;
   if (!candidate || !candidate.startsWith("/") || candidate.startsWith("//") || candidate.includes("\\")) {
     return fallback;

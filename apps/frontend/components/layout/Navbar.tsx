@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { FiBriefcase, FiCheckCircle, FiChevronDown, FiGrid, FiLogIn, FiLogOut, FiMenu, FiPlusSquare, FiSettings, FiShield, FiUserPlus, FiX } from "react-icons/fi";
 import { BrandLogo } from "@/components/brand/BrandLogo";
@@ -10,6 +10,7 @@ import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import { stripLocalePrefix } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 import { CategoryIcon, FEATURED_CATEGORIES } from "@/lib/business-categories";
+import { safeCallbackPath } from "@/lib/safe-callback-url";
 import { cn } from "@/lib/utils";
 
 type ProfileOverride = { name?: string; email?: string; avatarUrl?: string };
@@ -28,8 +29,15 @@ export default function Navbar() {
   const tCategories = useTranslations("Home.categoriesSection");
   const locale = useLocale();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const internalPathname = stripLocalePrefix(pathname);
+  const currentSearch = searchParams.toString();
+  const callbackPath = internalPathname === "/login" || internalPathname === "/register"
+    ? safeCallbackPath(searchParams.get("callbackUrl") ?? undefined)
+    : `${internalPathname}${currentSearch ? `?${currentSearch}` : ""}`;
+  const loginHref = `/login?callbackUrl=${encodeURIComponent(callbackPath)}`;
+  const registerHref = `/register?callbackUrl=${encodeURIComponent(callbackPath)}`;
   const hasHeroOverlay =
     internalPathname === "/" ||
     internalPathname === "/businesses" ||
@@ -122,7 +130,7 @@ export default function Navbar() {
                 labels={accountLabels}
               />
             ) : (
-              <Link href="/login" className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 px-3 text-xs font-black text-slate-700 transition hover:border-primary/25 hover:text-primary sm:h-10 sm:px-4 sm:text-sm">
+              <Link href={loginHref} className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 px-3 text-xs font-black text-slate-700 transition hover:border-primary/25 hover:text-primary sm:h-10 sm:px-4 sm:text-sm">
                 <FiLogIn />
                 <span className="hidden sm:inline">{t("auth.login")}</span>
               </Link>
@@ -265,11 +273,11 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login" className={cn("inline-flex items-center gap-2 text-sm font-bold transition-colors", authLinkClassName)}>
+                <Link href={loginHref} className={cn("inline-flex items-center gap-2 text-sm font-bold transition-colors", authLinkClassName)}>
                   <FiLogIn className="text-base" />
                   {t("auth.login")}
                 </Link>
-                <Link href="/register" className={secondaryActionClassName}>
+                <Link href={registerHref} className={secondaryActionClassName}>
                   <FiUserPlus className="text-base" />
                   {t("auth.register")}
                 </Link>
@@ -370,8 +378,8 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-3">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 font-bold text-slate-700"><FiLogIn />{t("auth.login")}</Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 font-bold text-slate-700"><FiUserPlus />{t("auth.register")}</Link>
+                  <Link href={loginHref} onClick={() => setMobileOpen(false)} className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 font-bold text-slate-700"><FiLogIn />{t("auth.login")}</Link>
+                  <Link href={registerHref} onClick={() => setMobileOpen(false)} className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 font-bold text-slate-700"><FiUserPlus />{t("auth.register")}</Link>
                 </div>
               )}
               <div className={`mt-3 flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>

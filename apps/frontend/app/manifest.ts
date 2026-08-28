@@ -19,8 +19,10 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/pwa-icons/128", sizes: "128x128", type: "image/png" },
       { src: "/pwa-icons/144", sizes: "144x144", type: "image/png" },
       { src: "/pwa-icons/152", sizes: "152x152", type: "image/png" },
+      { src: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
       { src: "/pwa-icons/192", sizes: "192x192", type: "image/png", purpose: "maskable" },
       { src: "/pwa-icons/384", sizes: "384x384", type: "image/png" },
+      { src: "/pwa-icons/512", sizes: "512x512", type: "image/png" },
       { src: "/pwa-icons/512", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
     shortcuts: [
