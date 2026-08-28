@@ -277,6 +277,8 @@
   "BusinessDetail": {
     "pageLabel": "Business detail page",
     "back": "Back to all businesses",
+    "favoriteAdd": "Add to favorites",
+    "favoriteRemove": "Remove from favorites",
     "verified": "Verified business",
     "featured": "Featured business",
     "reviewsCount": "{count, plural, =0 {No reviews yet} one {# review} other {# reviews}}",

@@ -275,6 +275,8 @@
   "BusinessDetail": {
     "pageLabel": "صفحه جزئیات کسب‌وکار",
     "back": "بازگشت به همه کسب‌وکارها",
+    "favoriteAdd": "افزودن به علاقه‌مندی‌ها",
+    "favoriteRemove": "حذف از علاقه‌مندی‌ها",
     "verified": "کسب‌وکار تاییدشده",
     "featured": "کسب‌وکار ویژه",
     "reviewsCount": "{count, plural, =0 {هنوز نظری ثبت نشده} one {# نظر} other {# نظر}}",

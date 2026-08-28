@@ -1,13 +1,14 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   FiArrowLeft,
   FiArrowRight,
   FiCalendar,
   FiCheckCircle,
+  FiChevronDown,
   FiExternalLink,
   FiGlobe,
   FiGrid,
@@ -32,6 +33,7 @@ import { getCookieConsent, onCookieConsentChange } from "@/lib/cookie-consent";
 import { getBusinessOpenStatus } from "@/lib/business-hours";
 import { BusinessLocationMap } from "@/components/business/BusinessLocationMap";
 import { BusinessPhotoGallery } from "@/components/business/BusinessPhotoGallery";
+import { FavoriteButton } from "@/components/business/FavoriteButton";
 import { CircularRatingInput, CircularRatingStars } from "@/components/ui/CircularRatingStars";
 
 type Props = {
@@ -136,11 +138,33 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   const [helpfulReviewIds, setHelpfulReviewIds] = useState<Set<string>>(new Set());
   const [helpfulPendingIds, setHelpfulPendingIds] = useState<Set<string>>(new Set());
   const [now, setNow] = useState(() => new Date());
+  const [mobileHoursOpen, setMobileHoursOpen] = useState(false);
+  const mobileHoursRef = useRef<HTMLDivElement>(null);
   const openStatus = getBusinessOpenStatus(business.hours, now);
   const openStatusLabel = openStatus.kind === "UNKNOWN"
     ? null
     : t(`openStatus.${openStatus.kind}`, { time: openStatus.transitionTime ?? "" });
   const reviewIdsKey = reviews.map((review) => review.id).join(",");
+
+  useEffect(() => {
+    if (!mobileHoursOpen) return;
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (event.target instanceof Node && !mobileHoursRef.current?.contains(event.target)) {
+        setMobileHoursOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileHoursOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileHoursOpen]);
 
   useEffect(() => {
     if (!business.googlePlaceId) return;
@@ -386,14 +410,23 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
   return (
     <div className="bg-[#f8f5f1] pb-16 [&_button:not(:disabled)]:cursor-pointer">
-      <section className="hero-theme relative isolate -mt-16 overflow-hidden bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 lg:-mt-[4.75rem] lg:pt-36">
+      <section className="hero-theme relative isolate z-20 -mt-16 overflow-visible bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 md:z-auto md:overflow-hidden lg:-mt-[4.75rem] lg:pt-36">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(241,91,63,.26),transparent_26%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.96)_0%,rgba(10,18,31,.83)_52%,rgba(10,18,31,.68)_100%)]" />
         <div className="relative mx-auto max-w-[1480px]">
-          <Link href="/businesses" className="inline-flex items-center gap-2 text-sm font-bold text-primary-light/90 transition hover:text-white">
-            <BackIcon className="text-base" />
-            {t("back")}
-          </Link>
+          <div className="flex items-center justify-between gap-4">
+            <Link href="/businesses" className="inline-flex items-center gap-2 text-sm font-bold text-primary-light/90 transition hover:text-white">
+              <BackIcon className="text-base" />
+              {t("back")}
+            </Link>
+            <FavoriteButton
+              businessId={business.id}
+              label={t("favoriteAdd")}
+              savedLabel={t("favoriteRemove")}
+              checkInitialSaved
+              variant="hero"
+            />
+          </div>
 
           <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-4xl">
@@ -455,6 +488,35 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                     {openStatusLabel}
                   </span>
                 ) : null}
+                {business.hours.length ? (
+                  <div ref={mobileHoursRef} className="relative md:hidden">
+                    <button
+                      type="button"
+                      aria-expanded={mobileHoursOpen}
+                      onClick={() => setMobileHoursOpen((open) => !open)}
+                      className="inline-flex items-center gap-1.5 px-1 py-1.5 font-bold text-slate-200 underline-offset-4 transition hover:text-white hover:underline focus-visible:outline-none focus-visible:text-white focus-visible:underline"
+                    >
+                      {t("hoursTitle")}
+                      <FiChevronDown
+                        aria-hidden="true"
+                        className={`transition-transform ${mobileHoursOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    {mobileHoursOpen ? (
+                      <div className="absolute start-0 top-full z-40 mt-2 max-h-[min(28rem,calc(100dvh-12rem))] w-[min(19rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_20px_60px_rgba(15,23,42,.28)]">
+                        {business.hours.map((hour) => (
+                          <div key={hour.dayOfWeek} className="flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 text-sm odd:bg-slate-50">
+                            <span className="font-bold">{t(`days.${hour.dayOfWeek}`)}</span>
+                            <span className={hour.isClosed ? "font-bold text-rose-500" : "text-slate-600"}>
+                              {hour.isClosed ? t("closed") : `${hour.openTime ?? "--"} - ${hour.closeTime ?? "--"}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
 
               <h1 className="text-3xl font-black tracking-tight sm:text-5xl">{business.title}</h1>
@@ -513,7 +575,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
       </section>
 
       <div className="mx-auto grid max-w-[1480px] gap-8 px-4 pt-8 sm:px-6 xl:grid-cols-[minmax(0,1.6fr)_360px]">
-        <div className="space-y-8">
+        <div className="contents md:block md:space-y-8">
           <section className="overflow-hidden rounded-[30px] bg-white shadow-[0_20px_60px_rgba(15,23,42,.08)]">
             <div className="relative aspect-[16/9] bg-slate-100">
               {activeImage ? (
@@ -535,7 +597,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
           </section>
 
-          <section className="rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5">
+          <section className="hidden rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5 md:block">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {business.reviewCount > 0 ? (
                 <>
@@ -620,7 +682,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             />
           ) : null}
 
-          <section id="reviews" className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] sm:p-8">
+          <section id="reviews" className="order-[99] rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] sm:p-8 md:order-none">
             <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{t("reviewsSection.eyebrow")}</p>
@@ -783,7 +845,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           </section>
         </div>
 
-        <aside className="flex flex-col gap-6">
+        <aside className="contents md:flex md:flex-col md:gap-6">
           <section className="order-1 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
             <h2 className={`text-2xl font-black text-slate-950 ${locale === "fa" ? "text-right" : ""}`}>{t("contactCard.title")}</h2>
 
@@ -932,7 +994,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             </section>
           ) : null}
 
-          <section className="order-4 rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)]">
+          <section className="order-4 hidden rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] md:block">
             <div className="flex items-center gap-3">
               <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <FiCalendar className="text-lg" />

@@ -277,6 +277,8 @@
   "BusinessDetail": {
     "pageLabel": "Unternehmensdetailseite",
     "back": "Zuruck zu allen Unternehmen",
+    "favoriteAdd": "Zu Favoriten hinzufügen",
+    "favoriteRemove": "Aus Favoriten entfernen",
     "verified": "Verifiziertes Unternehmen",
     "featured": "Empfohlenes Unternehmen",
     "reviewsCount": "{count, plural, =0 {Noch keine Bewertungen} one {# Bewertung} other {# Bewertungen}}",
