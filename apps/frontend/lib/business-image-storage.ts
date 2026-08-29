@@ -13,6 +13,11 @@ const BUSINESS_IMAGE_DIR = process.env.BUSINESS_IMAGE_STORAGE_DIR?.trim()
 const BUSINESS_IMAGE_URL_PREFIX = "/media/businesses/";
 const GOOGLE_COVER_FILENAME_PREFIX = "google-place-";
 
+export function googleBusinessCoverUrl(businessId: string, photoReference: string) {
+  const version = createHash("sha256").update(photoReference).digest("hex").slice(0, 12);
+  return `/api/businesses/${encodeURIComponent(businessId)}/google-photo-thumbnail?maxWidth=${GOOGLE_COVER_WIDTH}&v=${version}`;
+}
+
 type GooglePhotoListResponse = {
   success?: boolean;
   data?: {

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { FiAlertCircle, FiCheck, FiClock, FiCpu, FiEdit3, FiEye, FiGlobe, FiImage, FiInfo, FiLoader, FiMapPin, FiPlus, FiTag } from "react-icons/fi";
 import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons/md";
 import { Link } from "@/i18n/navigation";
-import { setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
+import { setBusinessFlag, setBusinessStatus } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
 import { AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 import { GooglePlaceImport, type GooglePlaceImportData } from "@/components/admin/GooglePlaceImport";
@@ -750,7 +750,9 @@ export function AdminBusinessGrid({
         openCreate();
         router.refresh();
       } else {
-        await updateBusinessDetails(formData);
+        const response = await fetch("/api/admin/businesses", { method: "PATCH", body: formData });
+        const payload = await response.json().catch(() => null) as { error?: string } | null;
+        if (!response.ok) throw new Error(payload?.error || t("validation.saveFailed"));
         closeModal();
         router.refresh();
       }

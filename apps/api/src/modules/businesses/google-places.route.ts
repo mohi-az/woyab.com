@@ -144,7 +144,7 @@ googlePlacesRouter.get(
 
     const business = await prisma.business.findFirst({
       where: { id, removedAt: null, status: "ACTIVE", verified: true },
-      select: { googlePlaceId: true },
+      select: { googlePlaceId: true, googleCoverPhotoReference: true },
     });
 
     if (!business?.googlePlaceId) {
@@ -152,7 +152,9 @@ googlePlacesRouter.get(
       return;
     }
 
-    const result = await getFirstPlacePhotoBuffer(business.googlePlaceId, maxWidth);
+    const result = business.googleCoverPhotoReference
+      ? await getPlacePhotoBuffer(business.googlePlaceId, business.googleCoverPhotoReference, maxWidth)
+      : await getFirstPlacePhotoBuffer(business.googlePlaceId, maxWidth);
     if (!result) {
       res.status(404).json({ success: false, error: "Google photo not found" });
       return;

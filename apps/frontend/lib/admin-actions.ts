@@ -10,7 +10,7 @@ import { ownershipRetentionDate } from "@/lib/business-claims";
 import { buildReviewModerationEmail, renderEmailCard } from "@/lib/email-templates";
 import { sendMail } from "@/lib/mail";
 import { businessAttributeDefinitionSelect, syncBusinessAttributes } from "@/lib/business-attributes";
-import { resolvePermanentBusinessCover } from "@/lib/business-image-storage";
+import { googleBusinessCoverUrl, resolvePermanentBusinessCover } from "@/lib/business-image-storage";
 import { syncBusinessTags } from "@/lib/business-tags";
 import { prisma } from "@/lib/prisma";
 import { aiBusinessProposalSchema, type AiBusinessProposal } from "@/lib/ai/business-import-schema";
@@ -442,21 +442,19 @@ export async function updateBusinessDetails(formData: FormData) {
   if (!currentBusiness) throw new Error("Business not found.");
   const googlePhotoReference = nullableValue(formData, "googlePhotoReference")
     ?? (currentBusiness.googlePlaceId === googlePlaceId ? currentBusiness.googleCoverPhotoReference : null);
-  const googleCoverChanged = imageMode === "google"
-    && Boolean(googlePhotoReference)
-    && googlePhotoReference !== currentBusiness.googleCoverPhotoReference;
   const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
   const coverImageUrl = imageMode === "manual"
     ? requestedCoverImageUrl
-    : await resolvePermanentBusinessCover({
-        googlePlaceId,
-        googlePhotoReference,
-        requestedCoverImageUrl,
-        existingCoverImageUrl: currentBusiness.coverImageUrl,
-        refreshGoogleCover: imageMode === "google" || currentBusiness.googlePlaceId !== googlePlaceId,
-        useGoogleWhenMissing: true,
-        fallbackOnGoogleError: !googleCoverChanged,
-      });
+    : googlePlaceId && googlePhotoReference
+      ? googleBusinessCoverUrl(businessId, googlePhotoReference)
+      : await resolvePermanentBusinessCover({
+          googlePlaceId,
+          googlePhotoReference,
+          requestedCoverImageUrl,
+          existingCoverImageUrl: currentBusiness.coverImageUrl,
+          refreshGoogleCover: currentBusiness.googlePlaceId !== googlePlaceId,
+          useGoogleWhenMissing: true,
+        });
   const persistedGooglePhotoReference = imageMode === "google" && googlePlaceId && googlePhotoReference && coverImageUrl
     ? googlePhotoReference
     : null;

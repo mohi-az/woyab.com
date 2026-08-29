@@ -105,8 +105,10 @@ export const fetchBusinessDetailFromDatabase = cache(
         );
         const existingUrls = new Set(gallery.map((image) => image.imageUrl));
         for (const [index, photo] of (result.data?.photos ?? []).entries()) {
-          // The permanent Google cover is created from the first Places photo.
-          if (storedGoogleCover && index === 0) continue;
+          // The selected Google cover is already the first gallery item.
+          if (business.googleCoverPhotoReference
+            ? photo.photoReference === business.googleCoverPhotoReference
+            : storedGoogleCover && index === 0) continue;
           const imageUrl = `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${photo.photoReference.split("/").map(encodeURIComponent).join("/")}?maxWidth=1200`;
           if (existingUrls.has(imageUrl)) continue;
           existingUrls.add(imageUrl);

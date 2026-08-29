@@ -55,7 +55,7 @@ test("manual uploads and stored Google covers share the protected image storage"
   assert.match(imageManager, /name="imageMode" value=\{imageMode\}/);
 });
 
-test("Google cover creation reuses the reviewed photo reference and explicit cover edits cannot fail silently", async () => {
+test("Google cover creation persists images while cover edits use the selected-photo proxy", async () => {
   const [storage, adminActions, geoRoute, placesService] = await Promise.all([
     frontendSource("lib/business-image-storage.ts"),
     frontendSource("lib/admin-actions.ts"),
@@ -65,9 +65,9 @@ test("Google cover creation reuses the reviewed photo reference and explicit cov
 
   assert.match(adminActions, /const googlePhotoReference = nullableValue\(formData, "googlePhotoReference"\)/);
   assert.match(storage, /preferredPhotoReference/);
-  assert.match(storage, /fallbackOnGoogleError\?: boolean/);
-  assert.match(storage, /input\.fallbackOnGoogleError === false/);
-  assert.match(adminActions, /googleCoverChanged[\s\S]*fallbackOnGoogleError: !googleCoverChanged/);
+  assert.match(storage, /googleBusinessCoverUrl/);
+  assert.match(storage, /createHash\("sha256"\)\.update\(photoReference\)/);
+  assert.match(adminActions, /googlePlaceId && googlePhotoReference[\s\S]*googleBusinessCoverUrl\(businessId, googlePhotoReference\)/);
   assert.match(adminActions, /persistedGooglePhotoReference[\s\S]*\? googlePhotoReference/);
   assert.match(placesService, /photoReferenceBelongsToPlace/);
   assert.match(geoRoute, /getPlacePhotoBuffer\(placeId, ref, maxWidth\)/);
@@ -99,8 +99,23 @@ test("admin editing persists galleries and business details merge Google photos 
   assert.match(detailClient, /setGallery\(\(current\)/);
 });
 
-test("admin refreshes the business list after a successful cover update", async () => {
-  const adminGrid = await frontendSource("components/admin/AdminBusinessGrid.tsx");
+test("admin updates use a stable HTTP endpoint and refresh the business list", async () => {
+  const [adminGrid, route] = await Promise.all([
+    frontendSource("components/admin/AdminBusinessGrid.tsx"),
+    frontendSource("app/api/admin/businesses/route.ts"),
+  ]);
 
-  assert.match(adminGrid, /await updateBusinessDetails\(formData\);\s*closeModal\(\);\s*router\.refresh\(\);/);
+  assert.match(adminGrid, /fetch\("\/api\/admin\/businesses", \{ method: "PATCH", body: formData \}\)/);
+  assert.match(adminGrid, /closeModal\(\);\s*router\.refresh\(\);/);
+  assert.match(route, /export async function PATCH/);
+  assert.match(route, /await updateBusinessDetails\(await request\.formData\(\)\)/);
+});
+
+test("the Google thumbnail endpoint serves the persisted cover selection", async () => {
+  const route = await apiSource("modules/businesses/google-places.route.ts");
+  const thumbnailHandler = route.match(/"\/businesses\/:id\/google-photo-thumbnail"[\s\S]*?\n\);/)?.[0] ?? "";
+
+  assert.match(thumbnailHandler, /googleCoverPhotoReference: true/);
+  assert.match(thumbnailHandler, /getPlacePhotoBuffer\(business\.googlePlaceId, business\.googleCoverPhotoReference, maxWidth\)/);
+  assert.match(thumbnailHandler, /getFirstPlacePhotoBuffer\(business\.googlePlaceId, maxWidth\)/);
 });
