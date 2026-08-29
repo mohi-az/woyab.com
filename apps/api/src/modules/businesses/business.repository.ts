@@ -9,8 +9,8 @@ type BusinessUpdateData = NonNullable<Parameters<typeof prisma.business.update>[
 type BusinessSort = "latest" | "oldest" | "popular";
 
 const businessDetailInclude = {
-  category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
-  subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+  category: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
+  subCategory: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
   city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
   district: { select: { id: true, nameFa: true, nameEn: true } },
   businessHours: { orderBy: { dayOfWeek: "asc" as const } },
@@ -33,7 +33,7 @@ const businessDetailInclude = {
     },
     orderBy: { attribute: { sortOrder: "asc" as const } },
   },
-  tags: { include: { tag: { select: { id: true, nameFa: true, nameEn: true, slug: true } } } },
+  tags: { include: { tag: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true } } } },
   images: { orderBy: { sortOrder: "asc" as const } },
   translations: { select: businessTranslationSelect },
   _count: {
@@ -60,9 +60,9 @@ const businessCardSelect = {
     select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true },
   },
   categoryId: true,
-  category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+  category: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
   subCategoryId: true,
-  subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
+  subCategory: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
   cityId: true,
   city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
   status: true,

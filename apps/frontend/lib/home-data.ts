@@ -26,6 +26,7 @@ export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
         id: true,
         nameFa: true,
         nameEn: true,
+        nameDe: true,
         slug: true,
         icon: true,
         _count: { select: { businesses: { where: visibleBusinessWhere } } },
@@ -60,7 +61,7 @@ export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
         googleRating: true,
         googleUserRatingCount: true,
         featured: true,
-        category: { select: { nameFa: true, nameEn: true, slug: true, icon: true } },
+        category: { select: { nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
         city: { select: { nameFa: true, nameEn: true } },
         businessHours: {
           orderBy: { dayOfWeek: "asc" },
@@ -78,8 +79,8 @@ export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
     }),
   ]);
 
-  const localizedName = (item: { nameFa: string; nameEn: string }) =>
-    locale === "fa" ? item.nameFa : item.nameEn;
+  const localizedName = (item: { nameFa: string; nameEn: string; nameDe?: string | null }) =>
+    locale === "fa" ? item.nameFa : locale === "de" ? item.nameDe || item.nameEn : item.nameEn;
 
   return {
     categories: categoryRows.map((category) => ({

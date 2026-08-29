@@ -14,6 +14,7 @@ export const tagService = {
         OR: [
           { nameFa: { contains: search, mode: "insensitive" as const } },
           { nameEn: { contains: search, mode: "insensitive" as const } },
+          { nameDe: { contains: search, mode: "insensitive" as const } },
           { slug: { contains: search, mode: "insensitive" as const } },
         ],
       }),

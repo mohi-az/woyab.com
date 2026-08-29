@@ -30,6 +30,7 @@ const translationSchema = z.object({
 
 const taxonomySuggestionSchema = z.object({
   nameEn: z.string().trim().min(1).max(120),
+  nameDe: z.string().trim().min(1).max(120),
   nameFa: z.string().trim().min(1).max(120),
   slug: z.string().trim().regex(/^[a-z0-9-]+$/).max(120).nullable(),
 });

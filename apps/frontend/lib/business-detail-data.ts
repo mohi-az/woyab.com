@@ -45,8 +45,8 @@ export const fetchBusinessDetailFromDatabase = cache(
         removedAt: null,
       },
       include: {
-        category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
-        subCategory: { select: { id: true, nameFa: true, nameEn: true } },
+        category: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
+        subCategory: { select: { id: true, nameFa: true, nameEn: true, nameDe: true } },
         city: { select: { id: true, nameFa: true, nameEn: true } },
         businessHours: { orderBy: { dayOfWeek: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
@@ -58,7 +58,7 @@ export const fetchBusinessDetailFromDatabase = cache(
             description: true,
           },
         },
-        tags: { include: { tag: { select: { id: true, slug: true, nameFa: true, nameEn: true } } } },
+        tags: { include: { tag: { select: { id: true, slug: true, nameFa: true, nameEn: true, nameDe: true } } } },
         attributes: {
           include: { attribute: true },
           orderBy: { attribute: { sortOrder: "asc" } },
@@ -70,9 +70,16 @@ export const fetchBusinessDetailFromDatabase = cache(
     if (!business) return null;
 
     const localized = localizeBusinessContent(business, activeLocale);
-    const localizedName = (item?: { nameFa: string; nameEn?: string | null } | null) => {
+    const localizedName = (item?: { nameFa: string; nameEn?: string | null; nameDe?: string | null } | null) => {
       if (!item) return null;
-      return activeLocale === "fa" ? item.nameFa : item.nameEn || item.nameFa;
+      if (activeLocale === "fa") return item.nameFa;
+      if (activeLocale === "de") return item.nameDe || item.nameEn || item.nameFa;
+      return item.nameEn || item.nameDe || item.nameFa;
+    };
+    const localizedTagName = (tag: { nameFa: string; nameEn?: string | null; nameDe?: string | null }) => {
+      if (activeLocale === "fa") return tag.nameFa;
+      if (activeLocale === "de") return tag.nameDe || tag.nameEn || tag.nameFa;
+      return tag.nameEn || tag.nameDe || tag.nameFa;
     };
     const gallery: BusinessDetailData["gallery"] = business.images.map((image) => ({
       id: image.id,
@@ -180,7 +187,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       tags: business.tags.map(({ tag }) => ({
         id: tag.id,
         slug: tag.slug,
-        name: localizedName(tag) ?? tag.nameFa,
+        name: localizedTagName(tag),
       })),
       attributes: business.attributes.flatMap(({ attribute, value }) => {
         if (!attributeValueIsSupported(attribute.dataType, value)) return [];

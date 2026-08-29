@@ -47,6 +47,7 @@ export default async function AdminTaxonomyPage() {
     id: category.id,
     nameFa: category.nameFa,
     nameEn: category.nameEn,
+    nameDe: category.nameDe,
     slug: category.slug,
     icon: category.icon,
     sortOrder: category.sortOrder,
@@ -56,6 +57,7 @@ export default async function AdminTaxonomyPage() {
       id: subCategory.id,
       nameFa: subCategory.nameFa,
       nameEn: subCategory.nameEn,
+      nameDe: subCategory.nameDe,
       slug: subCategory.slug,
       icon: subCategory.icon,
       categoryId: subCategory.categoryId,
@@ -69,6 +71,7 @@ export default async function AdminTaxonomyPage() {
     id: tag.id,
     nameFa: tag.nameFa,
     nameEn: tag.nameEn,
+    nameDe: tag.nameDe,
     slug: tag.slug,
     businesses: tag._count.businesses,
   }));

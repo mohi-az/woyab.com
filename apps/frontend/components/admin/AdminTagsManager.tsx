@@ -13,6 +13,7 @@ export type AdminTagRow = {
   id: number;
   nameFa: string;
   nameEn: string | null;
+  nameDe: string | null;
   slug: string;
   businesses: number;
 };
@@ -24,7 +25,7 @@ type EditableTagRow = AdminTagRow & {
 
 type EditableCellProps = React.HTMLAttributes<HTMLElement> & {
   editing: boolean;
-  dataIndex: keyof Pick<EditableTagRow, "nameFa" | "nameEn" | "slug">;
+  dataIndex: keyof Pick<EditableTagRow, "nameFa" | "nameEn" | "nameDe" | "slug">;
   cellTitle: React.ReactNode;
   required?: boolean;
   slug?: boolean;
@@ -32,7 +33,7 @@ type EditableCellProps = React.HTMLAttributes<HTMLElement> & {
 
 type EditableTagColumn = NonNullable<TableProps<EditableTagRow>["columns"]>[number] & {
   editable?: boolean;
-  editDataIndex?: keyof Pick<EditableTagRow, "nameFa" | "nameEn" | "slug">;
+  editDataIndex?: keyof Pick<EditableTagRow, "nameFa" | "nameEn" | "nameDe" | "slug">;
   required?: boolean;
   slug?: boolean;
 };
@@ -51,6 +52,7 @@ function text(locale: string) {
       delete: "\u062d\u0630\u0641",
       nameFa: "\u0646\u0627\u0645 \u0641\u0627\u0631\u0633\u06cc",
       nameEn: "\u0646\u0627\u0645 \u0627\u0646\u06af\u0644\u06cc\u0633\u06cc",
+      nameDe: "\u0646\u0627\u0645 \u0622\u0644\u0645\u0627\u0646\u06cc",
       slug: "\u0627\u0633\u0644\u0627\u06af",
       usage: "\u0627\u0633\u062a\u0641\u0627\u062f\u0647",
       actions: "\u0639\u0645\u0644\u06cc\u0627\u062a",
@@ -76,6 +78,7 @@ function text(locale: string) {
     delete: "Delete",
     nameFa: "Name FA",
     nameEn: "Name EN",
+    nameDe: "Name DE",
     slug: "Slug",
     usage: "Usage",
     actions: "Actions",
@@ -120,6 +123,7 @@ function tagFormData(values: Partial<EditableTagRow>, id?: number) {
   if (id) formData.append("id", String(id));
   formData.append("nameFa", String(values.nameFa ?? ""));
   formData.append("nameEn", String(values.nameEn ?? ""));
+  formData.append("nameDe", String(values.nameDe ?? ""));
   formData.append("slug", String(values.slug ?? ""));
   return formData;
 }
@@ -141,7 +145,7 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
   const rows = useMemo<EditableTagRow[]>(() => {
     const currentRows = tags.map((tag) => ({ ...tag, rowKey: String(tag.id) }));
     return adding
-      ? [{ id: 0, rowKey: newRowKey, isNew: true, nameFa: "", nameEn: "", slug: "", businesses: 0 }, ...currentRows]
+      ? [{ id: 0, rowKey: newRowKey, isNew: true, nameFa: "", nameEn: "", nameDe: "", slug: "", businesses: 0 }, ...currentRows]
       : currentRows;
   }, [adding, tags]);
 
@@ -151,6 +155,7 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
     form.setFieldsValue({
       nameFa: record.nameFa,
       nameEn: record.nameEn ?? "",
+      nameDe: record.nameDe ?? "",
       slug: record.slug,
     });
     setError("");
@@ -159,7 +164,7 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
 
   function addRow() {
     setAdding(true);
-    form.setFieldsValue({ nameFa: "", nameEn: "", slug: "" });
+    form.setFieldsValue({ nameFa: "", nameEn: "", nameDe: "", slug: "" });
     setError("");
     setEditingKey(newRowKey);
   }
@@ -206,7 +211,7 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
     }
   }
 
-  function searchColumn(dataIndex: keyof Pick<EditableTagRow, "nameFa" | "nameEn" | "slug">) {
+  function searchColumn(dataIndex: keyof Pick<EditableTagRow, "nameFa" | "nameEn" | "nameDe" | "slug">) {
     return {
       filterIcon: (filtered: boolean) => <FiSearch className={filtered ? "text-sky-400" : ""} />,
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: {
@@ -238,9 +243,10 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
   }
 
   const columns: EditableTagColumn[] = [
-    { title: t.nameFa, dataIndex: "nameFa", width: "28%", editable: true, editDataIndex: "nameFa", required: true, ...searchColumn("nameFa") },
-    { title: t.nameEn, dataIndex: "nameEn", width: "24%", editable: true, editDataIndex: "nameEn", ...searchColumn("nameEn") },
-    { title: t.slug, dataIndex: "slug", width: "22%", editable: true, editDataIndex: "slug", required: true, slug: true, ...searchColumn("slug") },
+    { title: t.nameFa, dataIndex: "nameFa", width: 220, editable: true, editDataIndex: "nameFa", required: true, ...searchColumn("nameFa") },
+    { title: t.nameEn, dataIndex: "nameEn", width: 200, editable: true, editDataIndex: "nameEn", ...searchColumn("nameEn") },
+    { title: t.nameDe, dataIndex: "nameDe", width: 200, editable: true, editDataIndex: "nameDe", ...searchColumn("nameDe") },
+    { title: t.slug, dataIndex: "slug", width: 190, editable: true, editDataIndex: "slug", required: true, slug: true, ...searchColumn("slug") },
     {
       title: t.usage,
       dataIndex: "businesses",
@@ -316,7 +322,7 @@ export function AdminTagsManager({ tags }: { tags: AdminTagRow[] }) {
             size="middle"
             bordered
             tableLayout="fixed"
-            scroll={{ x: 900 }}
+            scroll={{ x: 1120 }}
             pagination={{ pageSize: 10, onChange: cancel }}
             getPopupContainer={(trigger) => trigger.parentElement ?? document.body}
           />

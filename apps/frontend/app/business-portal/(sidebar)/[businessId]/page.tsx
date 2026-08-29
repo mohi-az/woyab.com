@@ -36,7 +36,7 @@ export default async function BusinessPortalBusinessPage({ params }: Props) {
       updatedAt: true,
       _count: { select: { changeRequests: { where: { status: "PENDING" } } } },
       businessViewDaily: { where: { day: { gte: thirtyDaysAgo } }, select: { views: true } },
-      category: { select: { nameEn: true, nameFa: true } },
+      category: { select: { nameEn: true, nameDe: true, nameFa: true } },
       city: { select: { nameEn: true, nameFa: true } },
     },
   });

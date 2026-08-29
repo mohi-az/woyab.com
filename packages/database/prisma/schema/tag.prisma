@@ -2,6 +2,7 @@ model Tag {
   id         Int           @id @default(autoincrement())
   nameFa     String        @unique
   nameEn     String?
+  nameDe     String?
   slug       String        @unique
   businesses BusinessTag[]
 

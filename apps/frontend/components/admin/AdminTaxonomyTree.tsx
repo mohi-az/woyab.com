@@ -13,6 +13,7 @@ type SubCategoryRow = {
   id: number;
   nameFa: string;
   nameEn: string;
+  nameDe: string;
   slug: string;
   icon: string | null;
   categoryId: number;
@@ -25,6 +26,7 @@ export type CategoryTreeRow = {
   id: number;
   nameFa: string;
   nameEn: string;
+  nameDe: string;
   slug: string;
   icon: string | null;
   sortOrder: number;
@@ -113,6 +115,10 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
   const t = useTranslations("Admin");
   const locale = useLocale();
   const [selectedKey, setSelectedKey] = useState<string>(categories[0] ? `category:${categories[0].id}` : "");
+  const localizedName = (item: { nameFa: string; nameEn: string; nameDe: string }) =>
+    locale === "fa" ? item.nameFa : locale === "de" ? item.nameDe || item.nameEn : item.nameEn;
+  const alternateNames = (item: { nameFa: string; nameEn: string; nameDe: string }) =>
+    [item.nameDe, item.nameEn, item.nameFa].filter((name, index, names) => name && names.indexOf(name) === index).join(" / ");
 
   let selected: SelectedNode | null = null;
   for (const category of categories) {
@@ -122,13 +128,13 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
     }
   }
 
-  const treeData = useMemo<DataNode[]>(() => categories.map((category) => ({
+  const treeData: DataNode[] = categories.map((category) => ({
     key: `category:${category.id}`,
     title: (
       <NodeTitle
         icon={<DynamicIcon iconKey={category.icon} />}
-        title={category.nameEn}
-        meta={`${category.nameFa} / ${t("taxonomy.categoryCounts", { businesses: category.businesses, children: category.subCategories.length })}`}
+        title={localizedName(category)}
+        meta={`${alternateNames(category)} / ${t("taxonomy.categoryCounts", { businesses: category.businesses, children: category.subCategories.length })}`}
         active={category.active}
       />
     ),
@@ -137,19 +143,19 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
       title: (
         <NodeTitle
           icon={<DynamicIcon iconKey={subCategory.icon ?? category.icon} />}
-          title={subCategory.nameEn}
-          meta={`${subCategory.nameFa} / ${subCategory.businesses} listings`}
+          title={localizedName(subCategory)}
+          meta={`${alternateNames(subCategory)} / ${subCategory.businesses} listings`}
           active={subCategory.active}
         />
       ),
     })),
-  })), [categories, t]);
+  }));
 
   const formId = selected ? `${selected.type}-${selected.item.id}` : "taxonomy-empty";
   const action = selected?.type === "category" ? updateCategory : updateSubCategory;
   const title = selected?.type === "category"
-    ? selected.item.nameEn
-    : selected?.item.nameEn || "";
+    ? localizedName(selected.item)
+    : selected ? localizedName(selected.item) : "";
 
   return (
     <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
@@ -183,12 +189,15 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
                 <input type="hidden" name="id" value={selected.item.id} />
                 {selected.type === "subCategory" ? <input type="hidden" name="categoryId" value={selected.item.categoryId} /> : null}
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-3">
                   <Field label={`${t("fields.name")} EN`}>
-                    <input name="nameEn" defaultValue={selected.item.nameEn ?? ""} className={fieldClassName} />
+                    <input name="nameEn" defaultValue={selected.item.nameEn ?? ""} required className={fieldClassName} />
+                  </Field>
+                  <Field label={`${t("fields.name")} DE`}>
+                    <input name="nameDe" defaultValue={selected.item.nameDe ?? ""} required className={fieldClassName} />
                   </Field>
                   <Field label={`${t("fields.name")} FA`}>
-                    <input name="nameFa" defaultValue={selected.item.nameFa} className={fieldClassName} />
+                    <input name="nameFa" defaultValue={selected.item.nameFa} required className={fieldClassName} />
                   </Field>
                 </div>
 

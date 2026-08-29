@@ -125,7 +125,7 @@ const progressByStatus: Record<string, number> = { QUEUED: 5, FETCHING_GOOGLE: 2
 function taxonomyLabel(choice: TaxonomyChoice | null) {
   if (!choice) return "—";
   if (choice.existingId) return `#${choice.existingId} · ${choice.reason}`;
-  return `${choice.suggested?.nameEn ?? "—"} / ${choice.suggested?.nameFa ?? "—"}`;
+  return `${choice.suggested?.nameDe ?? "—"} / ${choice.suggested?.nameEn ?? "—"} / ${choice.suggested?.nameFa ?? "—"}`;
 }
 
 function defaultSelections(proposal: AiBusinessProposal) {

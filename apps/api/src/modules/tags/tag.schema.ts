@@ -5,6 +5,7 @@ import { paginationQuerySchema } from "@woyab/shared";
 export const createTagBodySchema = z.object({
   nameFa: z.string().min(1),
   nameEn: z.string().optional(),
+  nameDe: z.string().optional(),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
 });
 

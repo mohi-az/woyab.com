@@ -29,6 +29,7 @@ type QuickAttributeType = "BOOLEAN" | "TEXT" | "NUMBER";
 type Option = {
   id: number;
   nameEn: string | null;
+  nameDe?: string | null;
   nameFa: string | null;
   slug?: string;
 };
@@ -122,7 +123,7 @@ type RowUiState = {
 };
 
 function optionLabel(option: Option) {
-  return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
+  return [option.nameDe, option.nameEn, option.nameFa].filter(Boolean).join(" / ");
 }
 
 const googlePlaceTaxonomy: Record<string, { categorySlug: string; subCategorySlug?: string }> = {
@@ -320,13 +321,13 @@ export function AdminBusinessGrid({
   const categorySelectOptions = [
     ...categories.map((item) => ({ value: String(item.id), label: optionLabel(item) })),
     ...(aiSelected("category") && aiProposal?.taxonomy.category.suggested
-      ? [{ value: "ai:category", label: `AI · ${aiProposal.taxonomy.category.suggested.nameEn} / ${aiProposal.taxonomy.category.suggested.nameFa} (${t("aiImport.newItem")})` }]
+      ? [{ value: "ai:category", label: `AI · ${aiProposal.taxonomy.category.suggested.nameDe} / ${aiProposal.taxonomy.category.suggested.nameEn} / ${aiProposal.taxonomy.category.suggested.nameFa} (${t("aiImport.newItem")})` }]
       : []),
   ];
   const subCategorySelectOptions = [
     ...visibleSubCategories.map((item) => ({ value: String(item.id), label: optionLabel(item) })),
     ...(aiSelected("subCategory") && aiProposal?.taxonomy.subCategory?.suggested
-      ? [{ value: "ai:subcategory", label: `AI · ${aiProposal.taxonomy.subCategory.suggested.nameEn} / ${aiProposal.taxonomy.subCategory.suggested.nameFa} (${t("aiImport.newItem")})` }]
+      ? [{ value: "ai:subcategory", label: `AI · ${aiProposal.taxonomy.subCategory.suggested.nameDe} / ${aiProposal.taxonomy.subCategory.suggested.nameEn} / ${aiProposal.taxonomy.subCategory.suggested.nameFa} (${t("aiImport.newItem")})` }]
       : []),
   ];
   const wizardSteps = [

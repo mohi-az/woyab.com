@@ -20,11 +20,11 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
   const start = new Date(); start.setUTCHours(0, 0, 0, 0); start.setUTCDate(start.getUTCDate() - days + 1);
   const businessWhere = { ...(businessId ? { id: businessId } : {}), ...(cityId ? { cityId } : {}), ...(categoryId ? { categoryId } : {}) };
   const [rows, events, businesses, cities, categories] = await Promise.all([
-    prisma.businessViewDaily.findMany({ where: { day: { gte: start }, business: businessWhere }, select: { day: true, views: true, business: { select: { id: true, businessName: true, city: { select: { id: true, nameEn: true, nameFa: true } }, category: { select: { id: true, nameEn: true, nameFa: true } } } } }, orderBy: { day: "asc" } }),
-    prisma.businessAnalyticsEvent.findMany({ where: { occurredAt: { gte: start }, business: businessWhere }, select: { visitorId: true, sessionId: true, business: { select: { businessName: true, city: { select: { nameEn: true, nameFa: true } }, category: { select: { nameEn: true, nameFa: true } } } } } }),
+    prisma.businessViewDaily.findMany({ where: { day: { gte: start }, business: businessWhere }, select: { day: true, views: true, business: { select: { id: true, businessName: true, city: { select: { id: true, nameEn: true, nameFa: true } }, category: { select: { id: true, nameEn: true, nameDe: true, nameFa: true } } } } }, orderBy: { day: "asc" } }),
+    prisma.businessAnalyticsEvent.findMany({ where: { occurredAt: { gte: start }, business: businessWhere }, select: { visitorId: true, sessionId: true, business: { select: { businessName: true, city: { select: { nameEn: true, nameFa: true } }, category: { select: { nameEn: true, nameDe: true, nameFa: true } } } } } }),
     prisma.business.findMany({ where: { status: "ACTIVE" }, select: { id: true, businessName: true }, orderBy: { businessName: "asc" } }),
     prisma.city.findMany({ select: { id: true, nameEn: true, nameFa: true }, orderBy: { nameEn: "asc" } }),
-    prisma.category.findMany({ select: { id: true, nameEn: true, nameFa: true }, orderBy: { nameEn: "asc" } }),
+    prisma.category.findMany({ select: { id: true, nameEn: true, nameDe: true, nameFa: true }, orderBy: { nameEn: "asc" } }),
   ]);
   const total = rows.reduce((sum, row) => sum + row.views, 0);
   const uniqueVisitors = new Set(events.map(event => event.visitorId)).size;
@@ -38,11 +38,11 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
     const key = row.day.toISOString().slice(0, 10); daily.set(key, (daily.get(key) ?? 0) + row.views);
     byBusiness.set(row.business.businessName, (byBusiness.get(row.business.businessName) ?? 0) + row.views);
     const city = locale === "fa" ? row.business.city.nameFa : row.business.city.nameEn; byCity.set(city, (byCity.get(city) ?? 0) + row.views);
-    const category = locale === "fa" ? row.business.category.nameFa : row.business.category.nameEn; byCategory.set(category, (byCategory.get(category) ?? 0) + row.views);
+    const category = locale === "fa" ? row.business.category.nameFa : locale === "de" ? row.business.category.nameDe || row.business.category.nameEn : row.business.category.nameEn; byCategory.set(category, (byCategory.get(category) ?? 0) + row.views);
   }
   for (const event of events) {
     const city = locale === "fa" ? event.business.city.nameFa : event.business.city.nameEn;
-    const category = locale === "fa" ? event.business.category.nameFa : event.business.category.nameEn;
+    const category = locale === "fa" ? event.business.category.nameFa : locale === "de" ? event.business.category.nameDe || event.business.category.nameEn : event.business.category.nameEn;
     for (const [map, key] of [[uniqueBusiness, event.business.businessName], [uniqueCity, city], [uniqueCategory, category]] as const) {
       const visitors = map.get(key) ?? new Set<string>(); visitors.add(event.visitorId); map.set(key, visitors);
     }
@@ -55,7 +55,7 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
     <form className="analytics-card admin-analytics-filters grid gap-3 rounded-2xl border p-4 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
       <AdminSearchSelect name="days" defaultValue={days} className="admin-analytics-filter" options={[7, 30, 90, 365].map(value => ({ value: String(value), label: t(`ranges.${value}`) }))} />
       <AdminSearchSelect name="cityId" defaultValue={cityId || ""} className="admin-analytics-filter" allowClear placeholder={t("allCities")} options={cities.map(c => ({ value: String(c.id), label: locale === "fa" ? c.nameFa : c.nameEn }))} />
-      <AdminSearchSelect name="categoryId" defaultValue={categoryId || ""} className="admin-analytics-filter" allowClear placeholder={t("allCategories")} options={categories.map(c => ({ value: String(c.id), label: locale === "fa" ? c.nameFa : c.nameEn }))} />
+      <AdminSearchSelect name="categoryId" defaultValue={categoryId || ""} className="admin-analytics-filter" allowClear placeholder={t("allCategories")} options={categories.map(c => ({ value: String(c.id), label: locale === "fa" ? c.nameFa : locale === "de" ? c.nameDe || c.nameEn : c.nameEn }))} />
       <AdminSearchSelect name="businessId" defaultValue={businessId} className="admin-analytics-filter" allowClear placeholder={t("allBusinesses")} options={businesses.map(b => ({ value: b.id, label: b.businessName }))} />
       <button className="admin-button min-h-11 rounded-lg border px-5 font-black sm:col-span-2 xl:col-span-1">{t("apply")}</button>
     </form>

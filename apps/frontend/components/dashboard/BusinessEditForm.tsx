@@ -10,7 +10,7 @@ import type { BusinessDraft } from "@/components/business/BusinessListingPreview
 import type { BusinessAttributeDefinition } from "@/lib/business-attributes";
 import type { BusinessTagOption } from "@/lib/business-tags";
 
-type Option = { id: number; nameEn: string | null; nameFa: string | null };
+type Option = { id: number; nameEn: string | null; nameDe?: string | null; nameFa: string | null };
 type SubOption = Option & { categoryId: number };
 type DistrictOption = Option & { cityId: number };
 
@@ -94,7 +94,11 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function locLabel(item: Option | DistrictOption, locale: string) {
-  return locale === "fa" ? (item.nameFa ?? item.nameEn ?? "") : (item.nameEn ?? "");
+  return locale === "fa"
+    ? (item.nameFa ?? item.nameEn ?? "")
+    : locale === "de"
+      ? (item.nameDe ?? item.nameEn ?? item.nameFa ?? "")
+      : (item.nameEn ?? item.nameDe ?? item.nameFa ?? "");
 }
 
 export function BusinessEditForm({

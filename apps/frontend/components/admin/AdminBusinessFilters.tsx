@@ -7,6 +7,7 @@ import { AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 type Option = {
   id: number;
   nameEn: string | null;
+  nameDe?: string | null;
   nameFa: string | null;
 };
 
@@ -21,7 +22,7 @@ type Props = {
 };
 
 function optionLabel(option: Option) {
-  return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
+  return [option.nameDe, option.nameEn, option.nameFa].filter(Boolean).join(" / ");
 }
 
 export function AdminBusinessFilters({ q, categoryId, cityId, status, categories, cities, statuses }: Props) {

@@ -23,6 +23,7 @@ type MapProperties = {
   reviewCount: number;
   categoryNameFa: string;
   categoryNameEn: string;
+  categoryNameDe: string | null;
   categorySlug: string;
   categoryIcon?: string | null;
   mapIcon: string;
@@ -60,7 +61,11 @@ type MapData = FeatureCollection<Point, MapProperties> & { truncated?: boolean }
 
 function localized(properties: MapProperties, locale: Props["locale"]) {
   return {
-    category: locale === "fa" ? properties.categoryNameFa : properties.categoryNameEn,
+    category: locale === "fa"
+      ? properties.categoryNameFa
+      : locale === "de"
+        ? properties.categoryNameDe || properties.categoryNameEn
+        : properties.categoryNameEn,
     city: locale === "fa" ? properties.cityNameFa : properties.cityNameEn,
   };
 }

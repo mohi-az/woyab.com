@@ -43,6 +43,7 @@ import {
 type Option = {
   id: number;
   nameEn: string | null;
+  nameDe?: string | null;
   nameFa: string | null;
 };
 
@@ -74,7 +75,7 @@ type ContentLocale = (typeof locales)[number];
 type TranslationDraft = Record<ContentLocale, { businessName: string; shortDescription: string; description: string }>;
 
 function optionLabel(option: Option) {
-  return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
+  return [option.nameDe, option.nameEn, option.nameFa].filter(Boolean).join(" / ");
 }
 
 function slugify(value: string) {
@@ -465,7 +466,7 @@ export function OwnerBusinessWizard({
     description: localizedDraft.description || undefined,
     coverImageUrl: imageMode === "manual" ? manualCoverUrl : googleCoverUrl,
     categoryName: selectedCategory
-      ? ((locale === "fa" ? selectedCategory.nameFa : selectedCategory.nameEn) ?? undefined)
+      ? ((locale === "fa" ? selectedCategory.nameFa : locale === "de" ? selectedCategory.nameDe || selectedCategory.nameEn : selectedCategory.nameEn) ?? undefined)
       : undefined,
     cityName: selectedCity
       ? ((locale === "fa" ? selectedCity.nameFa : selectedCity.nameEn) ?? undefined)

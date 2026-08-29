@@ -18,8 +18,10 @@ const publicBusinessWhere = {
   removedAt: null,
 } satisfies Prisma.BusinessWhereInput;
 
-function localizedName(locale: AppLocale, nameFa: string, nameEn: string | null) {
-  return locale === "fa" ? nameFa : nameEn || nameFa;
+function localizedName(locale: AppLocale, nameFa: string, nameEn: string | null, nameDe?: string | null) {
+  if (locale === "fa") return nameFa;
+  if (locale === "de") return nameDe || nameEn || nameFa;
+  return nameEn || nameDe || nameFa;
 }
 
 function tagCondition(tagIds?: number[]): Prisma.BusinessWhereInput {
@@ -68,6 +70,7 @@ export async function fetchBusinessDirectoryOptions(
         slug: true,
         nameFa: true,
         nameEn: true,
+        nameDe: true,
         icon: true,
         _count: { select: { businesses: { where: categoryBusinessWhere } } },
       },
@@ -87,6 +90,7 @@ export async function fetchBusinessDirectoryOptions(
         slug: true,
         nameFa: true,
         nameEn: true,
+        nameDe: true,
         icon: true,
         categoryId: true,
         _count: { select: { businesses: { where: subCategoryBusinessWhere } } },
@@ -105,6 +109,7 @@ export async function fetchBusinessDirectoryOptions(
         slug: true,
         nameFa: true,
         nameEn: true,
+        nameDe: true,
         _count: { select: { businesses: { where: { business: tagBusinessWhere } } } },
       },
     }),
@@ -132,14 +137,14 @@ export async function fetchBusinessDirectoryOptions(
     categories: categories.map((item) => ({
       id: item.id,
       slug: item.slug,
-      name: localizedName(locale, item.nameFa, item.nameEn),
+      name: localizedName(locale, item.nameFa, item.nameEn, item.nameDe),
       iconKey: item.icon,
       count: item._count.businesses,
     })),
     subCategories: subCategories.map((item) => ({
       id: item.id,
       slug: item.slug,
-      name: localizedName(locale, item.nameFa, item.nameEn),
+      name: localizedName(locale, item.nameFa, item.nameEn, item.nameDe),
       iconKey: item.icon,
       parentId: item.categoryId,
       count: item._count.businesses,
@@ -147,7 +152,7 @@ export async function fetchBusinessDirectoryOptions(
     tags: tags.map((item) => ({
       id: item.id,
       slug: item.slug,
-      name: localizedName(locale, item.nameFa, item.nameEn),
+      name: localizedName(locale, item.nameFa, item.nameEn, item.nameDe),
       count: item._count.businesses,
     })),
     cities: cities.map((item) => ({

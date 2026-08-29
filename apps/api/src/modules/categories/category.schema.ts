@@ -7,6 +7,7 @@ import { paginationQuerySchema } from "@woyab/shared";
 export const createCategoryBodySchema = z.object({
   nameFa: z.string().min(1),
   nameEn: z.string().min(1),
+  nameDe: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   icon: z.string().optional(),
   image: z.string().optional(),
@@ -29,6 +30,7 @@ export const listCategoriesQuerySchema = paginationQuerySchema.extend({
 export const createSubCategoryBodySchema = z.object({
   nameFa: z.string().min(1),
   nameEn: z.string().min(1),
+  nameDe: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   icon: z.string().optional(),
   image: z.string().optional(),

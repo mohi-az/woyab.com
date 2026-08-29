@@ -175,7 +175,7 @@ async function resolveCreateTaxonomy(
     if (!suggestion?.slug) throw new Error("The proposed AI category is unavailable.");
     const existing = await tx.category.findUnique({ where: { slug: suggestion.slug }, select: { id: true } });
     categoryId = existing?.id ?? (await tx.category.create({
-      data: { nameEn: suggestion.nameEn, nameFa: suggestion.nameFa, slug: suggestion.slug, active: true, sortOrder: 0 },
+      data: { nameEn: suggestion.nameEn, nameDe: suggestion.nameDe, nameFa: suggestion.nameFa, slug: suggestion.slug, active: true, sortOrder: 0 },
       select: { id: true },
     })).id;
   }
@@ -188,7 +188,7 @@ async function resolveCreateTaxonomy(
     const existing = await tx.subCategory.findUnique({ where: { slug: suggestion.slug }, select: { id: true, categoryId: true } });
     if (existing && existing.categoryId !== categoryId) throw new Error("The proposed subcategory slug belongs to another category.");
     subCategoryId = existing?.id ?? (await tx.subCategory.create({
-      data: { nameEn: suggestion.nameEn, nameFa: suggestion.nameFa, slug: suggestion.slug, categoryId, active: true, sortOrder: 0 },
+      data: { nameEn: suggestion.nameEn, nameDe: suggestion.nameDe, nameFa: suggestion.nameFa, slug: suggestion.slug, categoryId, active: true, sortOrder: 0 },
       select: { id: true },
     })).id;
   }
@@ -809,6 +809,7 @@ export async function updateCategory(formData: FormData) {
       data: {
         nameFa: value(formData, "nameFa"),
         nameEn: value(formData, "nameEn"),
+        nameDe: value(formData, "nameDe"),
         slug: value(formData, "slug"),
         icon: nullableValue(formData, "icon"),
         sortOrder: intValue(formData, "sortOrder") ?? 0,
@@ -833,6 +834,7 @@ export async function updateSubCategory(formData: FormData) {
       data: {
         nameFa: value(formData, "nameFa"),
         nameEn: value(formData, "nameEn"),
+        nameDe: value(formData, "nameDe"),
         slug: value(formData, "slug"),
         icon: nullableValue(formData, "icon"),
         categoryId: intValue(formData, "categoryId") ?? undefined,
@@ -858,6 +860,7 @@ export async function createTag(formData: FormData) {
       data: {
         nameFa,
         nameEn: nullableValue(formData, "nameEn"),
+        nameDe: nullableValue(formData, "nameDe"),
         slug,
       },
       select: { id: true },
@@ -882,6 +885,7 @@ export async function updateTag(formData: FormData) {
       data: {
         nameFa,
         nameEn: nullableValue(formData, "nameEn"),
+        nameDe: nullableValue(formData, "nameDe"),
         slug,
       },
     });

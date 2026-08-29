@@ -2,6 +2,7 @@ model Category {
   id            Int           @id @default(autoincrement())
   nameFa        String
   nameEn        String
+  nameDe        String
   slug          String        @unique
   icon          String?
   image         String?
@@ -19,6 +20,7 @@ model SubCategory {
   id          Int         @id @default(autoincrement())
   nameFa      String
   nameEn      String
+  nameDe      String
   slug        String      @unique
   icon        String?
   image       String?

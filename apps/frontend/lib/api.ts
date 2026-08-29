@@ -5,6 +5,7 @@ type CategoryApiItem = {
   id: number;
   nameFa: string;
   nameEn: string;
+  nameDe?: string | null;
   slug: string;
   icon?: string | null;
   _count: { businesses: number; subCategories: number };
@@ -29,6 +30,7 @@ type BusinessApiItem = {
   category?: {
     nameFa: string;
     nameEn: string;
+    nameDe?: string | null;
     slug: string;
     icon?: string | null;
   } | null;
@@ -94,6 +96,7 @@ type BusinessDetailApiResponse = {
       id: number;
       nameFa: string;
       nameEn: string;
+      nameDe?: string | null;
       slug: string;
       icon?: string | null;
     } | null;
@@ -101,6 +104,7 @@ type BusinessDetailApiResponse = {
       id: number;
       nameFa: string;
       nameEn: string;
+      nameDe?: string | null;
       slug: string;
       icon?: string | null;
     } | null;
@@ -141,6 +145,7 @@ type BusinessDetailApiResponse = {
         id: number;
         nameFa: string;
         nameEn: string | null;
+        nameDe: string | null;
         slug: string;
       };
     }>;
@@ -449,10 +454,12 @@ function compatibleAttributeValue(dataType: string, value: string) {
 
 function getLocalizedName(
   locale: string,
-  item?: { nameFa: string; nameEn?: string | null } | null,
+  item?: { nameFa: string; nameEn?: string | null; nameDe?: string | null } | null,
 ) {
   if (!item) return null;
-  return locale === "fa" ? item.nameFa : item.nameEn || item.nameFa;
+  if (locale === "fa") return item.nameFa;
+  if (locale === "de") return item.nameDe || item.nameEn || item.nameFa;
+  return item.nameEn || item.nameDe || item.nameFa;
 }
 
 export async function fetchCategoryCounts(): Promise<Record<number, number>> {
@@ -642,8 +649,17 @@ export async function searchBusinessDirectory(
   };
 }
 
-function localizedText(locale: string, item?: { nameFa: string; nameEn?: string | null } | null) {
+function localizedText(locale: string, item?: { nameFa: string; nameEn?: string | null; nameDe?: string | null } | null) {
   return getLocalizedName(locale, item);
+}
+
+function localizedTagText(
+  locale: string,
+  tag: { nameFa: string; nameEn?: string | null; nameDe?: string | null },
+) {
+  if (locale === "fa") return tag.nameFa;
+  if (locale === "de") return tag.nameDe || tag.nameEn || tag.nameFa;
+  return tag.nameEn || tag.nameDe || tag.nameFa;
 }
 
 export const fetchBusinessBySlug = cache(
@@ -786,7 +802,7 @@ export const fetchBusinessBySlug = cache(
       tags: (business.tags ?? []).map((entry) => ({
         id: entry.tag.id,
         slug: entry.tag.slug,
-        name: localizedText(locale, entry.tag) ?? entry.tag.nameFa,
+        name: localizedTagText(locale, entry.tag),
       })),
       attributes: (business.attributes ?? []).flatMap((entry) => {
         if (!compatibleAttributeValue(entry.attribute.dataType, entry.value)) return [];

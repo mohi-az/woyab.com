@@ -4,6 +4,7 @@ export type BusinessTagOption = {
   id: number;
   nameFa: string;
   nameEn: string | null;
+  nameDe: string | null;
   slug: string;
 };
 
@@ -15,6 +16,7 @@ export const businessTagOptionSelect = {
   id: true,
   nameFa: true,
   nameEn: true,
+  nameDe: true,
   slug: true,
 } satisfies Prisma.TagSelect;
 
@@ -23,7 +25,9 @@ export const businessTagValueSelect = {
 } satisfies Prisma.BusinessTagSelect;
 
 export function businessTagLabel(tag: BusinessTagOption, locale?: string) {
-  return locale === "fa" ? tag.nameFa : tag.nameEn || tag.nameFa;
+  if (locale === "fa") return tag.nameFa;
+  if (locale === "de") return tag.nameDe || tag.nameEn || tag.nameFa;
+  return tag.nameEn || tag.nameDe || tag.nameFa;
 }
 
 export function selectedTagIds(formData: FormData) {

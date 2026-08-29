@@ -17,12 +17,12 @@ export default async function BusinessPortalNewPage({ searchParams }: PageProps)
       prisma.category.findMany({
         where: { active: true },
         orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }],
-        select: { id: true, nameEn: true, nameFa: true },
+        select: { id: true, nameEn: true, nameDe: true, nameFa: true },
       }),
       prisma.subCategory.findMany({
         where: { active: true },
         orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }],
-        select: { id: true, nameEn: true, nameFa: true, categoryId: true },
+        select: { id: true, nameEn: true, nameDe: true, nameFa: true, categoryId: true },
       }),
       prisma.city.findMany({
         orderBy: { nameEn: "asc" },

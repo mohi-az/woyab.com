@@ -75,6 +75,12 @@ function spatialConditions(input: InternalBusinessSearchBody) {
     conditions.push(Prisma.sql`(
       b."businessName" ILIKE ${term}
       OR b."shortDescription" ILIKE ${term}
+      OR category."nameFa" ILIKE ${term}
+      OR category."nameEn" ILIKE ${term}
+      OR category."nameDe" ILIKE ${term}
+      OR sub_category."nameFa" ILIKE ${term}
+      OR sub_category."nameEn" ILIKE ${term}
+      OR sub_category."nameDe" ILIKE ${term}
       OR EXISTS (
         SELECT 1
         FROM "business_tags" bt_tag
@@ -83,6 +89,7 @@ function spatialConditions(input: InternalBusinessSearchBody) {
           AND (
             tag_search."nameFa" ILIKE ${term}
             OR tag_search."nameEn" ILIKE ${term}
+            OR tag_search."nameDe" ILIKE ${term}
             OR tag_search."slug" ILIKE ${term}
           )
       )
@@ -137,6 +144,8 @@ export async function findNearbyBusinesses(input: InternalBusinessSearchBody) {
       ) AS "locationRank"
     FROM "businesses" b
     JOIN "business_locations" bl ON bl."businessId" = b."id"
+    JOIN "categories" category ON category."id" = b."categoryId"
+    LEFT JOIN "sub_categories" sub_category ON sub_category."id" = b."subCategoryId"
     LEFT JOIN "cities" city ON city."id" = bl."cityId"
     LEFT JOIN "business_translations" bt_requested
       ON bt_requested."businessId" = b."id" AND bt_requested."locale" = ${requestedLocale}::"content_locale"

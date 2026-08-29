@@ -49,7 +49,7 @@ export const subCategoryRepository = {
       take,
       orderBy: { sortOrder: "asc" },
       include: {
-        category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+        category: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true } },
         _count: { select: { businesses: { where: { status: "ACTIVE", verified: true, removedAt: null } } } },
       },
     }),
@@ -61,7 +61,7 @@ export const subCategoryRepository = {
     prisma.subCategory.findUnique({
       where: { id },
       include: {
-        category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
+        category: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true } },
         _count: { select: { businesses: { where: { status: "ACTIVE", verified: true, removedAt: null } } } },
       },
     }),

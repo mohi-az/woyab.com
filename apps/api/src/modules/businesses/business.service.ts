@@ -33,9 +33,20 @@ function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: 
         { businessName: { contains: search, mode: "insensitive" as const } },
         { shortDescription: { contains: search, mode: "insensitive" as const } },
         { description: { contains: search, mode: "insensitive" as const } },
+        { category: { OR: [
+          { nameFa: { contains: search, mode: "insensitive" as const } },
+          { nameEn: { contains: search, mode: "insensitive" as const } },
+          { nameDe: { contains: search, mode: "insensitive" as const } },
+        ] } },
+        { subCategory: { OR: [
+          { nameFa: { contains: search, mode: "insensitive" as const } },
+          { nameEn: { contains: search, mode: "insensitive" as const } },
+          { nameDe: { contains: search, mode: "insensitive" as const } },
+        ] } },
         { tags: { some: { tag: { OR: [
           { nameFa: { contains: search, mode: "insensitive" as const } },
           { nameEn: { contains: search, mode: "insensitive" as const } },
+          { nameDe: { contains: search, mode: "insensitive" as const } },
           { slug: { contains: search, mode: "insensitive" as const } },
         ] } } } },
         {

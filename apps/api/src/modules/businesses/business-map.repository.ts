@@ -20,6 +20,7 @@ type BusinessMapRow = {
   reviewCount: number;
   categoryNameFa: string;
   categoryNameEn: string;
+  categoryNameDe: string | null;
   categorySlug: string;
   categoryIcon: string | null;
   cityNameFa: string | null;
@@ -92,6 +93,12 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
     conditions.push(Prisma.sql`(
       b."businessName" ILIKE ${term}
       OR b."shortDescription" ILIKE ${term}
+      OR category."nameFa" ILIKE ${term}
+      OR category."nameEn" ILIKE ${term}
+      OR category."nameDe" ILIKE ${term}
+      OR sub_category."nameFa" ILIKE ${term}
+      OR sub_category."nameEn" ILIKE ${term}
+      OR sub_category."nameDe" ILIKE ${term}
       OR EXISTS (
         SELECT 1
         FROM "business_tags" bt_tag
@@ -100,6 +107,7 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
           AND (
             tag_search."nameFa" ILIKE ${term}
             OR tag_search."nameEn" ILIKE ${term}
+            OR tag_search."nameDe" ILIKE ${term}
             OR tag_search."slug" ILIKE ${term}
           )
       )
@@ -143,13 +151,14 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
       b."coverImageUrl",
       COALESCE(b."googleRating", b."averageRating") AS "averageRating",
       COALESCE(b."googleUserRatingCount", b."reviewCount") AS "reviewCount",
-      category."nameFa" AS "categoryNameFa", category."nameEn" AS "categoryNameEn",
+      category."nameFa" AS "categoryNameFa", category."nameEn" AS "categoryNameEn", category."nameDe" AS "categoryNameDe",
       category."slug" AS "categorySlug", category."icon" AS "categoryIcon",
       city."nameFa" AS "cityNameFa", city."nameEn" AS "cityNameEn",
       ${distance} AS "distanceMeters"
     FROM "business_locations" bl
     JOIN "businesses" b ON b."id" = bl."businessId"
     JOIN "categories" category ON category."id" = b."categoryId"
+    LEFT JOIN "sub_categories" sub_category ON sub_category."id" = b."subCategoryId"
     LEFT JOIN "cities" city ON city."id" = bl."cityId"
     LEFT JOIN "business_translations" bt_requested
       ON bt_requested."businessId" = b."id" AND bt_requested."locale" = ${requestedLocale}::"content_locale"
@@ -187,6 +196,7 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
         reviewCount: row.reviewCount,
         categoryNameFa: row.categoryNameFa,
         categoryNameEn: row.categoryNameEn,
+        categoryNameDe: row.categoryNameDe,
         categorySlug: row.categorySlug,
         categoryIcon: row.categoryIcon,
         mapIcon: mapIconByCategory[row.categoryIcon ?? ""] ?? mapIconByCategory[row.categorySlug] ?? "marker",

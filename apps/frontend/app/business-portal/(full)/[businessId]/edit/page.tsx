@@ -96,8 +96,8 @@ export default async function BusinessEditPage({ params }: PageProps) {
         select: businessAttributeDefinitionSelect,
       }),
       prisma.tag.findMany({ orderBy: [{ nameEn: "asc" }, { nameFa: "asc" }], select: businessTagOptionSelect }),
-      prisma.category.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
-      prisma.subCategory.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, categoryId: true, nameEn: true, nameFa: true } }),
+      prisma.category.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, nameEn: true, nameDe: true, nameFa: true } }),
+      prisma.subCategory.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, categoryId: true, nameEn: true, nameDe: true, nameFa: true } }),
       prisma.city.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
       prisma.district.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, cityId: true, nameEn: true, nameFa: true } }),
     ]);
@@ -113,7 +113,11 @@ export default async function BusinessEditPage({ params }: PageProps) {
     description: business.description ?? "",
     logoUrl: business.logoUrl ?? undefined,
     coverImageUrl: business.coverImageUrl ?? undefined,
-    categoryName: locale === "fa" ? (categoryName?.nameFa ?? categoryName?.nameEn ?? "") : (categoryName?.nameEn ?? ""),
+    categoryName: locale === "fa"
+      ? (categoryName?.nameFa ?? categoryName?.nameEn ?? "")
+      : locale === "de"
+        ? (categoryName?.nameDe ?? categoryName?.nameEn ?? "")
+        : (categoryName?.nameEn ?? ""),
     cityName: locale === "fa" ? (cityName?.nameFa ?? cityName?.nameEn ?? "") : (cityName?.nameEn ?? ""),
     address: business.address ?? "",
     phone: business.phone ?? "",
@@ -126,8 +130,8 @@ export default async function BusinessEditPage({ params }: PageProps) {
     services: business.services.map((s) => ({ title: s.title, price: s.price?.toString(), currency: s.currency })),
   };
 
-  const locLabel = (item: { nameEn: string | null; nameFa: string | null }) =>
-    locale === "fa" ? (item.nameFa ?? item.nameEn ?? "") : (item.nameEn ?? "");
+  const locLabel = (item: { nameEn: string | null; nameDe?: string | null; nameFa: string | null }) =>
+    locale === "fa" ? (item.nameFa ?? item.nameEn ?? "") : locale === "de" ? (item.nameDe ?? item.nameEn ?? "") : (item.nameEn ?? "");
 
   const ownerInputClass = "min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-primary";
   const ownerButtonClass = "min-h-11 rounded-xl bg-slate-950 px-5 text-sm font-black text-white";

@@ -28,8 +28,8 @@ function optionalPositiveInt(value: string | undefined) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
-function nullableOption<T extends { id: number; nameEn?: string | null; nameFa?: string | null }>(item: T | null) {
-  return item ? { id: item.id, nameEn: item.nameEn ?? null, nameFa: item.nameFa ?? null } : null;
+function nullableOption<T extends { id: number; nameEn?: string | null; nameDe?: string | null; nameFa?: string | null }>(item: T | null) {
+  return item ? { id: item.id, nameEn: item.nameEn ?? null, nameDe: item.nameDe ?? null, nameFa: item.nameFa ?? null } : null;
 }
 
 export default async function AdminBusinessesPage({ searchParams }: PageProps) {
@@ -61,8 +61,8 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       include: {
-        category: { select: { id: true, nameEn: true, nameFa: true, slug: true } },
-        subCategory: { select: { id: true, nameEn: true, nameFa: true, slug: true } },
+        category: { select: { id: true, nameEn: true, nameDe: true, nameFa: true, slug: true } },
+        subCategory: { select: { id: true, nameEn: true, nameDe: true, nameFa: true, slug: true } },
         city: { select: { id: true, nameEn: true, nameFa: true } },
         owner: { select: { email: true, name: true } },
         businessHours: {
@@ -83,8 +83,8 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
       },
     }),
     prisma.business.count({ where }),
-    prisma.category.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, slug: true } }),
-    prisma.subCategory.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, slug: true, categoryId: true } }),
+    prisma.category.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameDe: true, nameFa: true, slug: true } }),
+    prisma.subCategory.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameDe: true, nameFa: true, slug: true, categoryId: true } }),
     prisma.city.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
     prisma.district.findMany({ orderBy: [{ cityId: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, cityId: true } }),
     prisma.user.findMany({
