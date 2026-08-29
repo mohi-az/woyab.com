@@ -23,8 +23,10 @@ type Props = {
   imageMode: ImageMode;
   initialImages?: string[];
   initialCoverUrl?: string;
+  initialGooglePhotoReference?: string;
   onImageModeChange: (mode: ImageMode) => void;
   onManualImagesChange: (urls: string[], coverUrl?: string) => void;
+  onGooglePhotoReferenceChange?: (photoReference: string) => void;
 };
 
 function copy(locale: string) {
@@ -32,7 +34,7 @@ function copy(locale: string) {
     return {
       auto: "دریافت خودکار از گوگل",
       manual: "مدیریت دستی تصاویر",
-      autoHelp: "در حالت خودکار، تصاویر Google Places نمایش داده می‌شوند و اولین تصویر به‌عنوان تصویر اصلی استفاده می‌شود.",
+      autoHelp: "یکی از تصاویر Google Places را برای کاور انتخاب کنید. تصویر انتخابی به‌صورت دائمی ذخیره می‌شود.",
       manualHelp: "تصاویر را آپلود کنید، با کلیک تصویر اصلی را انتخاب کنید و برای تغییر ترتیب آن‌ها را بکشید.",
       upload: "انتخاب و آپلود تصاویر",
       uploading: "در حال آپلود…",
@@ -50,7 +52,7 @@ function copy(locale: string) {
     return {
       auto: "Automatisch von Google",
       manual: "Bilder manuell verwalten",
-      autoHelp: "Im automatischen Modus werden Google-Places-Bilder verwendet; das erste Bild ist das Titelbild.",
+      autoHelp: "Wählen Sie ein Google-Places-Bild als Titelbild aus. Das ausgewählte Bild wird dauerhaft gespeichert.",
       manualHelp: "Bilder hochladen, Titelbild anklicken und die Reihenfolge per Drag-and-drop ändern.",
       upload: "Bilder auswählen und hochladen",
       uploading: "Wird hochgeladen…",
@@ -67,7 +69,7 @@ function copy(locale: string) {
   return {
     auto: "Use Google photos automatically",
     manual: "Manage images manually",
-    autoHelp: "In automatic mode, Google Places photos are used and the first photo becomes the cover.",
+    autoHelp: "Choose any Google Places photo as the cover. The selected image is stored permanently.",
     manualHelp: "Upload images, click to choose the cover, and drag thumbnails to set their display order.",
     upload: "Choose and upload images",
     uploading: "Uploading…",
@@ -93,8 +95,10 @@ export function BusinessImageManager({
   imageMode,
   initialImages = [],
   initialCoverUrl,
+  initialGooglePhotoReference,
   onImageModeChange,
   onManualImagesChange,
+  onGooglePhotoReferenceChange,
 }: Props) {
   const t = copy(locale);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -105,6 +109,15 @@ export function BusinessImageManager({
   );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [googlePhotoReference, setGooglePhotoReference] = useState(initialGooglePhotoReference ?? "");
+  const selectedGooglePhotoReference = googlePhotos.some((photo) => photo.photoReference === googlePhotoReference)
+    ? googlePhotoReference
+    : googlePhotos[0]?.photoReference ?? "";
+
+  function selectGoogleCover(photoReference: string) {
+    setGooglePhotoReference(photoReference);
+    onGooglePhotoReferenceChange?.(photoReference);
+  }
 
   function commit(nextImages: string[], nextCover = coverUrl) {
     const safeCover = nextCover && nextImages.includes(nextCover) ? nextCover : nextImages[0];
@@ -150,8 +163,8 @@ export function BusinessImageManager({
   return (
     <div className="grid gap-5">
       <input type="hidden" name="imageMode" value={imageMode} />
-      {imageMode === "google" && googlePhotos[0] ? (
-        <input type="hidden" name="googlePhotoReference" value={googlePhotos[0].photoReference} />
+      {imageMode === "google" && selectedGooglePhotoReference ? (
+        <input type="hidden" name="googlePhotoReference" value={selectedGooglePhotoReference} />
       ) : null}
       <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 sm:grid-cols-2">
         <button
@@ -183,26 +196,33 @@ export function BusinessImageManager({
             </div>
           ) : googlePhotos.length ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-              {googlePhotos.map((photo, index) => (
-                <div
-                  key={photo.photoReference}
-                  className={`relative overflow-hidden rounded-2xl border-2 bg-slate-100 ${
-                    index === 0 ? "border-primary ring-4 ring-primary/10" : "border-transparent"
-                  }`}
-                >
-                  <img
-                    src={googlePhotoUrl(photo.photoReference, googlePlaceId, 640)}
-                    alt=""
-                    draggable={false}
-                    className="aspect-square h-full w-full object-cover"
-                  />
-                  {index === 0 ? (
-                    <span className="absolute bottom-2 start-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-[10px] font-black text-white shadow">
-                      <FiCheck /> {t.main}
-                    </span>
-                  ) : null}
-                </div>
-              ))}
+              {googlePhotos.map((photo) => {
+                const selected = photo.photoReference === selectedGooglePhotoReference;
+                return (
+                  <button
+                    type="button"
+                    key={photo.photoReference}
+                    onClick={() => selectGoogleCover(photo.photoReference)}
+                    aria-pressed={selected}
+                    aria-label={t.main}
+                    className={`relative overflow-hidden rounded-2xl border-2 bg-slate-100 ${
+                      selected ? "border-primary ring-4 ring-primary/10" : "border-transparent hover:border-slate-300"
+                    }`}
+                  >
+                    <img
+                      src={googlePhotoUrl(photo.photoReference, googlePlaceId, 640)}
+                      alt=""
+                      draggable={false}
+                      className="aspect-square h-full w-full object-cover"
+                    />
+                    {selected ? (
+                      <span className="absolute bottom-2 start-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-[10px] font-black text-white shadow">
+                        <FiCheck /> {t.main}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm leading-7 text-slate-500">

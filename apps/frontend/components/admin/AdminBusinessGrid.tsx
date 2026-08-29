@@ -91,6 +91,7 @@ export type AdminBusinessRow = {
   attributes: BusinessAttributeValue[];
   tags: BusinessTagValue[];
   googlePlaceId: string | null;
+  googleCoverPhotoReference: string | null;
   coverImageUrl: string | null;
   images: Array<{ imageUrl: string }>;
 };
@@ -567,7 +568,7 @@ export function AdminBusinessGrid({
       longitude: business.longitude,
     });
     setHoursDraft(business.businessHours);
-    setGooglePhotoReferenceDraft("");
+    setGooglePhotoReferenceDraft(business.googleCoverPhotoReference ?? "");
     setGooglePlaceIdDraft(business.googlePlaceId ?? "");
     setImageMode(
       business.images.length > 0 || (business.coverImageUrl && !isStoredGoogleCover(business.coverImageUrl))
@@ -950,7 +951,6 @@ export function AdminBusinessGrid({
             <form key={`business-form-${editing?.id ?? "new"}-${formResetVersion}`} ref={formRef} action={submitBusinessDetails} onSubmit={handleSubmit} onChange={handleFieldChange} className="max-h-[calc(92vh-150px)] min-w-0 overflow-x-hidden overflow-y-auto pt-4">
               {editing ? <input type="hidden" name="businessId" value={editing.id} /> : null}
               {creating && aiApplication ? <input type="hidden" name="aiImportId" value={aiApplication.draftId} /> : null}
-              {googlePhotoReferenceDraft ? <input type="hidden" name="googlePhotoReference" value={googlePhotoReferenceDraft} /> : null}
               {!locationPickerMounted ? (
                 <>
                   <input type="hidden" name="latitude" value={locationDraft.latitude ?? ""} />
@@ -1224,8 +1224,10 @@ export function AdminBusinessGrid({
                         ...(editing.coverImageUrl ? [editing.coverImageUrl] : []),
                       ])] : []}
                       initialCoverUrl={editing?.coverImageUrl ?? undefined}
+                      initialGooglePhotoReference={googlePhotoReferenceDraft || undefined}
                       onImageModeChange={setImageMode}
                       onManualImagesChange={() => undefined}
+                      onGooglePhotoReferenceChange={setGooglePhotoReferenceDraft}
                     />
                   </div>
                 </section>

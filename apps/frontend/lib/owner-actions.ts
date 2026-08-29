@@ -239,8 +239,10 @@ export async function createOwnerBusiness(formData: FormData) {
     .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
     .map((item) => item.trim());
   const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
+  const googlePhotoReference = nullableValue(formData, "googlePhotoReference");
   const coverImageUrl = await resolvePermanentBusinessCover({
     googlePlaceId,
+    googlePhotoReference,
     requestedCoverImageUrl,
     useGoogleWhenMissing: value(formData, "imageMode") !== "manual",
   });
@@ -268,6 +270,7 @@ export async function createOwnerBusiness(formData: FormData) {
         mobile,
         website,
         googlePlaceId,
+        googleCoverPhotoReference: value(formData, "imageMode") !== "manual" && googlePlaceId && coverImageUrl ? googlePhotoReference : null,
         coverImageUrl,
         status: "PENDING",
         verified: false,

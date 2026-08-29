@@ -437,20 +437,27 @@ export async function updateBusinessDetails(formData: FormData) {
 
   const currentBusiness = await prisma.business.findUnique({
     where: { id: businessId },
-    select: { coverImageUrl: true, googlePlaceId: true },
+    select: { coverImageUrl: true, googlePlaceId: true, googleCoverPhotoReference: true },
   });
   if (!currentBusiness) throw new Error("Business not found.");
+  const googlePhotoReference = nullableValue(formData, "googlePhotoReference")
+    ?? (currentBusiness.googlePlaceId === googlePlaceId ? currentBusiness.googleCoverPhotoReference : null);
   const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
   const coverImageUrl = imageMode === "manual"
     ? requestedCoverImageUrl
     : await resolvePermanentBusinessCover({
         googlePlaceId,
-        googlePhotoReference: nullableValue(formData, "googlePhotoReference"),
+        googlePhotoReference,
         requestedCoverImageUrl,
         existingCoverImageUrl: currentBusiness.coverImageUrl,
         refreshGoogleCover: imageMode === "google" || currentBusiness.googlePlaceId !== googlePlaceId,
         useGoogleWhenMissing: true,
       });
+  const persistedGooglePhotoReference = imageMode === "google" && googlePlaceId && googlePhotoReference && coverImageUrl
+    ? coverImageUrl !== currentBusiness.coverImageUrl || googlePhotoReference === currentBusiness.googleCoverPhotoReference
+      ? googlePhotoReference
+      : currentBusiness.googleCoverPhotoReference
+    : null;
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({
     locale,
@@ -482,6 +489,7 @@ export async function updateBusinessDetails(formData: FormData) {
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
         googlePlaceId,
+        googleCoverPhotoReference: persistedGooglePhotoReference,
         googleRating: googlePlaceId ? googleRatings.googleRating : null,
         googleUserRatingCount: googlePlaceId ? googleRatings.googleUserRatingCount : null,
         googleRatingUpdatedAt: googlePlaceId && (googleRatings.googleRating !== null || googleRatings.googleUserRatingCount !== null)
@@ -577,11 +585,12 @@ export async function createBusinessDetails(formData: FormData) {
   }
 
   const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
+  const googlePhotoReference = nullableValue(formData, "googlePhotoReference");
   const coverImageUrl = imageMode === "manual"
     ? requestedCoverImageUrl
     : await resolvePermanentBusinessCover({
         googlePlaceId,
-        googlePhotoReference: nullableValue(formData, "googlePhotoReference"),
+        googlePhotoReference,
         requestedCoverImageUrl,
         useGoogleWhenMissing: true,
       });
@@ -631,6 +640,7 @@ export async function createBusinessDetails(formData: FormData) {
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
         googlePlaceId,
+        googleCoverPhotoReference: imageMode === "google" && googlePlaceId && coverImageUrl ? googlePhotoReference : null,
         googleRating: googlePlaceId ? googleRatings.googleRating : null,
         googleUserRatingCount: googlePlaceId ? googleRatings.googleUserRatingCount : null,
         googleRatingUpdatedAt: googlePlaceId && (googleRatings.googleRating !== null || googleRatings.googleUserRatingCount !== null)

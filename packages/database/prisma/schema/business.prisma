@@ -8,6 +8,7 @@ model Business {
   logoUrl           String?
   coverImageUrl     String?
   googlePlaceId     String?
+  googleCoverPhotoReference String?
   googleRating      Float?
   googleUserRatingCount Int?
   googleRatingUpdatedAt DateTime?

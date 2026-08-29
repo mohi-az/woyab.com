@@ -157,6 +157,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     attributes: business.attributes,
     tags: business.tags,
     googlePlaceId: business.googlePlaceId,
+    googleCoverPhotoReference: business.googleCoverPhotoReference,
     coverImageUrl: business.coverImageUrl,
     images: business.images,
   }));
