@@ -60,6 +60,21 @@ test("authenticated Google proxy routes send the server-only internal credential
   assert.doesNotMatch(proxy, /NEXT_PUBLIC_INTERNAL/);
 });
 
+test("read-only business proxies tolerate short API restarts and fail with a controlled 503", async () => {
+  const [proxy, search, map] = await Promise.all([
+    frontendSource("lib/server-api.ts"),
+    frontendSource("app/api/businesses/search/route.ts"),
+    frontendSource("app/api/businesses/map/route.ts"),
+  ]);
+
+  assert.match(proxy, /NETWORK_RETRY_DELAYS_MS = \[250, 750\]/);
+  assert.match(proxy, /status: 503/);
+  assert.match(proxy, /"Retry-After": "1"/);
+  assert.match(proxy, /The API is temporarily unavailable/);
+  assert.match(search, /retryNetworkErrors: true/);
+  assert.match(map, /retryNetworkErrors: true/);
+});
+
 test("public business photo proxies authenticate the trusted frontend hop", async () => {
   const routes = await Promise.all([
     frontendSource("app/api/businesses/[businessId]/google-photos/route.ts"),

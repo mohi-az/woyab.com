@@ -105,16 +105,20 @@ export function BusinessCard({
           <CategoryIcon iconKey={categoryIconKey} categorySlug={categorySlug} className="shrink-0 text-sm text-primary" />
           <span className="truncate">{categoryName ?? "-"}</span>
         </span>
-        {featured === true ? (
-          <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-black text-slate-950 shadow-lg">
-            <FiStar className="shrink-0" />
-            {featuredLabel}
-          </span>
-        ) : null}
-        {openStatusLabel ? (
-          <span className={`absolute end-3 top-3 rounded-full px-3 py-1.5 text-xs font-black shadow-lg ${openStatusStyle}`}>
-            {openStatusLabel}
-          </span>
+        {openStatusLabel || featured === true ? (
+          <div className="absolute left-3 top-3 flex max-w-[calc(100%-4.5rem)] flex-col items-start gap-2">
+            {openStatusLabel ? (
+              <span className={`rounded-full px-3 py-1.5 text-xs font-black shadow-lg ${openStatusStyle}`}>
+                {openStatusLabel}
+              </span>
+            ) : null}
+            {featured === true ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-black text-slate-950 shadow-lg">
+                <FiStar className="shrink-0" />
+                {featuredLabel}
+              </span>
+            ) : null}
+          </div>
         ) : null}
       </div>
 

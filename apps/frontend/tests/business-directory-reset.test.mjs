@@ -9,12 +9,12 @@ test("clear filters removes filter criteria while preserving the current search 
   const source = await readFile(directoryPath, "utf8");
 
   assert.doesNotMatch(source, /baseFilters/);
-  assert.match(source, /setFilters\(\(current\) => \(\{/);
+  assert.match(source, /updateFilters\(\(current\) => \(\{/);
   assert.match(source, /page: 1,[\s\S]*limit: initialFilters\.limit,[\s\S]*sortBy: current\.sortBy \?\? "popular",[\s\S]*cityId: current\.cityId/);
   assert.match(source, /const hasClearableFilters = Boolean\(/);
   assert.doesNotMatch(source, /sessionStorage\.removeItem\("woyab:business-search-location"\)/);
-  assert.doesNotMatch(source, /params\.set\("favoritesOnly"/);
-  assert.doesNotMatch(source, /params\.set\("openNow"/);
+  assert.match(source, /params\.set\("favoritesOnly", "true"\)/);
+  assert.match(source, /params\.set\("openNow", "true"\)/);
   assert.match(source, /filters\.sortBy !== "popular"/);
 });
 

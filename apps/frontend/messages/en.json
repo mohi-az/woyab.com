@@ -217,7 +217,7 @@
       "allCities": "All cities",
       "location": "Location",
       "reset": "Clear filters",
-      "favoritesOnly": "Show only my favorites",
+      "favoritesOnly": "Favorites",
       "openNow": "Open now"
     },
     "sort": {
@@ -256,7 +256,7 @@
     },
     "empty": {
       "title": "No matching businesses",
-      "description": "Try removing one or more filters or search with a different business name."
+      "description": "Try different filters. WoYab is always adding new businesses."
     },
     "pagination": {
       "label": "Business result pages",

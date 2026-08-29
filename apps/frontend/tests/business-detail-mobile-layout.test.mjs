@@ -12,10 +12,10 @@ test("mobile business details move reviews after the supporting cards", async ()
   assert.match(source, /<aside className="contents md:flex md:flex-col md:gap-6">/);
 });
 
-test("mobile stats and standalone hours card are hidden", async () => {
+test("duplicate stats are removed and the standalone hours card stays desktop-only", async () => {
   const source = await readFile(detailPath, "utf8");
 
-  assert.match(source, /className="hidden rounded-\[24px\][^"]*md:block"/);
+  assert.doesNotMatch(source, /stats\.(?:googleRating|category|subCategory)/);
   assert.match(source, /className="order-4 hidden rounded-\[30px\][^"]*md:block"/);
 });
 

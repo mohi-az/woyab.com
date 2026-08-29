@@ -14,12 +14,15 @@ const markData = readFile(
 // آیکون برند WoYab به صورت داینامیک تولید می‌شود
 // مثال: GET /pwa-icons/192  →  PNG 192×192
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ size: string }> },
 ) {
   const { size: sizeStr } = await context.params;
   const size = Math.min(512, Math.max(16, parseInt(sizeStr, 10) || 192));
-  const inner = Math.round(size * 0.82);
+  const isMaskable = new URL(request.url).searchParams.get("purpose") === "maskable";
+  // Keep the mark inside Android's maskable safe zone. The white canvas blends
+  // into the manifest splash background so only the brand mark is visible.
+  const inner = Math.round(size * (isMaskable ? 0.68 : 0.82));
   const mark = await markData;
 
   return new ImageResponse(
@@ -31,7 +34,7 @@ export async function GET(
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "transparent",
+          background: isMaskable ? "#ffffff" : "transparent",
         }}
       >
         {/* ImageResponse supports ArrayBuffer sources for local images, while

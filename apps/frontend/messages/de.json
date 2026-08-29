@@ -217,7 +217,7 @@
       "allCities": "Alle Städte",
       "location": "Standort",
         "reset": "Alle Filter löschen",
-        "favoritesOnly": "Nur meine Favoriten anzeigen",
+        "favoritesOnly": "Favoriten",
         "openNow": "Jetzt geöffnet"
     },
     "sort": {
@@ -256,7 +256,7 @@
     },
     "empty": {
       "title": "Keine passenden Unternehmen",
-      "description": "Entfernen Sie einen oder mehrere Filter oder suchen Sie nach einem anderen Unternehmensnamen."
+      "description": "Passen Sie die Filter an. WoYab fügt laufend neue Unternehmen hinzu."
     },
     "pagination": {
       "label": "Ergebnisseiten der Unternehmen",

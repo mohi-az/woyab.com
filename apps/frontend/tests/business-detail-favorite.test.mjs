@@ -24,5 +24,6 @@ test("hero favorite action loads and toggles the account state", async () => {
   assert.match(source, /response\.status === 401\) router\.push\(loginHref\)/);
   assert.match(source, /aria-pressed=\{saved\}/);
   assert.match(source, /saved \? \(savedLabel \?\? label\) : label/);
-  assert.match(source, /variant === "hero" \? "h-11 w-11 shrink-0"/);
+  assert.match(source, /variant === "hero" \? "h-11 w-11 shrink-0/);
+  assert.match(source, /lg:h-14 lg:w-14/);
 });

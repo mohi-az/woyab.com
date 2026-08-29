@@ -3,6 +3,28 @@ import "server-only";
 import type { NextRequest } from "next/server";
 
 const API_BASE = (process.env.API_URL ?? "http://localhost:4000").replace(/\/+$/, "");
+const NETWORK_RETRY_DELAYS_MS = [250, 750];
+
+async function fetchProxyTarget(
+  url: string,
+  init: RequestInit,
+  retryNetworkErrors: boolean,
+) {
+  const attempts = retryNetworkErrors ? NETWORK_RETRY_DELAYS_MS.length + 1 : 1;
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await fetch(url, init);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= attempts - 1) break;
+      await new Promise((resolve) => setTimeout(resolve, NETWORK_RETRY_DELAYS_MS[attempt]));
+    }
+  }
+
+  throw lastError;
+}
 
 export async function fetchInternalApiJson<T>(path: string, timeoutMs = 20_000): Promise<T> {
   const controller = new AbortController();
@@ -29,23 +51,31 @@ export async function fetchInternalApiJson<T>(path: string, timeoutMs = 20_000):
 export async function proxyApi(
   request: NextRequest,
   path: string,
-  options: { internal?: boolean } = {},
+  options: { internal?: boolean; retryNetworkErrors?: boolean } = {},
 ) {
   const body = request.method === "GET" || request.method === "HEAD"
     ? undefined
     : await request.text();
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: request.method,
-    body,
-    headers: {
-      Accept: "application/json",
-      ...(body ? { "Content-Type": "application/json" } : {}),
-      ...(options.internal && process.env.INTERNAL_API_SECRET
-        ? { "x-woyab-internal-secret": process.env.INTERNAL_API_SECRET }
-        : {}),
-    },
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetchProxyTarget(`${API_BASE}${path}`, {
+      method: request.method,
+      body,
+      headers: {
+        Accept: "application/json",
+        ...(body ? { "Content-Type": "application/json" } : {}),
+        ...(options.internal && process.env.INTERNAL_API_SECRET
+          ? { "x-woyab-internal-secret": process.env.INTERNAL_API_SECRET }
+          : {}),
+      },
+      cache: "no-store",
+    }, options.retryNetworkErrors === true || request.method === "GET" || request.method === "HEAD");
+  } catch {
+    return Response.json(
+      { success: false, error: "The API is temporarily unavailable." },
+      { status: 503, headers: { "Cache-Control": "no-store", "Retry-After": "1" } },
+    );
+  }
 
   const headers = new Headers({
     "Content-Type": response.headers.get("content-type") ?? "application/json",

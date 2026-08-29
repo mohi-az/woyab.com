@@ -171,16 +171,26 @@ export default function Navbar() {
                 if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) setDirectoryMenuOpen(false);
               }}
             >
-              <button
-                type="button"
-                aria-expanded={directoryMenuOpen}
-                aria-haspopup="menu"
-                onClick={() => setDirectoryMenuOpen((value) => !value)}
-                className={cn(navItemClassName(internalPathname.startsWith("/businesses")), "inline-flex items-center gap-1.5", isOverlay && "!text-white [&_*]:!text-white")}
-              >
-                {t("nav.businesses")}
-                <FiChevronDown className={cn("transition-transform", directoryMenuOpen && "rotate-180")} />
-              </button>
+              <div className={cn(navItemClassName(internalPathname.startsWith("/businesses")), "gap-1", isOverlay && "!text-white [&_*]:!text-white")}>
+                <Link
+                  href="/businesses"
+                  aria-current={internalPathname === "/businesses" ? "page" : undefined}
+                  onClick={() => setDirectoryMenuOpen(false)}
+                  className="inline-flex h-full items-center"
+                >
+                  {t("nav.businesses")}
+                </Link>
+                <button
+                  type="button"
+                  aria-expanded={directoryMenuOpen}
+                  aria-haspopup="menu"
+                  aria-label={t("nav.businesses")}
+                  onClick={() => setDirectoryMenuOpen((value) => !value)}
+                  className="grid h-8 w-6 place-items-center rounded-md transition hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                >
+                  <FiChevronDown className={cn("transition-transform", directoryMenuOpen && "rotate-180")} />
+                </button>
+              </div>
               <div className={cn("absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 transition", directoryMenuOpen ? "visible opacity-100" : "invisible opacity-0")}>
                 <div className="w-[min(44rem,calc(100vw-2rem))] rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_24px_70px_rgba(15,23,42,0.18)]" role="menu">
                   <div className="grid grid-cols-3 gap-0.5">
@@ -306,10 +316,20 @@ export default function Navbar() {
                 {t("nav.contact")}
               </Link>
 
-              <button type="button" aria-expanded={mobileDirectoryOpen} onClick={() => setMobileDirectoryOpen((value) => !value)} className="flex w-full items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary">
-                <span>{t("nav.businesses")}</span>
-                <FiChevronDown className={cn("transition-transform", mobileDirectoryOpen && "rotate-180")} />
-              </button>
+              <div className="flex items-center rounded-xl text-slate-700 transition hover:bg-primary/5 hover:text-primary">
+                <Link href="/businesses" className="flex min-h-12 flex-1 items-center px-4 font-bold" onClick={() => setMobileOpen(false)}>
+                  {t("nav.businesses")}
+                </Link>
+                <button
+                  type="button"
+                  aria-expanded={mobileDirectoryOpen}
+                  aria-label={t("nav.businesses")}
+                  onClick={() => setMobileDirectoryOpen((value) => !value)}
+                  className="grid min-h-12 w-12 shrink-0 place-items-center rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                >
+                  <FiChevronDown className={cn("transition-transform", mobileDirectoryOpen && "rotate-180")} />
+                </button>
+              </div>
               {mobileDirectoryOpen ? (
                 <div className="mx-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
                   <div className="grid grid-cols-2 gap-1">

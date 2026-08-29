@@ -20,5 +20,5 @@ export async function POST(request: NextRequest) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(search),
-  }), "/v1/businesses/search");
+  }), "/v1/businesses/search", { retryNetworkErrors: true });
 }

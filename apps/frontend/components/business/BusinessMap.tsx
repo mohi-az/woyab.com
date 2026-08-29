@@ -157,6 +157,7 @@ export function BusinessMap({
 
   useEffect(() => {
     let cancelled = false;
+    let mapLoaded = false;
 
     void Promise.all([
       import("mapbox-gl"),
@@ -230,6 +231,8 @@ export function BusinessMap({
       map.addControl(new UserLocationControl(), "top-left");
 
       map.on("load", () => {
+        mapLoaded = true;
+        setError(null);
         map.addSource("businesses", {
           type: "geojson",
           data: { type: "FeatureCollection", features: [] },
@@ -448,7 +451,12 @@ export function BusinessMap({
         setReady(true);
       });
 
-      map.on("error", () => setError(labels.error));
+      map.on("error", () => {
+        if (!mapLoaded && !cancelled) {
+          setError(labels.error);
+          setLoading(false);
+        }
+      });
     }).catch(() => {
       if (!cancelled) {
         setError(labels.error);
@@ -491,14 +499,16 @@ export function BusinessMap({
     const ids = [...favoriteBusinessIds];
     const favoriteFilter = ["in", ["get", "businessId"], ["literal", ids]];
 
-    map.setPaintProperty("business-points", "circle-radius", [
-      "case",
-      favoriteFilter,
-      ["interpolate", ["linear"], ["zoom"], 4, 13.65, 9, 14.95, 13, 16.25, 16, 17.55],
-      ["interpolate", ["linear"], ["zoom"], 4, 12.35, 9, 13.65, 13, 14.95, 16, 16.25],
-    ]);
-    map.setPaintProperty("business-points", "circle-stroke-width", 2.5);
-    map.setPaintProperty("business-points", "circle-stroke-color", "#1f2937");
+    if (map.getLayer("business-points")) {
+      map.setPaintProperty("business-points", "circle-radius", [
+        "case",
+        favoriteFilter,
+        ["interpolate", ["linear"], ["zoom"], 4, 13.65, 9, 14.95, 13, 16.25, 16, 17.55],
+        ["interpolate", ["linear"], ["zoom"], 4, 12.35, 9, 13.65, 13, 14.95, 16, 16.25],
+      ]);
+      map.setPaintProperty("business-points", "circle-stroke-width", 2.5);
+      map.setPaintProperty("business-points", "circle-stroke-color", "#1f2937");
+    }
 
     if (map.getLayer("business-favorite-glow")) {
       map.setFilter("business-favorite-glow", favoriteFilter);

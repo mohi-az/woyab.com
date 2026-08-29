@@ -23,3 +23,13 @@ test("directory location marker keeps Mapbox positioning and uses a blue dot", a
   assert.doesNotMatch(markerRule, /position: relative/);
   assert.match(css, /\.directory-origin-marker span \{[\s\S]*?background: #2563eb/);
 });
+
+test("non-fatal Mapbox errors after load do not replace a working map with an error message", async () => {
+  const source = await readFile(businessMapPath, "utf8");
+
+  assert.match(source, /let mapLoaded = false/);
+  assert.match(source, /mapLoaded = true;[\s\S]*setError\(null\)/);
+  assert.match(source, /map\.on\("error", \(\) => \{[\s\S]*if \(!mapLoaded && !cancelled\)/);
+  assert.match(source, /if \(map\.getLayer\("business-points"\)\)/);
+  assert.doesNotMatch(source, /map\.on\("error", \(\) => setError\(labels\.error\)\)/);
+});
