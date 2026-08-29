@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   FiChevronDown,
   FiChevronLeft,
@@ -80,6 +81,44 @@ function visiblePages(current: number, total: number) {
   return [...pages].filter((page) => page > 0 && page <= total).sort((a, b) => a - b);
 }
 
+type SearchParamsReader = Pick<URLSearchParams, "get" | "getAll">;
+
+function positiveIntParam(value: string | null) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function filtersFromSearchParams(params: SearchParamsReader, limit: number): BusinessDirectoryFilters {
+  const sortBy = params.get("sortBy");
+  return {
+    page: positiveIntParam(params.get("page")) ?? 1,
+    limit,
+    search: params.get("search")?.trim() || undefined,
+    categoryId: positiveIntParam(params.get("categoryId")),
+    subCategoryId: positiveIntParam(params.get("subCategoryId")),
+    tagIds: [...new Set(params.getAll("tagIds").flatMap((value) => value.split(","))
+      .map(Number).filter((value) => Number.isInteger(value) && value > 0))],
+    cityId: positiveIntParam(params.get("cityId")),
+    sortBy: sortBy === "latest" || sortBy === "oldest" || sortBy === "popular" ? sortBy : "popular",
+    favoritesOnly: params.get("favoritesOnly") === "true" || undefined,
+    openNow: params.get("openNow") === "true" || undefined,
+  };
+}
+
+function filtersQuery(filters: BusinessDirectoryFilters) {
+  const params = new URLSearchParams();
+  if (filters.search) params.set("search", filters.search);
+  if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
+  if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
+  for (const tagId of filters.tagIds ?? []) params.append("tagIds", String(tagId));
+  if (filters.cityId) params.set("cityId", String(filters.cityId));
+  if (filters.sortBy && filters.sortBy !== "popular") params.set("sortBy", filters.sortBy);
+  if (filters.favoritesOnly) params.set("favoritesOnly", "true");
+  if (filters.openNow) params.set("openNow", "true");
+  if (filters.page > 1) params.set("page", String(filters.page));
+  return params.toString();
+}
+
 export function BusinessDirectory({
   locale,
   initialFilters,
@@ -90,7 +129,15 @@ export function BusinessDirectory({
   cities,
   labels,
 }: Props) {
+  const searchParams = useSearchParams();
+  const searchParamsKey = searchParams.toString();
+  const urlFilters = useMemo(
+    () => filtersFromSearchParams(new URLSearchParams(searchParamsKey), initialFilters.limit),
+    [initialFilters.limit, searchParamsKey],
+  );
+  const urlFiltersKey = filtersQuery(urlFilters);
   const [filters, setFilters] = useState(initialFilters);
+  const [observedUrlFiltersKey, setObservedUrlFiltersKey] = useState(urlFiltersKey);
   const [directory, setDirectory] = useState(initialDirectory);
   const [filterOptions, setFilterOptions] = useState<BusinessDirectoryFilterOptions>({
     categories,
@@ -113,9 +160,16 @@ export function BusinessDirectory({
   const filtersDrawerRef = useRef<HTMLElement>(null);
   const filtersContentRef = useRef<HTMLDivElement>(null);
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
+  const locallyWrittenQueryRef = useRef<string | null>(null);
   const [favoriteBusinessIds, setFavoriteBusinessIds] = useState<Set<string>>(new Set());
   const [savedLocations, setSavedLocations] = useState<Array<SavedLocationOption & { isDefault?: boolean }>>([]);
   const [now, setNow] = useState(() => new Date());
+
+  if (observedUrlFiltersKey !== urlFiltersKey) {
+    setObservedUrlFiltersKey(urlFiltersKey);
+    if (filtersQuery(filters) !== urlFiltersKey) setFilters(urlFilters);
+  }
+
   const openNowRefreshKey = filters.openNow ? Math.floor(now.getTime() / 60_000) : 0;
   const filterOptionsQuery = (() => {
     const params = new URLSearchParams({ locale });
@@ -216,46 +270,49 @@ export function BusinessDirectory({
     return () => controller.abort();
   }, [filterOptionsQuery]);
 
-  const changeFilters = useCallback((patch: Partial<BusinessDirectoryFilters>) => {
-    setFilters((current) => ({ ...current, ...patch, page: 1 }));
+  const updateFilters = useCallback((updater: (current: BusinessDirectoryFilters) => BusinessDirectoryFilters) => {
+    setFilters((current) => {
+      const next = updater(current);
+      if (filtersQuery(next) === filtersQuery(current)) return current;
+      locallyWrittenQueryRef.current = filtersQuery(next);
+      return next;
+    });
   }, []);
+
+  const changeFilters = useCallback((patch: Partial<BusinessDirectoryFilters>) => {
+    updateFilters((current) => ({ ...current, ...patch, page: 1 }));
+  }, [updateFilters]);
 
   const changeLocation = useCallback((nextLocation: LocationValue | null) => {
     setLocation(nextLocation);
-    setFilters((current) => ({
+    updateFilters((current) => ({
       ...current,
       page: 1,
       cityId: nextLocation ? undefined : current.cityId,
     }));
-  }, []);
+  }, [updateFilters]);
 
   const changeRadius = useCallback((radius: RadiusKm | null) => {
     setRadiusKm(radius);
-    setFilters((current) => ({ ...current, page: 1 }));
-  }, []);
+    updateFilters((current) => ({ ...current, page: 1 }));
+  }, [updateFilters]);
 
   const reset = useCallback(() => {
-    setFilters((current) => ({
+    updateFilters((current) => ({
       page: 1,
       limit: initialFilters.limit,
       sortBy: current.sortBy ?? "popular",
       cityId: current.cityId,
     }));
-  }, [initialFilters.limit]);
+  }, [initialFilters.limit, updateFilters]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (filters.search) params.set("search", filters.search);
-    if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
-    if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
-    for (const tagId of filters.tagIds ?? []) params.append("tagIds", String(tagId));
-    if (filters.cityId) params.set("cityId", String(filters.cityId));
-    if (filters.sortBy && filters.sortBy !== "popular") params.set("sortBy", filters.sortBy);
-    if (filters.page > 1) params.set("page", String(filters.page));
-    const query = params.toString();
+    const query = filtersQuery(filters);
+    if (query === urlFiltersKey || locallyWrittenQueryRef.current !== query) return;
     const path = `/${locale}/businesses`;
     window.history.replaceState(null, "", query ? `${path}?${query}` : path);
-  }, [filters, locale]);
+    locallyWrittenQueryRef.current = null;
+  }, [filters, locale, urlFiltersKey]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -570,19 +627,19 @@ export function BusinessDirectory({
 
           {directory.totalPages > 1 ? (
             <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label={labels.pagination.label}>
-              <PageButton disabled={currentPage <= 1} label={labels.pagination.previous} onClick={() => setFilters((current) => ({ ...current, page: currentPage - 1 }))}><FiChevronLeft /></PageButton>
+              <PageButton disabled={currentPage <= 1} label={labels.pagination.previous} onClick={() => updateFilters((current) => ({ ...current, page: currentPage - 1 }))}><FiChevronLeft /></PageButton>
               {pages.map((page, index) => (
                 <span key={page} className="contents">
                   {index > 0 && page - pages[index - 1] > 1 ? <span className="px-1 text-gray-400">&hellip;</span> : null}
                   <button
                     type="button"
-                    onClick={() => setFilters((current) => ({ ...current, page }))}
+                    onClick={() => updateFilters((current) => ({ ...current, page }))}
                     aria-current={page === currentPage ? "page" : undefined}
                     className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}
                   >{page}</button>
                 </span>
               ))}
-              <PageButton disabled={currentPage >= directory.totalPages} label={labels.pagination.next} onClick={() => setFilters((current) => ({ ...current, page: currentPage + 1 }))}><FiChevronRight /></PageButton>
+              <PageButton disabled={currentPage >= directory.totalPages} label={labels.pagination.next} onClick={() => updateFilters((current) => ({ ...current, page: currentPage + 1 }))}><FiChevronRight /></PageButton>
             </nav>
           ) : null}
         </div>

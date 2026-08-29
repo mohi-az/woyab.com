@@ -211,7 +211,7 @@ test("open-now filtering and labels use registered hours in the Berlin time zone
   assert.match(searchRepository, /openTime.*closeTime/s);
 });
 
-test("business directory facets stay data-backed when city and tag filters change", async () => {
+test("business directory facets stay data-backed and URL navigation resets client filter state", async () => {
   const [page, directory, options, route] = await Promise.all([
     frontendSource("app/businesses/page.tsx"),
     frontendSource("features/businesses/BusinessDirectory.tsx"),
@@ -220,8 +220,15 @@ test("business directory facets stay data-backed when city and tag filters chang
   ]);
 
   assert.match(page, /fetchBusinessDirectoryOptions\(locale, filters\)/);
+  assert.match(directory, /useSearchParams\(\)/);
+  assert.match(directory, /filtersFromSearchParams\(new URLSearchParams\(searchParamsKey\), initialFilters\.limit\)/);
+  assert.match(directory, /observedUrlFiltersKey !== urlFiltersKey/);
+  assert.match(directory, /filtersQuery\(filters\) !== urlFiltersKey\) setFilters\(urlFilters\)/);
+  assert.match(directory, /locallyWrittenQueryRef\.current !== query/);
   assert.match(directory, /\/api\/businesses\/filter-options\?/);
   assert.match(directory, /setFilterOptions\(data\)/);
+  assert.match(directory, /filters\.favoritesOnly[\s\S]*params\.set\("favoritesOnly", "true"\)/);
+  assert.match(directory, /filters\.openNow[\s\S]*params\.set\("openNow", "true"\)/);
   assert.match(options, /status: "ACTIVE"/);
   assert.match(options, /verified: true/);
   assert.match(options, /removedAt: null/);
