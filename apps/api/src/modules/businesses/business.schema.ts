@@ -15,6 +15,12 @@ const businessAttributeInputSchema = z.object({
   value: z.string().min(1).max(500),
 });
 
+const tagIdsQuerySchema = z.preprocess((value) => {
+  if (value === undefined) return undefined;
+  const rawValues = Array.isArray(value) ? value : [value];
+  return rawValues.flatMap((item) => String(item).split(",")).filter(Boolean).map(Number);
+}, z.array(z.number().int().positive()).max(100).optional());
+
 export const createBusinessBodySchema = z.object({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   businessName: z.string().min(1),
@@ -30,7 +36,6 @@ export const createBusinessBodySchema = z.object({
   googlePlaceId: z.string().optional(),
   categoryId: z.number().int().positive(),
   subCategoryId: z.number().int().positive().optional(),
-  specialtyId: z.number().int().positive().optional(),
   ownerId: z.string().optional(),
   establishedYear: z.number().int().min(1800).max(new Date().getFullYear()).optional(),
   priceRange: z.enum(["BUDGET", "MODERATE", "EXPENSIVE", "LUXURY"]).optional(),
@@ -73,6 +78,7 @@ export const listBusinessesQuerySchema = paginationQuerySchema.extend({
   locale: appLocaleSchema.default("de"),
   categoryId: z.coerce.number().int().positive().optional(),
   subCategoryId: z.coerce.number().int().positive().optional(),
+  tagIds: tagIdsQuerySchema,
   cityId: z.coerce.number().int().positive().optional(),
   status: z.enum(["PENDING", "ACTIVE", "SUSPENDED", "CLOSED", "REJECTED"]).optional(),
   featured: z.enum(["true", "false"]).optional(),

@@ -1,10 +1,8 @@
 import { prisma } from "../../lib/prisma.js";
 import type {
   CreateCategoryBody,
-  CreateSpecialtyBody,
   CreateSubCategoryBody,
   UpdateCategoryBody,
-  UpdateSpecialtyBody,
   UpdateSubCategoryBody,
 } from "./category.schema.js";
 
@@ -52,7 +50,7 @@ export const subCategoryRepository = {
       orderBy: { sortOrder: "asc" },
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        _count: { select: { specialties: true, businesses: { where: { status: "ACTIVE", verified: true, removedAt: null } } } },
+        _count: { select: { businesses: { where: { status: "ACTIVE", verified: true, removedAt: null } } } },
       },
     }),
 
@@ -64,7 +62,6 @@ export const subCategoryRepository = {
       where: { id },
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        specialties: { orderBy: { sortOrder: "asc" } },
         _count: { select: { businesses: { where: { status: "ACTIVE", verified: true, removedAt: null } } } },
       },
     }),
@@ -77,38 +74,4 @@ export const subCategoryRepository = {
     prisma.subCategory.update({ where: { id }, data }),
 
   delete: (id: number) => prisma.subCategory.delete({ where: { id } }),
-};
-
-// ─── Specialty ──────────────────────────────────────────────────────────────
-
-export const specialtyRepository = {
-  findMany: (skip: number, take: number, where: { subCategoryId?: number; active?: boolean } = {}) =>
-    prisma.specialty.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { sortOrder: "asc" },
-      include: {
-        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-        _count: { select: { businesses: { where: { status: "ACTIVE", verified: true, removedAt: null } } } },
-      },
-    }),
-
-  count: (where: { subCategoryId?: number; active?: boolean } = {}) =>
-    prisma.specialty.count({ where }),
-
-  findById: (id: number) =>
-    prisma.specialty.findUnique({
-      where: { id },
-      include: {
-        subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
-      },
-    }),
-
-  create: (data: CreateSpecialtyBody) => prisma.specialty.create({ data }),
-
-  update: (id: number, data: UpdateSpecialtyBody) =>
-    prisma.specialty.update({ where: { id }, data }),
-
-  delete: (id: number) => prisma.specialty.delete({ where: { id } }),
 };

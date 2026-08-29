@@ -16,7 +16,6 @@ const selectableGroups = [
   "hours",
   "category",
   "subCategory",
-  "specialties",
   "tags",
   "attributes",
 ] as const;
@@ -61,7 +60,7 @@ const copy = {
     groups: {
       translations: "Three-language names and descriptions", legalName: "Legal name", contact: "Contact and social profiles",
       details: "Established year and price range", location: "Address and map location", hours: "Opening hours",
-      category: "Category", subCategory: "Subcategory", specialties: "Specialties", tags: "Tags", attributes: "Features",
+      category: "Category", subCategory: "Subcategory", tags: "Tags", attributes: "Features",
     },
   },
   de: {
@@ -88,7 +87,7 @@ const copy = {
     groups: {
       translations: "Namen und Beschreibungen in drei Sprachen", legalName: "Rechtlicher Name", contact: "Kontakt und soziale Profile",
       details: "Gründungsjahr und Preisklasse", location: "Adresse und Kartenposition", hours: "Öffnungszeiten",
-      category: "Kategorie", subCategory: "Unterkategorie", specialties: "Spezialisierungen", tags: "Tags", attributes: "Merkmale",
+      category: "Kategorie", subCategory: "Unterkategorie", tags: "Tags", attributes: "Merkmale",
     },
   },
   fa: {
@@ -115,7 +114,7 @@ const copy = {
     groups: {
       translations: "نام و توضیحات سه‌زبانه", legalName: "نام حقوقی", contact: "اطلاعات تماس و شبکه‌های اجتماعی",
       details: "سال تأسیس و بازه قیمت", location: "آدرس و موقعیت نقشه", hours: "ساعات کاری",
-      category: "دسته‌بندی", subCategory: "زیردسته", specialties: "تخصص‌ها", tags: "تگ‌ها", attributes: "ویژگی‌ها",
+      category: "دسته‌بندی", subCategory: "زیردسته", tags: "تگ‌ها", attributes: "ویژگی‌ها",
     },
   },
 } as const;
@@ -137,7 +136,6 @@ function defaultSelections(proposal: AiBusinessProposal) {
   }
   if (proposal.taxonomy.category.suggested) selected.delete("category");
   if (proposal.taxonomy.subCategory?.suggested) selected.delete("subCategory");
-  if (proposal.taxonomy.specialties.some((item) => item.suggested)) selected.delete("specialties");
   return selected;
 }
 
@@ -362,7 +360,7 @@ export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {selectableGroups.map((group) => {
                 const choice = group === "category" ? proposal.taxonomy.category : group === "subCategory" ? proposal.taxonomy.subCategory : null;
-                const proposedNew = Boolean(choice?.suggested) || (group === "specialties" && proposal.taxonomy.specialties.some((item) => item.suggested));
+                const proposedNew = Boolean(choice?.suggested);
                 return (
                   <label key={group} className={`rounded-xl border p-3 ${selected.has(group) ? "border-emerald-400/50 bg-emerald-500/10" : "border-white/10 bg-black/15"}`}>
                     <div className="flex items-start gap-3">
@@ -413,7 +411,7 @@ export function AiBusinessImportModal({ open, onClose, onApply }: Props) {
             <Collapse items={[
               { key: "translations", label: text.groups.translations, children: <div className="grid gap-3 lg:grid-cols-3">{(["DE", "EN", "FA"] as const).map((language) => <div key={language} className="rounded-lg border border-white/10 p-3"><div className="font-black text-sky-300">{language} · {proposal.translations[language].businessName}</div><p className="mt-2 text-sm text-slate-300">{proposal.translations[language].shortDescription}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-400">{proposal.translations[language].description}</p></div>)}</div> },
               { key: "facts", label: text.groups.contact, children: <div className="grid gap-2 md:grid-cols-2">{valueList(proposal).map(([label, value]) => <div key={String(label)} className="rounded-lg border border-white/10 px-3 py-2 text-sm"><span className="font-bold text-slate-400">{label}: </span><span className="break-all text-white">{String(value)}</span></div>)}</div> },
-              { key: "taxonomy", label: `${text.groups.category} / ${text.groups.subCategory}`, children: <div className="space-y-2 text-sm text-slate-300"><div><strong>{text.groups.category}:</strong> {taxonomyLabel(proposal.taxonomy.category)}</div><div><strong>{text.groups.subCategory}:</strong> {taxonomyLabel(proposal.taxonomy.subCategory)}</div><div><strong>{text.groups.specialties}:</strong> {proposal.taxonomy.specialties.map(taxonomyLabel).join(" · ") || "—"}</div></div> },
+              { key: "taxonomy", label: `${text.groups.category} / ${text.groups.subCategory}`, children: <div className="space-y-2 text-sm text-slate-300"><div><strong>{text.groups.category}:</strong> {taxonomyLabel(proposal.taxonomy.category)}</div><div><strong>{text.groups.subCategory}:</strong> {taxonomyLabel(proposal.taxonomy.subCategory)}</div></div> },
               { key: "evidence", label: text.sources, children: <div className="space-y-2">{proposal.evidence.map((item, index) => <div key={`${item.field}-${index}`} className="rounded-lg border border-white/10 p-3 text-sm"><div className="flex flex-wrap gap-2"><Tag color={item.confidence === "HIGH" ? "green" : item.confidence === "MEDIUM" ? "gold" : "red"}>{item.confidence}</Tag><Tag>{item.source}</Tag><strong className="text-white">{item.field}</strong></div>{item.excerpt ? <p className="mt-2 text-slate-400">{item.excerpt}</p> : null}{item.url ? <a href={item.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sky-300"><FiExternalLink />{item.url}</a> : null}</div>)}</div> },
               { key: "website", label: text.officialSite, children: <div className="space-y-2">{websitePages.map((page, index) => <a key={index} href={String(page.url)} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sky-300"><FiGlobe />{String(page.title || page.url)}</a>)}</div> },
               { key: "warnings", label: text.warnings, children: <div className="space-y-2">{[...active.warnings, ...proposal.conflicts.map((item) => `${item.field}: ${item.message}`)].map((warning, index) => <div key={index} className="flex gap-2 rounded-lg border border-amber-400/20 bg-amber-500/10 p-3 text-sm text-amber-100"><FiAlertTriangle className="mt-0.5 shrink-0" />{warning}</div>)}</div> },

@@ -584,6 +584,7 @@ export function BusinessMap({
       body: JSON.stringify({
         categoryId: filters.categoryId,
         subCategoryId: filters.subCategoryId,
+        tagIds: filters.tagIds,
         cityId: filters.cityId,
         search: filters.search,
         origin,
@@ -639,6 +640,7 @@ export function BusinessMap({
     filters.cityId,
     filters.search,
     filters.subCategoryId,
+    filters.tagIds,
     filters.favoritesOnly,
     filters.openNow,
     labels.error,

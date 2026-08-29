@@ -47,7 +47,6 @@ export const fetchBusinessDetailFromDatabase = cache(
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
         subCategory: { select: { nameFa: true, nameEn: true } },
-        specialty: { select: { nameFa: true, nameEn: true } },
         city: { select: { id: true, nameFa: true, nameEn: true } },
         businessHours: { orderBy: { dayOfWeek: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
@@ -145,7 +144,6 @@ export const fetchBusinessDetailFromDatabase = cache(
       categorySlug: business.category.slug,
       categoryIconKey: business.category.icon,
       subCategoryName: localizedName(business.subCategory),
-      specialtyName: localizedName(business.specialty),
       cityId: business.city.id,
       location: localizedName(business.city),
       address: business.address,

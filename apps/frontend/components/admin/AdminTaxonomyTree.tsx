@@ -4,19 +4,10 @@ import { ConfigProvider, Select, Switch, Tree } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import { FiFolder, FiSave, FiTag } from "react-icons/fi";
+import { FiSave } from "react-icons/fi";
 import { DynamicIcon, dynamicIconOptions } from "@/components/icons/DynamicIcon";
-import { updateCategory, updateSpecialty, updateSubCategory } from "@/lib/admin-actions";
+import { updateCategory, updateSubCategory } from "@/lib/admin-actions";
 import { AdminButton } from "@/components/admin/AdminPrimitives";
-
-type SpecialtyRow = {
-  id: number;
-  nameFa: string;
-  nameEn: string | null;
-  sortOrder: number;
-  active: boolean;
-  businesses: number;
-};
 
 type SubCategoryRow = {
   id: number;
@@ -28,7 +19,6 @@ type SubCategoryRow = {
   sortOrder: number;
   active: boolean;
   businesses: number;
-  specialties: SpecialtyRow[];
 };
 
 export type CategoryTreeRow = {
@@ -45,8 +35,7 @@ export type CategoryTreeRow = {
 
 type SelectedNode =
   | { type: "category"; item: CategoryTreeRow }
-  | { type: "subCategory"; item: SubCategoryRow; parent: CategoryTreeRow }
-  | { type: "specialty"; item: SpecialtyRow; parent: SubCategoryRow };
+  | { type: "subCategory"; item: SubCategoryRow; parent: CategoryTreeRow };
 
 const fieldClassName = "admin-input h-10 min-w-0 rounded-lg px-3 text-sm font-bold outline-none focus:border-sky-400";
 
@@ -130,9 +119,6 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
     if (selectedKey === `category:${category.id}`) selected = { type: "category", item: category };
     for (const subCategory of category.subCategories) {
       if (selectedKey === `subCategory:${subCategory.id}`) selected = { type: "subCategory", item: subCategory, parent: category };
-      for (const specialty of subCategory.specialties) {
-        if (selectedKey === `specialty:${specialty.id}`) selected = { type: "specialty", item: specialty, parent: subCategory };
-      }
     }
   }
 
@@ -152,31 +138,18 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
         <NodeTitle
           icon={<DynamicIcon iconKey={subCategory.icon ?? category.icon} />}
           title={subCategory.nameEn}
-          meta={`${subCategory.nameFa} / ${subCategory.businesses} listings / ${subCategory.specialties.length} specialties`}
+          meta={`${subCategory.nameFa} / ${subCategory.businesses} listings`}
           active={subCategory.active}
         />
       ),
-      children: subCategory.specialties.map((specialty) => ({
-        key: `specialty:${specialty.id}`,
-        title: (
-          <NodeTitle
-            icon={<FiTag />}
-            title={specialty.nameEn || specialty.nameFa}
-            meta={`${specialty.businesses} listings`}
-            active={specialty.active}
-          />
-        ),
-      })),
     })),
   })), [categories, t]);
 
   const formId = selected ? `${selected.type}-${selected.item.id}` : "taxonomy-empty";
-  const action = selected?.type === "category" ? updateCategory : selected?.type === "subCategory" ? updateSubCategory : updateSpecialty;
+  const action = selected?.type === "category" ? updateCategory : updateSubCategory;
   const title = selected?.type === "category"
     ? selected.item.nameEn
-    : selected?.type === "subCategory"
-      ? selected.item.nameEn
-      : selected?.item.nameEn || selected?.item.nameFa || "";
+    : selected?.item.nameEn || "";
 
   return (
     <ConfigProvider direction={locale === "fa" ? "rtl" : "ltr"}>
@@ -197,7 +170,7 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="admin-icon-button grid h-11 w-11 place-items-center rounded-lg border text-xl">
-                    {selected.type === "category" ? <DynamicIcon iconKey={selected.item.icon} /> : selected.type === "subCategory" ? <DynamicIcon iconKey={selected.item.icon ?? selected.parent.icon} /> : <FiFolder />}
+                    {selected.type === "category" ? <DynamicIcon iconKey={selected.item.icon} /> : <DynamicIcon iconKey={selected.item.icon ?? selected.parent.icon} />}
                   </span>
                   <div className="min-w-0">
                     <h3 className="admin-title truncate text-xl font-black">{title}</h3>
@@ -209,7 +182,6 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
               <form id={formId} action={action} className="grid gap-4">
                 <input type="hidden" name="id" value={selected.item.id} />
                 {selected.type === "subCategory" ? <input type="hidden" name="categoryId" value={selected.item.categoryId} /> : null}
-                {selected.type === "specialty" ? <input type="hidden" name="subCategoryId" value={selected.parent.id} /> : null}
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <Field label={`${t("fields.name")} EN`}>
@@ -220,16 +192,14 @@ export function AdminTaxonomyTree({ categories }: { categories: CategoryTreeRow[
                   </Field>
                 </div>
 
-                {selected.type !== "specialty" ? (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Field label={t("fields.slug")}>
-                      <input name="slug" defaultValue={selected.item.slug} className={fieldClassName} />
-                    </Field>
-                    <Field label={t("fields.icon")}>
-                      <IconSelect formId={formId} name="icon" defaultValue={selected.item.icon} />
-                    </Field>
-                  </div>
-                ) : null}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label={t("fields.slug")}>
+                    <input name="slug" defaultValue={selected.item.slug} className={fieldClassName} />
+                  </Field>
+                  <Field label={t("fields.icon")}>
+                    <IconSelect formId={formId} name="icon" defaultValue={selected.item.icon} />
+                  </Field>
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <Field label={t("fields.sort")}>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
-import { FiAlertCircle, FiBriefcase, FiCheck, FiEdit3, FiUser, FiUsers, FiX } from "react-icons/fi";
+import { FiAlertCircle, FiBriefcase, FiEdit3, FiUser, FiUsers, FiX } from "react-icons/fi";
 import { isAppLocale, localizePathname } from "@/i18n/config";
 import { Link } from "@/i18n/navigation";
 import type { BusinessDetailData, CurrentUser } from "@/lib/api";
@@ -14,7 +14,7 @@ type Props = { business: BusinessDetailData; currentUser: CurrentUser | null };
 const editableFields = [
   "businessName", "legalName", "shortDescription", "description", "email", "phone", "mobile", "whatsapp", "website",
   "instagram", "telegram", "facebook", "youtube", "linkedin", "address", "postalCode", "categoryId", "subCategoryId",
-  "specialtyId", "cityId", "districtId", "establishedYear", "priceRange",
+  "cityId", "districtId", "establishedYear", "priceRange",
 ] as const;
 
 export function BusinessEditButton({ business, currentUser }: Props) {
@@ -233,7 +233,7 @@ export function BusinessEditButton({ business, currentUser }: Props) {
 
           {relation && relation !== "OWNER" && currentUser ? <form onSubmit={submitSuggestion} className="mt-6 grid gap-4">
             <Field label={t("suggestion.field")}>
-              <select name="field" value={selectedField} onChange={(e) => setSelectedField(e.target.value as any)} className={inputClass}>
+              <select name="field" value={selectedField} onChange={(e) => setSelectedField(e.target.value as typeof editableFields[number])} className={inputClass}>
                 {editableFields.map((field) => <option key={field} value={field}>{t(`fields.${field}`)}</option>)}
               </select>
             </Field>

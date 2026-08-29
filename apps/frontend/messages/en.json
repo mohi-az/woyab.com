@@ -191,7 +191,7 @@
   "Businesses": {
     "eyebrow": "Discover local businesses",
     "title": "Find the right business for you",
-    "description": "Search WoYab's directory and narrow the results by category, specialty and city.",
+    "description": "Search WoYab's directory and narrow the results by category, products, services and city.",
     "resultsTitle": "Businesses",
     "resultCount": "{count, plural, =0 {No businesses found} one {# business found} other {# businesses found}}",
     "resultCountTemplate": "{count} businesses found",
@@ -209,6 +209,8 @@
       "allCategories": "All categories",
       "subCategories": "Subcategories",
       "allSubCategories": "All subcategories",
+      "tags": "Products, services and areas of activity",
+      "allTags": "All products and services",
       "showAll": "Show all",
       "showLess": "Show less",
       "city": "City",
@@ -311,7 +313,7 @@
       "woyabReviews": "WoYab reviews",
       "googleRating": "Google rating",
       "category": "Category",
-      "specialty": "Specialty"
+      "subCategory": "Subcategory"
     },
     "reviewsSection": {
       "showOriginal": "Show original",
@@ -463,7 +465,6 @@
         "postalCode": "Postal code",
         "categoryId": "Main category",
         "subCategoryId": "Subcategory",
-        "specialtyId": "Specialty / Core service",
         "cityId": "City",
         "districtId": "District / Neighborhood",
         "latitude": "Latitude on map",
@@ -1017,10 +1018,9 @@
     },
     "taxonomy": {
       "title": "Taxonomy",
-      "description": "Manage categories, subcategories and specialties used by the directory.",
+      "description": "Manage categories, subcategories and tags used by the directory.",
       "categories": "Categories",
       "subCategories": "Subcategories",
-      "specialties": "Specialties",
       "tree": "Taxonomy tree",
       "categoryCounts": "{businesses} listings / {children} children"
     },
@@ -1096,7 +1096,6 @@
         "linkedin": "LinkedIn",
         "categoryId": "Category",
         "subCategoryId": "Subcategory",
-        "specialtyId": "Specialty",
         "cityId": "City",
         "districtId": "District"
       },
@@ -1254,7 +1253,6 @@
       "owner": "Owner",
       "category": "Category",
       "subCategory": "Subcategory",
-      "specialty": "Specialty",
       "city": "City",
       "status": "Status",
       "flags": "Flags",
@@ -1343,7 +1341,7 @@
       "classification": "Classification",
       "translations": "Translations",
       "features": "Amenities and features",
-      "tags": "Tags",
+      "tags": "Products, services and areas of activity",
       "media": "Images",
       "location": "Location",
       "hours": "Hours",

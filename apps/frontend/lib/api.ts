@@ -13,7 +13,7 @@ type CategoryApiItem = {
 type DirectoryOptionApiItem = {
   id: number;
   nameFa: string;
-  nameEn: string;
+  nameEn: string | null;
   slug: string;
   icon?: string | null;
   _count?: { businesses?: number };
@@ -115,11 +115,6 @@ type BusinessDetailApiResponse = {
       nameEn: string;
       slug: string;
       icon?: string | null;
-    } | null;
-    specialty?: {
-      id: number;
-      nameFa: string;
-      nameEn: string;
     } | null;
     city?: {
       id: number;
@@ -244,6 +239,7 @@ export type BusinessDirectoryFilters = {
   search?: string;
   categoryId?: number;
   subCategoryId?: number;
+  tagIds?: number[];
   cityId?: number;
   sortBy?: "latest" | "oldest" | "popular";
   favoritesOnly?: boolean;
@@ -315,7 +311,6 @@ export type BusinessDetailData = {
   categorySlug?: string | null;
   categoryIconKey?: string | null;
   subCategoryName?: string | null;
-  specialtyName?: string | null;
   cityId?: number | null;
   location?: string | null;
   address?: string | null;
@@ -454,10 +449,10 @@ function compatibleAttributeValue(dataType: string, value: string) {
 
 function getLocalizedName(
   locale: string,
-  item?: { nameFa: string; nameEn: string } | null,
+  item?: { nameFa: string; nameEn?: string | null } | null,
 ) {
   if (!item) return null;
-  return locale === "fa" ? item.nameFa : item.nameEn;
+  return locale === "fa" ? item.nameFa : item.nameEn || item.nameFa;
 }
 
 export async function fetchCategoryCounts(): Promise<Record<number, number>> {
@@ -519,6 +514,7 @@ function directoryParams(filters: BusinessDirectoryFilters) {
   if (filters.search) params.set("search", filters.search);
   if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
   if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
+  for (const tagId of filters.tagIds ?? []) params.append("tagIds", String(tagId));
   if (filters.cityId) params.set("cityId", String(filters.cityId));
   if (filters.sortBy) params.set("sortBy", filters.sortBy);
   if (filters.openNow) params.set("openNow", "true");
@@ -595,6 +591,7 @@ export async function searchBusinessDirectory(
     limit: filters.limit,
     categoryId: filters.categoryId,
     subCategoryId: filters.subCategoryId,
+    tagIds: filters.tagIds,
     cityId: filters.cityId,
     search: filters.search,
     sortBy: filters.sortBy ?? "popular",
@@ -656,7 +653,7 @@ async function fetchDirectoryOptions(
     return (json.data?.items ?? []).map((item) => ({
       id: item.id,
       slug: item.slug,
-      name: getLocalizedName(locale, item) ?? item.nameEn,
+      name: getLocalizedName(locale, item) ?? item.nameEn ?? item.nameFa,
       count: item._count?.businesses,
       iconKey: item.icon,
       parentId: item.category?.id,
@@ -681,6 +678,10 @@ export function fetchDirectorySubCategories(locale: string, categoryId?: number)
 
 export function fetchDirectoryCities(locale: string) {
   return fetchDirectoryOptions(locale, "/v1/cities?limit=100");
+}
+
+export function fetchDirectoryTags(locale: string) {
+  return fetchDirectoryOptions(locale, "/v1/tags?limit=100");
 }
 
 function localizedText(locale: string, item?: { nameFa: string; nameEn: string } | null) {
@@ -791,7 +792,6 @@ export const fetchBusinessBySlug = cache(
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
       subCategoryName: localizedText(locale, business.subCategory),
-      specialtyName: localizedText(locale, business.specialty),
       cityId: business.city?.id,
       location: localizedText(locale, business.city),
       address: business.address,

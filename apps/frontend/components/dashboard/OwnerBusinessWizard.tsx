@@ -47,17 +47,9 @@ type Option = {
 };
 
 type SubCategoryOption = Option & { categoryId: number };
-type SpecialtyOption = {
-  id: number;
-  nameEn: string | null;
-  nameFa: string;
-  subCategoryId: number;
-};
-
 type Props = {
   categories: Option[];
   subCategories: SubCategoryOption[];
-  specialties: SpecialtyOption[];
   cities: Option[];
   attributeDefinitions: BusinessAttributeDefinition[];
   tagOptions: BusinessTagOption[];
@@ -81,7 +73,7 @@ const locales = ["DE", "EN", "FA"] as const;
 type ContentLocale = (typeof locales)[number];
 type TranslationDraft = Record<ContentLocale, { businessName: string; shortDescription: string; description: string }>;
 
-function optionLabel(option: Option | SpecialtyOption) {
+function optionLabel(option: Option) {
   return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
 }
 
@@ -181,7 +173,7 @@ function localizedText(locale: string) {
         googlePlace: "شناسه Google Place",
         images: "تصاویر",
         features: "امکانات",
-        tags: "برچسب‌ها",
+        tags: "محصولات، خدمات و حوزه‌های فعالیت",
         location: "موقعیت مکانی",
         hours: "ساعات کاری",
       },
@@ -200,9 +192,7 @@ function localizedText(locale: string) {
       category: "دسته‌بندی",
       city: "شهر",
       subcategory: "زیردسته",
-      specialty: "تخصص",
       noSubcategory: "بدون زیردسته",
-      noSpecialty: "بدون تخصص",
       shortDescription: "توضیح کوتاه",
       description: "توضیحات کامل",
       googlePlaceId: "شناسه Google Place",
@@ -232,7 +222,7 @@ function localizedText(locale: string) {
         googlePlace: "Google Place ID",
         images: "Bilder",
         features: "Ausstattung",
-        tags: "Tags",
+        tags: "Produkte und Dienstleistungen",
         location: "Standort",
         hours: "Öffnungszeiten",
       },
@@ -251,9 +241,7 @@ function localizedText(locale: string) {
       category: "Kategorie",
       city: "Stadt",
       subcategory: "Unterkategorie",
-      specialty: "Spezialisierung",
       noSubcategory: "Keine Unterkategorie",
-      noSpecialty: "Keine Spezialisierung",
       shortDescription: "Kurzbeschreibung",
       description: "Beschreibung",
       googlePlaceId: "Google Place ID",
@@ -282,7 +270,7 @@ function localizedText(locale: string) {
       googlePlace: "Google Place ID",
       images: "Images",
       features: "Amenities and features",
-      tags: "Tags",
+      tags: "Products, services and areas of activity",
       location: "Location",
       hours: "Opening hours",
     },
@@ -301,9 +289,7 @@ function localizedText(locale: string) {
     category: "Category",
     city: "City",
     subcategory: "Subcategory",
-    specialty: "Specialty",
     noSubcategory: "No subcategory",
-    noSpecialty: "No specialty",
     shortDescription: "Short description",
     description: "Description",
     googlePlaceId: "Google Place ID",
@@ -328,7 +314,6 @@ function localizedText(locale: string) {
 export function OwnerBusinessWizard({
   categories,
   subCategories,
-  specialties,
   cities,
   attributeDefinitions,
   tagOptions,
@@ -349,7 +334,6 @@ export function OwnerBusinessWizard({
   }));
   const [categoryId, setCategoryId] = useState(String(categories[0]?.id ?? ""));
   const [subCategoryId, setSubCategoryId] = useState("");
-  const [specialtyId, setSpecialtyId] = useState("");
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
   const [address, setAddress] = useState("");
@@ -370,10 +354,6 @@ export function OwnerBusinessWizard({
   const visibleSubCategories = useMemo(
     () => subCategories.filter((item) => String(item.categoryId) === categoryId),
     [categoryId, subCategories],
-  );
-  const visibleSpecialties = useMemo(
-    () => specialties.filter((item) => String(item.subCategoryId) === subCategoryId),
-    [specialties, subCategoryId],
   );
 
   useEffect(() => {
@@ -613,7 +593,6 @@ export function OwnerBusinessWizard({
                   onChange={(event) => {
                     setCategoryId(event.target.value);
                     setSubCategoryId("");
-                    setSpecialtyId("");
                   }}
                   className={inputClass}
                 >
@@ -631,18 +610,11 @@ export function OwnerBusinessWizard({
                   value={subCategoryId}
                   onChange={(event) => {
                     setSubCategoryId(event.target.value);
-                    setSpecialtyId("");
                   }}
                   className={inputClass}
                 >
                   <option value="">{text.noSubcategory}</option>
                   {visibleSubCategories.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
-                </select>
-              </Field>
-              <Field label={text.specialty} locale={locale} error={fieldErrors.specialtyId}>
-                <select name="specialtyId" value={specialtyId} onChange={(event) => setSpecialtyId(event.target.value)} disabled={!subCategoryId} className={inputClass}>
-                  <option value="">{text.noSpecialty}</option>
-                  {visibleSpecialties.map((item) => <option key={item.id} value={item.id}>{optionLabel(item)}</option>)}
                 </select>
               </Field>
             </div>

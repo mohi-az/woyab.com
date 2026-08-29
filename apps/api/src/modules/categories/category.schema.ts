@@ -48,26 +48,6 @@ export const listSubCategoriesQuerySchema = paginationQuerySchema.extend({
   active: z.enum(["true", "false"]).optional(),
 });
 
-// ─── Specialty ──────────────────────────────────────────────────────────────
-
-export const createSpecialtyBodySchema = z.object({
-  nameFa: z.string().min(1),
-  nameEn: z.string().optional(),
-  subCategoryId: z.number().int().positive(),
-  sortOrder: z.number().int().default(0),
-  active: z.boolean().default(true),
-});
-
-export const updateSpecialtyBodySchema = createSpecialtyBodySchema.partial();
-
-export const specialtyIdParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
-});
-
-export const listSpecialtiesQuerySchema = paginationQuerySchema.extend({
-  subCategoryId: z.coerce.number().int().positive().optional(),
-  active: z.enum(["true", "false"]).optional(),
-});
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -78,7 +58,3 @@ export type ListCategoriesQuery = z.infer<typeof listCategoriesQuerySchema>;
 export type CreateSubCategoryBody = z.infer<typeof createSubCategoryBodySchema>;
 export type UpdateSubCategoryBody = z.infer<typeof updateSubCategoryBodySchema>;
 export type ListSubCategoriesQuery = z.infer<typeof listSubCategoriesQuerySchema>;
-
-export type CreateSpecialtyBody = z.infer<typeof createSpecialtyBodySchema>;
-export type UpdateSpecialtyBody = z.infer<typeof updateSpecialtyBodySchema>;
-export type ListSpecialtiesQuery = z.infer<typeof listSpecialtiesQuerySchema>;

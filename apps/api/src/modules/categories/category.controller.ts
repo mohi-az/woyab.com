@@ -3,18 +3,14 @@ import type { Request, Response } from "express";
 import {
   categoryIdParamsSchema,
   createCategoryBodySchema,
-  createSpecialtyBodySchema,
   createSubCategoryBodySchema,
   listCategoriesQuerySchema,
-  listSpecialtiesQuerySchema,
   listSubCategoriesQuerySchema,
-  specialtyIdParamsSchema,
   subCategoryIdParamsSchema,
   updateCategoryBodySchema,
-  updateSpecialtyBodySchema,
   updateSubCategoryBodySchema,
 } from "./category.schema.js";
-import { categoryService, specialtyService, subCategoryService } from "./category.service.js";
+import { categoryService, subCategoryService } from "./category.service.js";
 
 // ─── Category Controllers ────────────────────────────────────────────────────
 
@@ -82,41 +78,6 @@ export const subCategoryController = {
   delete: async (req: Request, res: Response) => {
     const { id } = subCategoryIdParamsSchema.parse(req.params);
     await subCategoryService.delete(id);
-    res.status(204).send();
-  },
-};
-
-// ─── Specialty Controllers ───────────────────────────────────────────────────
-
-export const specialtyController = {
-  list: async (req: Request, res: Response) => {
-    const query = listSpecialtiesQuerySchema.parse(req.query);
-    const result = await specialtyService.list(query);
-    res.json({ success: true, data: result });
-  },
-
-  getById: async (req: Request, res: Response) => {
-    const { id } = specialtyIdParamsSchema.parse(req.params);
-    const specialty = await specialtyService.getById(id);
-    res.json({ success: true, data: specialty });
-  },
-
-  create: async (req: Request, res: Response) => {
-    const body = createSpecialtyBodySchema.parse(req.body);
-    const specialty = await specialtyService.create(body);
-    res.status(201).json({ success: true, data: specialty });
-  },
-
-  update: async (req: Request, res: Response) => {
-    const { id } = specialtyIdParamsSchema.parse(req.params);
-    const body = updateSpecialtyBodySchema.parse(req.body);
-    const specialty = await specialtyService.update(id, body);
-    res.json({ success: true, data: specialty });
-  },
-
-  delete: async (req: Request, res: Response) => {
-    const { id } = specialtyIdParamsSchema.parse(req.params);
-    await specialtyService.delete(id);
     res.status(204).send();
   },
 };

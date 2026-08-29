@@ -36,7 +36,6 @@ export const businessChangeFieldSchema = z.enum([
   "postalCode",
   "categoryId",
   "subCategoryId",
-  "specialtyId",
   "cityId",
   "districtId",
   "latitude",

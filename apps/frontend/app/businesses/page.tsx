@@ -6,6 +6,7 @@ import {
   fetchDirectoryCategories,
   fetchDirectoryCities,
   fetchDirectorySubCategories,
+  fetchDirectoryTags,
   type BusinessDirectoryFilters,
 } from "@/lib/api";
 import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
@@ -23,6 +24,12 @@ function first(value: string | string[] | undefined) {
 function positiveInt(value: string | undefined) {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function positiveInts(value: string | string[] | undefined) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(values.flatMap((item) => item.split(",")).map(Number)
+    .filter((item) => Number.isInteger(item) && item > 0))];
 }
 
 function directorySort(value: string | undefined): BusinessDirectoryFilters["sortBy"] {
@@ -52,16 +59,18 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
     search: first(params.search)?.trim() || undefined,
     categoryId: positiveInt(first(params.categoryId)),
     subCategoryId: positiveInt(first(params.subCategoryId)),
+    tagIds: positiveInts(params.tagIds),
     cityId: positiveInt(first(params.cityId)),
     sortBy: directorySort(first(params.sortBy)),
     favoritesOnly: first(params.favoritesOnly) === "true" || undefined,
     openNow: first(params.openNow) === "true" || undefined,
   };
 
-  const [directory, categories, subCategories, cities] = await Promise.all([
+  const [directory, categories, subCategories, tags, cities] = await Promise.all([
     fetchBusinessDirectory(locale, filters),
     fetchDirectoryCategories(locale),
     fetchDirectorySubCategories(locale),
+    fetchDirectoryTags(locale),
     fetchDirectoryCities(locale),
   ]);
 
@@ -73,6 +82,7 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
         initialDirectory={directory}
         categories={categories}
         subCategories={subCategories}
+        tags={tags}
         cities={cities}
         labels={{
           eyebrow: t("eyebrow"),
@@ -129,6 +139,8 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
             allCategories: t("filters.allCategories"),
             subCategories: t("filters.subCategories"),
             allSubCategories: t("filters.allSubCategories"),
+            tags: t("filters.tags"),
+            allTags: t("filters.allTags"),
             showAll: t("filters.showAll"),
             showLess: t("filters.showLess"),
             city: t("filters.city"),

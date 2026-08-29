@@ -12,7 +12,7 @@ type PageProps = { searchParams: Promise<{ businessName?: string | string[] }> }
 
 export default async function BusinessPortalNewPage({ searchParams }: PageProps) {
   await requireUserId();
-  const [categories, subCategories, specialties, cities, attributeDefinitions, tagOptions, locale, params] =
+  const [categories, subCategories, cities, attributeDefinitions, tagOptions, locale, params] =
     await Promise.all([
       prisma.category.findMany({
         where: { active: true },
@@ -23,11 +23,6 @@ export default async function BusinessPortalNewPage({ searchParams }: PageProps)
         where: { active: true },
         orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }],
         select: { id: true, nameEn: true, nameFa: true, categoryId: true },
-      }),
-      prisma.specialty.findMany({
-        where: { active: true },
-        orderBy: [{ sortOrder: "asc" }, { nameFa: "asc" }],
-        select: { id: true, nameFa: true, nameEn: true, subCategoryId: true },
       }),
       prisma.city.findMany({
         orderBy: { nameEn: "asc" },
@@ -55,7 +50,6 @@ export default async function BusinessPortalNewPage({ searchParams }: PageProps)
       <OwnerBusinessWizard
         categories={categories}
         subCategories={subCategories}
-        specialties={specialties}
         cities={cities}
         attributeDefinitions={attributeDefinitions}
         tagOptions={tagOptions}

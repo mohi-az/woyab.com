@@ -75,7 +75,7 @@ export const openApiSpec = swaggerJSDoc({
     tags: [
       { name: "System", description: "Health and system endpoints" },
       { name: "Users", description: "User management endpoints" },
-      { name: "Categories", description: "Category, sub-category, and specialty endpoints" },
+      { name: "Categories", description: "Category and sub-category endpoints" },
       { name: "Businesses", description: "Business directory endpoints" },
       { name: "Services", description: "Business service endpoints" },
       { name: "Reviews", description: "Review endpoints" },

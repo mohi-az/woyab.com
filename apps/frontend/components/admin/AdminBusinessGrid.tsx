@@ -9,7 +9,7 @@ import { MdOutlineVerified, MdStar, MdStarBorder, MdVerified } from "react-icons
 import { Link } from "@/i18n/navigation";
 import { setBusinessFlag, setBusinessStatus, updateBusinessDetails } from "@/lib/admin-actions";
 import { AdminButton, AdminSection, AdminTable, StatusBadge, tableClassName, tdClassName, thClassName } from "@/components/admin/AdminPrimitives";
-import { AdminMultiSelect, AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
+import { AdminSearchSelect } from "@/components/admin/AdminSearchSelect";
 import { GooglePlaceImport, type GooglePlaceImportData } from "@/components/admin/GooglePlaceImport";
 import { AiBusinessImportModal, type AiBusinessImportApplication, type AiImportSelection } from "@/components/admin/AiBusinessImportModal";
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
@@ -35,13 +35,6 @@ type Option = {
 
 type SubCategoryOption = Option & { categoryId: number };
 type DistrictOption = Option & { cityId: number };
-type SpecialtyOption = {
-  id: number;
-  nameEn: string | null;
-  nameFa: string;
-  subCategoryId: number;
-};
-
 type OwnerOption = {
   value: string;
   label: string;
@@ -65,8 +58,6 @@ export type AdminBusinessRow = {
   description: string | null;
   categoryId: number;
   subCategoryId: number | null;
-  specialtyId: number | null;
-  specialtyIds: number[];
   cityId: number;
   districtId: number | null;
   latitude: number | null;
@@ -110,7 +101,6 @@ type Props = {
   totalPages: number;
   categories: Option[];
   subCategories: SubCategoryOption[];
-  specialties: SpecialtyOption[];
   cities: Option[];
   districts: DistrictOption[];
   ownerOptions: OwnerOption[];
@@ -131,7 +121,7 @@ type RowUiState = {
   pendingFeatured: boolean;
 };
 
-function optionLabel(option: Option | SpecialtyOption) {
+function optionLabel(option: Option) {
   return [option.nameEn, option.nameFa].filter(Boolean).join(" / ");
 }
 
@@ -269,7 +259,6 @@ export function AdminBusinessGrid({
   totalPages,
   categories,
   subCategories,
-  specialties,
   cities,
   districts,
   ownerOptions,
@@ -323,7 +312,6 @@ export function AdminBusinessGrid({
   const defaultCategoryId = categories[0]?.id ?? "";
   const defaultCityId = cities[0]?.id ?? "";
   const visibleSubCategories = subCategories.filter((item) => String(item.categoryId) === categoryIdDraft);
-  const visibleSpecialties = specialties.filter((item) => String(item.subCategoryId) === subCategoryIdDraft);
   const visibleDistricts = districts.filter((item) => String(item.cityId) === cityIdDraft);
   const aiSelected = (group: AiImportSelection) => Boolean(aiApplication?.selected.includes(group));
   const aiProposal = aiApplication?.proposal ?? null;
@@ -341,13 +329,6 @@ export function AdminBusinessGrid({
       ? [{ value: "ai:subcategory", label: `AI · ${aiProposal.taxonomy.subCategory.suggested.nameEn} / ${aiProposal.taxonomy.subCategory.suggested.nameFa} (${t("aiImport.newItem")})` }]
       : []),
   ];
-  const specialtySelectOptions = [
-    ...visibleSpecialties.map((item) => ({ value: String(item.id), label: optionLabel(item) })),
-    ...(aiSelected("specialties") ? (aiProposal?.taxonomy.specialties ?? []).flatMap((item, index) => item.suggested
-      ? [{ value: `ai:specialty:${index}`, label: `AI · ${item.suggested.nameEn} / ${item.suggested.nameFa} (${t("aiImport.newItem")})` }]
-      : []) : []),
-  ];
-  const aiSpecialtyDefaults = aiSelected("specialties") ? (aiProposal?.taxonomy.specialties ?? []).map((item, index) => item.existingId ?? (item.suggested ? `ai:specialty:${index}` : null)).filter((item): item is string | number => item !== null) : [];
   const wizardSteps = [
     t("businessWizard.identity"),
     t("businessWizard.translations"),
@@ -1076,9 +1057,6 @@ export function AdminBusinessGrid({
                         </FieldShell>
                         <FieldShell label={t("fields.subCategory")}>
                           <AdminSearchSelect key={`subcategory-${editing?.id ?? aiApplication?.draftId ?? (creating ? "new" : "none")}-${categoryIdDraft}-${subCategoryIdDraft}`} name="subCategoryId" defaultValue={subCategoryIdDraft} allowClear options={subCategorySelectOptions} onValueChange={(_, value) => setSubCategoryIdDraft(value)} />
-                        </FieldShell>
-                        <FieldShell label={t("fields.specialty")}>
-                          <AdminMultiSelect key={`specialty-${editing?.id ?? aiApplication?.draftId ?? (creating ? "new" : "none")}-${subCategoryIdDraft}`} name="specialtyIds" defaultValue={editing && subCategoryIdDraft && String(editing.subCategoryId ?? "") === subCategoryIdDraft ? (editing.specialtyIds?.length ? editing.specialtyIds : (editing.specialtyId ? [editing.specialtyId] : [])) : aiSpecialtyDefaults} options={specialtySelectOptions} />
                         </FieldShell>
                         <FieldShell label={t("fields.city")} required error={errors.cityId}>
                           <AdminSearchSelect key={`city-${editing?.id ?? (creating ? "new" : "none")}-${cityIdDraft}`} name="cityId" defaultValue={cityIdDraft} options={cities.map((item) => ({ value: String(item.id), label: optionLabel(item) }))} onValueChange={(name, value) => {

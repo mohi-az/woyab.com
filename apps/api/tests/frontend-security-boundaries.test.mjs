@@ -195,16 +195,17 @@ test("helpful review votes are authenticated, unique, and cannot target the auth
 });
 
 test("open-now filtering and labels use registered hours in the Berlin time zone", async () => {
-  const [hours, filters, searchSchema, searchRepository] = await Promise.all([
+  const [hours, filters, directory, searchSchema, searchRepository] = await Promise.all([
     frontendSource("lib/business-hours.ts"),
     frontendSource("components/business/BusinessFilters.tsx"),
+    frontendSource("features/businesses/BusinessDirectory.tsx"),
     readFile(new URL("../../../packages/shared/src/validators/location.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/modules/businesses/business-hours.repository.ts", import.meta.url), "utf8"),
   ]);
   assert.match(hours, /Europe\/Berlin/);
   assert.match(hours, /OPEN_SOON/);
   assert.match(hours, /CLOSE_SOON/);
-  assert.match(filters, /filters\.openNow/);
+  assert.match(`${filters}\n${directory}`, /filters\.openNow/);
   assert.match(searchSchema, /openNow: z\.boolean\(\)\.optional\(\)/);
   assert.match(searchRepository, /business_hours/);
   assert.match(searchRepository, /openTime.*closeTime/s);

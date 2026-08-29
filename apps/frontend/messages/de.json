@@ -191,7 +191,7 @@
   "Businesses": {
     "eyebrow": "Lokale Unternehmen entdecken",
     "title": "Finden Sie das passende Unternehmen",
-    "description": "Durchsuchen Sie das WoYab-Verzeichnis und filtern Sie nach Kategorie, Fachgebiet und Stadt.",
+    "description": "Durchsuchen Sie das WoYab-Verzeichnis und filtern Sie nach Kategorie, Produkten, Dienstleistungen und Stadt.",
     "resultsTitle": "Unternehmen",
     "resultCount": "{count, plural, =0 {Keine Unternehmen gefunden} one {# Unternehmen gefunden} other {# Unternehmen gefunden}}",
     "resultCountTemplate": "{count} Unternehmen gefunden",
@@ -209,6 +209,8 @@
       "allCategories": "Alle Kategorien",
       "subCategories": "Unterkategorien",
       "allSubCategories": "Alle Unterkategorien",
+      "tags": "Produkte, Dienstleistungen und Tätigkeitsbereiche",
+      "allTags": "Alle Produkte und Dienstleistungen",
       "showAll": "Alle anzeigen",
       "showLess": "Weniger anzeigen",
       "city": "Stadt",
@@ -311,7 +313,7 @@
       "woyabReviews": "WoYab-Bewertungen",
       "googleRating": "Google-Bewertung",
       "category": "Kategorie",
-      "specialty": "Schwerpunkt"
+      "subCategory": "Unterkategorie"
     },
     "reviewsSection": {
       "showOriginal": "Original anzeigen",
@@ -412,7 +414,7 @@
         "viewDashboard": "Im Dashboard ansehen"
       },
       "suggestion": { "field": "Zu ändernde Information", "value": "Neue oder korrekte Informationen", "valuePlaceholder": "Geben Sie hier die neuen oder korrigierten Angaben ein...", "context": "Zusätzlicher Kontext zur Überprüfung", "contextPlaceholder": "Geben Sie optionale Details oder Quellen an, die bei der Überprüfung helfen...", "evidence": "Beleg-Link (optional)", "submit": "Vorschlag einreichen", "submitted": "Vielen Dank für Ihre Unterstützung! Ihr Änderungsvorschlag wurde erfolgreich eingereicht und wird in Kürze geprüft." },
-      "fields": { "businessName": "Unternehmensname", "legalName": "Rechtlicher Name", "shortDescription": "Kurzbeschreibung", "description": "Vollständige Beschreibung", "email": "Geschäftliche E-Mail", "phone": "Telefonnummer", "mobile": "Mobilnummer", "whatsapp": "WhatsApp-Nummer", "website": "Website-URL", "instagram": "Instagram-Seite", "telegram": "Telegram-Kanal / Handle", "facebook": "Facebook-Seite", "youtube": "YouTube-Kanal", "linkedin": "LinkedIn-Seite", "address": "Adresse & Anschrift", "postalCode": "Postleitzahl", "categoryId": "Hauptkategorie", "subCategoryId": "Unterkategorie", "specialtyId": "Spezialisierung / Hauptdienstleistung", "cityId": "Stadt", "districtId": "Stadtteil / Bezirk", "latitude": "Breitengrad auf der Karte", "longitude": "Längengrad auf der Karte", "establishedYear": "Gründungsjahr", "priceRange": "Preisklasse" },
+      "fields": { "businessName": "Unternehmensname", "legalName": "Rechtlicher Name", "shortDescription": "Kurzbeschreibung", "description": "Vollständige Beschreibung", "email": "Geschäftliche E-Mail", "phone": "Telefonnummer", "mobile": "Mobilnummer", "whatsapp": "WhatsApp-Nummer", "website": "Website-URL", "instagram": "Instagram-Seite", "telegram": "Telegram-Kanal / Handle", "facebook": "Facebook-Seite", "youtube": "YouTube-Kanal", "linkedin": "LinkedIn-Seite", "address": "Adresse & Anschrift", "postalCode": "Postleitzahl", "categoryId": "Hauptkategorie", "subCategoryId": "Unterkategorie", "cityId": "Stadt", "districtId": "Stadtteil / Bezirk", "latitude": "Breitengrad auf der Karte", "longitude": "Längengrad auf der Karte", "establishedYear": "Gründungsjahr", "priceRange": "Preisklasse" },
       "priceRanges": { "BUDGET": "Günstig (€)", "MODERATE": "Mittel (€€)", "EXPENSIVE": "Teuer (€€€)", "LUXURY": "Luxuriös (€€€€)" },
       "errors": { "submit": "Die Anfrage konnte nicht gesendet werden. Bitte überprüfen Sie Ihre Eingaben.", "verify": "Der Bestätigungscode ist ungültig oder abgelaufen.", "alreadyActive": "Für dieses spezifische Feld liegt bereits ein ausstehender Vorschlag vor.", "rateLimited": "Zu viele Anfragen. Bitte versuchen Sie es später erneut.", "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.", "invalidPhone": "Bitte geben Sie eine gültige Telefonnummer ein.", "invalidUrl": "Bitte geben Sie eine gültige URL ein (beginnend mit https).", "invalidPostalCode": "Bitte geben Sie eine gültige Postleitzahl ein." }
     },
@@ -928,7 +930,6 @@
       "description": "Kategorien, Unterkategorien und Spezialgebiete verwalten.",
       "categories": "Kategorien",
       "subCategories": "Unterkategorien",
-      "specialties": "Spezialgebiete",
       "tree": "Taxonomie-Baum",
       "categoryCounts": "{businesses} Eintraege / {children} Kinder"
     },
@@ -988,7 +989,6 @@
         "linkedin": "LinkedIn",
         "categoryId": "Kategorie",
         "subCategoryId": "Unterkategorie",
-        "specialtyId": "Spezialisierung",
         "cityId": "Stadt",
         "districtId": "Stadtteil"
       },
@@ -1146,7 +1146,6 @@
       "owner": "Owner",
       "category": "Kategorie",
       "subCategory": "Unterkategorie",
-      "specialty": "Spezialgebiet",
       "city": "Stadt",
       "status": "Status",
       "flags": "Markierungen",
@@ -1233,7 +1232,7 @@
       "classification": "Zuordnung",
       "translations": "Uebersetzungen",
       "features": "Ausstattung und Merkmale",
-      "tags": "Tags",
+      "tags": "Produkte, Dienstleistungen und Tätigkeitsbereiche",
       "media": "Bilder",
       "location": "Standort",
       "hours": "Zeiten",

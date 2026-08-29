@@ -134,7 +134,7 @@ test("final creation locks the server draft and activates only reviewed AI-assis
   assert.match(actions, /status: "APPLIED"/);
   assert.match(actions, /tx\.category\.create/);
   assert.match(actions, /tx\.subCategory\.create/);
-  assert.match(actions, /tx\.specialty\.create/);
+  assert.doesNotMatch(actions, /tx\.specialty\./);
   assert.match(grid, /Apply selected data to form|AiBusinessImportModal/);
   assert.match(grid, /fetch\("\/api\/admin\/businesses", \{ method: "POST", body: formData \}\)/);
   assert.match(grid, /openCreate\(\);\s*router\.refresh\(\)/);

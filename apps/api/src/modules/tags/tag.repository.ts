@@ -1,9 +1,9 @@
+import type { Prisma } from "@woyab/database";
+
 import { prisma } from "../../lib/prisma.js";
 import type { CreateTagBody, UpdateTagBody } from "./tag.schema.js";
 
-type TagFilter = {
-  OR?: Array<{ nameFa?: { contains: string; mode: "insensitive" }; nameEn?: { contains: string; mode: "insensitive" }; slug?: { contains: string; mode: "insensitive" } }>;
-};
+type TagFilter = Prisma.TagWhereInput;
 
 export const tagRepository = {
   findMany: (skip: number, take: number, where: TagFilter = {}) =>
@@ -12,7 +12,7 @@ export const tagRepository = {
       skip,
       take,
       orderBy: { nameFa: "asc" },
-      include: { _count: { select: { businesses: { where: { business: { status: "ACTIVE", removedAt: null } } } } } },
+      include: { _count: { select: { businesses: { where: { business: { status: "ACTIVE", verified: true, removedAt: null } } } } } },
     }),
 
   count: (where: TagFilter = {}) => prisma.tag.count({ where }),
@@ -20,7 +20,7 @@ export const tagRepository = {
   findById: (id: number) =>
     prisma.tag.findUnique({
       where: { id },
-      include: { _count: { select: { businesses: { where: { business: { status: "ACTIVE", removedAt: null } } } } } },
+      include: { _count: { select: { businesses: { where: { business: { status: "ACTIVE", verified: true, removedAt: null } } } } } },
     }),
 
   findBySlug: (slug: string) => prisma.tag.findUnique({ where: { slug } }),

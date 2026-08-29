@@ -69,6 +69,7 @@ type Props = {
   initialDirectory: BusinessDirectoryData;
   categories: DirectoryFilterOption[];
   subCategories: DirectoryFilterOption[];
+  tags: DirectoryFilterOption[];
   cities: DirectoryFilterOption[];
   labels: Labels;
 };
@@ -84,6 +85,7 @@ export function BusinessDirectory({
   initialDirectory,
   categories,
   subCategories,
+  tags,
   cities,
   labels,
 }: Props) {
@@ -214,6 +216,7 @@ export function BusinessDirectory({
     if (filters.search) params.set("search", filters.search);
     if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
     if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
+    for (const tagId of filters.tagIds ?? []) params.append("tagIds", String(tagId));
     if (filters.cityId) params.set("cityId", String(filters.cityId));
     if (filters.sortBy && filters.sortBy !== "popular") params.set("sortBy", filters.sortBy);
     if (filters.page > 1) params.set("page", String(filters.page));
@@ -257,6 +260,7 @@ export function BusinessDirectory({
     filters.search,
     filters.categoryId,
     filters.subCategoryId,
+    filters.tagIds?.length,
     filters.cityId,
     filters.favoritesOnly,
     filters.openNow,
@@ -266,6 +270,7 @@ export function BusinessDirectory({
     filters.search
     || filters.categoryId
     || filters.subCategoryId
+    || filters.tagIds?.length
     || filters.favoritesOnly
     || filters.openNow,
   );
@@ -407,6 +412,7 @@ export function BusinessDirectory({
                     filters={filters}
                     categories={categories}
                     subCategories={subCategories}
+                    tags={tags}
                     cities={cities}
                     labels={labels.filters}
                     locale={locale}

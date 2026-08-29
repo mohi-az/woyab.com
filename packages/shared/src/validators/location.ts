@@ -20,6 +20,7 @@ export const locationOriginSchema = z.object({
 export const businessSearchBodySchema = paginationQuerySchema.extend({
   categoryId: z.number().int().positive().optional(),
   subCategoryId: z.number().int().positive().optional(),
+  tagIds: z.array(z.number().int().positive()).max(100).optional(),
   cityId: z.number().int().positive().optional(),
   search: z.string().trim().min(1).max(120).optional(),
   sortBy: z.enum(["recommended", "latest", "oldest", "popular", "distance"]).default("recommended"),
@@ -70,6 +71,7 @@ export const mapBoundsSchema = z.object({
 export const businessMapBodySchema = z.object({
   categoryId: z.number().int().positive().optional(),
   subCategoryId: z.number().int().positive().optional(),
+  tagIds: z.array(z.number().int().positive()).max(100).optional(),
   cityId: z.number().int().positive().optional(),
   search: z.string().trim().min(1).max(120).optional(),
   origin: locationOriginSchema.optional(),

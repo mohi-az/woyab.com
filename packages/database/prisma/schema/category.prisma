@@ -28,23 +28,7 @@ model SubCategory {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   businesses  Business[]
-  specialties Specialty[]
   category    Category    @relation(fields: [categoryId], references: [id])
 
   @@map("sub_categories")
-}
-
-/// Optional specialization for a professional sub-category.
-model Specialty {
-  id            Int         @id @default(autoincrement())
-  nameFa        String
-  nameEn        String?
-  subCategoryId Int
-  sortOrder     Int         @default(0)
-  active        Boolean     @default(true)
-  businesses    Business[]
-  businessLinks  BusinessSpecialty[]
-  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
-
-  @@map("specialties")
 }

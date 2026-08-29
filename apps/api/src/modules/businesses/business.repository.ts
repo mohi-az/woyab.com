@@ -11,7 +11,6 @@ type BusinessSort = "latest" | "oldest" | "popular";
 const businessDetailInclude = {
   category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
   subCategory: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
-  specialty: { select: { id: true, nameFa: true, nameEn: true } },
   city: { select: { id: true, nameFa: true, nameEn: true, slug: true } },
   district: { select: { id: true, nameFa: true, nameEn: true } },
   businessHours: { orderBy: { dayOfWeek: "asc" as const } },

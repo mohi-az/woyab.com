@@ -1,16 +1,13 @@
 import { ApiError } from "../../errors/api-error.js";
 import type {
   CreateCategoryBody,
-  CreateSpecialtyBody,
   CreateSubCategoryBody,
   ListCategoriesQuery,
-  ListSpecialtiesQuery,
   ListSubCategoriesQuery,
   UpdateCategoryBody,
-  UpdateSpecialtyBody,
   UpdateSubCategoryBody,
 } from "./category.schema.js";
-import { categoryRepository, specialtyRepository, subCategoryRepository } from "./category.repository.js";
+import { categoryRepository, subCategoryRepository } from "./category.repository.js";
 
 // ─── Category Service ────────────────────────────────────────────────────────
 
@@ -96,41 +93,5 @@ export const subCategoryService = {
   delete: async (id: number) => {
     await subCategoryService.getById(id);
     return subCategoryRepository.delete(id);
-  },
-};
-
-// ─── Specialty Service ───────────────────────────────────────────────────────
-
-export const specialtyService = {
-  list: async (query: ListSpecialtiesQuery) => {
-    const { page, limit, subCategoryId, active } = query;
-    const skip = (page - 1) * limit;
-    const where = {
-      ...(subCategoryId !== undefined && { subCategoryId }),
-      ...(active !== undefined && { active: active === "true" }),
-    };
-    const [items, total] = await Promise.all([
-      specialtyRepository.findMany(skip, limit, where),
-      specialtyRepository.count(where),
-    ]);
-    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
-  },
-
-  getById: async (id: number) => {
-    const specialty = await specialtyRepository.findById(id);
-    if (!specialty) throw ApiError.notFound("Specialty not found");
-    return specialty;
-  },
-
-  create: async (data: CreateSpecialtyBody) => specialtyRepository.create(data),
-
-  update: async (id: number, data: UpdateSpecialtyBody) => {
-    await specialtyService.getById(id);
-    return specialtyRepository.update(id, data);
-  },
-
-  delete: async (id: number) => {
-    await specialtyService.getById(id);
-    return specialtyRepository.delete(id);
   },
 };

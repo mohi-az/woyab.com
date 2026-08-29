@@ -50,6 +50,13 @@ function spatialConditions(input: InternalBusinessSearchBody) {
 
   if (input.categoryId) conditions.push(Prisma.sql`b."categoryId" = ${input.categoryId}`);
   if (input.subCategoryId) conditions.push(Prisma.sql`b."subCategoryId" = ${input.subCategoryId}`);
+  if (input.tagIds?.length) {
+    conditions.push(Prisma.sql`EXISTS (
+      SELECT 1 FROM "business_tags" selected_tags
+      WHERE selected_tags."businessId" = b."id"
+        AND selected_tags."tagId" IN (${Prisma.join(input.tagIds)})
+    )`);
+  }
   if (input.cityId) conditions.push(Prisma.sql`bl."cityId" = ${input.cityId}`);
   if (input.favoriteBusinessIds) {
     conditions.push(input.favoriteBusinessIds.length
@@ -68,6 +75,17 @@ function spatialConditions(input: InternalBusinessSearchBody) {
     conditions.push(Prisma.sql`(
       b."businessName" ILIKE ${term}
       OR b."shortDescription" ILIKE ${term}
+      OR EXISTS (
+        SELECT 1
+        FROM "business_tags" bt_tag
+        JOIN "tags" tag_search ON tag_search."id" = bt_tag."tagId"
+        WHERE bt_tag."businessId" = b."id"
+          AND (
+            tag_search."nameFa" ILIKE ${term}
+            OR tag_search."nameEn" ILIKE ${term}
+            OR tag_search."slug" ILIKE ${term}
+          )
+      )
       OR EXISTS (
         SELECT 1
         FROM "business_translations" bt_search

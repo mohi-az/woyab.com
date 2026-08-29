@@ -88,7 +88,6 @@ export const aiBusinessProposalSchema = z.object({
   taxonomy: z.object({
     category: taxonomyChoiceSchema,
     subCategory: taxonomyChoiceSchema.nullable(),
-    specialties: z.array(taxonomyChoiceSchema).max(12),
   }),
   tagIds: z.array(z.number().int().positive()).max(30),
   attributes: z.array(z.object({

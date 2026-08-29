@@ -20,6 +20,8 @@ export type BusinessFilterLabels = {
   allCategories: string;
   subCategories: string;
   allSubCategories: string;
+  tags: string;
+  allTags: string;
   showAll: string;
   showLess: string;
   city: string;
@@ -35,6 +37,7 @@ type Props = {
   filters: BusinessDirectoryFilters;
   categories: DirectoryFilterOption[];
   subCategories: DirectoryFilterOption[];
+  tags: DirectoryFilterOption[];
   cities: DirectoryFilterOption[];
   labels: BusinessFilterLabels;
   locale: "de" | "en" | "fa";
@@ -53,6 +56,7 @@ export function BusinessFilters({
   filters,
   categories,
   subCategories,
+  tags,
   cities,
   labels,
   locale,
@@ -132,6 +136,20 @@ export function BusinessFilters({
               showLessLabel={labels.showLess}
               onSelect={(subCategoryId) => onFiltersChange({ subCategoryId })}
             />
+            </FilterGroup>
+          ) : null}
+
+          {tags.length > 0 ? (
+            <FilterGroup title={labels.tags}>
+              <MultiFilterChoiceList
+                legend={labels.tags}
+                allLabel={labels.allTags}
+                options={tags}
+                selectedIds={filters.tagIds ?? []}
+                showAllLabel={labels.showAll}
+                showLessLabel={labels.showLess}
+                onChange={(tagIds) => onFiltersChange({ tagIds: tagIds.length ? tagIds : undefined })}
+              />
             </FilterGroup>
           ) : null}
 
@@ -228,6 +246,77 @@ function FilterChoiceList({
             iconKey={option.iconKey}
             checked={selectedId === option.id}
             onClick={() => onSelect(option.id)}
+          />
+        ))}
+      </div>
+      {canExpand ? (
+        <div className="pt-4">
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+            aria-expanded={expanded}
+            className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white !text-[13px] font-medium leading-5 text-slate-600 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+          >
+            {expanded ? showLessLabel : showAllLabel}
+            <FiChevronDown aria-hidden="true" className={`text-xs transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+      ) : null}
+    </fieldset>
+  );
+}
+
+function MultiFilterChoiceList({
+  legend,
+  allLabel,
+  options,
+  selectedIds,
+  showAllLabel,
+  showLessLabel,
+  onChange,
+}: {
+  legend: string;
+  allLabel: string;
+  options: DirectoryFilterOption[];
+  selectedIds: number[];
+  showAllLabel: string;
+  showLessLabel: string;
+  onChange: (ids: number[]) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const initialOptions = options.slice(0, INITIAL_VISIBLE_OPTIONS);
+  const selectedOptions = options.filter((option) => selectedIds.includes(option.id));
+  const collapsedOptions = [...initialOptions];
+  for (const selected of selectedOptions) {
+    if (!collapsedOptions.some((option) => option.id === selected.id)) collapsedOptions.push(selected);
+  }
+  const shownOptions = expanded ? options : collapsedOptions;
+  const canExpand = options.length > INITIAL_VISIBLE_OPTIONS;
+
+  function toggle(id: number) {
+    onChange(selectedIds.includes(id)
+      ? selectedIds.filter((selectedId) => selectedId !== id)
+      : [...selectedIds, id]);
+  }
+
+  return (
+    <fieldset>
+      <legend className="sr-only">{legend}</legend>
+      <div className="flex flex-wrap gap-2">
+        <FilterChoiceButton
+          label={allLabel}
+          iconKey={null}
+          checked={selectedIds.length === 0}
+          onClick={() => onChange([])}
+        />
+        {shownOptions.map((option) => (
+          <FilterChoiceButton
+            key={option.id}
+            label={option.name}
+            count={option.count}
+            iconKey={option.iconKey}
+            checked={selectedIds.includes(option.id)}
+            onClick={() => toggle(option.id)}
           />
         ))}
       </div>

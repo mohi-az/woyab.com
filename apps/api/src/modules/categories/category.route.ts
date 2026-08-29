@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { categoryController, specialtyController, subCategoryController } from "./category.controller.js";
+import { categoryController, subCategoryController } from "./category.controller.js";
 
 /**
  * Taxonomy mutations intentionally live behind the authenticated Next.js admin
@@ -8,7 +8,6 @@ import { categoryController, specialtyController, subCategoryController } from "
  */
 export const categoryRouter = Router();
 export const subCategoryRouter = Router();
-export const specialtyRouter = Router();
 
 /**
  * @openapi
@@ -64,30 +63,3 @@ subCategoryRouter.get("/", subCategoryController.list);
  *       404: { description: Sub-category not found }
  */
 subCategoryRouter.get("/:id", subCategoryController.getById);
-
-/**
- * @openapi
- * /specialties:
- *   get:
- *     summary: List specialties
- *     tags: [Categories]
- *     parameters:
- *       - { in: query, name: subCategoryId, schema: { type: integer } }
- *       - { in: query, name: locale, schema: { type: string, enum: [de, en, fa], default: de } }
- *     responses:
- *       200: { description: Specialty list }
- */
-specialtyRouter.get("/", specialtyController.list);
-/**
- * @openapi
- * /specialties/{id}:
- *   get:
- *     summary: Get a specialty
- *     tags: [Categories]
- *     parameters:
- *       - { in: path, name: id, required: true, schema: { type: integer } }
- *     responses:
- *       200: { description: Specialty }
- *       404: { description: Specialty not found }
- */
-specialtyRouter.get("/:id", specialtyController.getById);

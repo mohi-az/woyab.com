@@ -5,7 +5,6 @@ import { FiTrash2 } from "react-icons/fi";
 import { BusinessAttributeFields } from "@/components/business/BusinessAttributeFields";
 import { BusinessTagFields } from "@/components/business/BusinessTagFields";
 import { BusinessHoursEditor } from "@/components/dashboard/BusinessHoursEditor";
-import type { DayOfWeek } from "@/components/dashboard/BusinessHoursEditor";
 import { BusinessEditorShell } from "@/components/dashboard/BusinessEditorShell";
 import type { BusinessDraft } from "@/components/business/BusinessListingPreview";
 import type { BusinessAttributeDefinition } from "@/lib/business-attributes";
@@ -14,7 +13,6 @@ import type { BusinessTagOption } from "@/lib/business-tags";
 type Option = { id: number; nameEn: string | null; nameFa: string | null };
 type SubOption = Option & { categoryId: number };
 type DistrictOption = Option & { cityId: number };
-type SpecialtyOption = { id: number; nameEn: string | null; nameFa: string | null; subCategoryId: number };
 
 type Business = {
   id: string;
@@ -37,7 +35,6 @@ type Business = {
   postalCode: string | null;
   categoryId: number;
   subCategoryId: number | null;
-  specialtyId: number | null;
   cityId: number;
   districtId: number | null;
   latitude: number | null;
@@ -78,7 +75,6 @@ type Props = {
   tagOptions: BusinessTagOption[];
   categoryOptions: Option[];
   subCategoryOptions: SubOption[];
-  specialtyOptions: SpecialtyOption[];
   cityOptions: Option[];
   districtOptions: DistrictOption[];
   locale: string;
@@ -97,7 +93,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function locLabel(item: Option | SpecialtyOption | DistrictOption, locale: string) {
+function locLabel(item: Option | DistrictOption, locale: string) {
   return locale === "fa" ? (item.nameFa ?? item.nameEn ?? "") : (item.nameEn ?? "");
 }
 
@@ -108,13 +104,17 @@ export function BusinessEditForm({
   tagOptions,
   categoryOptions,
   subCategoryOptions,
-  specialtyOptions,
   cityOptions,
   districtOptions,
   locale,
   actions,
 }: Props) {
   const [draft, setDraft] = useState<BusinessDraft>(initialDraft);
+  const offeringsTitle = locale === "fa"
+    ? "محصولات، خدمات و حوزه‌های فعالیت"
+    : locale === "de"
+      ? "Produkte, Dienstleistungen und Tätigkeitsbereiche"
+      : "Products, services and areas of activity";
 
   const patch = (key: keyof BusinessDraft) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setDraft((d) => ({ ...d, [key]: e.target.value }));
@@ -214,15 +214,6 @@ export function BusinessEditForm({
                     <option value="">None</option>
                     {subCategoryOptions.map((o) => (
                       <option key={o.id} value={o.id}>{locLabel(o, locale)} · #{o.categoryId}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="grid gap-2 text-sm font-bold text-slate-700">
-                  Primary specialty
-                  <select name="specialtyId" defaultValue={business.specialtyId ?? ""} className={inputClass}>
-                    <option value="">None</option>
-                    {specialtyOptions.map((o) => (
-                      <option key={o.id} value={o.id}>{locLabel(o, locale)} · #{o.subCategoryId}</option>
                     ))}
                   </select>
                 </label>
@@ -342,7 +333,7 @@ export function BusinessEditForm({
             <form action={actions.updateTags}>
               <input type="hidden" name="businessId" value={business.id} />
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-xl font-black text-slate-950">Tags</h2>
+                <h2 className="text-xl font-black text-slate-950">{offeringsTitle}</h2>
                 <button type="submit" className={buttonClass}>Submit for review</button>
               </div>
               <div className="mt-5">

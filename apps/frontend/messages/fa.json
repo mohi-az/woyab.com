@@ -207,6 +207,8 @@
       "allCategories": "همه دسته‌بندی‌ها",
       "subCategories": "زیردسته‌ها",
       "allSubCategories": "همه زیردسته‌ها",
+      "tags": "محصولات، خدمات و حوزه‌های فعالیت",
+      "allTags": "همه محصولات و خدمات",
       "showAll": "نمایش همه",
       "showLess": "نمایش کمتر",
       "city": "شهر",
@@ -309,7 +311,7 @@
       "woyabReviews": "نظرهای وُیاب",
       "googleRating": "امتیاز گوگل",
       "category": "دسته‌بندی",
-      "specialty": "تخصص"
+      "subCategory": "زیردسته"
     },
     "reviewsSection": {
       "showOriginal": "نمایش متن اصلی",
@@ -461,7 +463,6 @@
         "postalCode": "کد پستی",
         "categoryId": "دسته‌بندی اصلی",
         "subCategoryId": "زیردسته‌بندی",
-        "specialtyId": "تخصص و زمینه فعالیت",
         "cityId": "شهر",
         "districtId": "منطقه / محله",
         "latitude": "موقعیت روی نقشه (عرض جغرافیایی)",
@@ -1014,10 +1015,9 @@
     },
     "taxonomy": {
       "title": "دسته‌بندی‌ها",
-      "description": "category، subcategory و specialtyهای دایرکتوری را مدیریت کن.",
+      "description": "دسته‌بندی‌ها، زیردسته‌ها و تگ‌های دایرکتوری را مدیریت کن.",
       "categories": "دسته‌بندی‌ها",
       "subCategories": "زیردسته‌ها",
-      "specialties": "تخصص‌ها",
       "tree": "درخت دسته‌بندی‌ها",
       "categoryCounts": "{businesses} listing / {children} زیرمجموعه"
     },
@@ -1093,7 +1093,6 @@
         "linkedin": "لینکدین",
         "categoryId": "دسته‌بندی اصلی",
         "subCategoryId": "زیردسته‌بندی",
-        "specialtyId": "تخصص",
         "cityId": "شهر",
         "districtId": "منطقه / محله"
       },
@@ -1251,7 +1250,6 @@
       "owner": "مالک",
       "category": "دسته‌بندی",
       "subCategory": "زیردسته",
-      "specialty": "تخصص",
       "city": "شهر",
       "status": "وضعیت",
       "flags": "نشان‌ها",
@@ -1340,7 +1338,7 @@
       "classification": "دسته‌بندی",
       "translations": "ترجمه‌ها",
       "features": "امکانات و ویژگی‌ها",
-      "tags": "برچسب‌ها",
+      "tags": "محصولات، خدمات و حوزه‌های فعالیت",
       "media": "تصاویر",
       "location": "موقعیت",
       "hours": "ساعات کاری",

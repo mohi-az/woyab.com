@@ -13,7 +13,6 @@ model Business {
   googleRatingUpdatedAt DateTime?
   categoryId        Int
   subCategoryId     Int?
-  specialtyId       Int?
   ownerId           String?
   establishedYear   Int?
   priceRange        PriceRange?
@@ -61,7 +60,6 @@ model Business {
   district          District?                @relation(fields: [districtId], references: [id])
   owner             User?                    @relation(fields: [ownerId], references: [id])
   removedBy         User?                    @relation("BusinessRemovedBy", fields: [removedById], references: [id])
-  specialty         Specialty?               @relation(fields: [specialtyId], references: [id])
   subCategory       SubCategory?             @relation(fields: [subCategoryId], references: [id])
   contactMessages   ContactMessage[]
   directoryReports  DirectoryReport[]
@@ -70,7 +68,6 @@ model Business {
   posts             Post[]
   reviews           Review[]
   services          Service[]
-  specialties       BusinessSpecialty[]
 
   @@index([slug])
   @@index([cityId])
@@ -82,16 +79,6 @@ model Business {
   @@index([removedAt])
   @@index([removedById])
   @@map("businesses")
-}
-
-model BusinessSpecialty {
-  businessId  String
-  specialtyId Int
-  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  specialty   Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
-
-  @@id([businessId, specialtyId])
-  @@map("business_specialties")
 }
 
 model BusinessTranslation {

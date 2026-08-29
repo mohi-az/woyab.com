@@ -638,8 +638,8 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 )}
               </div>
               <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.specialty")}</p>
-                <p className="mt-2 text-base font-black text-slate-950">{business.subCategoryName ?? business.specialtyName ?? "-"}</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.subCategory")}</p>
+                <p className="mt-2 text-base font-black text-slate-950">{business.subCategoryName ?? "-"}</p>
               </div>
             </div>
           </section>

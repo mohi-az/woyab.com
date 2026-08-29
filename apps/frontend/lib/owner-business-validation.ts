@@ -87,7 +87,6 @@ function stepShapes(sourceLocale: OwnerBusinessContentLocale, locale: string) {
       categoryId: z.string().trim().regex(/^[1-9]\d*$/, t.selection),
       cityId: z.string().trim().regex(/^[1-9]\d*$/, t.selection),
       subCategoryId: emptyOr(z.string().trim().regex(/^[1-9]\d*$/, t.selection)),
-      specialtyId: emptyOr(z.string().trim().regex(/^[1-9]\d*$/, t.selection)).optional(),
     },
     contentShape,
     {

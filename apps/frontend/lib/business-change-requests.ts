@@ -38,7 +38,7 @@ const serviceDeactivatePayloadSchema = z.object({ serviceId: z.string().min(1) }
 const contactEmailFields = new Set(["email"]);
 const phoneFields = new Set(["phone", "mobile", "whatsapp"]);
 const urlFields = new Set(["website", "instagram", "telegram", "facebook", "youtube", "linkedin"]);
-const integerFields = new Set(["categoryId", "subCategoryId", "specialtyId", "cityId", "districtId", "establishedYear"]);
+const integerFields = new Set(["categoryId", "subCategoryId", "cityId", "districtId", "establishedYear"]);
 
 const phoneRegex = /^\+?[0-9\s\-()]{3,30}$/;
 const postalCodeRegex = /^[a-zA-Z0-9\s\-]{3,15}$/;
@@ -85,7 +85,7 @@ export async function businessChangeSnapshot(businessId: string) {
       email: true, phone: true, mobile: true, whatsapp: true, website: true,
       instagram: true, telegram: true, facebook: true, youtube: true, linkedin: true,
       address: true, postalCode: true,
-      categoryId: true, subCategoryId: true, specialtyId: true, cityId: true, districtId: true,
+      categoryId: true, subCategoryId: true, cityId: true, districtId: true,
       latitude: true, longitude: true, establishedYear: true, priceRange: true,
       translations: { orderBy: { locale: "asc" }, select: { locale: true, businessName: true, shortDescription: true, description: true } },
       businessHours: { orderBy: { dayOfWeek: "asc" }, select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true, note: true } },
@@ -116,7 +116,7 @@ export async function applyBusinessChangeRequest(requestId: string, reviewerId: 
   return prisma.$transaction(async (tx) => {
     const request = await tx.businessChangeRequest.findUnique({ where: { id: requestId } });
     if (!request || request.status !== "PENDING") throw new Error("Change request is not pending.");
-    const business = await tx.business.findUnique({ where: { id: request.businessId }, select: { id: true, updatedAt: true, sourceLocale: true, removedAt: true, coverImageUrl: true, categoryId: true, subCategoryId: true, specialtyId: true, cityId: true, districtId: true } });
+    const business = await tx.business.findUnique({ where: { id: request.businessId }, select: { id: true, updatedAt: true, sourceLocale: true, removedAt: true, coverImageUrl: true, categoryId: true, subCategoryId: true, cityId: true, districtId: true } });
     if (!business) throw new Error("Business not found.");
     if (business.removedAt) throw new Error("BUSINESS_REMOVED");
 
@@ -138,19 +138,16 @@ export async function applyBusinessChangeRequest(requestId: string, reviewerId: 
       }
       const nextCategoryId = "categoryId" in data ? data.categoryId as number : business.categoryId;
       const nextSubCategoryId = "subCategoryId" in data ? data.subCategoryId as number | null : business.subCategoryId;
-      const nextSpecialtyId = "specialtyId" in data ? data.specialtyId as number | null : business.specialtyId;
       const nextCityId = "cityId" in data ? data.cityId as number : business.cityId;
       const nextDistrictId = "districtId" in data ? data.districtId as number | null : business.districtId;
-      const [category, city, subCategory, specialty, district] = await Promise.all([
+      const [category, city, subCategory, district] = await Promise.all([
         tx.category.findFirst({ where: { id: nextCategoryId, active: true }, select: { id: true } }),
         tx.city.findUnique({ where: { id: nextCityId }, select: { id: true } }),
         nextSubCategoryId ? tx.subCategory.findFirst({ where: { id: nextSubCategoryId, categoryId: nextCategoryId, active: true }, select: { id: true } }) : null,
-        nextSpecialtyId && nextSubCategoryId ? tx.specialty.findFirst({ where: { id: nextSpecialtyId, subCategoryId: nextSubCategoryId, active: true }, select: { id: true } }) : null,
         nextDistrictId ? tx.district.findFirst({ where: { id: nextDistrictId, cityId: nextCityId }, select: { id: true } }) : null,
       ]);
       if (!category || !city) throw new Error("The requested category or city is not available.");
       if (nextSubCategoryId && !subCategory) throw new Error("The requested subcategory does not belong to the category.");
-      if (nextSpecialtyId && !specialty) throw new Error("The requested specialty does not belong to the subcategory.");
       if (nextDistrictId && !district) throw new Error("The requested district does not belong to the city.");
       await tx.business.update({ where: { id: business.id }, data: data as Prisma.BusinessUncheckedUpdateInput });
       const translated = changes.filter((change) => ["businessName", "shortDescription", "description"].includes(change.field));

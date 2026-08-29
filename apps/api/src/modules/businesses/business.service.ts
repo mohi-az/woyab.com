@@ -14,7 +14,7 @@ import { findNearbyBusinesses } from "./business-search.repository.js";
 import { businessRepository } from "./business.repository.js";
 
 function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: string[]; openBusinessIds?: string[] }) {
-  const { categoryId, subCategoryId, cityId, status, featured, verified, search } = query;
+  const { categoryId, subCategoryId, tagIds, cityId, status, featured, verified, search } = query;
 
   return {
     AND: [
@@ -23,6 +23,7 @@ function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: 
     ],
     ...(categoryId !== undefined && { categoryId }),
     ...(subCategoryId !== undefined && { subCategoryId }),
+    ...(tagIds?.length && { tags: { some: { tagId: { in: tagIds } } } }),
     ...(cityId !== undefined && { cityId }),
     ...(status && { status }),
     ...(featured !== undefined && { featured: featured === "true" }),
@@ -32,6 +33,11 @@ function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: 
         { businessName: { contains: search, mode: "insensitive" as const } },
         { shortDescription: { contains: search, mode: "insensitive" as const } },
         { description: { contains: search, mode: "insensitive" as const } },
+        { tags: { some: { tag: { OR: [
+          { nameFa: { contains: search, mode: "insensitive" as const } },
+          { nameEn: { contains: search, mode: "insensitive" as const } },
+          { slug: { contains: search, mode: "insensitive" as const } },
+        ] } } } },
         {
           translations: {
             some: {
@@ -115,7 +121,6 @@ function buildCreateData(data: CreateBusinessBody) {
     googlePlaceId: data.googlePlaceId,
     categoryId: data.categoryId,
     subCategoryId: data.subCategoryId,
-    specialtyId: data.specialtyId,
     ownerId: data.ownerId,
     establishedYear: data.establishedYear,
     priceRange: data.priceRange,
@@ -253,7 +258,6 @@ function buildUpdateData(
     ...(data.googlePlaceId !== undefined && { googlePlaceId: data.googlePlaceId }),
     ...(data.categoryId !== undefined && { categoryId: data.categoryId }),
     ...(data.subCategoryId !== undefined && { subCategoryId: data.subCategoryId }),
-    ...(data.specialtyId !== undefined && { specialtyId: data.specialtyId }),
     ...(data.ownerId !== undefined && { ownerId: data.ownerId }),
     ...(data.establishedYear !== undefined && { establishedYear: data.establishedYear }),
     ...(data.priceRange !== undefined && { priceRange: data.priceRange }),
@@ -306,6 +310,7 @@ export const businessService = {
         locale: input.locale,
         categoryId: input.categoryId,
         subCategoryId: input.subCategoryId,
+        tagIds: input.tagIds,
         cityId: input.cityId,
         search: input.search,
         sortBy: input.sortBy === "latest" || input.sortBy === "oldest" || input.sortBy === "popular"

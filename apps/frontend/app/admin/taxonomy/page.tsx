@@ -17,10 +17,6 @@ export default async function AdminTaxonomyPage() {
           orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }],
           include: {
             _count: { select: { businesses: true } },
-            specialties: {
-              orderBy: [{ sortOrder: "asc" }, { nameFa: "asc" }],
-              include: { _count: { select: { businesses: true } } },
-            },
           },
         },
       },
@@ -66,14 +62,6 @@ export default async function AdminTaxonomyPage() {
       sortOrder: subCategory.sortOrder,
       active: subCategory.active,
       businesses: subCategory._count.businesses,
-      specialties: subCategory.specialties.map((specialty) => ({
-        id: specialty.id,
-        nameFa: specialty.nameFa,
-        nameEn: specialty.nameEn,
-        sortOrder: specialty.sortOrder,
-        active: specialty.active,
-        businesses: specialty._count.businesses,
-      })),
     })),
   }));
 
@@ -97,7 +85,11 @@ export default async function AdminTaxonomyPage() {
     active: attribute.active,
     values: attribute._count.values,
   }));
-  const tagSectionTitle = locale === "fa" ? "\u0628\u0631\u0686\u0633\u0628\u200c\u0647\u0627" : "Tags";
+  const tagSectionTitle = locale === "fa"
+    ? "\u0645\u062d\u0635\u0648\u0644\u0627\u062a\u060c \u062e\u062f\u0645\u0627\u062a \u0648 \u062d\u0648\u0632\u0647\u200c\u0647\u0627\u06cc \u0641\u0639\u0627\u0644\u06cc\u062a"
+    : locale === "de"
+      ? "Produkte, Dienstleistungen und Tätigkeitsbereiche"
+      : "Products, services and areas of activity";
   const attributeSectionTitle = locale === "fa" ? "\u0627\u0645\u06a9\u0627\u0646\u0627\u062a" : "Amenities and features";
 
   return (

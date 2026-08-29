@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BusinessEditPage({ params }: PageProps) {
   const [{ businessId }, userId, locale] = await Promise.all([params, requireUserId(), getLocale()]);
 
-  const [business, attributeDefinitions, tagOptions, categoryOptions, subCategoryOptions, specialtyOptions, cityOptions, districtOptions] =
+  const [business, attributeDefinitions, tagOptions, categoryOptions, subCategoryOptions, cityOptions, districtOptions] =
     await Promise.all([
       prisma.business.findFirst({
         where: { id: businessId, ownerId: userId },
@@ -60,7 +60,6 @@ export default async function BusinessEditPage({ params }: PageProps) {
           postalCode: true,
           categoryId: true,
           subCategoryId: true,
-          specialtyId: true,
           cityId: true,
           districtId: true,
           latitude: true,
@@ -99,7 +98,6 @@ export default async function BusinessEditPage({ params }: PageProps) {
       prisma.tag.findMany({ orderBy: [{ nameEn: "asc" }, { nameFa: "asc" }], select: businessTagOptionSelect }),
       prisma.category.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
       prisma.subCategory.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, categoryId: true, nameEn: true, nameFa: true } }),
-      prisma.specialty.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" }, select: { id: true, subCategoryId: true, nameEn: true, nameFa: true } }),
       prisma.city.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
       prisma.district.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, cityId: true, nameEn: true, nameFa: true } }),
     ]);
@@ -149,7 +147,6 @@ export default async function BusinessEditPage({ params }: PageProps) {
       tagOptions={tagOptions}
       categoryOptions={categoryOptions}
       subCategoryOptions={subCategoryOptions}
-      specialtyOptions={specialtyOptions}
       cityOptions={cityOptions}
       districtOptions={districtOptions}
       locale={locale}

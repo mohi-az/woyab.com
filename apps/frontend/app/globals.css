@@ -1778,7 +1778,7 @@ html[lang="fa"] .admin-wizard-step::after {
   color: var(--admin-muted) !important;
 }
 
-/* Specialty Tags in Select */
+/* Tags in Select */
 .admin-ant-select .ant-select-selection-overflow-item .ant-select-selection-item {
   background-color: color-mix(in srgb, var(--admin-surface-strong) 60%, var(--admin-surface)) !important;
   border: 1px solid var(--admin-border) !important;

@@ -32,11 +32,6 @@ function nullableOption<T extends { id: number; nameEn?: string | null; nameFa?:
   return item ? { id: item.id, nameEn: item.nameEn ?? null, nameFa: item.nameFa ?? null } : null;
 }
 
-type BusinessSpecialtyRow = {
-  businessId: string;
-  specialtyId: number;
-};
-
 export default async function AdminBusinessesPage({ searchParams }: PageProps) {
   const [params, t, admin] = await Promise.all([searchParams, getTranslations("Admin"), requireAdmin()]);
   const page = positiveInt(first(params.page));
@@ -59,7 +54,7 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     }),
   };
 
-  const [businessesRaw, total, categories, subCategories, specialties, cities, districts, ownerOptions, attributeDefinitions, tagOptions] = await Promise.all([
+  const [businessesRaw, total, categories, subCategories, cities, districts, ownerOptions, attributeDefinitions, tagOptions] = await Promise.all([
     prisma.business.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -90,7 +85,6 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     prisma.business.count({ where }),
     prisma.category.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, slug: true } }),
     prisma.subCategory.findMany({ orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, slug: true, categoryId: true } }),
-    prisma.specialty.findMany({ orderBy: [{ sortOrder: "asc" }, { nameFa: "asc" }], select: { id: true, nameFa: true, nameEn: true, subCategoryId: true } }),
     prisma.city.findMany({ orderBy: { nameEn: "asc" }, select: { id: true, nameEn: true, nameFa: true } }),
     prisma.district.findMany({ orderBy: [{ cityId: "asc" }, { nameEn: "asc" }], select: { id: true, nameEn: true, nameFa: true, cityId: true } }),
     prisma.user.findMany({
@@ -109,18 +103,6 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
       select: businessTagOptionSelect,
     }),
   ]);
-  const businessIds = businessesRaw.map((business) => business.id);
-  const specialtyRows = businessIds.length
-    ? await prisma.$queryRaw<BusinessSpecialtyRow[]>`
-        SELECT "businessId", "specialtyId"
-        FROM "business_specialties"
-        WHERE "businessId" = ANY(${businessIds})
-      `
-    : [];
-  const specialtyIdsByBusiness = new Map<string, number[]>();
-  for (const row of specialtyRows) {
-    specialtyIdsByBusiness.set(row.businessId, [...(specialtyIdsByBusiness.get(row.businessId) ?? []), row.specialtyId]);
-  }
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const pageQuery = new URLSearchParams();
   if (validStatus) pageQuery.set("status", validStatus);
@@ -143,8 +125,6 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
     description: business.description,
     categoryId: business.categoryId,
     subCategoryId: business.subCategoryId,
-    specialtyId: business.specialtyId,
-    specialtyIds: specialtyIdsByBusiness.get(business.id) ?? (business.specialtyId ? [business.specialtyId] : []),
     cityId: business.cityId,
     districtId: business.districtId,
     latitude: business.latitude,
@@ -212,7 +192,6 @@ export default async function AdminBusinessesPage({ searchParams }: PageProps) {
         totalPages={totalPages}
         categories={categories}
         subCategories={subCategories}
-        specialties={specialties}
         cities={cities}
         districts={districts}
         ownerOptions={[...ownerMap.values()].map((owner) => ({

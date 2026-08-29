@@ -41,7 +41,7 @@ export function BusinessTagFields({ tags, values = [], variant = "owner", onSele
       <AdminMultiSelect
         name="tagIds"
         defaultValue={selectedValues}
-        placeholder={locale === "fa" ? "برچسب‌ها" : "Tags"}
+        placeholder={locale === "fa" ? "محصولات، خدمات و حوزه‌های فعالیت" : locale === "de" ? "Produkte und Dienstleistungen" : "Products and services"}
         options={tags.map((tag) => ({ value: String(tag.id), label: businessTagLabel(tag, locale) }))}
       />
     );

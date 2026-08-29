@@ -7,6 +7,9 @@ export const tagService = {
     const { page, limit, search } = query;
     const skip = (page - 1) * limit;
     const where = {
+      businesses: {
+        some: { business: { status: "ACTIVE" as const, verified: true, removedAt: null } },
+      },
       ...(search && {
         OR: [
           { nameFa: { contains: search, mode: "insensitive" as const } },
