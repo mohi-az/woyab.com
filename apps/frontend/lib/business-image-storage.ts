@@ -162,6 +162,7 @@ export async function resolvePermanentBusinessCover(input: {
   existingCoverImageUrl?: string | null;
   refreshGoogleCover?: boolean;
   useGoogleWhenMissing?: boolean;
+  fallbackOnGoogleError?: boolean;
 }) {
   const requestedCover = input.requestedCoverImageUrl?.trim() || null;
   const existingCover = input.existingCoverImageUrl?.trim() || null;
@@ -184,7 +185,20 @@ export async function resolvePermanentBusinessCover(input: {
         : null;
   }
 
-  // An external image outage must not roll back an otherwise valid business.
-  return persistFirstGooglePlacePhoto(input.googlePlaceId, input.googlePhotoReference)
-    .catch(() => existingCover && !isGoogleProxyImageUrl(existingCover) ? existingCover : null);
+  try {
+    const googleCover = await persistFirstGooglePlacePhoto(input.googlePlaceId, input.googlePhotoReference);
+    if (googleCover) return googleCover;
+    if (input.fallbackOnGoogleError === false) {
+      throw new Error("The selected Google Places photo could not be saved.");
+    }
+  } catch (error) {
+    // Creation and unrelated edits may safely retain an existing cover during
+    // an external outage. An explicit cover change must report the failure so
+    // the UI never claims that an unchanged cover was saved successfully.
+    if (input.fallbackOnGoogleError === false) {
+      throw new Error("The selected Google Places photo could not be saved. Please try again.", { cause: error });
+    }
+  }
+
+  return existingCover && !isGoogleProxyImageUrl(existingCover) ? existingCover : null;
 }

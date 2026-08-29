@@ -442,6 +442,9 @@ export async function updateBusinessDetails(formData: FormData) {
   if (!currentBusiness) throw new Error("Business not found.");
   const googlePhotoReference = nullableValue(formData, "googlePhotoReference")
     ?? (currentBusiness.googlePlaceId === googlePlaceId ? currentBusiness.googleCoverPhotoReference : null);
+  const googleCoverChanged = imageMode === "google"
+    && Boolean(googlePhotoReference)
+    && googlePhotoReference !== currentBusiness.googleCoverPhotoReference;
   const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
   const coverImageUrl = imageMode === "manual"
     ? requestedCoverImageUrl
@@ -452,11 +455,10 @@ export async function updateBusinessDetails(formData: FormData) {
         existingCoverImageUrl: currentBusiness.coverImageUrl,
         refreshGoogleCover: imageMode === "google" || currentBusiness.googlePlaceId !== googlePlaceId,
         useGoogleWhenMissing: true,
+        fallbackOnGoogleError: !googleCoverChanged,
       });
   const persistedGooglePhotoReference = imageMode === "google" && googlePlaceId && googlePhotoReference && coverImageUrl
-    ? coverImageUrl !== currentBusiness.coverImageUrl || googlePhotoReference === currentBusiness.googleCoverPhotoReference
-      ? googlePhotoReference
-      : currentBusiness.googleCoverPhotoReference
+    ? googlePhotoReference
     : null;
 
   const translations = (["DE", "EN", "FA"] as const).map((locale) => ({

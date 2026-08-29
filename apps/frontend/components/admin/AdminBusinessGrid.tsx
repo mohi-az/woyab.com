@@ -752,6 +752,7 @@ export function AdminBusinessGrid({
       } else {
         await updateBusinessDetails(formData);
         closeModal();
+        router.refresh();
       }
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : t("validation.saveFailed"));

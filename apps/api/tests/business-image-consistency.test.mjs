@@ -55,7 +55,7 @@ test("manual uploads and stored Google covers share the protected image storage"
   assert.match(imageManager, /name="imageMode" value=\{imageMode\}/);
 });
 
-test("Google cover creation reuses the reviewed photo reference and never blocks business creation", async () => {
+test("Google cover creation reuses the reviewed photo reference and explicit cover edits cannot fail silently", async () => {
   const [storage, adminActions, geoRoute, placesService] = await Promise.all([
     frontendSource("lib/business-image-storage.ts"),
     frontendSource("lib/admin-actions.ts"),
@@ -63,9 +63,12 @@ test("Google cover creation reuses the reviewed photo reference and never blocks
     apiSource("modules/businesses/google-places.service.ts"),
   ]);
 
-  assert.match(adminActions, /googlePhotoReference: nullableValue\(formData, "googlePhotoReference"\)/);
+  assert.match(adminActions, /const googlePhotoReference = nullableValue\(formData, "googlePhotoReference"\)/);
   assert.match(storage, /preferredPhotoReference/);
-  assert.match(storage, /persistFirstGooglePlacePhoto\(input\.googlePlaceId, input\.googlePhotoReference\)[\s\S]*\.catch\(\(\) => existingCover/);
+  assert.match(storage, /fallbackOnGoogleError\?: boolean/);
+  assert.match(storage, /input\.fallbackOnGoogleError === false/);
+  assert.match(adminActions, /googleCoverChanged[\s\S]*fallbackOnGoogleError: !googleCoverChanged/);
+  assert.match(adminActions, /persistedGooglePhotoReference[\s\S]*\? googlePhotoReference/);
   assert.match(placesService, /photoReferenceBelongsToPlace/);
   assert.match(geoRoute, /getPlacePhotoBuffer\(placeId, ref, maxWidth\)/);
   assert.doesNotMatch(geoRoute.match(/geoRouter\.get\("\/place-photo"[\s\S]*?\n\}\);/)?.[0] ?? "", /getPlacePhotos\(placeId\)/);
@@ -94,4 +97,10 @@ test("admin editing persists galleries and business details merge Google photos 
   assert.match(detailData, /fetchInternalApiJson<GooglePhotoList>/);
   assert.match(detailClient, /fetch\(`\/api\/businesses\/\$\{encodeURIComponent\(business\.id\)\}\/google-photos`/);
   assert.match(detailClient, /setGallery\(\(current\)/);
+});
+
+test("admin refreshes the business list after a successful cover update", async () => {
+  const adminGrid = await frontendSource("components/admin/AdminBusinessGrid.tsx");
+
+  assert.match(adminGrid, /await updateBusinessDetails\(formData\);\s*closeModal\(\);\s*router\.refresh\(\);/);
 });
