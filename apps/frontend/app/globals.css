@@ -1504,6 +1504,29 @@ html[dir="rtl"] .mapboxgl-popup-content {
   box-shadow: 0 0 0 1px rgb(30 64 175 / 45%);
 }
 
+.business-hours-today {
+  border-color: rgba(241, 91, 63, 0.3);
+  background-color: rgba(241, 91, 63, 0.055);
+  animation: business-hours-today-glow 4.8s ease-in-out infinite;
+}
+
+@keyframes business-hours-today-glow {
+  0%, 100% {
+    border-color: rgba(241, 91, 63, 0.22);
+    box-shadow: 0 0 0 1px rgba(241, 91, 63, 0.04);
+  }
+  50% {
+    border-color: rgba(241, 91, 63, 0.48);
+    box-shadow: 0 0 0 3px rgba(241, 91, 63, 0.075);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .business-hours-today {
+    animation: none;
+  }
+}
+
 @keyframes directory-origin-pulse {
   0% { opacity: 0.9; transform: scale(0.62); }
   70%, 100% { opacity: 0; transform: scale(1.55); }
