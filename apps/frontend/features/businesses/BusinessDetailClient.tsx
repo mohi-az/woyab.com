@@ -62,6 +62,8 @@ const socialIcons = {
   linkedin: FaLinkedinIn,
 } as const;
 
+const weekDays = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"] as const;
+
 function normalizeUrl(url: string) {
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   return `https://${url}`;
@@ -145,6 +147,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   const [now, setNow] = useState(() => new Date());
   const [mobileHoursOpen, setMobileHoursOpen] = useState(false);
   const mobileHoursRef = useRef<HTMLDivElement>(null);
+  const currentDayOfWeek = weekDays[now.getDay()];
   const openStatus = getBusinessOpenStatus(business.hours, now);
   const openStatusLabel = openStatus.kind === "UNKNOWN"
     ? null
@@ -200,7 +203,9 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
         const existingUrls = new Set(next.map((image) => image.imageUrl));
         let changed = false;
         for (const [index, photo] of photos.entries()) {
-          if (storedGoogleCover && index === 0) continue;
+          if (business.googleCoverPhotoReference
+            ? photo.photoReference === business.googleCoverPhotoReference
+            : storedGoogleCover && index === 0) continue;
           const encodedReference = photo.photoReference.split("/").map(encodeURIComponent).join("/");
           const imageUrl = `/api/businesses/${encodeURIComponent(business.id)}/google-photos/${encodedReference}?maxWidth=1200`;
           if (existingUrls.has(imageUrl)) continue;
@@ -219,7 +224,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     }).catch(() => undefined);
 
     return () => controller.abort();
-  }, [business.coverImageUrl, business.googlePlaceId, business.id, business.title]);
+  }, [business.coverImageUrl, business.googleCoverPhotoReference, business.googlePlaceId, business.id, business.title]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
@@ -511,7 +516,15 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                     {mobileHoursOpen ? (
                       <div className="absolute start-0 top-full z-40 mt-2 max-h-[min(28rem,calc(100dvh-12rem))] w-[min(19rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_20px_60px_rgba(15,23,42,.28)]">
                         {business.hours.map((hour) => (
-                          <div key={hour.dayOfWeek} className="flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 text-sm odd:bg-slate-50">
+                          <div
+                            key={hour.dayOfWeek}
+                            aria-current={hour.dayOfWeek === currentDayOfWeek ? "date" : undefined}
+                            className={`flex items-center justify-between gap-4 rounded-xl border px-3 py-2.5 text-sm ${
+                              hour.dayOfWeek === currentDayOfWeek
+                                ? "business-hours-today"
+                                : "border-transparent odd:bg-slate-50"
+                            }`}
+                          >
                             <span className="font-bold">{t(`days.${hour.dayOfWeek}`)}</span>
                             <span className={hour.isClosed ? "font-bold text-rose-500" : "text-slate-600"}>
                               {hour.isClosed ? t("closed") : `${hour.openTime ?? "--"} - ${hour.closeTime ?? "--"}`}
@@ -982,7 +995,15 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
             <div className="mt-5 space-y-3">
               {business.hours.length ? business.hours.map((hour) => (
-                <div key={hour.dayOfWeek} className="flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+                <div
+                  key={hour.dayOfWeek}
+                  aria-current={hour.dayOfWeek === currentDayOfWeek ? "date" : undefined}
+                  className={`flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 text-sm ${
+                    hour.dayOfWeek === currentDayOfWeek
+                      ? "business-hours-today"
+                      : "border-transparent bg-slate-50"
+                  }`}
+                >
                   <span className="font-bold text-slate-800">{t(`days.${hour.dayOfWeek}`)}</span>
                   <span className={hour.isClosed ? "font-bold text-rose-500" : "text-slate-600"}>
                     {hour.isClosed ? t("closed") : `${hour.openTime ?? "--"} - ${hour.closeTime ?? "--"}`}

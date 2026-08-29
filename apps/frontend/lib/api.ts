@@ -69,6 +69,7 @@ type BusinessDetailApiResponse = {
     logoUrl?: string | null;
     coverImageUrl?: string | null;
     googlePlaceId?: string | null;
+    googleCoverPhotoReference?: string | null;
     googleRating?: number | null;
     googleUserRatingCount?: number | null;
     phone?: string | null;
@@ -296,6 +297,7 @@ export type BusinessDetailData = {
   description?: string | null;
   logoUrl?: string | null;
   coverImageUrl?: string | null;
+  googleCoverPhotoReference?: string | null;
   gallery: Array<{
     id: string;
     imageUrl: string;
@@ -757,6 +759,7 @@ export const fetchBusinessBySlug = cache(
       description: business.description,
       logoUrl: business.logoUrl,
       coverImageUrl: business.coverImageUrl,
+      googleCoverPhotoReference: business.googleCoverPhotoReference,
       googlePlaceId: business.googlePlaceId,
       googleRating: business.googleRating ?? null,
       googleUserRatingCount: business.googleUserRatingCount ?? null,

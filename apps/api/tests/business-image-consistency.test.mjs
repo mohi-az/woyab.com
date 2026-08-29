@@ -97,6 +97,8 @@ test("admin editing persists galleries and business details merge Google photos 
   assert.match(detailData, /fetchInternalApiJson<GooglePhotoList>/);
   assert.match(detailClient, /fetch\(`\/api\/businesses\/\$\{encodeURIComponent\(business\.id\)\}\/google-photos`/);
   assert.match(detailClient, /setGallery\(\(current\)/);
+  assert.match(detailClient, /photo\.photoReference === business\.googleCoverPhotoReference/);
+  assert.match(detailData, /googleCoverPhotoReference: business\.googleCoverPhotoReference/);
 });
 
 test("admin updates use a stable HTTP endpoint and refresh the business list", async () => {

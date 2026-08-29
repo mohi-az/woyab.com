@@ -144,6 +144,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       description: localized.description,
       logoUrl: business.logoUrl,
       coverImageUrl: business.coverImageUrl,
+      googleCoverPhotoReference: business.googleCoverPhotoReference,
       gallery,
       googlePlaceId: business.googlePlaceId,
       googleRating: business.googleRating,
