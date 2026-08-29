@@ -3,12 +3,9 @@ import { BusinessDirectory } from "@/features/businesses/BusinessDirectory";
 import { isAppLocale } from "@/i18n/config";
 import {
   fetchBusinessDirectory,
-  fetchDirectoryCategories,
-  fetchDirectoryCities,
-  fetchDirectorySubCategories,
-  fetchDirectoryTags,
   type BusinessDirectoryFilters,
 } from "@/lib/api";
+import { fetchBusinessDirectoryOptions } from "@/lib/business-directory-options";
 import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 
 const PAGE_SIZE = 9;
@@ -66,12 +63,9 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
     openNow: first(params.openNow) === "true" || undefined,
   };
 
-  const [directory, categories, subCategories, tags, cities] = await Promise.all([
+  const [directory, filterOptions] = await Promise.all([
     fetchBusinessDirectory(locale, filters),
-    fetchDirectoryCategories(locale),
-    fetchDirectorySubCategories(locale),
-    fetchDirectoryTags(locale),
-    fetchDirectoryCities(locale),
+    fetchBusinessDirectoryOptions(locale, filters),
   ]);
 
   return (
@@ -80,10 +74,10 @@ export default async function BusinessesPage({ searchParams }: PageProps) {
         locale={locale}
         initialFilters={filters}
         initialDirectory={directory}
-        categories={categories}
-        subCategories={subCategories}
-        tags={tags}
-        cities={cities}
+        categories={filterOptions.categories}
+        subCategories={filterOptions.subCategories}
+        tags={filterOptions.tags}
+        cities={filterOptions.cities}
         labels={{
           eyebrow: t("eyebrow"),
           title: t("title"),

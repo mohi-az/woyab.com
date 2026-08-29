@@ -210,3 +210,22 @@ test("open-now filtering and labels use registered hours in the Berlin time zone
   assert.match(searchRepository, /business_hours/);
   assert.match(searchRepository, /openTime.*closeTime/s);
 });
+
+test("business directory facets stay data-backed when city and tag filters change", async () => {
+  const [page, directory, options, route] = await Promise.all([
+    frontendSource("app/businesses/page.tsx"),
+    frontendSource("features/businesses/BusinessDirectory.tsx"),
+    frontendSource("lib/business-directory-options.ts"),
+    frontendSource("app/api/businesses/filter-options/route.ts"),
+  ]);
+
+  assert.match(page, /fetchBusinessDirectoryOptions\(locale, filters\)/);
+  assert.match(directory, /\/api\/businesses\/filter-options\?/);
+  assert.match(directory, /setFilterOptions\(data\)/);
+  assert.match(options, /status: "ACTIVE"/);
+  assert.match(options, /verified: true/);
+  assert.match(options, /removedAt: null/);
+  assert.match(options, /filters\.cityId/);
+  assert.match(options, /filters\.tagIds/);
+  assert.match(route, /tagIds: url\.searchParams\.getAll\("tagIds"\)/);
+});

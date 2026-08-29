@@ -291,6 +291,7 @@
     "established": "Since {year}",
     "directions": "Get directions",
     "overviewTitle": "Overview",
+    "taxonomyAndOfferings": "Category and offerings",
     "descriptionFallback": "This business has not added a full description yet.",
     "gallery": {
       "showAll": "Show all {count} photos",

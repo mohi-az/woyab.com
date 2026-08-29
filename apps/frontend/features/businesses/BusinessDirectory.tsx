@@ -24,6 +24,7 @@ import type { LocationValue, RadiusKm, SavedLocationOption } from "@/components/
 import {
   searchBusinessDirectory,
   type BusinessDirectoryData,
+  type BusinessDirectoryFilterOptions,
   type BusinessDirectoryFilters,
   type DirectoryFilterOption,
 } from "@/lib/api";
@@ -91,6 +92,12 @@ export function BusinessDirectory({
 }: Props) {
   const [filters, setFilters] = useState(initialFilters);
   const [directory, setDirectory] = useState(initialDirectory);
+  const [filterOptions, setFilterOptions] = useState<BusinessDirectoryFilterOptions>({
+    categories,
+    subCategories,
+    tags,
+    cities,
+  });
   const [location, setLocation] = useState<LocationValue | null>(null);
   const [radiusKm, setRadiusKm] = useState<RadiusKm | null>(5);
   // The directory refreshes once after hydration. Start in a loading state so
@@ -110,6 +117,14 @@ export function BusinessDirectory({
   const [savedLocations, setSavedLocations] = useState<Array<SavedLocationOption & { isDefault?: boolean }>>([]);
   const [now, setNow] = useState(() => new Date());
   const openNowRefreshKey = filters.openNow ? Math.floor(now.getTime() / 60_000) : 0;
+  const filterOptionsQuery = (() => {
+    const params = new URLSearchParams({ locale });
+    if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
+    if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
+    if (filters.cityId) params.set("cityId", String(filters.cityId));
+    for (const tagId of filters.tagIds ?? []) params.append("tagIds", String(tagId));
+    return params.toString();
+  })();
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
@@ -183,6 +198,23 @@ export function BusinessDirectory({
       .catch(() => undefined);
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch(`/api/businesses/filter-options?${filterOptionsQuery}`, {
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Filter options request failed");
+        return response.json() as Promise<{ data?: BusinessDirectoryFilterOptions }>;
+      })
+      .then(({ data }) => {
+        if (data && !controller.signal.aborted) setFilterOptions(data);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [filterOptionsQuery]);
 
   const changeFilters = useCallback((patch: Partial<BusinessDirectoryFilters>) => {
     setFilters((current) => ({ ...current, ...patch, page: 1 }));
@@ -339,7 +371,7 @@ export function BusinessDirectory({
                 label={labels.filters.city}
                 value={filters.cityId}
                 onChange={(value) => changeFilters({ cityId: value })}
-                options={cities}
+                options={filterOptions.cities}
                 allLabel={labels.filters.allCities}
               />
               <button
@@ -410,10 +442,10 @@ export function BusinessDirectory({
                   <BusinessFilters
                     variant="drawer"
                     filters={filters}
-                    categories={categories}
-                    subCategories={subCategories}
-                    tags={tags}
-                    cities={cities}
+                    categories={filterOptions.categories}
+                    subCategories={filterOptions.subCategories}
+                    tags={filterOptions.tags}
+                    cities={filterOptions.cities}
                     labels={labels.filters}
                     locale={locale}
                     location={location}

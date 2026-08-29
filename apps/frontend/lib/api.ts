@@ -10,18 +10,6 @@ type CategoryApiItem = {
   _count: { businesses: number; subCategories: number };
 };
 
-type DirectoryOptionApiItem = {
-  id: number;
-  nameFa: string;
-  nameEn: string | null;
-  slug: string;
-  icon?: string | null;
-  _count?: { businesses?: number };
-  category?: { id: number };
-  latitude?: number | null;
-  longitude?: number | null;
-};
-
 type BusinessApiItem = {
   id: string;
   slug: string;
@@ -152,7 +140,7 @@ type BusinessDetailApiResponse = {
       tag: {
         id: number;
         nameFa: string;
-        nameEn: string;
+        nameEn: string | null;
         slug: string;
       };
     }>;
@@ -257,6 +245,13 @@ export type DirectoryFilterOption = {
   longitude?: number | null;
 };
 
+export type BusinessDirectoryFilterOptions = {
+  categories: DirectoryFilterOption[];
+  subCategories: DirectoryFilterOption[];
+  tags: DirectoryFilterOption[];
+  cities: DirectoryFilterOption[];
+};
+
 export type BusinessDirectoryData = {
   items: LatestBusinessCardItem[];
   total: number;
@@ -310,6 +305,7 @@ export type BusinessDetailData = {
   categoryId?: number | null;
   categorySlug?: string | null;
   categoryIconKey?: string | null;
+  subCategoryId?: number | null;
   subCategoryName?: string | null;
   cityId?: number | null;
   location?: string | null;
@@ -340,7 +336,11 @@ export type BusinessDetailData = {
     isClosed: boolean;
     note?: string | null;
   }>;
-  tags: string[];
+  tags: Array<{
+    id: number;
+    slug: string;
+    name: string;
+  }>;
   attributes: Array<{
     id: number;
     key: string;
@@ -642,49 +642,7 @@ export async function searchBusinessDirectory(
   };
 }
 
-async function fetchDirectoryOptions(
-  locale: string,
-  path: string,
-): Promise<DirectoryFilterOption[]> {
-  try {
-    const res = await fetchApiWithRetry(`${API_BASE}${path}`, { next: { revalidate: 300 } });
-    if (!res.ok) return [];
-    const json = (await res.json()) as PaginatedResponse<DirectoryOptionApiItem>;
-    return (json.data?.items ?? []).map((item) => ({
-      id: item.id,
-      slug: item.slug,
-      name: getLocalizedName(locale, item) ?? item.nameEn ?? item.nameFa,
-      count: item._count?.businesses,
-      iconKey: item.icon,
-      parentId: item.category?.id,
-      latitude: item.latitude,
-      longitude: item.longitude,
-    }));
-  } catch {
-    return [];
-  }
-}
-
-export function fetchDirectoryCategories(locale: string) {
-  return fetchDirectoryOptions(locale, "/v1/categories?limit=100&active=true");
-}
-
-export function fetchDirectorySubCategories(locale: string, categoryId?: number) {
-  return fetchDirectoryOptions(
-    locale,
-    `/v1/sub-categories?limit=100&active=true${categoryId ? `&categoryId=${categoryId}` : ""}`,
-  );
-}
-
-export function fetchDirectoryCities(locale: string) {
-  return fetchDirectoryOptions(locale, "/v1/cities?limit=100");
-}
-
-export function fetchDirectoryTags(locale: string) {
-  return fetchDirectoryOptions(locale, "/v1/tags?limit=100");
-}
-
-function localizedText(locale: string, item?: { nameFa: string; nameEn: string } | null) {
+function localizedText(locale: string, item?: { nameFa: string; nameEn?: string | null } | null) {
   return getLocalizedName(locale, item);
 }
 
@@ -699,7 +657,7 @@ export const fetchBusinessBySlug = cache(
             { cache: "no-store" },
           );
           if (localizedRes.ok || localizedRes.status === 404) break;
-        } catch (error) {
+        } catch {
           if (attempt === 1) return null;
         }
         if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 300));
@@ -791,6 +749,7 @@ export const fetchBusinessBySlug = cache(
       categoryId: business.category?.id,
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
+      subCategoryId: business.subCategory?.id,
       subCategoryName: localizedText(locale, business.subCategory),
       cityId: business.city?.id,
       location: localizedText(locale, business.city),
@@ -824,7 +783,11 @@ export const fetchBusinessBySlug = cache(
         isClosed: hour.isClosed,
         note: hour.note,
       })),
-      tags: (business.tags ?? []).map((entry) => localizedText(locale, entry.tag) ?? entry.tag.nameEn),
+      tags: (business.tags ?? []).map((entry) => ({
+        id: entry.tag.id,
+        slug: entry.tag.slug,
+        name: localizedText(locale, entry.tag) ?? entry.tag.nameFa,
+      })),
       attributes: (business.attributes ?? []).flatMap((entry) => {
         if (!compatibleAttributeValue(entry.attribute.dataType, entry.value)) return [];
         return [{

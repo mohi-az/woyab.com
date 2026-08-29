@@ -80,12 +80,6 @@ function formatAttributeValue(attribute: BusinessDetailData["attributes"][number
   return `${attribute.label}: ${attribute.value}`;
 }
 
-function localizedTagTitle(locale: string) {
-  if (locale === "fa") return "برچسب‌ها";
-  if (locale === "de") return "Tags";
-  return "Tags";
-}
-
 function ReviewAvatar({ user }: { user: BusinessReviewItem["user"] }) {
   if (user.avatarUrl) {
     return <img src={user.avatarUrl} alt={user.name} className="h-12 w-12 rounded-2xl object-cover" />;
@@ -109,7 +103,18 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     longitude: business.longitude,
   });
   const categoryHref = business.categoryId ? `/businesses?categoryId=${business.categoryId}` : null;
+  const subCategoryHref = business.categoryId && business.subCategoryId
+    ? `/businesses?categoryId=${business.categoryId}&subCategoryId=${business.subCategoryId}`
+    : null;
   const cityHref = business.cityId ? `/businesses?cityId=${business.cityId}` : null;
+  const taxonomyNames = new Set(
+    [business.categoryName, business.subCategoryName]
+      .filter((name): name is string => Boolean(name))
+      .map((name) => name.trim().toLocaleLowerCase(locale)),
+  );
+  const offeringTags = business.tags.filter(
+    (tag) => !taxonomyNames.has(tag.name.trim().toLocaleLowerCase(locale)),
+  );
   const hasValidCoordinates = typeof business.latitude === "number"
     && typeof business.longitude === "number"
     && Number.isFinite(business.latitude)
@@ -594,54 +599,6 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                 </button>
               ) : null}
             </div>
-
-          </section>
-
-          <section className="hidden rounded-[24px] bg-white p-4 shadow-[0_18px_48px_rgba(15,23,42,.05)] sm:p-5 md:block">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {business.reviewCount > 0 ? (
-                <>
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabRating")}</p>
-                    <p className="mt-2 text-2xl font-black text-slate-950">{business.rating.toFixed(1)}</p>
-                  </div>
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.woyabReviews")}</p>
-                    <p className="mt-2 text-2xl font-black text-slate-950">{business.reviewCount}</p>
-                  </div>
-                </>
-              ) : null}
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.googleRating")}</p>
-                <p className="mt-2 text-2xl font-black text-slate-950">
-                  {business.googleRating !== null && business.googleRating !== undefined ? business.googleRating.toFixed(1) : "-"}
-                </p>
-                {business.googleRating !== null && business.googleRating !== undefined ? (
-                  <>
-                    <CircularRatingStars rating={business.googleRating} size="sm" className="mt-2" />
-                    <p className="mt-2 text-xs font-bold text-slate-500">{t("googleReviewsCount", { count: business.googleUserRatingCount ?? 0 })}</p>
-                  </>
-                ) : null}
-              </div>
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.category")}</p>
-                {business.categoryName ? (
-                  categoryHref ? (
-                    <Link href={categoryHref} className="mt-2 inline-flex text-base font-black text-slate-950 transition hover:text-primary">
-                      {business.categoryName}
-                    </Link>
-                  ) : (
-                    <p className="mt-2 text-base font-black text-slate-950">{business.categoryName}</p>
-                  )
-                ) : (
-                  <p className="mt-2 text-base font-black text-slate-950">-</p>
-                )}
-              </div>
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("stats.subCategory")}</p>
-                <p className="mt-2 text-base font-black text-slate-950">{business.subCategoryName ?? "-"}</p>
-              </div>
-            </div>
           </section>
 
           <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] sm:p-8">
@@ -652,14 +609,35 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               <p className="mt-5 text-base leading-8 text-slate-500">{t("descriptionFallback")}</p>
             )}
 
-            {business.tags.length ? (
+            {business.categoryName || business.subCategoryName || offeringTags.length ? (
               <div className="mt-8">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{localizedTagTitle(locale)}</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{t("taxonomyAndOfferings")}</p>
                 <div className="mt-3 flex flex-wrap gap-3">
-                  {business.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700">
-                      {tag}
-                    </span>
+                  {business.categoryName && categoryHref ? (
+                    <Link
+                      href={categoryHref}
+                      className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-black text-white shadow-sm transition hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+                    >
+                      <CategoryIcon iconKey={business.categoryIconKey} categorySlug={business.categorySlug} className="text-white" />
+                      {business.categoryName}
+                    </Link>
+                  ) : null}
+                  {business.subCategoryName && subCategoryHref ? (
+                    <Link
+                      href={subCategoryHref}
+                      className="rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-black text-primary transition hover:border-primary/35 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+                    >
+                      {business.subCategoryName}
+                    </Link>
+                  ) : null}
+                  {offeringTags.map((tag) => (
+                    <Link
+                      key={tag.id}
+                      href={`/businesses?tagIds=${tag.id}`}
+                      className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+                    >
+                      {tag.name}
+                    </Link>
                   ))}
                 </div>
               </div>

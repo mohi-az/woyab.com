@@ -46,7 +46,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       },
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, slug: true, icon: true } },
-        subCategory: { select: { nameFa: true, nameEn: true } },
+        subCategory: { select: { id: true, nameFa: true, nameEn: true } },
         city: { select: { id: true, nameFa: true, nameEn: true } },
         businessHours: { orderBy: { dayOfWeek: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
@@ -58,7 +58,7 @@ export const fetchBusinessDetailFromDatabase = cache(
             description: true,
           },
         },
-        tags: { include: { tag: { select: { nameFa: true, nameEn: true } } } },
+        tags: { include: { tag: { select: { id: true, slug: true, nameFa: true, nameEn: true } } } },
         attributes: {
           include: { attribute: true },
           orderBy: { attribute: { sortOrder: "asc" } },
@@ -143,6 +143,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       categoryId: business.category.id,
       categorySlug: business.category.slug,
       categoryIconKey: business.category.icon,
+      subCategoryId: business.subCategory?.id,
       subCategoryName: localizedName(business.subCategory),
       cityId: business.city.id,
       location: localizedName(business.city),
@@ -176,7 +177,11 @@ export const fetchBusinessDetailFromDatabase = cache(
         isClosed: hour.isClosed,
         note: hour.note,
       })),
-      tags: business.tags.map(({ tag }) => localizedName(tag) ?? tag.nameFa),
+      tags: business.tags.map(({ tag }) => ({
+        id: tag.id,
+        slug: tag.slug,
+        name: localizedName(tag) ?? tag.nameFa,
+      })),
       attributes: business.attributes.flatMap(({ attribute, value }) => {
         if (!attributeValueIsSupported(attribute.dataType, value)) return [];
         return [{

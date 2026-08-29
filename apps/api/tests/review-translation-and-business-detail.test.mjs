@@ -124,7 +124,7 @@ test("translation maintenance is secret-protected and processes at most twenty j
   assert.match(service, /translationLeaseExpiresAt: \{ lte: now \}/);
 });
 
-test("business detail hides empty WoYab stats and provides resilient map, gallery, ratings, and original-text controls", async () => {
+test("business detail provides linked taxonomy chips, resilient media, ratings, and original-text controls", async () => {
   const [detail, gallery, map, data, ratings] = await Promise.all([
     source("apps/frontend/features/businesses/BusinessDetailClient.tsx"),
     source("apps/frontend/components/business/BusinessPhotoGallery.tsx"),
@@ -138,6 +138,14 @@ test("business detail hides empty WoYab stats and provides resilient map, galler
   assert.match(detail, /reviewsSection\.showTranslation/);
   assert.match(detail, /BusinessLocationMap/);
   assert.match(detail, /gallery\.showAll/);
+  assert.match(detail, /taxonomyAndOfferings/);
+  assert.match(detail, /href=\{categoryHref\}/);
+  assert.match(detail, /href=\{subCategoryHref\}/);
+  assert.match(detail, /subCategoryId=\$\{business\.subCategoryId\}/);
+  assert.match(detail, /href=\{`\/businesses\?tagIds=\$\{tag\.id\}`\}/);
+  assert.match(detail, /\{tag\.name\}/);
+  assert.match(detail, /categoryName[\s\S]*subCategoryName[\s\S]*offeringTags\.map/);
+  assert.match(data, /tag: \{ select: \{ id: true, slug: true/);
   assert.doesNotMatch(detail, /activeImageIndex|setActiveImageIndex/);
   assert.match(gallery, /role="dialog"/);
   assert.match(gallery, /aria-modal="true"/);
@@ -157,7 +165,7 @@ test("business detail hides empty WoYab stats and provides resilient map, galler
   assert.match(ratings, /precision = 0\.5/);
   assert.match(ratings, /safeFill \* 100/);
   assert.match(ratings, /fill=\{filled \? "#ff9f0a" : "#a3a3a3"\}/);
-  assert.match(detail, /stats\.googleRating[\s\S]*CircularRatingStars rating=\{business\.googleRating\}/);
+  assert.doesNotMatch(detail, /stats\.(?:googleRating|category|subCategory)/);
   assert.match(detail, /Amenities and More/);
   assert.doesNotMatch(detail, /activeImage\.authorAttributions|activeImage\.sourceUri/);
 });
