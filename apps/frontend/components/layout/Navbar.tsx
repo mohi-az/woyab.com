@@ -32,6 +32,7 @@ export default function Navbar() {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const internalPathname = stripLocalePrefix(pathname);
+  const isHomePage = internalPathname === "/";
   const currentSearch = searchParams.toString();
   const callbackPath = internalPathname === "/login" || internalPathname === "/register"
     ? safeCallbackPath(searchParams.get("callbackUrl") ?? undefined)
@@ -294,16 +295,21 @@ export default function Navbar() {
             ))}
           </div>
 
-          <button
-            className={cn(
-              "inline-flex h-10 w-10 items-center justify-center rounded-2xl border transition-colors lg:hidden",
-              isOverlay ? "border-white/15 bg-white/10 text-white" : "border-slate-200 bg-white text-slate-800 shadow-sm",
-            )}
-            onClick={() => setMobileOpen((value) => !value)}
-            aria-label={t("toggleNavigation")}
-          >
-            {mobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            {isHomePage ? (
+              <LanguageSelector align="end" triggerClassName={languageTriggerClassName} />
+            ) : null}
+            <button
+              className={cn(
+                "inline-flex h-10 w-10 items-center justify-center rounded-2xl border transition-colors",
+                isOverlay ? "border-white/15 bg-white/10 text-white" : "border-slate-200 bg-white text-slate-800 shadow-sm",
+              )}
+              onClick={() => setMobileOpen((value) => !value)}
+              aria-label={t("toggleNavigation")}
+            >
+              {mobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+            </button>
+          </div>
         </div>
 
         {mobileOpen ? (
@@ -401,9 +407,11 @@ export default function Navbar() {
                   <Link href={registerHref} onClick={() => setMobileOpen(false)} className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 font-bold text-slate-700"><FiUserPlus />{t("auth.register")}</Link>
                 </div>
               )}
-              <div className={`mt-3 flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>
-                <LanguageSelector align="start" triggerClassName="h-10 rounded-full border border-slate-200 bg-white px-3 text-slate-600" />
-              </div>
+              {!isHomePage ? (
+                <div className={`mt-3 flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>
+                  <LanguageSelector align="start" triggerClassName="h-10 rounded-full border border-slate-200 bg-white px-3 text-slate-600" />
+                </div>
+              ) : null}
             </div>
           </nav>
         ) : null}
