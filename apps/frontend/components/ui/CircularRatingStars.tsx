@@ -4,6 +4,8 @@ import clsx from "clsx";
 
 type RatingSize = "xs" | "sm" | "md" | "lg";
 
+const THIRD_STAR_PRECISION = 1 / 3;
+
 const dimensions: Record<RatingSize, number> = {
   xs: 16,
   sm: 20,
@@ -54,7 +56,7 @@ type CircularRatingStarsProps = {
   rating: number;
   max?: number;
   size?: RatingSize;
-  precision?: 0.5 | 1;
+  precision?: number;
   label?: string;
   className?: string;
 };
@@ -63,17 +65,18 @@ export function CircularRatingStars({
   rating,
   max = 5,
   size = "sm",
-  precision = 0.5,
+  precision = THIRD_STAR_PRECISION,
   label,
   className,
 }: CircularRatingStarsProps) {
   const safeRating = Number.isFinite(rating) ? Math.max(0, Math.min(max, rating)) : 0;
-  const normalizedRating = Math.round(safeRating / precision) * precision;
+  const safePrecision = Number.isFinite(precision) && precision > 0 ? precision : THIRD_STAR_PRECISION;
+  const normalizedRating = Math.min(max, Math.round(safeRating / safePrecision) * safePrecision);
 
   return (
     <span
       role="img"
-      aria-label={label ?? `${normalizedRating.toFixed(1)} / ${max}`}
+      aria-label={label ?? `${safeRating} / ${max}`}
       className={clsx("inline-flex items-center gap-1", className)}
     >
       {Array.from({ length: max }, (_, index) => (

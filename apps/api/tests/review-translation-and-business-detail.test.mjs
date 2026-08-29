@@ -162,7 +162,10 @@ test("business detail provides linked taxonomy chips, resilient media, ratings, 
   assert.doesNotMatch(map, /map\.once\("error"/);
   assert.match(data, /authorAttributions/);
   assert.match(data, /sourceUri: photo\.googleMapsUri/);
-  assert.match(ratings, /precision = 0\.5/);
+  assert.match(ratings, /THIRD_STAR_PRECISION = 1 \/ 3/);
+  assert.match(ratings, /precision = THIRD_STAR_PRECISION/);
+  assert.match(ratings, /Math\.round\(safeRating \/ safePrecision\) \* safePrecision/);
+  assert.match(ratings, /aria-label=\{label \?\? `\$\{safeRating\} \/ \$\{max\}`\}/);
   assert.match(ratings, /safeFill \* 100/);
   assert.match(ratings, /fill=\{filled \? "#ff9f0a" : "#a3a3a3"\}/);
   assert.doesNotMatch(detail, /stats\.(?:googleRating|category|subCategory)/);
