@@ -302,18 +302,23 @@ export default function Navbar() {
             <button
               className={cn(
                 "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border transition-colors",
-                isOverlay ? "border-white/15 bg-white/10 text-white" : "border-slate-200 bg-white text-slate-800 shadow-sm",
+                isOverlay ? "border-white/25 bg-white/20 text-white" : "border-slate-200 bg-white text-slate-800 shadow-sm",
               )}
               onClick={() => setMobileOpen((value) => !value)}
               aria-label={t("toggleNavigation")}
             >
-              {mobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+              {mobileOpen ? <FiX className="text-[1.35rem] stroke-[2.5]" /> : <FiMenu className="text-[1.35rem] stroke-[2.5]" />}
             </button>
           </div>
         </div>
 
         {mobileOpen ? (
-          <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-200/70 py-4 [&_a]:cursor-pointer [&_button]:cursor-pointer lg:hidden" aria-label={t("navigationLabel")}>
+          <nav className="absolute end-4 top-full z-50 mt-2 max-h-[calc(100dvh-5.25rem)] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_20px_55px_rgba(15,23,42,0.18)] [&_a]:cursor-pointer [&_button]:cursor-pointer lg:hidden" aria-label={t("navigationLabel")}>
+            {!isHomePage ? (
+              <div className={`mb-3 flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>
+                <LanguageSelector align="start" triggerClassName="h-10 rounded-full border border-slate-200 bg-white px-3 text-slate-600" />
+              </div>
+            ) : null}
             <div className="flex flex-col gap-1.5">
               <Link href="/" className="flex items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
                 {t("nav.home")}
@@ -407,11 +412,6 @@ export default function Navbar() {
                   <Link href={registerHref} onClick={() => setMobileOpen(false)} className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 font-bold text-slate-700"><FiUserPlus />{t("auth.register")}</Link>
                 </div>
               )}
-              {!isHomePage ? (
-                <div className={`mt-3 flex ${locale === "fa" ? "justify-end" : "justify-start"}`}>
-                  <LanguageSelector align="start" triggerClassName="h-10 rounded-full border border-slate-200 bg-white px-3 text-slate-600" />
-                </div>
-              ) : null}
             </div>
           </nav>
         ) : null}

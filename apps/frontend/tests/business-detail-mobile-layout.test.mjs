@@ -31,6 +31,14 @@ test("mobile opening hours use an outside-click dropdown in the hero", async () 
   assert.match(source, /max-h-\[min\(28rem,calc\(100dvh-12rem\)\)\][^\"]*overflow-y-auto/);
 });
 
+test("business cover powers a compact blurred desktop hero", async () => {
+  const source = await readFile(detailPath, "utf8");
+
+  assert.match(source, /const heroImageUrl = activeImage\?\.imageUrl \?\? business\.coverImageUrl/);
+  assert.match(source, /src=\{heroImageUrl\}[^>]*opacity-90 blur-\[4px\]/);
+  assert.match(source, /lg:pb-10 lg:pt-28/);
+});
+
 test("today is subtly highlighted in both business-hours views", async () => {
   const [source, styles] = await Promise.all([
     readFile(detailPath, "utf8"),

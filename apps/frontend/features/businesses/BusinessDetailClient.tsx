@@ -315,6 +315,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   }, [business.id]);
 
   const activeImage = gallery[0];
+  const heroImageUrl = activeImage?.imageUrl ?? business.coverImageUrl;
 
   async function submitReview(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -420,9 +421,14 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
   return (
     <div className="bg-[#f8f5f1] pb-16 [&_button:not(:disabled)]:cursor-pointer">
-      <section className="hero-theme relative isolate z-20 -mt-16 overflow-visible bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 md:z-auto md:overflow-hidden lg:-mt-[4.75rem] lg:pt-36">
+      <section className={`${heroImageUrl ? "" : "hero-theme"} relative isolate z-20 -mt-16 overflow-visible bg-slate-950 px-4 pb-12 pt-28 text-white sm:px-6 sm:pb-16 sm:pt-32 md:z-auto md:overflow-hidden lg:-mt-[4.75rem] lg:pb-10 lg:pt-28`}>
+        {heroImageUrl ? (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            <img src={heroImageUrl} alt="" className="h-full w-full scale-[1.02] object-cover opacity-90 blur-[4px]" />
+          </div>
+        ) : null}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(241,91,63,.26),transparent_26%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.96)_0%,rgba(10,18,31,.83)_52%,rgba(10,18,31,.68)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.80)_0%,rgba(10,18,31,.62)_52%,rgba(10,18,31,.48)_100%)]" />
         <div className="relative mx-auto max-w-[1480px]">
           <div className="flex items-center justify-between gap-4">
             <Link href="/businesses" className="inline-flex items-center gap-2 text-sm font-bold text-primary-light/90 transition hover:text-white">
@@ -438,7 +444,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
             />
           </div>
 
-          <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="mt-6 flex flex-col gap-6 lg:mt-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-4xl">
               <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-slate-300">
                 {business.categoryName ? (

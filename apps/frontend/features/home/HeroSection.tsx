@@ -75,7 +75,7 @@ export default function HeroSection({ categories, cities }: Props) {
                 <FiChevronDown className="pointer-events-none absolute end-3 text-slate-400" />
               </label>
 
-              <button type="submit" aria-label={t("search")} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-primary text-xl text-white shadow-[0_10px_25px_rgba(241,91,63,.32)] transition hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30">
+              <button type="submit" aria-label={t("search")} className="inline-flex min-h-14 cursor-pointer items-center justify-center rounded-xl bg-primary text-xl text-white shadow-[0_10px_25px_rgba(241,91,63,.32)] transition hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30">
                 <FiSearch />
               </button>
             </div>

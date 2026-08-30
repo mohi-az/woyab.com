@@ -278,7 +278,7 @@
   },
   "BusinessDetail": {
     "pageLabel": "Business detail page",
-    "back": "Back to all businesses",
+    "back": "Back",
     "favoriteAdd": "Add to favorites",
     "favoriteRemove": "Remove from favorites",
     "verified": "Verified business",
