@@ -33,7 +33,7 @@ export default async function LatestBusinessesSection({ items }: Props) {
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6">
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-primary">{t("eyebrow")}</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[#c94127]">{t("eyebrow")}</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
               {t("title")}
             </h2>

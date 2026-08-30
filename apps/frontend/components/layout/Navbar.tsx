@@ -84,7 +84,7 @@ export default function Navbar() {
           : "text-slate-700 hover:text-primary",
     );
   const languageTriggerClassName = cn(
-    "!h-auto !px-0 !bg-transparent border-none shadow-none transition-colors hover:!bg-transparent",
+    "!px-0 !bg-transparent border-none shadow-none transition-colors hover:!bg-transparent",
     isOverlay
       ? "!text-white/80 hover:!text-white [&_*]:!text-white/80 hover:[&_*]:!text-white"
       : "!text-slate-700 hover:!text-primary [&_*]:!text-slate-700 hover:[&_*]:!text-primary",

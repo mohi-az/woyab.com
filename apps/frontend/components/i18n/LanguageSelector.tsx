@@ -106,21 +106,19 @@ export function LanguageSelector({
         )
         : null}
       <div className={cn("dropdown", align === "end" && "dropdown-end", isPersian && "font-dirooz")}>
-        <div tabIndex={0} role="button">
         <button
           type="button"
           className={cn(
             "inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold text-gray-600 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-60",
             triggerClassName,
           )}
-          aria-label={t("label")}
+          aria-label={`${t("label")}: ${localeLabels[activeLocale]}`}
           disabled={Boolean(switchingLocale)}
         >
           <LanguageFlag locale={activeLocale} />
           {localeLabels[activeLocale]}
           <FiChevronDown className="text-xs opacity-70" />
         </button>
-        </div>
         <ul
           tabIndex={0}
           className={cn(

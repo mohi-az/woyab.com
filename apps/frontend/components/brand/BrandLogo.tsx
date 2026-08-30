@@ -14,6 +14,7 @@ export function BrandLogo({ className, priority = false, variant = "black" }: Br
       alt="WoYab"
       width={1840}
       height={661}
+      sizes="136px"
       className={cn("object-contain", className)}
       priority={priority}
     />

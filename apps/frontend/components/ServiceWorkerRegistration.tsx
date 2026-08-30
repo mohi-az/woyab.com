@@ -155,7 +155,6 @@ export function ServiceWorkerRegistration() {
 
   return (
     <aside
-      role="dialog"
       aria-label={t("title")}
       className="fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-[0_18px_60px_rgba(15,23,42,0.24)] sm:inset-x-auto sm:end-5 sm:bottom-5"
     >

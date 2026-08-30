@@ -20,7 +20,7 @@ export default async function CategoriesSection({ counts }: Props) {
           <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
             {t("title")}
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-500">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600">
             {t("description")}
           </p>
         </div>
@@ -46,7 +46,7 @@ export default async function CategoriesSection({ counts }: Props) {
                   {t(`items.${cat.labelKey}`)}
                 </span>
 
-                <span className="cat-badge pointer-events-none absolute bottom-0 left-1/2 inline-flex h-[2.3rem] w-[4.35rem] -translate-x-1/2 items-center justify-center rounded-t-full border-x border-t border-b-0 border-transparent bg-[#f8f5f1] pt-1 text-sm font-black text-slate-500 transition-[background-color,border-color,color,box-shadow] duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-white group-focus-visible:border-primary group-focus-visible:bg-primary group-focus-visible:text-white sm:h-[2.55rem] sm:w-[4.8rem] sm:text-base">
+                <span className="cat-badge pointer-events-none absolute bottom-0 left-1/2 inline-flex h-[2.3rem] w-[4.35rem] -translate-x-1/2 items-center justify-center rounded-t-full border-x border-t border-b-0 border-transparent bg-[#f8f5f1] pt-1 text-sm font-black text-slate-600 transition-[background-color,border-color,color,box-shadow] duration-300 group-hover:border-primary group-hover:bg-primary group-hover:text-white group-focus-visible:border-primary group-focus-visible:bg-primary group-focus-visible:text-white sm:h-[2.55rem] sm:w-[4.8rem] sm:text-base">
                   {count}
                 </span>
               </Link>

@@ -41,9 +41,21 @@ body {
 }
 
 .hero-theme {
-  background-image: url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2200&q=86");
+  background-image: url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=78");
   background-position: center;
   background-size: cover;
+}
+
+@media (min-width: 768px) {
+  .hero-theme {
+    background-image: url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=82");
+  }
+}
+
+@media (min-width: 1536px) {
+  .hero-theme {
+    background-image: url("https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2200&q=84");
+  }
 }
 
 .font-geist {

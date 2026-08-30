@@ -99,7 +99,6 @@ export function PwaInstallButton() {
         type="button"
         onClick={() => void install()}
         disabled={installed || installing}
-        aria-label={installed ? t("installed") : t("action")}
         className="group inline-flex min-h-[78px] w-full max-w-[22rem] cursor-pointer items-center gap-4 rounded-2xl border-2 border-slate-400 bg-black px-4 py-3 text-start text-white shadow-[0_8px_24px_rgba(0,0,0,0.22)] transition hover:border-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.34)] disabled:cursor-default disabled:opacity-70"
       >
         <span className="shrink-0 text-[2rem] font-black leading-none tracking-[-0.16em]" dir="ltr" aria-hidden="true">

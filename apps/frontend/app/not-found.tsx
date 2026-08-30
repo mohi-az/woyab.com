@@ -95,7 +95,8 @@ export default async function NotFound() {
             alt={content.imageAlt}
             width={1536}
             height={1024}
-            fetchPriority="high"
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-contain object-center"
           />
         </div>

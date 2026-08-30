@@ -17,6 +17,22 @@ export type HomeData = {
   latestBusinesses: LatestBusinessCardItem[];
 };
 
+function homeCardImageUrl(imageUrl: string | null, businessId: string, hasGooglePlace: boolean) {
+  if (!imageUrl) {
+    return hasGooglePlace
+      ? `/api/businesses/${encodeURIComponent(businessId)}/google-photo-thumbnail?maxWidth=640`
+      : null;
+  }
+
+  const googleThumbnailPath = `/api/businesses/${encodeURIComponent(businessId)}/google-photo-thumbnail`;
+  if (!imageUrl.startsWith(googleThumbnailPath)) return imageUrl;
+
+  const [pathname, query = ""] = imageUrl.split("?", 2);
+  const params = new URLSearchParams(query);
+  params.set("maxWidth", "640");
+  return `${pathname}?${params.toString()}`;
+}
+
 export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
   const [categoryRows, cityRows, businessRows] = await Promise.all([
     prisma.category.findMany({
@@ -106,9 +122,7 @@ export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
         slug: business.slug,
         href: `/businesses/${business.slug}`,
         title: localized.businessName,
-        imageUrl: business.coverImageUrl || !business.googlePlaceId
-          ? business.coverImageUrl
-          : `/api/businesses/${encodeURIComponent(business.id)}/google-photo-thumbnail?maxWidth=640`,
+        imageUrl: homeCardImageUrl(business.coverImageUrl, business.id, Boolean(business.googlePlaceId)),
         fallbackImageUrl: null,
         shortDescription: localized.shortDescription,
         categoryName: localizedName(business.category),
