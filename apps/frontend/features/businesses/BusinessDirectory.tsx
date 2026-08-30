@@ -406,7 +406,7 @@ export function BusinessDirectory({
                   onClick={() => setFiltersOpen((open) => !open)}
                   aria-expanded={filtersOpen}
                   aria-haspopup="dialog"
-                  className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 ${filtersOpen || activeFilterCount > 0 ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
+                  className={`inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 ${filtersOpen || activeFilterCount > 0 ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
                 >
                   <FiSliders />
                   {labels.allFilters}
@@ -435,7 +435,7 @@ export function BusinessDirectory({
                 type="button"
                 aria-pressed={Boolean(filters.openNow)}
                 onClick={() => changeFilters({ openNow: filters.openNow ? undefined : true })}
-                className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 ${filters.openNow ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
+                className={`inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 ${filters.openNow ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
               >
                 <FiClock aria-hidden="true" className="text-primary" /> {labels.filters.openNow}
               </button>
@@ -443,7 +443,7 @@ export function BusinessDirectory({
                 type="button"
                 aria-pressed={Boolean(filters.favoritesOnly)}
                 onClick={() => changeFilters({ favoritesOnly: filters.favoritesOnly ? undefined : true })}
-                className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 ${filters.favoritesOnly ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
+                className={`inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 ${filters.favoritesOnly ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
               >
                 <FiHeart aria-hidden="true" className="text-primary" /> {labels.filters.favoritesOnly}
               </button>
@@ -451,7 +451,7 @@ export function BusinessDirectory({
                 type="button"
                 onClick={() => setMapOpen((open) => !open)}
                 aria-expanded={mapOpen}
-                className={`inline-flex h-11 items-center justify-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 lg:hidden ${mapOpen ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
+                className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full border px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 lg:hidden ${mapOpen ? "border-primary bg-primary/5 text-primary" : "border-slate-300 bg-white text-slate-800 hover:border-primary hover:text-primary"}`}
               >
                 <FiMap />
                 {mapOpen ? labels.map.hide : labels.map.show}
@@ -460,7 +460,7 @@ export function BusinessDirectory({
                 <button
                   type="button"
                   onClick={reset}
-                  className="px-1 text-sm font-semibold text-slate-500 underline-offset-4 transition hover:text-primary hover:underline focus-visible:outline-none focus-visible:text-primary focus-visible:underline"
+                  className="cursor-pointer px-1 text-sm font-semibold text-slate-500 underline-offset-4 transition hover:text-primary hover:underline focus-visible:outline-none focus-visible:text-primary focus-visible:underline"
                 >
                   {labels.filters.reset}
                 </button>
@@ -490,7 +490,7 @@ export function BusinessDirectory({
                     type="button"
                     onClick={() => setFiltersOpen(false)}
                     aria-label={labels.closeFilters}
-                    className="grid h-10 w-10 place-items-center rounded-full text-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+                    className="grid h-10 w-10 cursor-pointer place-items-center rounded-full text-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
                   >
                     <FiX aria-hidden="true" />
                   </button>
@@ -698,7 +698,7 @@ function QuickSelect({
 
 function PageButton({ disabled, label, onClick, children }: { disabled: boolean; label: string; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" disabled={disabled} onClick={onClick} aria-label={label} className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 transition hover:border-primary hover:text-primary disabled:border-gray-100 disabled:bg-gray-50 disabled:text-gray-300">
+    <button type="button" disabled={disabled} onClick={onClick} aria-label={label} className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:border-gray-100 disabled:bg-gray-50 disabled:text-gray-300">
       {children}
     </button>
   );

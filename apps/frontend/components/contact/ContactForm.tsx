@@ -78,12 +78,12 @@ export function ContactForm() {
         <label>{t("website")}<input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
       </div>
       <label className="flex items-start gap-3 text-sm leading-6 text-slate-600">
-        <input name="privacyAcknowledged" type="checkbox" required className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+        <input name="privacyAcknowledged" type="checkbox" required className="mt-1 h-4 w-4 cursor-pointer rounded border-slate-300 text-primary focus:ring-primary" />
         <span>{t.rich("privacyAcknowledgement", { privacy: (chunks) => <Link href="/privacy" className="font-bold text-primary underline underline-offset-2">{chunks}</Link> })}</span>
       </label>
       {status === "success" ? <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800" role="status">{t("success")}</p> : null}
       {status === "error" ? <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800" role="alert">{error}</p> : null}
-      <button disabled={status === "sending"} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+      <button disabled={status === "sending"} className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl bg-primary px-5 text-sm font-black text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
         {status === "sending" ? t("sending") : t("submit")}
       </button>
     </form>

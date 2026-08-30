@@ -110,7 +110,7 @@ export function LanguageSelector({
         <button
           type="button"
           className={cn(
-            "inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold text-gray-600 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-60",
+            "inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold text-gray-600 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:opacity-60",
             triggerClassName,
           )}
           aria-label={t("label")}
@@ -137,7 +137,7 @@ export function LanguageSelector({
                   type="button"
                   onClick={() => handleChange(item)}
                   disabled={Boolean(switchingLocale)}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="flex items-center gap-2">
                     <LanguageFlag locale={item} />

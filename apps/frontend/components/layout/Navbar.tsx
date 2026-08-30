@@ -74,7 +74,7 @@ export default function Navbar() {
   );
   const navItemClassName = (active: boolean) =>
     cn(
-      "relative inline-flex h-10 items-center py-0 !text-sm !font-bold !leading-5 transition-colors",
+      "relative inline-flex h-10 cursor-pointer items-center py-0 !text-sm !font-bold !leading-5 transition-colors",
       active
         ? isOverlay
           ? "text-white"
@@ -90,7 +90,7 @@ export default function Navbar() {
       : "!text-slate-700 hover:!text-primary [&_*]:!text-slate-700 hover:[&_*]:!text-primary",
   );
   const secondaryActionClassName = cn(
-    "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-bold transition-all",
+    "inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-bold transition-all",
     isOverlay
       ? "border-white/15 bg-white/10 text-white hover:bg-white/15"
       : "border-slate-200 bg-white text-slate-700 shadow-sm hover:border-primary/25 hover:text-primary",
@@ -237,7 +237,7 @@ export default function Navbar() {
                 <FiChevronDown className={cn("transition-transform", businessMenuOpen && "rotate-180")} />
               </button>
               <div className={cn("absolute top-full z-50 pt-3 ltr:left-0 rtl:right-0", businessMenuOpen ? "visible opacity-100" : "invisible opacity-0")}>
-                <div className="w-72 rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_22px_60px_rgba(15,23,42,0.18)]" role="menu">
+                <div className="w-72 rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_22px_60px_rgba(15,23,42,0.18)] [&_a]:cursor-pointer" role="menu">
                   <Link href="/add-business?intent=add" role="menuitem" onClick={() => setBusinessMenuOpen(false)} className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2 font-bold transition hover:bg-slate-100 hover:text-primary">
                     <span className="grid h-8 w-8 shrink-0 place-items-center text-xl text-primary"><FiPlusSquare /></span>
                     <span className="text-sm font-black">{t("businessMenu.addBusiness")}</span>
@@ -301,7 +301,7 @@ export default function Navbar() {
             ) : null}
             <button
               className={cn(
-                "inline-flex h-10 w-10 items-center justify-center rounded-2xl border transition-colors",
+                "inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border transition-colors",
                 isOverlay ? "border-white/15 bg-white/10 text-white" : "border-slate-200 bg-white text-slate-800 shadow-sm",
               )}
               onClick={() => setMobileOpen((value) => !value)}
@@ -313,7 +313,7 @@ export default function Navbar() {
         </div>
 
         {mobileOpen ? (
-          <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-200/70 py-4 lg:hidden" aria-label={t("navigationLabel")}>
+          <nav className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-slate-200/70 py-4 [&_a]:cursor-pointer [&_button]:cursor-pointer lg:hidden" aria-label={t("navigationLabel")}>
             <div className="flex flex-col gap-1.5">
               <Link href="/" className="flex items-center justify-between rounded-xl px-4 py-3 font-bold text-slate-700 hover:bg-primary/5 hover:text-primary" onClick={() => setMobileOpen(false)}>
                 {t("nav.home")}
@@ -442,11 +442,11 @@ function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, role, lo
     <div className="relative" onBlur={(event) => {
       if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) onClose();
     }}>
-      <button type="button" aria-expanded={open} aria-haspopup="menu" aria-label={labels.menu} onClick={onToggle} className={cn("flex h-10 items-center gap-1.5 rounded-full border p-1 pe-2 transition", overlay ? "border-white/20 bg-white/10 text-white hover:bg-white/15" : "border-slate-200 bg-white text-slate-700 shadow-sm hover:border-primary/30")}>
+      <button type="button" aria-expanded={open} aria-haspopup="menu" aria-label={labels.menu} onClick={onToggle} className={cn("flex h-10 cursor-pointer items-center gap-1.5 rounded-full border p-1 pe-2 transition", overlay ? "border-white/20 bg-white/10 text-white hover:bg-white/15" : "border-slate-200 bg-white text-slate-700 shadow-sm hover:border-primary/30")}>
         <UserAvatar name={name} avatarUrl={avatarUrl} />
         <FiChevronDown className={cn("text-sm transition-transform", open && "rotate-180")} />
       </button>
-      <div className={cn("absolute top-full z-[70] mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_22px_60px_rgba(15,23,42,0.2)] ltr:right-0 rtl:left-0", open ? "visible opacity-100" : "invisible opacity-0")} role="menu">
+      <div className={cn("absolute top-full z-[70] mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 text-slate-800 shadow-[0_22px_60px_rgba(15,23,42,0.2)] ltr:right-0 rtl:left-0 [&_a]:cursor-pointer [&_button]:cursor-pointer", open ? "visible opacity-100" : "invisible opacity-0")} role="menu">
         <div className="border-b border-slate-100 px-3 py-3">
           <p className="truncate text-sm font-black text-slate-950">{name}</p>
           {email ? <p className="mt-1 truncate text-xs text-slate-500" dir="ltr">{email}</p> : null}
@@ -481,7 +481,7 @@ function AccountMenu({ open, onToggle, onClose, name, email, avatarUrl, role, lo
 function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, role, locale, labels }: AccountMenuProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-      <button type="button" aria-expanded={open} onClick={onToggle} className="flex min-h-14 w-full items-center gap-3 px-3 text-start">
+      <button type="button" aria-expanded={open} onClick={onToggle} className="flex min-h-14 w-full cursor-pointer items-center gap-3 px-3 text-start">
         <UserAvatar name={name} avatarUrl={avatarUrl} />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-black text-slate-950">{name}</span>
@@ -490,7 +490,7 @@ function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, ro
         <FiChevronDown className={cn("shrink-0 transition-transform", open && "rotate-180")} />
       </button>
       {open ? (
-        <div className="grid gap-1 border-t border-slate-100 p-2">
+        <div className="grid gap-1 border-t border-slate-100 p-2 [&_a]:cursor-pointer [&_button]:cursor-pointer">
           <Link href="/dashboard" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-primary"><FiGrid />{labels.dashboard}</Link>
           {(role === "ADMIN" || role === "SUPER_ADMIN") ? (
             <Link href="/admin" onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold text-sky-700 hover:bg-sky-50"><FiShield className="text-sky-600" />{labels.adminPanel}</Link>

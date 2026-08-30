@@ -341,7 +341,7 @@ export function LocationPicker({
           />
           <div className="absolute right-2 flex items-center gap-1 rtl:left-2 rtl:right-auto">
             {value ? (
-              <button type="button" onClick={clearLocation} aria-label={labels.clear} className="btn btn-ghost btn-square btn-xs rounded-lg text-gray-400">
+              <button type="button" onClick={clearLocation} aria-label={labels.clear} className="btn btn-ghost btn-square btn-xs cursor-pointer rounded-lg text-gray-400">
                 <FiX />
               </button>
             ) : null}
@@ -351,7 +351,7 @@ export function LocationPicker({
               disabled={status === "locating"}
               aria-label={labels.useCurrentLocation}
               title={labels.useCurrentLocation}
-              className="btn btn-primary btn-square btn-sm rounded-lg"
+              className="btn btn-primary btn-square btn-sm cursor-pointer rounded-lg disabled:cursor-not-allowed"
             >
               {status === "locating" ? <FiLoader className="animate-spin" /> : <MdMyLocation />}
             </button>
@@ -364,7 +364,7 @@ export function LocationPicker({
               <div>
                 <p className="px-3 py-2 text-xs font-bold uppercase tracking-wide text-gray-400">{labels.savedLocations}</p>
                 {savedLocations.map((saved) => (
-                  <button key={saved.id} type="button" onClick={() => chooseSaved(saved)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-start text-sm hover:bg-primary/5">
+                  <button key={saved.id} type="button" onClick={() => chooseSaved(saved)} className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-start text-sm hover:bg-primary/5">
                     <span className="text-primary">{savedIcon(saved.icon)}</span>
                     <span className="min-w-0"><strong className="block truncate text-gray-800">{saved.label}</strong></span>
                   </button>
@@ -382,7 +382,7 @@ export function LocationPicker({
                 type="button"
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => selectSuggestion(suggestion)}
-                className={`flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-start transition ${activeIndex === index ? "bg-primary/10" : "hover:bg-gray-50"}`}
+                className={`flex w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 text-start transition ${activeIndex === index ? "bg-primary/10" : "hover:bg-gray-50"}`}
               >
                 <FiMapPin className="mt-0.5 shrink-0 text-primary" />
                 <span className="min-w-0">
@@ -404,7 +404,7 @@ export function LocationPicker({
           value={radiusKm ?? ""}
           disabled={!value}
           onChange={(event) => onRadiusChange(event.target.value ? Number(event.target.value) as RadiusKm : null)}
-          className={`${compact ? "h-11 text-[14px]" : "h-12 text-sm"} w-full rounded-xl border border-gray-200 bg-white px-4 outline-none transition disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10`}
+          className={`${compact ? "h-11 text-[14px]" : "h-12 text-sm"} w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-4 outline-none transition disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10`}
         >
           <option value="">{labels.anyDistance}</option>
           {RADIUS_OPTIONS.map((radius) => <option key={radius} value={radius}>{radius} km</option>)}

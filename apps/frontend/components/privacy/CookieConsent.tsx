@@ -41,7 +41,7 @@ function PreferenceSwitch({
         aria-label={label}
         disabled={disabled}
         onClick={() => onChange?.(!checked)}
-        className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed ${checked ? "bg-primary" : "bg-slate-300"}`}
+        className={`relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed ${checked ? "bg-primary" : "bg-slate-300"}`}
       >
         <span className={`absolute top-1 grid h-5 w-5 place-items-center rounded-full bg-white text-[11px] shadow-sm transition-[inset-inline-start] ${checked ? "start-6 text-primary" : "start-1 text-slate-400"}`}>
           {checked ? <FiCheck aria-hidden="true" /> : null}
@@ -111,13 +111,13 @@ export function CookieConsent() {
             <p className="mt-1 text-sm leading-6 text-slate-600">{t("bannerDescription")}</p>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:mt-0 lg:w-auto lg:min-w-[510px]">
-            <button type="button" onClick={() => persist({ analytics: true, marketing: true })} className="min-h-11 rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold text-white transition hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+            <button type="button" onClick={() => persist({ analytics: true, marketing: true })} className="min-h-11 cursor-pointer rounded-xl bg-primary px-5 py-2.5 text-sm font-extrabold text-white transition hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
               {t("acceptAll")}
             </button>
-            <button type="button" onClick={() => persist(rejectedPreferences)} className="min-h-11 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-extrabold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+            <button type="button" onClick={() => persist(rejectedPreferences)} className="min-h-11 cursor-pointer rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-extrabold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
               {t("rejectAll")}
             </button>
-            <button type="button" onClick={(event) => { previousFocusRef.current = event.currentTarget; setPreferences(rejectedPreferences); setPreferencesOpen(true); }} className="min-h-11 rounded-xl border border-slate-300 bg-slate-100 px-5 py-2.5 text-sm font-extrabold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+            <button type="button" onClick={(event) => { previousFocusRef.current = event.currentTarget; setPreferences(rejectedPreferences); setPreferencesOpen(true); }} className="min-h-11 cursor-pointer rounded-xl border border-slate-300 bg-slate-100 px-5 py-2.5 text-sm font-extrabold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
               {t("manage")}
             </button>
           </div>
@@ -132,7 +132,7 @@ export function CookieConsent() {
                 <h2 id="cookie-preferences-title" className="text-xl font-black text-slate-950">{t("preferencesTitle")}</h2>
                 <p id="cookie-preferences-description" className="mt-1 text-sm leading-6 text-slate-600">{t("preferencesDescription")}</p>
               </div>
-              <button ref={closeButtonRef} type="button" onClick={closePreferences} aria-label={t("close")} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-xl text-slate-600 transition hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              <button ref={closeButtonRef} type="button" onClick={closePreferences} aria-label={t("close")} className="grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-xl text-xl text-slate-600 transition hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 <FiX aria-hidden="true" />
               </button>
             </div>
@@ -144,10 +144,10 @@ export function CookieConsent() {
             </div>
 
             <div className="sticky bottom-0 grid gap-2 border-t border-slate-200 bg-white p-4 sm:grid-cols-2 sm:px-6">
-              <button type="button" onClick={() => persist(preferences)} className="min-h-12 rounded-xl bg-primary px-5 py-3 text-sm font-extrabold text-white transition hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              <button type="button" onClick={() => persist(preferences)} className="min-h-12 cursor-pointer rounded-xl bg-primary px-5 py-3 text-sm font-extrabold text-white transition hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 {t("save")}
               </button>
-              <button type="button" onClick={() => persist(rejectedPreferences)} className="min-h-12 rounded-xl border border-slate-300 px-5 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+              <button type="button" onClick={() => persist(rejectedPreferences)} className="min-h-12 cursor-pointer rounded-xl border border-slate-300 px-5 py-3 text-sm font-extrabold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 {t("rejectAll")}
               </button>
             </div>

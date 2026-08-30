@@ -172,7 +172,7 @@ export function BusinessFilters({
           <button
             type="button"
             onClick={reset}
-            className="mt-6 text-sm font-semibold text-slate-500 underline-offset-4 transition hover:text-primary hover:underline focus-visible:outline-none focus-visible:text-primary focus-visible:underline"
+            className="mt-6 cursor-pointer text-sm font-semibold text-slate-500 underline-offset-4 transition hover:text-primary hover:underline focus-visible:outline-none focus-visible:text-primary focus-visible:underline"
           >
             {labels.reset}
           </button>
@@ -255,7 +255,7 @@ function FilterChoiceList({
             type="button"
             onClick={() => setExpanded((current) => !current)}
             aria-expanded={expanded}
-            className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white !text-[13px] font-medium leading-5 text-slate-600 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+            className="flex h-8 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white !text-[13px] font-medium leading-5 text-slate-600 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
           >
             {expanded ? showLessLabel : showAllLabel}
             <FiChevronDown aria-hidden="true" className={`text-xs transition-transform ${expanded ? "rotate-180" : ""}`} />
@@ -326,7 +326,7 @@ function MultiFilterChoiceList({
             type="button"
             onClick={() => setExpanded((current) => !current)}
             aria-expanded={expanded}
-            className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white !text-[13px] font-medium leading-5 text-slate-600 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+            className="flex h-8 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white !text-[13px] font-medium leading-5 text-slate-600 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
           >
             {expanded ? showLessLabel : showAllLabel}
             <FiChevronDown aria-hidden="true" className={`text-xs transition-transform ${expanded ? "rotate-180" : ""}`} />
@@ -343,7 +343,7 @@ function FilterChoiceButton({ label, count, iconKey, checked, onClick }: { label
       type="button"
       aria-pressed={checked}
       onClick={onClick}
-      className={`inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-start !text-[13px] leading-5 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10 ${checked ? "border-primary/35 bg-primary/10 font-medium text-primary" : "border-slate-200 bg-white font-normal text-slate-600 hover:border-primary/40 hover:bg-primary/5 hover:text-slate-900"}`}
+      className={`inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-start !text-[13px] leading-5 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10 ${checked ? "border-primary/35 bg-primary/10 font-medium text-primary" : "border-slate-200 bg-white font-normal text-slate-600 hover:border-primary/40 hover:bg-primary/5 hover:text-slate-900"}`}
     >
       {iconKey ? <CategoryIcon iconKey={iconKey} className="shrink-0 text-sm text-primary" /> : <FiGrid aria-hidden="true" className="shrink-0 text-sm text-primary" />}
       <span className="min-w-0 truncate">{label}</span>
