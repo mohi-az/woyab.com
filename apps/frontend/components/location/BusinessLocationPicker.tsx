@@ -6,6 +6,7 @@ import { FiCrosshair, FiLoader, FiMapPin, FiSearch } from "react-icons/fi";
 import { MdMyLocation } from "react-icons/md";
 import type mapboxgl from "mapbox-gl";
 import { isAppLocale } from "@/i18n/config";
+import { removeMapboxLogoLink } from "@/lib/mapbox-attribution";
 
 type Suggestion = {
   id: string;
@@ -143,6 +144,7 @@ export function BusinessLocationPicker({ defaultAddress, defaultLatitude, defaul
         center: [initialLongitude, initialLatitude],
         zoom: defaultLatitude && defaultLongitude ? 14 : 6,
       });
+      removeMapboxLogoLink(map.getContainer());
       mapRef.current = map;
       map.addControl(new mapbox.NavigationControl({ showCompass: false }), "bottom-left");
       const normalizeMapControlButtons = () => {

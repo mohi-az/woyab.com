@@ -8,6 +8,7 @@ import type { LocationValue, RadiusKm, SavedLocationOption } from "@/components/
 import { localizePathname, type AppLocale } from "@/i18n/config";
 import type { BusinessDirectoryFilters } from "@/lib/api";
 import { buildDirectionsUrl } from "@/lib/directions";
+import { removeMapboxLogoLink } from "@/lib/mapbox-attribution";
 
 type MapProperties = {
   locationId: string;
@@ -184,6 +185,7 @@ export function BusinessMap({
         zoom: 5,
         attributionControl: true,
       });
+      removeMapboxLogoLink(map.getContainer());
 
       mapRef.current = map;
       map.addControl(new mapbox.NavigationControl(), "top-left");

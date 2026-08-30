@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type mapboxgl from "mapbox-gl";
 import { FiMapPin, FiNavigation } from "react-icons/fi";
+import { removeMapboxLogoLink } from "@/lib/mapbox-attribution";
 
 type Props = {
   latitude: number;
@@ -65,6 +66,7 @@ export function BusinessLocationMap({ latitude, longitude, title, address, direc
         attributionControl: true,
         cooperativeGestures: true,
       });
+      removeMapboxLogoLink(map.getContainer());
       mapRef.current = map;
       map.scrollZoom.disable();
       map.addControl(new mapbox.NavigationControl({ showCompass: false }), "top-right");

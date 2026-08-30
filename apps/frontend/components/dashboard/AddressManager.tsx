@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { FiBriefcase, FiCheck, FiEdit3, FiHeart, FiHome, FiLoader, FiMapPin, FiSearch, FiStar, FiTrash2, FiX } from "react-icons/fi";
 import { MdMyLocation } from "react-icons/md";
 import type mapboxgl from "mapbox-gl";
+import { removeMapboxLogoLink } from "@/lib/mapbox-attribution";
 
 type Address = {
   id: string;
@@ -156,6 +157,7 @@ export function AddressManager({ initial }: { initial: Address[] }) {
         center: [DEFAULT_CENTER.longitude, DEFAULT_CENTER.latitude],
         zoom: 12,
       });
+      removeMapboxLogoLink(map.getContainer());
 
       map.on("movestart", (event) => {
         if (!event.originalEvent) return;
