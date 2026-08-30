@@ -60,12 +60,21 @@
     "title": "WoYab installieren",
     "description": "Installieren Sie die WoYab-PWA auf Ihrem iPhone oder Android-Gerät – für ein besseres mobiles Erlebnis.",
     "iosInstructions": "Tippen Sie in Safari auf „Teilen“ und dann auf „Zum Home-Bildschirm“.",
+    "iosGuideTitle": "WoYab auf dem iPhone installieren",
+    "iosStepShareTitle": "Teilen-Menü öffnen",
+    "iosStepShareDescription": "Tippen Sie unten in Safari auf das Teilen-Symbol.",
+    "iosStepHomeTitle": "Zum Home-Bildschirm wählen",
+    "iosStepHomeDescription": "Scrollen Sie nach unten, falls die Option nicht sofort sichtbar ist.",
+    "iosStepAddTitle": "Installation bestätigen",
+    "iosStepAddDescription": "Tippen Sie oben auf Hinzufügen, um WoYab auf dem Home-Bildschirm abzulegen.",
+    "iosGuideDone": "Verstanden",
     "action": "App installieren",
     "mobileLabel": "Mobile PWA",
     "installing": "Wird installiert…",
     "installed": "Installiert",
     "unavailable": "Öffnen Sie das Browsermenü und wählen Sie „App installieren“ oder „Zum Home-Bildschirm“.",
-    "dismiss": "Nicht jetzt"
+    "dismiss": "Nicht jetzt",
+    "close": "Installationsanleitung schließen"
   },
   "Contact": {
     "metaTitle": "WoYab kontaktieren",
