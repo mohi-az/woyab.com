@@ -510,10 +510,21 @@ function MobileAccountMenu({ open, onToggle, onClose, name, email, avatarUrl, ro
 }
 
 function UserAvatar({ name, avatarUrl }: { name: string; avatarUrl: string }) {
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState("");
   const initial = name.trim().slice(0, 1).toUpperCase() || "F";
+  const showImage = Boolean(avatarUrl && avatarUrl !== failedAvatarUrl);
   return (
     <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/10 text-sm font-black text-primary ring-1 ring-white/70">
-      {avatarUrl ? <span className="block h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${avatarUrl})` }} aria-label={name} /> : initial}
+      {showImage ? (
+        // Dynamic account avatars can be remote OAuth images or database-backed URLs.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={avatarUrl}
+          alt={name}
+          className="h-full w-full object-cover"
+          onError={() => setFailedAvatarUrl(avatarUrl)}
+        />
+      ) : initial}
     </span>
   );
 }

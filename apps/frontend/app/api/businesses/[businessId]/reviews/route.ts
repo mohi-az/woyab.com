@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { shouldShowBusinessRatings } from "@woyab/shared";
 import { currentUserId } from "@/lib/auth-user";
 import { prisma } from "@/lib/prisma";
 import { isPersistentlyRateLimited } from "@/lib/persistent-rate-limit";
@@ -27,9 +28,16 @@ export async function POST(request: Request, context: RouteContext) {
 
   const business = await prisma.business.findFirst({
     where: { id: businessId, removedAt: null, status: "ACTIVE" },
-    select: { id: true },
+    select: {
+      id: true,
+      category: { select: { slug: true } },
+      subCategory: { select: { slug: true } },
+    },
   });
   if (!business) return NextResponse.json({ error: "Business not found" }, { status: 404 });
+  if (!shouldShowBusinessRatings(business.category.slug, business.subCategory?.slug)) {
+    return NextResponse.json({ error: "Ratings are not available for this business category." }, { status: 403 });
+  }
   const existing = await prisma.review.findUnique({ where: { businessId_userId: { businessId, userId } } });
   if (existing) return NextResponse.json({ error: "You have already reviewed this business." }, { status: 409 });
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { shouldShowBusinessGallery } from "@woyab/shared";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import BusinessDetailClient from "@/features/businesses/BusinessDetailClient";
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     pathname: `/businesses/${slug}`,
     title,
     description,
-    image: business.coverImageUrl,
+    image: shouldShowBusinessGallery(business.categorySlug) ? business.coverImageUrl : null,
   });
 }
 
@@ -63,7 +64,8 @@ export default async function BusinessDetailPage({ params }: PageProps) {
   const sameAs = [business.website, ...business.socialLinks.map((link) => link.url)].filter(
     (url): url is string => Boolean(url),
   );
-  const hasAggregateRating = business.rating > 0 && business.reviewCount > 0;
+  const hasAggregateRating = business.ratingsVisible && business.rating > 0 && business.reviewCount > 0;
+  const showBusinessImages = shouldShowBusinessGallery(business.categorySlug);
 
   return (
     <>
@@ -76,7 +78,7 @@ export default async function BusinessDetailPage({ params }: PageProps) {
           name: business.title,
           description: business.shortDescription ?? business.description ?? undefined,
           url: pageUrl,
-          image: business.coverImageUrl ? [absoluteUrl(business.coverImageUrl)] : undefined,
+          image: showBusinessImages && business.coverImageUrl ? [absoluteUrl(business.coverImageUrl)] : undefined,
           telephone: business.phone ?? business.mobile ?? undefined,
           email: business.email ?? undefined,
           priceRange: business.priceRange ?? undefined,

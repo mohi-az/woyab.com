@@ -30,7 +30,22 @@ const providers: NextAuthConfig["providers"] = [
       ]);
       if (limited.some(Boolean)) return null;
 
-      const user = await prisma.user.findUnique({ where: { email } });
+      const user = await prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatarUrl: true,
+          role: true,
+          authVersion: true,
+          active: true,
+          emailVerified: true,
+          passwordHash: true,
+          twoFactorEnabledAt: true,
+          twoFactorSecretEncrypted: true,
+        },
+      });
       if (!user?.passwordHash || !user.active || !user.emailVerified) return null;
       if (!(await compare(parsed.data.password, user.passwordHash))) return null;
 
@@ -141,7 +156,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       });
       if (existingUser && !existingUser.active) return false;
       const googleAvatar = typeof profile.picture === "string" ? profile.picture : undefined;
-      const avatarUrl = existingUser?.avatarUrl?.startsWith("/uploads/avatars/")
+      const hasCustomAvatar = existingUser?.avatarUrl?.startsWith("/uploads/avatars/")
+        || existingUser?.avatarUrl?.startsWith("/api/users/");
+      const avatarUrl = hasCustomAvatar
         ? undefined
         : googleAvatar;
 
@@ -167,10 +184,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
     jwt: async ({ token, user }) => {
+      const authUserSelect = {
+        id: true,
+        email: true,
+        name: true,
+        avatarUrl: true,
+        role: true,
+        authVersion: true,
+        active: true,
+      } as const;
       const databaseUser = user?.email
-        ? await prisma.user.findUnique({ where: { email: user.email.toLowerCase() } })
+        ? await prisma.user.findUnique({ where: { email: user.email.toLowerCase() }, select: authUserSelect })
         : token.sub
-          ? await prisma.user.findUnique({ where: { id: token.sub } })
+          ? await prisma.user.findUnique({ where: { id: token.sub }, select: authUserSelect })
           : null;
 
       if (!databaseUser?.active) {

@@ -18,6 +18,7 @@ export type BusinessCardProps = {
   categoryName?: string | null;
   categorySlug?: string | null;
   categoryIconKey?: string | null;
+  ratingsVisible?: boolean;
   rating?: number | null;
   reviewCount?: number | null;
   location?: string | null;
@@ -45,6 +46,7 @@ export function BusinessCard({
   categoryName,
   categorySlug,
   categoryIconKey,
+  ratingsVisible = true,
   rating,
   reviewCount,
   location,
@@ -134,13 +136,15 @@ export function BusinessCard({
             </p>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-slate-500">
-            <div className="flex items-center gap-2">
-              <CircularRatingStars rating={rating ?? 0} size="xs" />
-              <span className="font-bold text-slate-700">({(rating ?? 0).toFixed(1)})</span>
+          {ratingsVisible ? (
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-slate-500">
+              <div className="flex items-center gap-2">
+                <CircularRatingStars rating={rating ?? 0} size="xs" />
+                <span className="font-bold text-slate-700">({(rating ?? 0).toFixed(1)})</span>
+              </div>
+              <span>{reviewsLabel.replace("{count}", String(reviewCount ?? 0))}</span>
             </div>
-            <span>{reviewsLabel.replace("{count}", String(reviewCount ?? 0))}</span>
-          </div>
+          ) : null}
 
           <div className="flex items-center gap-2 border-t border-slate-100 pt-3 text-sm text-slate-500">
             <FiMapPin className="shrink-0 text-base text-primary" />

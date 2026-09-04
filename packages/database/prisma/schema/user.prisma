@@ -4,6 +4,8 @@ model User {
   email                    String?                 @unique
   name                     String?
   avatarUrl                String?
+  avatarData               Bytes?
+  avatarMimeType           String?
   role                     UserRole                @default(USER)
   active                   Boolean                 @default(true)
   createdAt                DateTime                @default(now())

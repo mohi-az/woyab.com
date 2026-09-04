@@ -1,4 +1,4 @@
-import type { AppLocale, BusinessSearchBody, LocationOrigin } from "@woyab/shared";
+import { shouldShowBusinessRatings, type AppLocale, type BusinessSearchBody, type LocationOrigin } from "@woyab/shared";
 import { cache } from "react";
 
 type CategoryApiItem = {
@@ -33,6 +33,9 @@ type BusinessApiItem = {
     nameDe?: string | null;
     slug: string;
     icon?: string | null;
+  } | null;
+  subCategory?: {
+    slug: string;
   } | null;
   city?: {
     nameFa: string;
@@ -278,6 +281,7 @@ export type LatestBusinessCardItem = {
   categoryName?: string | null;
   categorySlug?: string | null;
   categoryIconKey?: string | null;
+  ratingsVisible: boolean;
   rating?: number | null;
   reviewCount?: number | null;
   location?: string | null;
@@ -314,6 +318,7 @@ export type BusinessDetailData = {
   categoryIconKey?: string | null;
   subCategoryId?: number | null;
   subCategoryName?: string | null;
+  subCategorySlug?: string | null;
   cityId?: number | null;
   location?: string | null;
   address?: string | null;
@@ -333,6 +338,7 @@ export type BusinessDetailData = {
   priceRange?: "BUDGET" | "MODERATE" | "EXPENSIVE" | "LUXURY" | null;
   rating: number;
   reviewCount: number;
+  ratingsVisible: boolean;
   verified: boolean;
   featured: boolean;
   hasOwner: boolean;
@@ -501,6 +507,7 @@ export async function fetchLatestBusinesses(locale: string): Promise<LatestBusin
       categoryName: getLocalizedName(locale, business.category),
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
+      ratingsVisible: shouldShowBusinessRatings(business.category?.slug, business.subCategory?.slug),
       rating: business.googleRating ?? business.averageRating ?? 0,
       reviewCount: business.googleUserRatingCount ?? business.reviewCount ?? 0,
       location: getLocalizedName(locale, business.city),
@@ -565,6 +572,7 @@ export async function fetchBusinessDirectory(
         categoryName: getLocalizedName(locale, business.category),
         categorySlug: business.category?.slug,
         categoryIconKey: business.category?.icon,
+        ratingsVisible: shouldShowBusinessRatings(business.category?.slug, business.subCategory?.slug),
         rating: business.googleRating ?? business.averageRating ?? 0,
         reviewCount: business.googleUserRatingCount ?? business.reviewCount ?? 0,
         location: localizedBusinessLocation(locale, business),
@@ -639,6 +647,7 @@ export async function searchBusinessDirectory(
       categoryName: getLocalizedName(locale, business.category),
       categorySlug: business.category?.slug,
       categoryIconKey: business.category?.icon,
+      ratingsVisible: shouldShowBusinessRatings(business.category?.slug, business.subCategory?.slug),
       rating: business.googleRating ?? business.averageRating ?? 0,
       reviewCount: business.googleUserRatingCount ?? business.reviewCount ?? 0,
       location: localizedBusinessLocation(locale, business),
@@ -685,13 +694,15 @@ export const fetchBusinessBySlug = cache(
 
     const json = (await localizedRes.json()) as BusinessDetailApiResponse;
     const business = json.data;
-    let gallery = (business.images ?? []).map((image) => ({
-      id: image.id,
-      imageUrl: image.imageUrl,
-      caption: image.caption,
-    }));
-
     const isMedicalBusiness = business.category?.slug === "medical";
+    let gallery = isMedicalBusiness
+      ? []
+      : (business.images ?? []).map((image) => ({
+          id: image.id,
+          imageUrl: image.imageUrl,
+          caption: image.caption,
+        }));
+
     const storedGoogleCover = business.coverImageUrl?.startsWith("/media/businesses/google-place-") === true
       || business.coverImageUrl?.startsWith("/uploads/businesses/google-place-") === true;
 
@@ -771,6 +782,7 @@ export const fetchBusinessBySlug = cache(
       categoryIconKey: business.category?.icon,
       subCategoryId: business.subCategory?.id,
       subCategoryName: localizedText(locale, business.subCategory),
+      subCategorySlug: business.subCategory?.slug,
       cityId: business.city?.id,
       location: localizedText(locale, business.city),
       address: business.address,
@@ -793,6 +805,7 @@ export const fetchBusinessBySlug = cache(
       priceRange: business.priceRange,
       rating: business.averageRating ?? 0,
       reviewCount: business.reviewCount ?? 0,
+      ratingsVisible: shouldShowBusinessRatings(business.category?.slug, business.subCategory?.slug),
       verified: Boolean(business.verified),
       featured: booleanFlag(business.featured),
       hasOwner: Boolean(business.hasOwner),

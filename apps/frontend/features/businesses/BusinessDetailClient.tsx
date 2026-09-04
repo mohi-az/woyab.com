@@ -35,6 +35,7 @@ import { BusinessLocationMap } from "@/components/business/BusinessLocationMap";
 import { BusinessPhotoGallery } from "@/components/business/BusinessPhotoGallery";
 import { FavoriteButton } from "@/components/business/FavoriteButton";
 import { CircularRatingInput, CircularRatingStars } from "@/components/ui/CircularRatingStars";
+import { shouldShowBusinessGallery } from "@woyab/shared";
 
 type Props = {
   business: BusinessDetailData;
@@ -314,7 +315,8 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     });
   }, [business.id]);
 
-  const activeImage = gallery[0];
+  const galleryVisible = shouldShowBusinessGallery(business.categorySlug);
+  const activeImage = galleryVisible ? gallery[0] : undefined;
   const heroImageUrl = activeImage?.imageUrl ?? business.coverImageUrl;
 
   async function submitReview(event: React.FormEvent<HTMLFormElement>) {
@@ -549,7 +551,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               ) : null}
 
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-slate-200">
-                {business.reviewCount > 0 ? (
+                {business.ratingsVisible && business.reviewCount > 0 ? (
                   <>
                     <div className="flex items-center gap-3">
                       <CircularRatingStars rating={business.rating} size="sm" />
@@ -558,7 +560,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                     <span>{t("woyabReviewsCount", { count: business.reviewCount })}</span>
                   </>
                 ) : null}
-                {business.googleRating !== null && business.googleRating !== undefined ? (
+                {business.ratingsVisible && business.googleRating !== null && business.googleRating !== undefined ? (
                   <div className="flex items-center gap-3">
                     <CircularRatingStars rating={business.googleRating} size="sm" />
                     <span className="font-bold">{business.googleRating.toFixed(1)} {t("googleRating")}</span>
@@ -600,25 +602,27 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
 
       <div className="mx-auto grid max-w-[1480px] gap-8 px-4 pt-8 sm:px-6 xl:grid-cols-[minmax(0,1.6fr)_360px]">
         <div className="contents md:block md:space-y-8">
-          <section className="overflow-hidden rounded-[30px] bg-white shadow-[0_20px_60px_rgba(15,23,42,.08)]">
-            <div className="relative aspect-[16/9] bg-slate-100">
-              {activeImage ? (
-                <img src={activeImage.imageUrl} alt={activeImage.caption || business.title} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center text-sm font-bold text-slate-500">{business.title}</div>
-              )}
-              {gallery.length ? (
-                <button
-                  type="button"
-                  onClick={() => setGalleryOpen(true)}
-                  className="absolute bottom-3 end-3 z-10 inline-flex min-h-11 max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-xl bg-white px-4 text-sm font-black text-slate-950 shadow-[0_10px_30px_rgba(15,23,42,.35)] ring-1 ring-black/10 transition hover:bg-slate-100 sm:bottom-5 sm:end-5"
-                >
-                  <FiGrid className="shrink-0 text-primary" />
-                  <span className="truncate">{t("gallery.showAll", { count: gallery.length })}</span>
-                </button>
-              ) : null}
-            </div>
-          </section>
+          {galleryVisible ? (
+            <section className="overflow-hidden rounded-[30px] bg-white shadow-[0_20px_60px_rgba(15,23,42,.08)]">
+              <div className="relative aspect-[16/9] bg-slate-100">
+                {activeImage ? (
+                  <img src={activeImage.imageUrl} alt={activeImage.caption || business.title} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm font-bold text-slate-500">{business.title}</div>
+                )}
+                {gallery.length ? (
+                  <button
+                    type="button"
+                    onClick={() => setGalleryOpen(true)}
+                    className="absolute bottom-3 end-3 z-10 inline-flex min-h-11 max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-xl bg-white px-4 text-sm font-black text-slate-950 shadow-[0_10px_30px_rgba(15,23,42,.35)] ring-1 ring-black/10 transition hover:bg-slate-100 sm:bottom-5 sm:end-5"
+                  >
+                    <FiGrid className="shrink-0 text-primary" />
+                    <span className="truncate">{t("gallery.showAll", { count: gallery.length })}</span>
+                  </button>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
 
           <section className="rounded-[30px] bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,.06)] sm:p-8">
             <h2 className="text-2xl font-black text-slate-950">{t("overviewTitle")}</h2>
@@ -708,7 +712,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                           <p className="text-sm text-slate-500">{formatReviewDate(review.createdAt, locale)}</p>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
-                          <CircularRatingStars rating={review.rating} size="sm" />
+                          {business.ratingsVisible ? <CircularRatingStars rating={review.rating} size="sm" /> : null}
                           <DirectoryReportButton
                             targetType="review"
                             targetId={review.id}
@@ -786,7 +790,8 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
               )}
             </div>
 
-            <div className="mt-8 rounded-[28px] border border-slate-100 bg-[#fcfbfa] p-5 sm:p-6">
+            {business.ratingsVisible ? (
+              <div className="mt-8 rounded-[28px] border border-slate-100 bg-[#fcfbfa] p-5 sm:p-6">
               <div className="flex items-center gap-3">
                 <FiMessageSquare className="text-xl text-primary" />
                 <h3 className="text-xl font-black text-slate-950">{t("reviewsForm.title")}</h3>
@@ -838,7 +843,8 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
                   </Link>
                 </div>
               )}
-            </div>
+              </div>
+            ) : null}
           </section>
         </div>
 
@@ -1022,20 +1028,22 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
           </section>
         </aside>
       </div>
-      <BusinessPhotoGallery
-        images={gallery}
-        businessTitle={business.title}
-        open={galleryOpen}
-        rtl={locale === "fa"}
-        onClose={() => setGalleryOpen(false)}
-        labels={{
-          title: t("gallery.title", { count: gallery.length }),
-          close: t("gallery.close"),
-          previous: t("gallery.previous"),
-          next: t("gallery.next"),
-          back: t("gallery.back"),
-        }}
-      />
+      {galleryVisible && gallery.length ? (
+        <BusinessPhotoGallery
+          images={gallery}
+          businessTitle={business.title}
+          open={galleryOpen}
+          rtl={locale === "fa"}
+          onClose={() => setGalleryOpen(false)}
+          labels={{
+            title: t("gallery.title", { count: gallery.length }),
+            close: t("gallery.close"),
+            previous: t("gallery.previous"),
+            next: t("gallery.next"),
+            back: t("gallery.back"),
+          }}
+        />
+      ) : null}
     </div>
   );
 }

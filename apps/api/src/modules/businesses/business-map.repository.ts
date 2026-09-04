@@ -1,5 +1,5 @@
 import { Prisma } from "@woyab/database";
-import type { BusinessMapBody } from "@woyab/shared";
+import { shouldShowBusinessRatings, type BusinessMapBody } from "@woyab/shared";
 
 import { prisma } from "../../lib/prisma.js";
 import { appLocaleToContentLocale } from "./business-localization.js";
@@ -22,6 +22,7 @@ type BusinessMapRow = {
   categoryNameEn: string;
   categoryNameDe: string | null;
   categorySlug: string;
+  subCategorySlug: string | null;
   categoryIcon: string | null;
   cityNameFa: string | null;
   cityNameEn: string | null;
@@ -153,6 +154,7 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
       COALESCE(b."googleUserRatingCount", b."reviewCount") AS "reviewCount",
       category."nameFa" AS "categoryNameFa", category."nameEn" AS "categoryNameEn", category."nameDe" AS "categoryNameDe",
       category."slug" AS "categorySlug", category."icon" AS "categoryIcon",
+      sub_category."slug" AS "subCategorySlug",
       city."nameFa" AS "cityNameFa", city."nameEn" AS "cityNameEn",
       ${distance} AS "distanceMeters"
     FROM "business_locations" bl
@@ -198,6 +200,8 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
         categoryNameEn: row.categoryNameEn,
         categoryNameDe: row.categoryNameDe,
         categorySlug: row.categorySlug,
+        subCategorySlug: row.subCategorySlug,
+        ratingsVisible: shouldShowBusinessRatings(row.categorySlug, row.subCategorySlug),
         categoryIcon: row.categoryIcon,
         mapIcon: mapIconByCategory[row.categoryIcon ?? ""] ?? mapIconByCategory[row.categorySlug] ?? "marker",
         mapGlyph: mapGlyphByCategorySlug[row.categorySlug] ?? null,

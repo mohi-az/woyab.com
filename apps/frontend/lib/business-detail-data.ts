@@ -1,5 +1,6 @@
 import "server-only";
 
+import { shouldShowBusinessRatings } from "@woyab/shared";
 import { cache } from "react";
 import type { AppLocale } from "@/i18n/config";
 import type { BusinessDetailData, BusinessReviewItem } from "@/lib/api";
@@ -46,7 +47,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       },
       include: {
         category: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
-        subCategory: { select: { id: true, nameFa: true, nameEn: true, nameDe: true } },
+        subCategory: { select: { id: true, nameFa: true, nameEn: true, nameDe: true, slug: true } },
         city: { select: { id: true, nameFa: true, nameEn: true } },
         businessHours: { orderBy: { dayOfWeek: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
@@ -81,13 +82,15 @@ export const fetchBusinessDetailFromDatabase = cache(
       if (activeLocale === "de") return tag.nameDe || tag.nameEn || tag.nameFa;
       return tag.nameEn || tag.nameDe || tag.nameFa;
     };
-    const gallery: BusinessDetailData["gallery"] = business.images.map((image) => ({
-      id: image.id,
-      imageUrl: image.imageUrl,
-      caption: image.caption,
-    }));
-
     const isMedicalBusiness = business.category.slug === "medical";
+    const gallery: BusinessDetailData["gallery"] = isMedicalBusiness
+      ? []
+      : business.images.map((image) => ({
+          id: image.id,
+          imageUrl: image.imageUrl,
+          caption: image.caption,
+        }));
+
     const storedGoogleCover = Boolean(business.coverImageUrl && isStoredGoogleCoverUrl(business.coverImageUrl));
     if (!isMedicalBusiness && business.coverImageUrl && !gallery.some((image) => image.imageUrl === business.coverImageUrl)) {
       gallery.unshift({
@@ -156,6 +159,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       categoryIconKey: business.category.icon,
       subCategoryId: business.subCategory?.id,
       subCategoryName: localizedName(business.subCategory),
+      subCategorySlug: business.subCategory?.slug,
       cityId: business.city.id,
       location: localizedName(business.city),
       address: business.address,
@@ -178,6 +182,7 @@ export const fetchBusinessDetailFromDatabase = cache(
       priceRange: business.priceRange,
       rating: business.averageRating,
       reviewCount: business.reviewCount,
+      ratingsVisible: shouldShowBusinessRatings(business.category.slug, business.subCategory?.slug),
       verified: business.verified,
       featured: business.featured,
       hasOwner: Boolean(business.ownerId),

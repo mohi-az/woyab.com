@@ -6,3 +6,4 @@ export * from "./validators/location.js";
 export * from "./validators/auth.js";
 export * from "./validators/business-management.js";
 export * from "./business-claim-policy.js";
+export * from "./business-visibility.js";

@@ -26,6 +26,8 @@ type MapProperties = {
   categoryNameEn: string;
   categoryNameDe: string | null;
   categorySlug: string;
+  subCategorySlug?: string | null;
+  ratingsVisible: boolean;
   categoryIcon?: string | null;
   mapIcon: string;
   cityNameFa?: string | null;
@@ -123,7 +125,9 @@ function businessCardElement(feature: Feature<Point, MapProperties>, locale: Pro
     actions.append(directionsLink);
   }
 
-  body.append(title, meta, rating, actions);
+  body.append(title, meta);
+  if (properties.ratingsVisible) body.append(rating);
+  body.append(actions);
   card.append(body);
   return card;
 }

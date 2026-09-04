@@ -1,5 +1,6 @@
 import "server-only";
 
+import { shouldShowBusinessRatings } from "@woyab/shared";
 import type { AppLocale } from "@/i18n/config";
 import { localizeBusinessContent } from "@/lib/business-localization";
 import { prisma } from "@/lib/prisma";
@@ -78,6 +79,7 @@ export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
         googleUserRatingCount: true,
         featured: true,
         category: { select: { nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
+        subCategory: { select: { slug: true } },
         city: { select: { nameFa: true, nameEn: true } },
         businessHours: {
           orderBy: { dayOfWeek: "asc" },
@@ -128,6 +130,7 @@ export async function fetchHomeData(locale: AppLocale): Promise<HomeData> {
         categoryName: localizedName(business.category),
         categorySlug: business.category.slug,
         categoryIconKey: business.category.icon,
+        ratingsVisible: shouldShowBusinessRatings(business.category.slug, business.subCategory?.slug),
         rating: business.googleRating ?? business.averageRating,
         reviewCount: business.googleUserRatingCount ?? business.reviewCount,
         location: localizedName(business.city),

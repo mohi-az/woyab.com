@@ -91,7 +91,9 @@ test("admin editing persists galleries and business details merge Google photos 
   assert.match(detailData, /isStoredGoogleCoverUrl/);
   assert.match(detailData, /google-photo-thumbnail\?maxWidth=1600/);
   assert.match(detailData, /\/google-photos\/\$\{photo\.photoReference/);
-  assert.match(detailData, /if \(business\.googlePlaceId\)/);
+  assert.match(detailData, /if \(!isMedicalBusiness && business\.googlePlaceId\)/);
+  assert.match(detailData, /const gallery:[\s\S]*isMedicalBusiness[\s\S]*\? \[\]/);
+  assert.match(detailClient, /galleryVisible \? \(/);
   assert.doesNotMatch(detailData, /gallery\.length === 0 && business\.googlePlaceId/);
   assert.match(detailData, /storedGoogleCover && index === 0/);
   assert.match(detailData, /fetchInternalApiJson<GooglePhotoList>/);
