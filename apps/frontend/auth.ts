@@ -195,6 +195,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     session: ({ session, token }) => {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        // The JWT callback keeps the current avatar in `picture`. Copy it to
+        // the public session as well so client components (including Navbar)
+        // can render the logged-in user's avatar.
+        session.user.image = token.picture ?? null;
         session.user.role = token.role ?? "USER";
         session.user.invalid = token.invalid;
         session.user.twoFactorVerified = token.twoFactorVerified;
