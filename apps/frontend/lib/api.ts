@@ -691,12 +691,13 @@ export const fetchBusinessBySlug = cache(
       caption: image.caption,
     }));
 
+    const isMedicalBusiness = business.category?.slug === "medical";
     const storedGoogleCover = business.coverImageUrl?.startsWith("/media/businesses/google-place-") === true
       || business.coverImageUrl?.startsWith("/uploads/businesses/google-place-") === true;
 
     // A manually managed gallery always wins. For Google-sourced businesses,
     // the permanent local cover is first and the remaining photos stay on-demand.
-    if (business.googlePlaceId && gallery.length === 0 && (!business.coverImageUrl || storedGoogleCover)) {
+    if (!isMedicalBusiness && business.googlePlaceId && gallery.length === 0 && (!business.coverImageUrl || storedGoogleCover)) {
       try {
         const googlePhotosRes = await fetch(
           `${API_BASE}/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
@@ -742,7 +743,7 @@ export const fetchBusinessBySlug = cache(
       }
     }
 
-    if (gallery.length === 0 && business.coverImageUrl) {
+    if (!isMedicalBusiness && gallery.length === 0 && business.coverImageUrl) {
       gallery.push({
         id: `${business.id}-cover`,
         imageUrl: business.coverImageUrl,

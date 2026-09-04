@@ -421,6 +421,12 @@ export async function updateBusinessDetails(formData: FormData) {
     throw new Error("Please check the required business fields.");
   }
   const taxonomy = await validateBusinessTaxonomy(categoryId, subCategoryId);
+  const selectedCategory = await prisma.category.findUnique({ where: { id: categoryId }, select: { slug: true } });
+  const specialtyCover = selectedCategory?.slug === "medical"
+    ? (taxonomy.subCategoryId
+      ? (await prisma.subCategory.findUnique({ where: { id: taxonomy.subCategoryId }, select: { image: true } }))?.image
+      : null) ?? "/images/medical/medical-default-cover.png"
+    : null;
 
   if (ownerId) {
     const owner = await prisma.user.findUnique({ where: { id: ownerId }, select: { id: true, active: true } });
@@ -443,7 +449,7 @@ export async function updateBusinessDetails(formData: FormData) {
   const googlePhotoReference = nullableValue(formData, "googlePhotoReference")
     ?? (currentBusiness.googlePlaceId === googlePlaceId ? currentBusiness.googleCoverPhotoReference : null);
   const requestedCoverImageUrl = nullableValue(formData, "coverImageUrl") ?? imageUrls[0] ?? null;
-  const coverImageUrl = imageMode === "manual"
+  const resolvedCoverImageUrl = imageMode === "manual"
     ? requestedCoverImageUrl
     : googlePlaceId && googlePhotoReference
       ? googleBusinessCoverUrl(businessId, googlePhotoReference)
@@ -455,7 +461,8 @@ export async function updateBusinessDetails(formData: FormData) {
           refreshGoogleCover: currentBusiness.googlePlaceId !== googlePlaceId,
           useGoogleWhenMissing: true,
         });
-  const persistedGooglePhotoReference = imageMode === "google" && googlePlaceId && googlePhotoReference && coverImageUrl
+  const coverImageUrl = specialtyCover ?? resolvedCoverImageUrl;
+  const persistedGooglePhotoReference = !specialtyCover && imageMode === "google" && googlePlaceId && googlePhotoReference && coverImageUrl
     ? googlePhotoReference
     : null;
 
@@ -535,7 +542,7 @@ export async function updateBusinessDetails(formData: FormData) {
     await syncBusinessTags(tx, businessId, formData);
     await syncBusinessHours(tx, businessId, formData);
     await tx.businessImage.deleteMany({ where: { businessId } });
-    if (imageMode === "manual" && imageUrls.length > 0) {
+    if (!specialtyCover && imageMode === "manual" && imageUrls.length > 0) {
       await tx.businessImage.createMany({
         data: imageUrls.map((imageUrl, sortOrder) => ({ businessId, imageUrl, sortOrder })),
       });
@@ -619,6 +626,13 @@ export async function createBusinessDetails(formData: FormData) {
       if (locked[0]?.status !== "READY") throw new Error("The AI draft has already been used or is no longer ready.");
     }
     const taxonomy = await resolveCreateTaxonomy(tx, formData, aiDraft?.proposal ?? null);
+    const selectedCategory = await tx.category.findUnique({ where: { id: taxonomy.categoryId }, select: { slug: true } });
+    const specialtyCover = selectedCategory?.slug === "medical"
+      ? (taxonomy.subCategoryId
+        ? (await tx.subCategory.findUnique({ where: { id: taxonomy.subCategoryId }, select: { image: true } }))?.image
+        : null) ?? "/images/medical/medical-default-cover.png"
+      : null;
+    const finalCoverImageUrl = specialtyCover ?? coverImageUrl;
     const created = await tx.business.create({
       data: {
         slug,
@@ -640,13 +654,13 @@ export async function createBusinessDetails(formData: FormData) {
         address: nullableValue(formData, "address"),
         postalCode: contact.postalCode,
         googlePlaceId,
-        googleCoverPhotoReference: imageMode === "google" && googlePlaceId && coverImageUrl ? googlePhotoReference : null,
+        googleCoverPhotoReference: !specialtyCover && imageMode === "google" && googlePlaceId && finalCoverImageUrl ? googlePhotoReference : null,
         googleRating: googlePlaceId ? googleRatings.googleRating : null,
         googleUserRatingCount: googlePlaceId ? googleRatings.googleUserRatingCount : null,
         googleRatingUpdatedAt: googlePlaceId && (googleRatings.googleRating !== null || googleRatings.googleUserRatingCount !== null)
           ? new Date()
           : null,
-        coverImageUrl,
+        coverImageUrl: finalCoverImageUrl,
         email: contact.email,
         phone: contact.phone,
         mobile: contact.mobile,
@@ -662,7 +676,7 @@ export async function createBusinessDetails(formData: FormData) {
         businessHours: {
           create: businessHoursCreateData(formData),
         },
-        images: imageMode === "manual" && imageUrls.length > 0 ? {
+        images: !specialtyCover && imageMode === "manual" && imageUrls.length > 0 ? {
           create: imageUrls.map((imageUrl, sortOrder) => ({ imageUrl, sortOrder })),
         } : undefined,
         translations: {

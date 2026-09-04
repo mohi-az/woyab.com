@@ -175,7 +175,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
   }, [mobileHoursOpen]);
 
   useEffect(() => {
-    if (!business.googlePlaceId) return;
+    if (!business.googlePlaceId || business.categorySlug === "medical") return;
     const controller = new AbortController();
 
     void fetch(`/api/businesses/${encodeURIComponent(business.id)}/google-photos`, {
@@ -224,7 +224,7 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     }).catch(() => undefined);
 
     return () => controller.abort();
-  }, [business.coverImageUrl, business.googleCoverPhotoReference, business.googlePlaceId, business.id, business.title]);
+  }, [business.categorySlug, business.coverImageUrl, business.googleCoverPhotoReference, business.googlePlaceId, business.id, business.title]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);

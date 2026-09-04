@@ -87,8 +87,9 @@ export const fetchBusinessDetailFromDatabase = cache(
       caption: image.caption,
     }));
 
+    const isMedicalBusiness = business.category.slug === "medical";
     const storedGoogleCover = Boolean(business.coverImageUrl && isStoredGoogleCoverUrl(business.coverImageUrl));
-    if (business.coverImageUrl && !gallery.some((image) => image.imageUrl === business.coverImageUrl)) {
+    if (!isMedicalBusiness && business.coverImageUrl && !gallery.some((image) => image.imageUrl === business.coverImageUrl)) {
       gallery.unshift({
         id: `${business.id}-cover`,
         imageUrl: business.coverImageUrl,
@@ -98,7 +99,7 @@ export const fetchBusinessDetailFromDatabase = cache(
 
     // A persisted cover or a manually uploaded image must not suppress the rest
     // of the Google gallery. Merge both sources and keep the stored cover first.
-    if (business.googlePlaceId) {
+    if (!isMedicalBusiness && business.googlePlaceId) {
       try {
         const result = await fetchInternalApiJson<GooglePhotoList>(
           `/v1/businesses/${encodeURIComponent(business.id)}/google-photos`,
