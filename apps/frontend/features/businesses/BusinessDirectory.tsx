@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { applyDirectoryDefaults, directoryRouteQuery, filtersFromSearchParams, filtersQuery, matchesDirectoryScope, type DirectoryRoute } from "@/lib/directory-route-filters";
 import {
   FiChevronDown,
   FiChevronLeft,
@@ -74,6 +76,7 @@ type Props = {
   tags: DirectoryFilterOption[];
   cities: DirectoryFilterOption[];
   labels: Labels;
+  route?: DirectoryRoute;
 };
 
 function visiblePages(current: number, total: number) {
@@ -81,43 +84,6 @@ function visiblePages(current: number, total: number) {
   return [...pages].filter((page) => page > 0 && page <= total).sort((a, b) => a - b);
 }
 
-type SearchParamsReader = Pick<URLSearchParams, "get" | "getAll">;
-
-function positiveIntParam(value: string | null) {
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
-}
-
-function filtersFromSearchParams(params: SearchParamsReader, limit: number): BusinessDirectoryFilters {
-  const sortBy = params.get("sortBy");
-  return {
-    page: positiveIntParam(params.get("page")) ?? 1,
-    limit,
-    search: params.get("search")?.trim() || undefined,
-    categoryId: positiveIntParam(params.get("categoryId")),
-    subCategoryId: positiveIntParam(params.get("subCategoryId")),
-    tagIds: [...new Set(params.getAll("tagIds").flatMap((value) => value.split(","))
-      .map(Number).filter((value) => Number.isInteger(value) && value > 0))],
-    cityId: positiveIntParam(params.get("cityId")),
-    sortBy: sortBy === "latest" || sortBy === "oldest" || sortBy === "popular" ? sortBy : "popular",
-    favoritesOnly: params.get("favoritesOnly") === "true" || undefined,
-    openNow: params.get("openNow") === "true" || undefined,
-  };
-}
-
-function filtersQuery(filters: BusinessDirectoryFilters) {
-  const params = new URLSearchParams();
-  if (filters.search) params.set("search", filters.search);
-  if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
-  if (filters.subCategoryId) params.set("subCategoryId", String(filters.subCategoryId));
-  for (const tagId of filters.tagIds ?? []) params.append("tagIds", String(tagId));
-  if (filters.cityId) params.set("cityId", String(filters.cityId));
-  if (filters.sortBy && filters.sortBy !== "popular") params.set("sortBy", filters.sortBy);
-  if (filters.favoritesOnly) params.set("favoritesOnly", "true");
-  if (filters.openNow) params.set("openNow", "true");
-  if (filters.page > 1) params.set("page", String(filters.page));
-  return params.toString();
-}
 
 export function BusinessDirectory({
   locale,
@@ -128,12 +94,13 @@ export function BusinessDirectory({
   tags,
   cities,
   labels,
+  route,
 }: Props) {
   const searchParams = useSearchParams();
   const searchParamsKey = searchParams.toString();
   const urlFilters = useMemo(
-    () => filtersFromSearchParams(new URLSearchParams(searchParamsKey), initialFilters.limit),
-    [initialFilters.limit, searchParamsKey],
+    () => applyDirectoryDefaults(filtersFromSearchParams(new URLSearchParams(searchParamsKey), initialFilters.limit), new URLSearchParams(searchParamsKey), route?.defaults),
+    [initialFilters.limit, searchParamsKey, route?.defaults],
   );
   const urlFiltersKey = filtersQuery(urlFilters);
   const [filters, setFilters] = useState(initialFilters);
@@ -309,10 +276,11 @@ export function BusinessDirectory({
   useEffect(() => {
     const query = filtersQuery(filters);
     if (query === urlFiltersKey || locallyWrittenQueryRef.current !== query) return;
-    const path = `/${locale}/businesses`;
-    window.history.replaceState(null, "", query ? `${path}?${query}` : path);
+    const path = `/${locale}${route?.pathname ?? "/businesses"}`;
+    const routeQuery = directoryRouteQuery(query, filters, route?.defaults);
+    window.history.replaceState(null, "", routeQuery ? `${path}?${routeQuery}` : path);
     locallyWrittenQueryRef.current = null;
-  }, [filters, locale, urlFiltersKey]);
+  }, [filters, locale, urlFiltersKey, route]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -343,6 +311,12 @@ export function BusinessDirectory({
   }, [filters, labels.error, locale, location, openNowRefreshKey, radiusKm, retryCount]);
 
   const currentPage = directory.totalPages > 0 ? Math.min(directory.page, directory.totalPages) : 1;
+  const scopedTitle = route && !location && matchesDirectoryScope(filters, route.defaults);
+  const pageHref = (page: number) => {
+    const next = { ...filters, page };
+    const query = directoryRouteQuery(filtersQuery(next), next, route?.defaults);
+    return `${route?.pathname ?? "/businesses"}${query ? `?${query}` : ""}`;
+  };
   const pages = visiblePages(currentPage, directory.totalPages);
   const numberFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const activeFilterCount = [
@@ -370,7 +344,8 @@ export function BusinessDirectory({
         <div className="min-w-0 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 xl:px-12">
           <header className="mb-7">
             <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-primary">{labels.eyebrow}</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{labels.title}</h1>
+            <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{scopedTitle ? route.title : labels.title}</h1>
+            {scopedTitle && <p className="mt-3 text-sm leading-7 text-slate-600">{route.description}</p>}
           </header>
 
           <div className="relative z-30 mb-7 border-b border-slate-200 pb-5">
@@ -626,6 +601,14 @@ export function BusinessDirectory({
           </div>
 
           {directory.totalPages > 1 ? (
+            route && !location ? <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label={labels.pagination.label}>
+              {currentPage > 1 && <Link href={pageHref(currentPage - 1)} aria-label={labels.pagination.previous} className="inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 px-3"><FiChevronLeft /></Link>}
+              {pages.map((page, index) => <span key={page} className="contents">
+                {index > 0 && page - pages[index - 1] > 1 && <span className="px-1 text-gray-400">&hellip;</span>}
+                <Link href={pageHref(page)} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}>{page}</Link>
+              </span>)}
+              {currentPage < directory.totalPages && <Link href={pageHref(currentPage + 1)} aria-label={labels.pagination.next} className="inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 px-3"><FiChevronRight /></Link>}
+            </nav> :
             <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label={labels.pagination.label}>
               <PageButton disabled={currentPage <= 1} label={labels.pagination.previous} onClick={() => updateFilters((current) => ({ ...current, page: currentPage - 1 }))}><FiChevronLeft /></PageButton>
               {pages.map((page, index) => (

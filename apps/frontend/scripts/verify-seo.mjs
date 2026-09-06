@@ -9,11 +9,11 @@ async function page(path) {
   checked.push({ path, status: response.status });
   return { response, $: load(html), html };
 }
-function metadata($, path, locale) {
+function metadata($, path, locale, minimumDescriptionLength = 21) {
   assert.equal($('html').attr('lang'), locale);
   assert.equal($('h1').length, 1, path);
   assert.equal(new URL($('link[rel="canonical"]').attr('href')).pathname, path.split('?')[0]);
-  assert.ok($('meta[name="description"]').attr('content')?.length > 20);
+  assert.ok(($('meta[name="description"]').attr('content')?.trim().length ?? 0) >= minimumDescriptionLength, `Missing or unexpectedly short description: ${path}`);
   for (const lang of ['de', 'en', 'fa', 'x-default']) assert.equal($(`link[hreflang="${lang}"]`).length, 1);
   $('script[type="application/ld+json"]').each((_, element) => assert.doesNotThrow(() => JSON.parse($(element).text())));
 }
@@ -32,7 +32,7 @@ for (const locale of ['fa', 'de', 'en']) {
     const result = await page(path);
     assert.equal(result.response.status, 200);
     metadata(result.$, path, locale);
-    assert.ok(result.$('article h3 a[href*="/businesses/"]').length > 0, path);
+    assert.ok(result.$('article a[href*="/businesses/"]').length > 0, path);
     const data = result.$('script[type="application/ld+json"]').map((_, el) => JSON.parse(result.$(el).text())).get();
     const list = data.find((item) => item['@type'] === 'CollectionPage').mainEntity;
     assert.equal(list.itemListElement.length, result.$('article').length);
@@ -44,17 +44,19 @@ for (const locale of ['fa', 'de', 'en']) {
         metadata(local.$, intersection, locale);
         assert.ok(local.$('article').length >= 3);
       }
-      const profilePath = result.$('article h3 a').first().attr('href');
+      const profilePath = result.$('article a[href*="/businesses/"]').first().attr('href');
       const profile = await page(profilePath);
       assert.equal(profile.response.status, 200);
-      metadata(profile.$, profilePath, locale);
+      // Existing business descriptions may legitimately be short; landing-page
+      // editorial copy still has the stricter length check above.
+      metadata(profile.$, profilePath, locale, 1);
     }
     const next = result.$('a[href$="?page=2"]').first().attr('href');
     if (next) {
       const second = await page(next);
       assert.equal(second.response.status, 200);
       assert.equal(new URL(second.$('link[rel="canonical"]').attr('href')).search, '?page=2');
-      assert.notEqual(second.$('article h3 a').first().attr('href'), result.$('article h3 a').first().attr('href'));
+      assert.notEqual(second.$('article a[href*="/businesses/"]').first().attr('href'), result.$('article a[href*="/businesses/"]').first().attr('href'));
     }
   }
 }

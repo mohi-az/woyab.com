@@ -51,7 +51,7 @@ export const getDirectoryTopics = cache(async (): Promise<DirectoryTopic[]> => {
   return topics;
 });
 
-export const DIRECTORY_PAGE_SIZE = 18;
+export const DIRECTORY_PAGE_SIZE = 9;
 
 export const getDirectoryListings = cache(async (path: string, page: number) => {
   const topics = await getDirectoryTopics();
@@ -64,9 +64,12 @@ export const getDirectoryListings = cache(async (path: string, page: number) => 
     select: {
       id: true, slug: true, businessName: true, sourceLocale: true, shortDescription: true,
       address: true, postalCode: true, phone: true, mobile: true,
+      coverImageUrl: true, googlePlaceId: true, featured: true,
+      averageRating: true, reviewCount: true, googleRating: true, googleUserRatingCount: true,
+      businessHours: { select: { dayOfWeek: true, openTime: true, closeTime: true, isClosed: true } },
       city: { select: { nameFa: true, nameEn: true } },
-      category: { select: { nameFa: true, nameEn: true, nameDe: true } },
-      subCategory: { select: { nameFa: true, nameEn: true, nameDe: true } },
+      category: { select: { nameFa: true, nameEn: true, nameDe: true, slug: true, icon: true } },
+      subCategory: { select: { nameFa: true, nameEn: true, nameDe: true, slug: true } },
       translations: { select: { locale: true, businessName: true, shortDescription: true, description: true } },
     },
   });

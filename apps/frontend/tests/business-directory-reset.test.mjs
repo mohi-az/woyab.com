@@ -6,7 +6,10 @@ const directoryPath = new URL("../features/businesses/BusinessDirectory.tsx", im
 const filtersPath = new URL("../components/business/BusinessFilters.tsx", import.meta.url);
 
 test("clear filters removes filter criteria while preserving the current search area", async () => {
-  const source = await readFile(directoryPath, "utf8");
+  const source = (await Promise.all([
+    readFile(directoryPath, "utf8"),
+    readFile(new URL("../lib/directory-route-filters.ts", import.meta.url), "utf8"),
+  ])).join("\n");
 
   assert.doesNotMatch(source, /baseFilters/);
   assert.match(source, /updateFilters\(\(current\) => \(\{/);
