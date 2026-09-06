@@ -9,9 +9,18 @@ export default async function CategoriesSection({ counts }: Props) {
 
   return (
     <section className="relative overflow-hidden bg-[#f8f5f1] pb-18 pt-10 lg:pb-24 lg:pt-14">
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -bottom-36 -left-28 h-96 w-96 rounded-full border-[62px] border-primary/5" />
         <div className="absolute -right-20 top-14 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+        <div className="latest-shape-dots latest-shape-float-reverse absolute start-[3%] top-16 h-24 w-24 opacity-45 sm:h-28 sm:w-28" />
+        <div className="latest-shape-float absolute end-[5%] top-24 hidden h-16 w-16 sm:block">
+          <div className="h-full w-full rotate-[28deg] rounded-[18px] border-[6px] border-amber-200/50 bg-amber-50/35" />
+        </div>
+        <div className="latest-shape-orbit absolute -end-10 bottom-16 h-28 w-28 opacity-80 sm:h-36 sm:w-36">
+          <div className="h-full w-full rotate-12 bg-primary/7 [clip-path:polygon(50%_0%,100%_100%,0%_100%)]" />
+        </div>
+        <div className="latest-shape-pulse absolute bottom-[12%] start-[19%] h-4 w-4 rounded-full bg-sky-300/40 ring-8 ring-sky-100/55" />
+        <div className="latest-shape-float-reverse absolute bottom-12 end-[22%] hidden h-7 w-7 rounded-lg border-4 border-teal-300/30 sm:block" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 xl:w-[80%] xl:max-w-none">
