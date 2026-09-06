@@ -33,14 +33,20 @@ function directorySort(value: string | undefined): BusinessDirectoryFilters["sor
   return value === "latest" || value === "oldest" || value === "popular" ? value : "popular";
 }
 
-export async function generateMetadata() {
+export async function generateMetadata({ searchParams }: PageProps) {
+  const params = await searchParams;
   const [locale, t] = await Promise.all([getLocale(), getTranslations("Businesses")]);
-  return publicMetadata({
+  const metadata = publicMetadata({
     locale: toAppLocale(locale),
     pathname: "/businesses",
     title: t("title"),
     description: t("description"),
   });
+  // Curated /directory pages handle local search discovery; arbitrary search,
+  // map, sorting and personal filters should not create indexable duplicates.
+  return Object.keys(params).length
+    ? { ...metadata, robots: { index: false, follow: true } }
+    : metadata;
 }
 
 export default async function BusinessesPage({ searchParams }: PageProps) {

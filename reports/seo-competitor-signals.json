@@ -1,0 +1,359 @@
+{
+  "checkedAt": "2026-09-06T11:36:04.979Z",
+  "results": [
+    {
+      "url": "https://mineed.net/",
+      "finalUrl": "https://mineed.net/",
+      "status": 200,
+      "title": "نیازمندی های فارسی زبانان آلمان",
+      "description": "می نید یه مرجع معتبر برای ثبت آگهی و نیازمندی های فارسی زبانان خارج کشوره و به خصوص آلمانه. ما اینجاییم تا کمک کنیم جمعیت مهاجر فارسی زبان راحت تر بتونن همدیگه رو پیدا کنن و از تخصص های هم با خبر بشن. مشاغل خدماتی و فنی ، پزشک ها و متخصصین فارسی زبان ، خرید و فروش وسایل شخصی و خصوصی ، حمل مدارک",
+      "robots": "index, follow",
+      "lang": "fa-ir",
+      "h1": [],
+      "h2": [],
+      "alternates": [],
+      "structuredDataTypes": []
+    },
+    {
+      "url": "https://risman.de/",
+      "finalUrl": "https://risman.de/",
+      "status": 200,
+      "title": "ریسمان | Risman - نیازمندیهای فارسی زبانان مقیم آلمان",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "canonical": "https://risman.de/blog-2/",
+      "lang": "fa-IR",
+      "h1": [],
+      "h2": [
+        "×",
+        "برای ارسال آگهی باید وارد سایت شوید",
+        "ورود",
+        "ثبت نام",
+        "آخرین آگهی‌ها",
+        "کیوسک تک-کلن",
+        "Rosmori Restaurant & Catering",
+        "علیرضا عبداللهی – مترجم رسمی دادگستری در آلمان",
+        "تدریس ریاضی و فیزیک در آلمان",
+        "رستوران تک در دوسلدورف",
+        "فروش وی پی ان ایرانی برای اتصال به آی پی ایران",
+        "دکتر سحر شوکری، دندانپزشک در دوسلدورف",
+        "دکتر کاشانی، دندانپزشک در دوسلدورف",
+        "سالن زیبایی شیوا (Salon Shiva) در دوسلدورف",
+        "رستوران زیتون (Olive) در دوسلدورف"
+      ],
+      "alternates": [],
+      "structuredDataTypes": [
+        "\"@type\":\"BreadcrumbList\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebSite\"",
+        "\"@type\":\"SearchAction\"",
+        "\"@type\":\"EntryPoint\"",
+        "\"@type\":\"PropertyValueSpecification\"",
+        "\"@type\":\"Organization\"",
+        "\"@type\":\"ImageObject\""
+      ]
+    },
+    {
+      "url": "https://nationsbase.com/fa",
+      "finalUrl": "https://nationsbase.com/fa",
+      "status": 200,
+      "title": "Nationsbase | صفحه اصلی",
+      "description": "با شما در آلمان، معرفی کسب‌وکارها، رویدادها و دوره‌ها. این پلتفرم شما را به تمام کسب‌وکارها و رویدادهای ایرانی خارج از ایران متصل می‌کند",
+      "robots": "index, follow",
+      "canonical": "https://nationsbase.com/fa",
+      "lang": "fa",
+      "h1": [
+        "به خانواده nationsbase بپیوندید تا"
+      ],
+      "h2": [
+        "خدمات ما",
+        "درباره ما",
+        "آگهی‌های جدید",
+        "Faranak Amin Tinat",
+        "فروشگاه مد و پوشاک تاگ هاوس",
+        "پارتی سیلوستر",
+        "سوالات متداول"
+      ],
+      "alternates": [
+        {
+          "lang": "fa",
+          "href": "https://nationsbase.com/fa"
+        },
+        {
+          "lang": "en",
+          "href": "https://nationsbase.com/en"
+        },
+        {
+          "lang": "de",
+          "href": "https://nationsbase.com/de"
+        },
+        {
+          "lang": "x-default",
+          "href": "https://nationsbase.com/en"
+        }
+      ],
+      "structuredDataTypes": []
+    },
+    {
+      "url": "https://www.abhavij.com/",
+      "finalUrl": "https://www.abhavij.com/",
+      "status": 200,
+      "title": "ABHAVIJ - Persian Online Community",
+      "description": "اینجا با ایرانیان در سراسر جهان ارتباط بگیر Discover businesses, events, stories and connections with Iranians around the world Sign up Discover Persian…",
+      "robots": "max-snippet:-1,max-image-preview:large,max-video-preview:-1",
+      "canonical": "https://www.abhavij.com/",
+      "lang": "en-US",
+      "h1": [
+        "Events"
+      ],
+      "h2": [
+        "کامیونیتی ایرانیان خارج از ایران",
+        "A Global Community for Iranians Abroad",
+        "List of events in Photo View",
+        "Marrying Someone from a Different Culture: What You Should Know Before Building a Life Together",
+        "Why Are Europeans Thinking About Moving Abroad More Than Ever?",
+        "Football, a Shared Language for Iranians Far From Home"
+      ],
+      "alternates": [
+        {
+          "lang": "en-US",
+          "href": "https://www.abhavij.com/"
+        },
+        {
+          "lang": "fa-IR",
+          "href": "https://www.abhavij.com/fa/"
+        },
+        {
+          "lang": "en",
+          "href": "https://www.abhavij.com/"
+        },
+        {
+          "lang": "fa",
+          "href": "https://www.abhavij.com/fa/"
+        }
+      ],
+      "structuredDataTypes": [
+        "\"@type\":\"WebSite\"",
+        "\"@type\":\"SearchAction\"",
+        "\"@type\":\"EntryPoint\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"BreadcrumbList\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"ReadAction\"",
+        "\"@type\":\"Organization\"",
+        "\"@type\":\"ImageObject\"",
+        "\"@type\":\"Event\"",
+        "\"@type\":\"Place\"",
+        "\"@type\":\"PostalAddress\"",
+        "\"@type\":\"Offer\"",
+        "\"@type\":\"Event\"",
+        "\"@type\":\"Place\"",
+        "\"@type\":\"PostalAddress\"",
+        "\"@type\":\"Offer\"",
+        "\"@type\":\"Event\"",
+        "\"@type\":\"Place\"",
+        "\"@type\":\"PostalAddress\"",
+        "\"@type\":\"Offer\"",
+        "\"@type\":\"Event\"",
+        "\"@type\":\"Place\"",
+        "\"@type\":\"PostalAddress\"",
+        "\"@type\":\"Offer\""
+      ]
+    },
+    {
+      "url": "https://mainja.com/fa",
+      "finalUrl": "https://mainja.com/fa",
+      "status": 200,
+      "title": "لیست خدمات و مشاغل ایرانی در خارج - ما اینجا",
+      "description": "با ثبت آگهی خود در ما اینجا می توانید خدمات و محوصلات خود را در معرض دیده شدن مشتریان مورد نظر خود در سراسر جهان قرار دهید و به رونق کسب کار خود کمک کنید.",
+      "canonical": "https://mainja.com/fa",
+      "lang": "fa",
+      "h1": [
+        "لیست خدمات و مشاغل ایرانی خارج از کشور"
+      ],
+      "h2": [
+        "ما اینجا"
+      ],
+      "alternates": [
+        {
+          "lang": "fa",
+          "href": "https://mainja.com/fa"
+        },
+        {
+          "lang": "en",
+          "href": "https://mainja.com/en"
+        },
+        {
+          "lang": "x-default",
+          "href": "https://mainja.com"
+        }
+      ],
+      "structuredDataTypes": [
+        "\"@type\":\"Organization\"",
+        "\"@type\":\"CollectionPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\"",
+        "\"@type\":\"ItemPage\""
+      ]
+    },
+    {
+      "url": "https://nazdikia.com/",
+      "finalUrl": "https://nazdikia.com/",
+      "status": 200,
+      "title": "نزدیکیا: معرفی کسب و کارهای ایرانی و فارسی زبان - نزدیکیا",
+      "description": "نزدیکیا، محلی برای معرفی کسب و کارهای ایرانی و فارسی زبان برای ایرانیان خارج از کشور و فارسی زبانان تمام دنیا.",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "canonical": "https://nazdikia.com/",
+      "lang": "fa",
+      "h1": [
+        "هم‌زبانات همین نزدیکیا هستن؛ کسب‌وکارهای ایرانی خارج از کشور در نزدیکیا"
+      ],
+      "h2": [
+        "دسته‌بندی‌های محبوب",
+        "خدمات نزدیکیا در شهرهای مختلف",
+        "با نزدیکیا آشنا شو",
+        "کسب‌وکار ایرانی داری؟ اینجا جات خالیه!",
+        "سوالات متداول",
+        "چرا نزدیکیا؟",
+        "کسب‌وکارهای ایرانی در سراسر جهان"
+      ],
+      "alternates": [
+        {
+          "lang": "fa",
+          "href": "https://nazdikia.com/"
+        },
+        {
+          "lang": "en",
+          "href": "https://nazdikia.com/en/"
+        },
+        {
+          "lang": "x-default",
+          "href": "https://nazdikia.com/"
+        }
+      ],
+      "structuredDataTypes": [
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ReadAction\"",
+        "\"@type\":\"BreadcrumbList\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebSite\"",
+        "\"@type\":\"SearchAction\"",
+        "\"@type\":\"EntryPoint\"",
+        "\"@type\":\"PropertyValueSpecification\"",
+        "\"@type\":\"FAQPage\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Organization\"",
+        "\"@type\":\"ImageObject\"",
+        "\"@type\":\"Place\"",
+        "\"@type\":\"PostalAddress\""
+      ]
+    },
+    {
+      "url": "https://www.kojast.de/",
+      "finalUrl": "https://www.kojast.de/",
+      "status": 200,
+      "title": "Kojast.de | Iranische Ärzte, Rechtsanwälte & Restaurants finden",
+      "description": "Kojast.de | Schnelle Suche nach iranischen Unternehmen wie Allgemeinarzt, Rechtsanwalt, Restaurant oder Hausarzt. Jetzt passende Dienstleister finden!",
+      "keywords": "Iranischer Allgemeinarzt,Kojast,Iranischer Rechtsanwalt,Iranischer Hausarzt,Persischer Supermarkt,Iranischer Zahnarzt,Iranische Frauenärztin,Iranischer Steuerberater",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "canonical": "https://www.kojast.de/",
+      "lang": "de",
+      "h1": [
+        "Finden Sie iranische Services in Ihrer Nähe"
+      ],
+      "h2": [
+        "Suche",
+        "Beliebte Städte",
+        "Oft gesucht",
+        "Sie haben ein Unternehmen oder bieten eine Dienstleistung an?",
+        "Kojast in Zahlen",
+        "Ratgeber",
+        "Häufige Fragen zu Kojast",
+        "Suche"
+      ],
+      "alternates": [
+        {
+          "lang": "de",
+          "href": "https://www.kojast.de/"
+        },
+        {
+          "lang": "fa",
+          "href": "https://www.kojast.de/fa/"
+        },
+        {
+          "lang": "x-default",
+          "href": "https://www.kojast.de/"
+        }
+      ],
+      "structuredDataTypes": [
+        "\"@type\":\"WebSite\"",
+        "\"@type\":\"SearchAction\"",
+        "\"@type\":\"ImageObject\"",
+        "\"@type\":\"ImageObject\"",
+        "\"@type\":\"ContactPoint\"",
+        "\"@type\":\"PostalAddress\"",
+        "\"@type\":\"State\"",
+        "\"@type\":\"State\"",
+        "\"@type\":\"State\"",
+        "\"@type\":\"State\"",
+        "\"@type\":\"State\"",
+        "\"@type\":\"WebSite\"",
+        "\"@type\":\"SearchAction\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ImageObject\"",
+        "\"@type\":\"BreadcrumbList\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"ItemList\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ItemList\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"ListItem\"",
+        "\"@type\":\"WebPage\"",
+        "\"@type\":\"FAQPage\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\"",
+        "\"@type\":\"Question\"",
+        "\"@type\":\"Answer\""
+      ]
+    }
+  ]
+}

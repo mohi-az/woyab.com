@@ -5,12 +5,9 @@ import type { AppLocale } from "@/i18n/config";
 import { localizeBusinessContent } from "@/lib/business-localization";
 import { prisma } from "@/lib/prisma";
 import type { DirectoryFilterOption, LatestBusinessCardItem } from "@/lib/api";
+import { directoryBusinessWhere } from "@/lib/directory-seo-data";
 
-const visibleBusinessWhere = {
-  status: "ACTIVE" as const,
-  verified: true,
-  removedAt: null,
-};
+const visibleBusinessWhere = directoryBusinessWhere;
 
 export type HomeData = {
   categories: DirectoryFilterOption[];

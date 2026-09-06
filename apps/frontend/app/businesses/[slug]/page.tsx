@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const title = business.title;
-  const description = business.shortDescription ?? business.description ?? business.title;
+  const title = [business.title, business.subCategoryName || business.categoryName, business.location].filter(Boolean).join(" · ");
+  const description = (business.shortDescription || business.description || title).replace(/\s+/g, " ").trim().slice(0, 180);
 
   return publicMetadata({
     locale: toAppLocale(locale),
@@ -109,6 +109,15 @@ export default async function BusinessDetailPage({ params }: PageProps) {
             : undefined,
         }}
       />
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "WoYab", item: localizedUrl(currentLocale) },
+          { "@type": "ListItem", position: 2, name: t("pageLabel"), item: localizedUrl(currentLocale, "/businesses") },
+          { "@type": "ListItem", position: 3, name: business.title, item: pageUrl },
+        ],
+      }} />
       <BusinessDetailClient business={business} initialReviews={reviews} />
     </>
   );

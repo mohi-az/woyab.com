@@ -11,6 +11,7 @@ import { getDirection, isAppLocale } from "@/i18n/config";
 import { dirooz, geistMono, geistSans } from "@/styles/fonts";
 import "antd/dist/reset.css";
 import "./globals.css";
+import { appUrl } from "@/lib/seo";
 
 export const viewport: Viewport = {
   themeColor: "#f15b3f",
@@ -19,8 +20,6 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
 };
-
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://woyab.de";
 
 const appleStartupScreens = [
   { width: 440, height: 956, ratio: 3 },
@@ -55,7 +54,8 @@ function appleStartupMedia(
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL(appUrl),
+  metadataBase: new URL(appUrl()),
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION || undefined },
   title: {
     default: "WoYab — Alles in deiner Nähe. Für deine Community",
     template: "%s | WoYab",

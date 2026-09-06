@@ -7,6 +7,7 @@ import { isAppLocale, localizePathname } from "@/i18n/config";
 import { CookiePreferencesButton } from "@/components/privacy/CookiePreferencesButton";
 import { PwaInstallButton } from "@/components/pwa/PwaInstallButton";
 import { supportEmail } from "@/lib/mail";
+import { directoryCopy } from "@/lib/directory-seo";
 
 export default async function Footer() {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("Footer")]);
@@ -40,6 +41,7 @@ export default async function Footer() {
           <nav className="mt-5 flex flex-col items-start gap-3.5 text-sm text-slate-300">
             <Link href={href("/")} className="transition hover:text-white">{t("home")}</Link>
             <Link href={href("/businesses")} className="transition hover:text-white">{t("businesses")}</Link>
+            <Link href={href("/directory")} className="transition hover:text-white">{directoryCopy[appLocale].title}</Link>
             <Link href={href("/for-businesses")} className="transition hover:text-white">{t("businessOwners")}</Link>
           </nav>
         </div>

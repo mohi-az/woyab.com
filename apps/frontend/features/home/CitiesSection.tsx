@@ -35,7 +35,7 @@ export default async function CitiesSection({ cities }: Props) {
       id: city.id,
       name: city.name,
       count: city.count ?? 0,
-      href: `/businesses?cityId=${city.id}`,
+      href: `/directory/cities/${encodeURIComponent(city.slug)}`,
       imageUrl: CITY_IMAGES[city.slug.toLowerCase()] ?? FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],
     }));
 
@@ -48,7 +48,7 @@ export default async function CitiesSection({ cities }: Props) {
       kind: "all-cities",
       name: t("allCitiesTitle"),
       description: t("allCitiesDescription"),
-      href: "/businesses",
+      href: "/directory",
     },
   ];
 

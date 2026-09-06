@@ -33,7 +33,7 @@ export default async function CategoriesSection({ counts }: Props) {
             return (
               <Link
                 key={cat.dbId}
-                href={`/businesses?categoryId=${cat.dbId}`}
+                href={count > 0 ? `/directory/categories/${cat.slug}` : `/businesses?categoryId=${cat.dbId}`}
                 className="cat-card group relative isolate flex min-h-[9.1rem] items-center justify-center overflow-visible rounded-[1.35rem] border border-slate-200 bg-white px-3 pb-7 pt-7 text-center transition-[border-color,box-shadow] duration-300 hover:border-primary/60 hover:shadow-[0_20px_38px_rgba(241,91,63,.12)] focus-visible:border-primary/60 focus-visible:shadow-[0_20px_38px_rgba(241,91,63,.12)] sm:min-h-[10.1rem] sm:px-5 sm:pb-8 sm:pt-9"
               >
                 <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent transition duration-300 group-hover:via-primary/35 group-focus-visible:via-primary/35" />
