@@ -131,7 +131,7 @@
     "hero": {
       "eyebrow": "Persischsprachige Unternehmen in ganz Deutschland",
       "title": "Alles in deiner Nähe. Für deine Community.",
-      "description": "WoYab ist das Verzeichnis für persischsprachige Unternehmen in Deutschland - von Restaurants und Apotheken bis zu Kanzleien und Kosmetikstudios.",
+      "description": "Das Verzeichnis für persischsprachige Unternehmen in Deutschland",
       "queryPlaceholder": "Ich suche nach",
       "categoriesLabel": "Kategorien",
       "allCategories": "Alle Kategorien",
@@ -491,7 +491,7 @@
     }
   },
   "Footer": {
-    "description": "Entdecken Sie vertrauenswürdige persischsprachige Unternehmen und Dienstleistungen in ganz Deutschland.",
+    "description": "Ein praktisches Verzeichnis, um vertrauenswürdige persischsprachige Unternehmen und Dienstleistungen in ganz Deutschland zu finden.",
     "mobilePwa": "Installieren Sie die WoYab-PWA auf Ihrem iPhone oder Android-Gerät – für ein besseres mobiles Erlebnis.",
     "linksTitle": "Entdecken",
     "home": "Startseite",
