@@ -51,7 +51,8 @@ export const getDirectoryTopics = cache(async (): Promise<DirectoryTopic[]> => {
   return topics;
 });
 
-export const DIRECTORY_PAGE_SIZE = 9;
+// Directory cards use the same two-column desktop layout as /businesses.
+export const DIRECTORY_PAGE_SIZE = 10;
 
 export const getDirectoryListings = cache(async (path: string, page: number) => {
   const topics = await getDirectoryTopics();

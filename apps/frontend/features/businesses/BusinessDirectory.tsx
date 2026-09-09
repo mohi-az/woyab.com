@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { applyDirectoryDefaults, directoryRouteQuery, filtersFromSearchParams, filtersQuery, matchesDirectoryScope, type DirectoryRoute } from "@/lib/directory-route-filters";
 import {
@@ -96,6 +96,7 @@ export function BusinessDirectory({
   labels,
   route,
 }: Props) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const searchParamsKey = searchParams.toString();
   const urlFilters = useMemo(
@@ -317,6 +318,20 @@ export function BusinessDirectory({
     const query = directoryRouteQuery(filtersQuery(next), next, route?.defaults);
     return `${route?.pathname ?? "/businesses"}${query ? `?${query}` : ""}`;
   };
+  const goToPage = useCallback((page: number) => {
+    const next = { ...filters, page };
+    const query = directoryRouteQuery(filtersQuery(next), next, route?.defaults);
+    const pathname = `/${locale}${route?.pathname ?? "/businesses"}`;
+
+    // Pagination must create a router history entry. Mutating the URL with the
+    // History API leaves Next's cached route state at the old page, which made
+    // browser Back show page 1 even when the URL still contained page=8.
+    router.push(query ? `${pathname}?${query}` : pathname);
+    // Do not let the URL-sync effect replace the preceding history entry while
+    // the router transition is being applied.
+    locallyWrittenQueryRef.current = null;
+    setFilters(next);
+  }, [filters, locale, route, router]);
   const pages = visiblePages(currentPage, directory.totalPages);
   const numberFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const activeFilterCount = [
@@ -602,27 +617,27 @@ export function BusinessDirectory({
 
           {directory.totalPages > 1 ? (
             route && !location ? <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label={labels.pagination.label}>
-              {currentPage > 1 && <Link href={pageHref(currentPage - 1)} aria-label={labels.pagination.previous} className="inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 px-3"><FiChevronLeft /></Link>}
+              {currentPage > 1 && <Link href={pageHref(currentPage - 1)} aria-label={labels.pagination.previous} className="inline-flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-xl border border-slate-200 px-3"><FiChevronLeft /></Link>}
               {pages.map((page, index) => <span key={page} className="contents">
                 {index > 0 && page - pages[index - 1] > 1 && <span className="px-1 text-gray-400">&hellip;</span>}
-                <Link href={pageHref(page)} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}>{page}</Link>
+                <Link href={pageHref(page)} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}>{page}</Link>
               </span>)}
-              {currentPage < directory.totalPages && <Link href={pageHref(currentPage + 1)} aria-label={labels.pagination.next} className="inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 px-3"><FiChevronRight /></Link>}
+              {currentPage < directory.totalPages && <Link href={pageHref(currentPage + 1)} aria-label={labels.pagination.next} className="inline-flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-xl border border-slate-200 px-3"><FiChevronRight /></Link>}
             </nav> :
             <nav className="mt-10 flex flex-wrap items-center justify-center gap-2" aria-label={labels.pagination.label}>
-              <PageButton disabled={currentPage <= 1} label={labels.pagination.previous} onClick={() => updateFilters((current) => ({ ...current, page: currentPage - 1 }))}><FiChevronLeft /></PageButton>
+              <PageButton disabled={currentPage <= 1} label={labels.pagination.previous} onClick={() => goToPage(currentPage - 1)}><FiChevronLeft /></PageButton>
               {pages.map((page, index) => (
                 <span key={page} className="contents">
                   {index > 0 && page - pages[index - 1] > 1 ? <span className="px-1 text-gray-400">&hellip;</span> : null}
                   <button
                     type="button"
-                    onClick={() => updateFilters((current) => ({ ...current, page }))}
+                    onClick={() => goToPage(page)}
                     aria-current={page === currentPage ? "page" : undefined}
-                    className={`inline-flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}
+                    className={`inline-flex h-11 min-w-11 cursor-pointer items-center justify-center rounded-xl border px-3 text-sm font-bold transition ${page === currentPage ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary hover:text-primary"}`}
                   >{page}</button>
                 </span>
               ))}
-              <PageButton disabled={currentPage >= directory.totalPages} label={labels.pagination.next} onClick={() => updateFilters((current) => ({ ...current, page: currentPage + 1 }))}><FiChevronRight /></PageButton>
+              <PageButton disabled={currentPage >= directory.totalPages} label={labels.pagination.next} onClick={() => goToPage(currentPage + 1)}><FiChevronRight /></PageButton>
             </nav>
           ) : null}
         </div>

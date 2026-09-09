@@ -9,7 +9,8 @@ import { fetchBusinessDirectoryOptions } from "@/lib/business-directory-options"
 import { appLocale as toAppLocale, publicMetadata } from "@/lib/seo";
 import { getBusinessDirectoryLabels } from "@/lib/business-directory-labels";
 
-const PAGE_SIZE = 9;
+// Desktop cards are displayed in two columns, so keep every full page balanced.
+const PAGE_SIZE = 10;
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
