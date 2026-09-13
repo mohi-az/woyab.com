@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --env-file=../../packages/database/.env.development --loader ts-node/esm --watch src/server.ts",
     "build": "pnpm --dir ../.. --filter @woyab/shared build && pnpm --dir ../.. --filter @woyab/database generate && tsc",
-    "start": "pnpm --dir ../.. --filter @woyab/database generate && node dist/server.js",
+    "start": "node dist/server.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -5,7 +5,7 @@ export function GET() {
     {
       status: "ok",
       service: "frontend",
-      revision: process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
+      revision: process.env.APP_REVISION ?? process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
     },
     {
       headers: {

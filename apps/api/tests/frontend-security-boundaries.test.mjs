@@ -227,11 +227,12 @@ test("open-now filtering and labels use registered hours in the Berlin time zone
 });
 
 test("business directory facets stay data-backed and URL navigation resets client filter state", async () => {
-  const [page, directory, options, route] = await Promise.all([
+  const [page, directory, options, route, queryHelpers] = await Promise.all([
     frontendSource("app/businesses/page.tsx"),
     frontendSource("features/businesses/BusinessDirectory.tsx"),
     frontendSource("lib/business-directory-options.ts"),
     frontendSource("app/api/businesses/filter-options/route.ts"),
+    frontendSource("lib/directory-route-filters.ts"),
   ]);
 
   assert.match(page, /fetchBusinessDirectoryOptions\(locale, filters\)/);
@@ -242,8 +243,10 @@ test("business directory facets stay data-backed and URL navigation resets clien
   assert.match(directory, /locallyWrittenQueryRef\.current !== query/);
   assert.match(directory, /\/api\/businesses\/filter-options\?/);
   assert.match(directory, /setFilterOptions\(data\)/);
-  assert.match(directory, /filters\.favoritesOnly[\s\S]*params\.set\("favoritesOnly", "true"\)/);
-  assert.match(directory, /filters\.openNow[\s\S]*params\.set\("openNow", "true"\)/);
+  assert.match(directory, /from "@\/lib\/directory-route-filters"/);
+  assert.match(directory, /filtersQuery\(filters\)/);
+  assert.match(queryHelpers, /filters\.favoritesOnly[\s\S]*params\.set\("favoritesOnly", "true"\)/);
+  assert.match(queryHelpers, /filters\.openNow[\s\S]*params\.set\("openNow", "true"\)/);
   assert.match(options, /status: "ACTIVE"/);
   assert.match(options, /verified: true/);
   assert.match(options, /removedAt: null/);

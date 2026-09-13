@@ -1,0 +1,13 @@
+packages:
+  - "apps/api"
+  - "apps/frontend"
+  - "packages/database"
+  - "packages/shared"
+allowBuilds:
+  '@prisma/engines': true
+  '@sentry/cli': true
+  '@swc/core': true
+  prisma: true
+  sharp: true
+  unrs-resolver: false
+  '@scarf/scarf': false

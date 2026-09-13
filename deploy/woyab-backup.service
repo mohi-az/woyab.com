@@ -1,0 +1,8 @@
+[Unit]
+Description=WoYab persistent media and configuration backup
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/woyab/infra/backup.py

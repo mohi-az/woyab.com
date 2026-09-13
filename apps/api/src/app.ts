@@ -25,6 +25,7 @@ export const createApp = () => {
   const helmetMiddleware = (helmet as unknown as () => express.RequestHandler)();
 
   app.disable("x-powered-by");
+  if (env.TRUST_PROXY_HOPS) app.set("trust proxy", env.TRUST_PROXY_HOPS);
   app.use(requestIdMiddleware);
   app.use(httpLoggerMiddleware);
   app.use(helmetMiddleware);

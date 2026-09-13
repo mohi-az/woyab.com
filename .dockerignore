@@ -1,0 +1,15 @@
+.git
+.private
+**/.env
+**/.env.*
+**/node_modules
+**/.next
+**/dist
+**/generated
+**/.cache
+**/coverage
+**/__pycache__
+**/*.log
+apps/mobile
+apps/frontend/public/uploads
+reports

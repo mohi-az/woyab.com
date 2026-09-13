@@ -4,6 +4,11 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+  outputFileTracingRoot: resolve(process.cwd(), "../.."),
+  outputFileTracingIncludes: {
+    "/*": ["../../packages/database/generated/prisma/**/*"],
+  },
   // Railway exposes the commit SHA at build and runtime. Including it in client
   // requests lets Next detect an old browser tab after a rolling deployment.
   deploymentId: process.env.RAILWAY_GIT_COMMIT_SHA || process.env.NEXT_DEPLOYMENT_ID || undefined,

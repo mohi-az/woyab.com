@@ -5,6 +5,9 @@ import { z } from "zod";
 const envSchema = z.object({
   API_VERSION: z.string().min(1).default("v1"),
   APP_NAME: z.string().min(1).default("WoYab API"),
+  APP_REVISION: z.string().min(1).optional(),
+  DB_POOL_MAX: z.coerce.number().int().min(1).max(20).default(5),
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(1).default(0),
   CORS_ORIGIN: z.string().min(1).default("*"),
   DATABASE_URL: z.string().min(1).optional(),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),

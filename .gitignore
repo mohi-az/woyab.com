@@ -13,6 +13,8 @@ node_modules/
 !.yarn/versions/
 
 # Environment files
+.private/
+**/__pycache__/
 .env
 .env.*
 !.env.example
