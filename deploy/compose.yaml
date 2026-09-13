@@ -3,13 +3,16 @@ services:
     image: ${API_IMAGE:?immutable API digest required}
     init: true
     restart: unless-stopped
-    env_file: /opt/woyab/env/api.env
+    env_file:
+      - path: /opt/woyab/env/api.env
+        format: raw
     environment:
       NODE_ENV: production
       PORT: '4000'
       APP_REVISION: ${APP_REVISION:?release SHA required}
       DB_POOL_MAX: '5'
       TRUST_PROXY_HOPS: '1'
+      CORS_ORIGIN: https://woyab.com
       GOOGLE_PHOTO_CACHE_DIR: /data/google-photo-cache
     ports:
       - '127.0.0.1:${API_PORT:?slot API port required}:4000'
@@ -36,7 +39,9 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    env_file: /opt/woyab/env/frontend.env
+    env_file:
+      - path: /opt/woyab/env/frontend.env
+        format: raw
     environment:
       NODE_ENV: production
       PORT: '3000'

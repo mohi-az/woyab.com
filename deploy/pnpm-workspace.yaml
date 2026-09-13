@@ -4,6 +4,7 @@ packages:
   - "packages/database"
   - "packages/shared"
 allowBuilds:
+  '@parcel/watcher': true
   '@prisma/engines': true
   '@sentry/cli': true
   '@swc/core': true
