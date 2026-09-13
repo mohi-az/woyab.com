@@ -8,6 +8,9 @@ services:
         format: raw
     environment:
       NODE_ENV: production
+      # Reserve cgroup memory for Prisma/pg, native buffers and health probes.
+      NODE_OPTIONS: --max-old-space-size=96
+      MALLOC_ARENA_MAX: '2'
       PORT: '4000'
       APP_REVISION: ${APP_REVISION:?release SHA required}
       DB_POOL_MAX: '5'
@@ -44,6 +47,10 @@ services:
         format: raw
     environment:
       NODE_ENV: production
+      # Bound JS heap and concurrent native image work on the 2 GiB host.
+      NODE_OPTIONS: --max-old-space-size=160
+      MALLOC_ARENA_MAX: '2'
+      UV_THREADPOOL_SIZE: '2'
       PORT: '3000'
       HOSTNAME: 0.0.0.0
       APP_REVISION: ${APP_REVISION:?release SHA required}

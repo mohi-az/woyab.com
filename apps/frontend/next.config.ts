@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   // requests lets Next detect an old browser tab after a rolling deployment.
   deploymentId: process.env.RAILWAY_GIT_COMMIT_SHA || process.env.NEXT_DEPLOYMENT_ID || undefined,
   transpilePackages: ["@woyab/database", "@woyab/shared"],
+  // Disk cache remains available; avoid a large per-slot in-memory cache on VPS.
+  cacheMaxMemorySize: 5 * 1024 * 1024,
+  experimental: {
+    imgOptConcurrency: 1,
+  },
   turbopack: {
     root: resolve(process.cwd(), "../.."),
   },
