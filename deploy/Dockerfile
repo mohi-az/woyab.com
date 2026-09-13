@@ -30,7 +30,7 @@ FROM source AS api-build
 RUN pnpm --filter api exec tsc
 
 FROM dependencies AS api-production-dependencies
-RUN pnpm install --prod --frozen-lockfile
+RUN CI=true pnpm install --prod --frozen-lockfile
 
 FROM base AS api
 ENV NODE_ENV=production PORT=4000
@@ -40,6 +40,7 @@ COPY --from=api-build --chown=node:node /app/packages/shared/dist ./packages/sha
 COPY --from=api-build --chown=node:node /app/packages/database/generated ./packages/database/generated
 WORKDIR /app/apps/api
 USER node
+RUN node --input-type=module -e "await import('@woyab/database'); await import('@woyab/shared'); await import('pg');"
 EXPOSE 4000
 CMD ["node", "dist/server.js"]
 
