@@ -10,6 +10,15 @@
 
 woyab.com {
     encode zstd gzip
+    # Next inventories public/ at startup. Serve only existing legacy upload
+    # namespaces directly so new files do not require a container restart.
+    # Preserve their existing URLs; do not expose env/state/cache or dotfiles.
+    @legacyUploads path_regexp legacyUploads ^/uploads/(avatars|businesses|claim-notes)/[A-Za-z0-9][A-Za-z0-9._-]{0,200}\.(jpg|jpeg|png|webp|pdf)$
+    handle @legacyUploads {
+        root * /opt/woyab/media
+        header Cache-Control "private, no-store, max-age=0"
+        file_server
+    }
     handle /_next/static/* {
         root * /opt/woyab/assets
         header Cache-Control "public, max-age=31536000, immutable"
