@@ -9,7 +9,8 @@ Local implementation includes Docker builds, a web-only frozen pnpm lock,
 Compose, paired Blue/Green readiness, Caddy routing, a restricted SSH receiver,
 GitHub Actions, persistent bind mounts and seven daily local backups.
 
-VPS bootstrap, real Linux builds, secrets, media recovery, DNS cutover and end-to-end
+VPS bootstrap and private Railway environment transfer are complete. Successful
+Linux builds, full registry/CI access, media recovery, DNS cutover and end-to-end
 production checks remain pending. `VPS_DEPLOY_ENABLED` must stay unset/false until
 the initial deployment and HTTPS checks pass. Infrastructure files are installed
 separately; pushing app images does not upgrade the root-owned release controller.
@@ -25,6 +26,10 @@ separately; pushing app images does not upgrade the root-owned release controlle
    `/opt/woyab/env/frontend.env` and `/opt/woyab/env/api.env`, root:root mode 0600.
    The `.example` files are not runnable configuration. Preserve Neon URLs,
    AUTH_SECRET, OAuth, 2FA and AI encryption keys, and INTERNAL_API_SECRET.
+   Compose uses `env_file` with `format: raw`: parse the official dotenv export
+   first, then write exact values as unquoted `NAME=value` lines without changing
+   any secrets. Reject unresolved Railway references and multiline/NUL values;
+   do not put dotenv quote delimiters into these raw files.
 4. Download the Railway frontend volume with the official CLI to a private local
    directory. First verify access using `railway volume files --volume ID list /`;
    then use `railway volume files --volume ID download / LOCAL_DIRECTORY`.
