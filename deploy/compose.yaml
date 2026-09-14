@@ -47,8 +47,9 @@ services:
         format: raw
     environment:
       NODE_ENV: production
-      # Bound JS heap and concurrent native image work on the 2 GiB host.
-      NODE_OPTIONS: --max-old-space-size=160
+      # 160 MiB exhausted Next's JS heap in production. Leave native headroom
+      # within the unchanged 512 MiB cgroup and keep image concurrency bounded.
+      NODE_OPTIONS: --max-old-space-size=256
       MALLOC_ARENA_MAX: '2'
       UV_THREADPOOL_SIZE: '2'
       PORT: '3000'

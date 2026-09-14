@@ -1,4 +1,4 @@
-# VPS deployment (not yet activated)
+# VPS deployment
 
 The production database stays in Neon. These deployment commands **never** run
 Prisma migrations, `db push`, reset, or seed. Prisma Client generation is build-only.
@@ -9,11 +9,25 @@ Local implementation includes Docker builds, a web-only frozen pnpm lock,
 Compose, paired Blue/Green readiness, Caddy routing, a restricted SSH receiver,
 GitHub Actions, persistent bind mounts and seven daily local backups.
 
-VPS bootstrap and private Railway environment transfer are complete. Successful
-Linux builds, full registry/CI access, media recovery, DNS cutover and end-to-end
-production checks remain pending. `VPS_DEPLOY_ENABLED` must stay unset/false until
-the initial deployment and HTTPS checks pass. Infrastructure files are installed
-separately; pushing app images does not upgrade the root-owned release controller.
+VPS bootstrap, private Railway environment transfer, Linux builds, initial
+deployment and Cloudflare DNS/strict HTTPS cutover are complete. The workflow
+automatically deploys successful `main` builds only when repository variable
+`VPS_DEPLOY_ENABLED=true`; setting it to `false` pauses future automatic releases
+without stopping the running site. Current acceptance results and private recovery
+details are recorded outside Git in `.private/handover.md`.
+
+Infrastructure files are installed separately; pushing app images does not
+upgrade the root-owned release controller or installed Compose configuration.
+The frontend uses a 256 MiB JavaScript old-space limit inside its unchanged
+512 MiB container limit: the initial 160 MiB heap exhausted in production.
+This is additional headroom, not proof that long-term memory growth is resolved.
+
+Railway volume recovery is not a prerequisite for the current site: the read-only
+Neon audit found no current business cover/gallery references to its stored-image
+URLs. Current restaurant covers use Google proxies/fallbacks; generated medical
+and home-service covers are bundled in Git. The old volume remains untouched;
+its inaccessible contents are not claimed fully recovered. New manual business
+uploads still require the persistent business-images directory on the VPS.
 
 ## Safe initial deployment
 
