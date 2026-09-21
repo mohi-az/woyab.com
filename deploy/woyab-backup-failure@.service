@@ -1,0 +1,7 @@
+[Unit]
+Description=Notify on WoYab Backup Failure for %i
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 /opt/woyab/infra/backup.py --alert-only --service-name=%i

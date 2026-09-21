@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily WoYab Database and Configuration Backup
+OnFailure=woyab-backup-failure@%n.service
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/woyab/infra/backup.py --type=db
