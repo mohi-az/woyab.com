@@ -19,6 +19,7 @@ const envSchema = z.object({
   GOOGLE_PHOTO_CACHE_DIR: z.string().min(1).optional(),
   GOOGLE_PLACES_API_KEY: z.string().min(1).optional(),
   INTERNAL_API_SECRET: z.string().min(32).optional(),
+  GEMINI_EMBEDDING_API_KEY: z.string().min(1).optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

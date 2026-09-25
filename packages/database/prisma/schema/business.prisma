@@ -69,6 +69,7 @@ model Business {
   posts             Post[]
   reviews           Review[]
   services          Service[]
+  embedding         BusinessEmbedding?
 
   @@index([slug])
   @@index([cityId])

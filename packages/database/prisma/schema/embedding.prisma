@@ -1,0 +1,17 @@
+/// Stores the embedding vector for each business, used for semantic search.
+/// Uses pgvector extension — requires `CREATE EXTENSION vector` on the database.
+model BusinessEmbedding {
+  id           String                     @id @default(cuid())
+  businessId   String                     @unique
+  embedding    Unsupported("vector(768)")
+  documentText String                     @db.Text
+  documentHash String
+  model        String                     @default("text-embedding-004")
+  tokenCount   Int?
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @default(now()) @updatedAt
+  business     Business                   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@map("business_embeddings")
+}
