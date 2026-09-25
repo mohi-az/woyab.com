@@ -12,6 +12,8 @@ import { findBusinessMapPoints } from "./business-map.repository.js";
 import { findCurrentlyOpenBusinessIds } from "./business-hours.repository.js";
 import { findNearbyBusinesses } from "./business-search.repository.js";
 import { businessRepository } from "./business.repository.js";
+import { embeddingService } from "../embeddings/embedding.service.js";
+import { logger } from "../../logger/logger.js";
 
 function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: string[]; openBusinessIds?: string[] }) {
   const { categoryId, subCategoryId, tagIds, cityId, status, featured, verified, search } = query;
@@ -315,6 +317,55 @@ export const businessService = {
   search: async (input: BusinessSearchBody) => {
     if (!input.origin) {
       const openBusinessIds = input.openNow ? await findCurrentlyOpenBusinessIds() : undefined;
+
+      const trimmedSearch = input.search?.trim();
+      if (trimmedSearch && embeddingService.isAvailable()) {
+        try {
+          const semanticResult = await embeddingService.search({
+            query: trimmedSearch,
+            locale: input.locale,
+            categoryId: input.categoryId,
+            subCategoryId: input.subCategoryId,
+            cityId: input.cityId,
+            tagIds: input.tagIds,
+            limit: input.limit * input.page,
+            minSimilarity: 0.6,
+          });
+
+          if (semanticResult.items.length > 0) {
+            let filteredItems = semanticResult.items;
+
+            if (openBusinessIds) {
+              const openSet = new Set(openBusinessIds);
+              filteredItems = filteredItems.filter((item) => openSet.has(item.id));
+            }
+            if (input.favoriteBusinessIds && input.favoriteBusinessIds.length > 0) {
+              const favSet = new Set(input.favoriteBusinessIds);
+              filteredItems = filteredItems.filter((item) => favSet.has(item.id));
+            }
+
+            const total = filteredItems.length;
+            const startIdx = (input.page - 1) * input.limit;
+            const pagedItems = filteredItems.slice(startIdx, startIdx + input.limit);
+
+            if (pagedItems.length > 0 || input.page === 1) {
+              return {
+                items: pagedItems,
+                total,
+                page: input.page,
+                limit: input.limit,
+                totalPages: Math.ceil(total / input.limit) || 1,
+              };
+            }
+          }
+        } catch (error) {
+          logger.warn(
+            { error: (error as Error).message, query: trimmedSearch },
+            "Semantic search attempt failed, falling back to keyword search",
+          );
+        }
+      }
+
       return businessService.list({
         page: input.page,
         limit: input.limit,

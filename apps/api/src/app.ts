@@ -18,6 +18,7 @@ import { cityRouter, countryRouter, districtRouter, provinceRouter } from "./mod
 import { reviewRouter, reviewStandaloneRouter } from "./modules/reviews/review.route.js";
 import { serviceRouter } from "./modules/services/service.route.js";
 import { tagRouter } from "./modules/tags/tag.route.js";
+import { embeddingRouter } from "./modules/embeddings/embedding.route.js";
 import { healthRouter } from "./routes/health.route.js";
 
 export const createApp = () => {
@@ -67,6 +68,7 @@ export const createApp = () => {
   app.use(`${v}/provinces`, provinceRouter);
   app.use(`${v}/cities`, cityRouter);
   app.use(`${v}/districts`, districtRouter);
+  app.use(`${v}/embeddings`, embeddingRouter);
 
   app.use(notFoundMiddleware);
   app.use(errorHandlerMiddleware);
