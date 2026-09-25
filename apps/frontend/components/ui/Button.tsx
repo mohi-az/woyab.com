@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-// انواع ظاهری دکمه
+// Button appearance variants
 type ButtonVariant = "primary" | "outlined" | "ghost" | "secondary";
 type ButtonSize = "xs" | "sm" | "md" | "lg";
 
@@ -14,8 +14,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * کامپوننت دکمه قابل استفاده مجدد با DaisyUI
- * این کامپوننت پایه تمام دکمه‌های پروژه است
+ * Reusable Button component with DaisyUI
+ * Base button component across the project
  */
 export function Button({
   variant = "primary",

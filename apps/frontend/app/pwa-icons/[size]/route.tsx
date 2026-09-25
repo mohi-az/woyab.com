@@ -11,8 +11,8 @@ const markData = readFile(
   join(process.cwd(), "public", "brand", "woyab-mark.png"),
 ).then((data) => Uint8Array.from(data).buffer);
 
-// آیکون برند WoYab به صورت داینامیک تولید می‌شود
-// مثال: GET /pwa-icons/192  →  PNG 192×192
+// WoYab brand icon is generated dynamically
+// Example: GET /pwa-icons/192  →  PNG 192×192
 export async function GET(
   request: Request,
   context: { params: Promise<{ size: string }> },

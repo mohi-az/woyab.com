@@ -60,6 +60,7 @@ Desktop.ini
 .vscode/
 *.swp
 *.swo
+*.plans
 
 /apps/api/src/scripts/*
 !/apps/api/src/scripts/import-geonames-locations.ts

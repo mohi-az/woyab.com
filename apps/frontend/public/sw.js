@@ -1,14 +1,14 @@
 /**
  * WoYab PWA — Service Worker
- * استراتژی‌های کش:
- *  - Navigation (صفحات): network-first با fallback به /offline
- *  - API (/api/*):       network-first بدون کش
- *  - آیکون‌ها/static:   stale-while-revalidate
+ * Caching strategies:
+ *  - Navigation (pages): network-first with fallback to /offline
+ *  - API (/api/*):       network-first without caching
+ *  - Static/Icons:       stale-while-revalidate
  */
 
 const CACHE_NAME = "woyab-cache-v2";
 
-// منابع حیاتی که در install کش می‌شوند
+// Critical resources precached during installation
 const PRECACHE_URLS = ["/", "/offline", "/manifest.webmanifest"];
 const PRIVATE_PATH_PREFIXES = ["/admin", "/dashboard", "/business-portal"];
 
@@ -36,7 +36,7 @@ self.addEventListener("install", (event) => {
 });
 
 // ========================
-// Activate — پاک کردن کش‌های قدیمی
+// Activate — Clean up old caches
 // ========================
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -54,16 +54,16 @@ self.addEventListener("activate", (event) => {
 });
 
 // ========================
-// Fetch — انتخاب استراتژی بر اساس نوع درخواست
+// Fetch — Select strategy based on request type
 // ========================
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // فقط GET روی همین origin
+  // Only GET requests on the same origin
   if (request.method !== "GET" || url.origin !== location.origin) return;
 
-  // API calls: شبکه اول، کش نمی‌شود
+  // API calls: network-first, un-cached
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(networkOnly(request));
     return;
@@ -75,21 +75,21 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // درخواست‌های ناوبری (صفحات HTML): شبکه اول + offline fallback
+  // Navigation requests (HTML pages): network-first + offline fallback
   if (request.mode === "navigate") {
     event.respondWith(navigationStrategy(request));
     return;
   }
 
-  // بقیه (CSS, JS, تصاویر، آیکون‌ها): stale-while-revalidate
+  // Other assets (CSS, JS, images, icons): stale-while-revalidate
   event.respondWith(staleWhileRevalidate(request));
 });
 
 // ========================
-// استراتژی‌ها
+// Strategies
 // ========================
 
-/** شبکه اول — برای API */
+/** Network first — for API calls */
 async function networkOnly(request) {
   try {
     return await fetch(request);
@@ -118,7 +118,7 @@ async function privateNetworkOnly(request) {
   }
 }
 
-/** شبکه اول با offline fallback — برای صفحات */
+/** Network first with offline fallback — for HTML pages */
 async function navigationStrategy(request) {
   try {
     const response = await fetch(request);
@@ -130,7 +130,7 @@ async function navigationStrategy(request) {
   } catch {
     const cached = await caches.match(request);
     if (cached) return cached;
-    // نمایش صفحه offline
+    // Render offline page
     return (
       caches.match("/offline") ??
       new Response("<h1>Offline</h1>", {
@@ -140,7 +140,7 @@ async function navigationStrategy(request) {
   }
 }
 
-/** کش قدیمی + بروزرسانی در پس‌زمینه — برای static assets */
+/** Stale cache + background revalidation — for static assets */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
