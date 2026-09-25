@@ -64,3 +64,4 @@ Desktop.ini
 
 /apps/api/src/scripts/*
 !/apps/api/src/scripts/import-geonames-locations.ts
+!/apps/api/src/scripts/index-business-embeddings.ts
