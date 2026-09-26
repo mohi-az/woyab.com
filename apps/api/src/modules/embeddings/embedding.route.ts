@@ -19,3 +19,4 @@ embeddingRouter.post("/search", asyncHandler(embeddingController.search));
 embeddingRouter.get("/stats", requireInternalApi, asyncHandler(embeddingController.getStats));
 embeddingRouter.post("/index/:id", requireInternalApi, asyncHandler(embeddingController.reindexSingle));
 embeddingRouter.post("/test", requireInternalApi, asyncHandler(embeddingController.testSearch));
+embeddingRouter.get("/sync-status", requireInternalApi, asyncHandler(embeddingController.getSyncStatus));

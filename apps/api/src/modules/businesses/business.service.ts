@@ -13,6 +13,7 @@ import { findCurrentlyOpenBusinessIds } from "./business-hours.repository.js";
 import { findNearbyBusinesses } from "./business-search.repository.js";
 import { businessRepository } from "./business.repository.js";
 import { embeddingService } from "../embeddings/embedding.service.js";
+import { scheduleEmbeddingUpdate, scheduleEmbeddingDeletion } from "../embeddings/embedding-sync.js";
 import { logger } from "../../logger/logger.js";
 
 function businessListWhere(query: ListBusinessesQuery & { favoriteBusinessIds?: string[]; openBusinessIds?: string[] }) {
@@ -451,7 +452,9 @@ export const businessService = {
   create: async (data: CreateBusinessBody) => {
     const existing = await businessRepository.findBySlug(data.slug);
     if (existing) throw ApiError.conflict(`Business with slug "${data.slug}" already exists`);
-    return businessRepository.create(buildCreateData(data));
+    const created = await businessRepository.create(buildCreateData(data));
+    scheduleEmbeddingUpdate(created.id);
+    return created;
   },
 
   update: async (id: string, data: UpdateBusinessBody) => {
@@ -463,12 +466,16 @@ export const businessService = {
       if (existing && existing.id !== id) throw ApiError.conflict(`Business with slug "${data.slug}" already exists`);
     }
 
-    return businessRepository.update(id, buildUpdateData(current, data));
+    const updated = await businessRepository.update(id, buildUpdateData(current, data));
+    scheduleEmbeddingUpdate(id);
+    return updated;
   },
 
   delete: async (id: string) => {
     const business = await businessRepository.findById(id);
     if (!business) throw ApiError.notFound("Business not found");
-    return businessRepository.delete(id);
+    const deleted = await businessRepository.delete(id);
+    scheduleEmbeddingDeletion(id);
+    return deleted;
   },
 };

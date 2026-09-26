@@ -5,6 +5,7 @@ import {
   testSearchSchema,
 } from "./embedding.schema.js";
 import { embeddingService } from "./embedding.service.js";
+import { getSyncQueueStatus } from "./embedding-sync.js";
 
 export const embeddingController = {
   search: async (req: Request, res: Response) => {
@@ -28,5 +29,10 @@ export const embeddingController = {
     const body = testSearchSchema.parse(req.body);
     const result = await embeddingService.testSearch(body);
     res.json({ success: true, data: result });
+  },
+
+  getSyncStatus: async (_req: Request, res: Response) => {
+    const status = getSyncQueueStatus();
+    res.json({ success: true, data: status });
   },
 };
