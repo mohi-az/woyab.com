@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import {
   FiArrowLeft,
   FiArrowRight,
@@ -98,6 +99,7 @@ function ReviewAvatar({ user }: { user: BusinessReviewItem["user"] }) {
 export default function BusinessDetailClient({ business, initialReviews }: Props) {
   const t = useTranslations("BusinessDetail");
   const locale = useLocale();
+  const router = useRouter();
   const BackIcon = locale === "fa" ? FiArrowRight : FiArrowLeft;
   const directionsHref = buildDirectionsUrl({
     address: business.address,
@@ -154,6 +156,17 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
     ? null
     : t(`openStatus.${openStatus.kind}`, { time: openStatus.transitionTime ?? "" });
   const reviewIdsKey = reviews.map((review) => review.id).join(",");
+
+  function goBack() {
+    // Preserve the exact directory route (including its page and filters) when
+    // the detail page was opened from a listing. Direct visits still have a
+    // useful directory fallback instead of leaving the application.
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push("/businesses");
+  }
 
   useEffect(() => {
     if (!mobileHoursOpen) return;
@@ -433,10 +446,10 @@ export default function BusinessDetailClient({ business, initialReviews }: Props
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,18,31,.80)_0%,rgba(10,18,31,.62)_52%,rgba(10,18,31,.48)_100%)]" />
         <div className="relative mx-auto max-w-[1480px]">
           <div className="flex items-center justify-between gap-4">
-            <Link href="/businesses" className="inline-flex items-center gap-2 text-sm font-bold text-primary-light/90 transition hover:text-white">
+            <button type="button" onClick={goBack} className="inline-flex items-center gap-2 text-sm font-bold text-primary-light/90 transition hover:text-white">
               <BackIcon className="text-base" />
               {t("back")}
-            </Link>
+            </button>
             <FavoriteButton
               businessId={business.id}
               label={t("favoriteAdd")}
