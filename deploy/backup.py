@@ -164,6 +164,34 @@ def backup_media(root=DEFAULT_ROOT, config=None):
     return target
 
 
+def backup(root=DEFAULT_ROOT):
+    """Create a local media archive for the lightweight backup contract.
+
+    This helper is intentionally local-only: the systemd media job uses
+    ``backup_media`` for the production archive and remote replication, while
+    this stable entry point is useful for local retention checks and recovery
+    tooling that only needs a portable archive under ``root/backups``.
+    """
+    destination = root / "backups"
+    destination.mkdir(mode=0o700, parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S-%f")
+    target = destination / f"woyab-{stamp}.tar.gz"
+    temporary = destination / f".woyab-{stamp}.partial"
+
+    try:
+        descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "wb") as output, tarfile.open(fileobj=output, mode="w:gz") as archive:
+            media_path = root / "media"
+            if media_path.exists():
+                archive.add(media_path, arcname="media", recursive=True)
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+    prune_local(destination, "woyab-*.tar.gz", keep_count=7)
+    return target
+
+
 def main():
     parser = argparse.ArgumentParser(description="WoYab Automated Backup Runner")
     parser.add_argument(
