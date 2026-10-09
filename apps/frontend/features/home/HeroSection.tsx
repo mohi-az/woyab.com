@@ -84,7 +84,7 @@ export default function HeroSection({ categories, cities }: Props) {
           <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">{t("description")}</p>
 
           <form onSubmit={handleSearch} className="mt-9 rounded-2xl bg-white p-2.5 shadow-[0_25px_70px_rgba(0,0,0,.28)] sm:p-3">
-            <div className="grid gap-1.5 sm:grid-cols-[minmax(0,1fr)_auto_auto_52px]">
+            <div className="grid gap-1.5 sm:grid-cols-[minmax(0,1fr)_minmax(150px,200px)_auto_52px]">
               <label className="relative flex min-h-14 items-center gap-2 rounded-xl bg-gradient-to-r from-primary/10 via-violet-500/10 to-sky-500/10 px-3 text-slate-700 ring-1 ring-primary/25 focus-within:ring-2 focus-within:ring-primary/40">
                 <HiSparkles className="shrink-0 animate-pulse text-xl text-primary" aria-hidden="true" />
                 <span className="sr-only">{t("queryPlaceholder")}</span>
@@ -95,9 +95,6 @@ export default function HeroSection({ categories, cities }: Props) {
                       <span className="min-w-0 truncate">{typed}</span><span className="ms-0.5 inline-block h-4 w-px shrink-0 animate-pulse bg-primary" />
                     </span>
                   )}
-                </span>
-                <span className="hidden shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary xl:inline-flex">
-                  <HiSparkles aria-hidden="true" /> {t("smartSearch")}
                 </span>
               </label>
 
