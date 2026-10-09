@@ -133,6 +133,8 @@
       "title": "Alles in deiner Nähe. Für deine Community.",
       "description": "Das Verzeichnis für persischsprachige Unternehmen in Deutschland",
       "queryPlaceholder": "Ich suche nach",
+      "typingExamples": ["Ich suche einen Anwalt in Berlin", "Ein iranisches Restaurant in Bahnhofsnähe", "Ein Damenfriseur in Hamburg", "Eine beeidigte Persisch-Übersetzerin in München"],
+      "smartSearch": "Intelligente Suche",
       "categoriesLabel": "Kategorien",
       "allCategories": "Alle Kategorien",
       "locationPlaceholder": "Standort",

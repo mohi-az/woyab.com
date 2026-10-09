@@ -133,6 +133,8 @@
       "title": "Everything nearby. For your community.",
       "description": "The directory for Persian-speaking businesses in Germany",
       "queryPlaceholder": "I'm looking for",
+      "typingExamples": ["I'm looking for a lawyer in Berlin", "An Iranian restaurant near the train station", "A women's hairdresser in Hamburg", "A certified Persian translator in Munich"],
+      "smartSearch": "Smart search",
       "categoriesLabel": "Categories",
       "allCategories": "All categories",
       "locationPlaceholder": "Location",

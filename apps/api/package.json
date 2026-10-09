@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "node --env-file=../../packages/database/.env.development --loader ts-node/esm --watch src/server.ts",
+    "dev": "node ../../scripts/ensure-db-tunnel.mjs && node --env-file=../../packages/database/.env.development --loader ts-node/esm --watch src/server.ts",
     "build": "pnpm --dir ../.. --filter @woyab/shared build && pnpm --dir ../.. --filter @woyab/database generate && tsc",
     "start": "node dist/server.js",
     "lint": "eslint .",

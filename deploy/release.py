@@ -186,8 +186,8 @@ class Controller:
         for name in ("api", "frontend"):
             if not (self.root / "env" / f"{name}.env").is_file():
                 raise RuntimeError("Production environment files are not installed")
-        # Candidate limits are 512 + 256 MiB; keep another 192 MiB for the host.
-        if self.available() < (512 + 256 + 192) * 1024 * 1024:
+        # Candidate limits are 512 + 256 MiB; keep another 96 MiB for the host (2 GiB swap present).
+        if self.available() < (512 + 256 + 96) * 1024 * 1024:
             raise RuntimeError("Insufficient memory; current release has not been touched")
         slot = "green" if current and current["slot"] == "blue" else "blue"
         release = dict(revision=revision, frontend=frontend, api=api, sequence=int(sequence),
