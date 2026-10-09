@@ -15,6 +15,10 @@ from urllib.request import Request, urlopen
 
 SHA = re.compile(r"[0-9a-f]{40}\Z")
 REGISTRY = "ghcr.io/mohi-az/fargo-"
+# A blue/green release briefly keeps the current pair alive while starting
+# another pair (512 MiB frontend + 256 MiB API). Keep 192 MiB for the host,
+# Docker, Caddy, and process overhead before admitting the candidate.
+MIN_AVAILABLE_MEMORY = 960 * 1024 * 1024
 
 
 def validate_release(revision, frontend, api, sequence):
@@ -186,8 +190,7 @@ class Controller:
         for name in ("api", "frontend"):
             if not (self.root / "env" / f"{name}.env").is_file():
                 raise RuntimeError("Production environment files are not installed")
-        # Candidate limits are 512 + 256 MiB; keep another 96 MiB for the host (2 GiB swap present).
-        if self.available() < (512 + 256 + 96) * 1024 * 1024:
+        if self.available() < MIN_AVAILABLE_MEMORY:
             raise RuntimeError("Insufficient memory; current release has not been touched")
         slot = "green" if current and current["slot"] == "blue" else "blue"
         release = dict(revision=revision, frontend=frontend, api=api, sequence=int(sequence),
