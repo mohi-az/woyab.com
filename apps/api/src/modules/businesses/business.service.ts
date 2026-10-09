@@ -1,4 +1,4 @@
-import type { AppLocale, BusinessSearchBody } from "@woyab/shared";
+import type { AppLocale, BusinessMapBody, BusinessSearchBody } from "@woyab/shared";
 
 import { env } from "../../config/env.js";
 import { ApiError } from "../../errors/api-error.js";
@@ -314,7 +314,35 @@ function buildUpdateData(
 }
 
 export const businessService = {
-  map: findBusinessMapPoints,
+  map: async (input: BusinessMapBody) => {
+    const result = await findBusinessMapPoints(input);
+    if (result.features.length > 0 || !input.search || !embeddingService.isAvailable()) return result;
+
+    // The directory search may use semantic matching while the map's SQL
+    // filter only matches literal text. Reuse semantic matches when the
+    // literal query produced no points, so cards and map stay consistent.
+    try {
+      const semantic = await embeddingService.search({
+        query: input.search,
+        locale: input.locale,
+        categoryId: input.categoryId,
+        subCategoryId: input.subCategoryId,
+        cityId: input.cityId,
+        tagIds: input.tagIds,
+        limit: 100,
+        minSimilarity: env.SEMANTIC_MIN_SIMILARITY,
+      });
+      if (semantic.items.length === 0) return result;
+      return findBusinessMapPoints({
+        ...input,
+        search: undefined,
+        businessIds: semantic.items.map((item) => item.id),
+      });
+    } catch (error) {
+      logger.warn({ error: (error as Error).message }, "Semantic map fallback failed");
+      return result;
+    }
+  },
 
   search: async (input: BusinessSearchBody) => {
     if (!input.origin) {

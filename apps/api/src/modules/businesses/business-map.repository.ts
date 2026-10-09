@@ -55,7 +55,7 @@ const mapGlyphByCategorySlug: Record<string, string> = {
   "legal-financial": "\u2696",
 };
 
-export async function findBusinessMapPoints(input: BusinessMapBody) {
+export async function findBusinessMapPoints(input: BusinessMapBody & { businessIds?: string[] }) {
   const requestedLocale = appLocaleToContentLocale(input.locale);
   const conditions = [
     Prisma.sql`b."status" = 'ACTIVE'::"business_status"`,
@@ -86,6 +86,11 @@ export async function findBusinessMapPoints(input: BusinessMapBody) {
   if (input.favoriteBusinessIds) {
     conditions.push(input.favoriteBusinessIds.length
       ? Prisma.sql`b."id" IN (${Prisma.join(input.favoriteBusinessIds)})`
+      : Prisma.sql`FALSE`);
+  }
+  if (input.businessIds) {
+    conditions.push(input.businessIds.length
+      ? Prisma.sql`b."id" IN (${Prisma.join(input.businessIds)})`
       : Prisma.sql`FALSE`);
   }
   if (input.openNow) conditions.push(currentlyOpenBusinessCondition());
