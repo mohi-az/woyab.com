@@ -1,5 +1,6 @@
 import type { AppLocale, BusinessSearchBody } from "@woyab/shared";
 
+import { env } from "../../config/env.js";
 import { ApiError } from "../../errors/api-error.js";
 import type { CreateBusinessBody, ListBusinessesQuery, UpdateBusinessBody } from "./business.schema.js";
 import {
@@ -330,7 +331,7 @@ export const businessService = {
             cityId: input.cityId,
             tagIds: input.tagIds,
             limit: input.limit * input.page,
-            minSimilarity: 0.6,
+            minSimilarity: env.SEMANTIC_MIN_SIMILARITY,
           });
 
           if (semanticResult.items.length > 0) {
@@ -358,6 +359,11 @@ export const businessService = {
                 totalPages: Math.ceil(total / input.limit) || 1,
               };
             }
+          } else {
+            logger.info(
+              { query: trimmedSearch, minSimilarity: env.SEMANTIC_MIN_SIMILARITY },
+              "Semantic search returned no matches above threshold, falling back to keyword search",
+            );
           }
         } catch (error) {
           logger.warn(

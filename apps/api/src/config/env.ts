@@ -20,6 +20,7 @@ const envSchema = z.object({
   GOOGLE_PLACES_API_KEY: z.string().min(1).optional(),
   INTERNAL_API_SECRET: z.string().min(32).optional(),
   GEMINI_EMBEDDING_API_KEY: z.string().min(1).optional(),
+  SEMANTIC_MIN_SIMILARITY: z.coerce.number().min(0).max(1).default(0.45),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
